@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-
+  <meta charset="utf-8">
   <title>polygonplanet/Pot.js @ GitHub</title>
-
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #6a58b6;
+      background-color: #f8f8ff;
       font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+      color: #555;
+      line-height: 1.5;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #95a749; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #336699; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #95a749; }
-    h3 { text-align: center; color: #95a749; }
-    a { color: #95a749; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    h2 { font-size: 1.5em; color: #336699; }
+    h3 { text-align: center; color: #336699; }
+    a { color: #9999ff; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; }
     .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
+    pre { font-size: small; background: #fff; color: #333; padding: 15px; border: 1px solid #aaa; }
+    pre .keyword  { font-weight: bold; }
+    pre .comment  { color: #888; }
+    pre .reserved { color: #336699; }
+    pre .string   { color: #996633; }
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    blockquote { font-style: normal; background: #ddd; padding: 10px; }
     .footer { text-align:center; padding-top:30px; font-style: italic; }
   </style>
 </head>
@@ -46,21 +50,179 @@
       <span class="small">by <a href="http://github.com/polygonplanet">polygonplanet</a></span></h1>
 
     <div class="description">
-      Pot.js is a JavaScript library which is fully ECMAScript compliant.
+      Pot.js - JavaScript utility library.
     </div>
-
-    <p>Pot.js implements practical tendency as a substitution utility library.
-That includes asynchronous methods as "Deferred" for solution to heavy process.
-That is fully ECMAScript compliant.
-
-主に非同期/同期/非ブロックでのループ処理を扱うJavaScriptライブラリ。
-</p><h2>Install</h2>
-<p>require "pot.js" or "potlite.js".
-
-<code>
-<script type="text/javascript" src="pot.min.js"></script>
-</code>
+    <!--p>
+      <div>
+        Pot.js implements practical tendency as a substitution utility library.
+      </div>
+      <div>
+        That includes asynchronous methods as &quot;<strong>Deferred</strong>&quot; for solution to heavy process.
+      </div>
+      <div>
+        That is fully ECMAScript compliant.
+      </div>
+    </p>
+    <hr/-->
+    <p>
+      主に非同期/同期/非ブロックでのループ処理を扱う JavaScript ライブラリ。
+      <br/>
+      MochKit ライクな <strong>Deferred</strong> オブジェクトにより
+      <br/>
+      CPU 負荷を軽減するイテレート (forEach, repeat, forEver など) を可能とします。
+    </p>
+    <p>
+      元々は JSDeferred の概要から派生しています。
+      
+      <p><a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html">JSDeferred 紹介</a> より引用：</p>
+      <blockquote>
+       <p>
+        <p>JavaScript における「高速化」</p>
+        <p>
+         JavaScript における「高速化」では、単純に処理速度の高速化というよりは、
+         ユーザ体験のストレスをいかになくすかがとても重要です。
+        </p>
+       </p>
+      </blockquote>
+      <br/>
+      そこで、Pot.js は、非同期処理を直列的に書けるようにする Deferred を調整し、
+      forEach, map, reduce, some, every, repeat, forEver といったイテレート関数と結びつけ、
+      更なるストレス軽減を目標としています。
+      <br/>
+      Deferred.forEach(obj, function() {...}) のように Deferred オブジェクトからコールした場合、
+      非同期で処理が行われ 各ループはコールバック関数の処理の重さにより負荷がかからないよう、
+      自動で wait 等を使い処理を調整します。
+      <br/>
+      Deferred チェインでも同じ扱いですが、引数が異なります。
+      <br/>
+      (例： <code>(new Deferred()).forEach(function(val, key) {...}).begin([1, 2, 3]);</code> )
+      <br/>
+      <p>
+       この処理をすることで、例えば 10000 程の巨大なアイテム数を持つオブジェクトに対して
+       for-in でループした場合と
+       Deferred.forEach で実行した場合、
+       全体の処理の重さは大きな差が出ます。
+       また、それによりブラウザによって発行される、
+       「処理が重くなっています、中断しますか？」などのメッセージを回避することができます。
+      </p>
+      また、イテレータを同期する場合は Pot.forEach (globalize してる場合は forEach) を使います。
+      同期に関しては、wait が可能な環境のみ速度調整します (XUL 上など)。
+      それ以外の環境でも多少は軽減されるでしょう。
+      <p>
+      Deferred に関連する イテレータのすべては、速度を調整することができます。
+      <br/>
+      遅くする場合は、<code>Deferred.forEach.slow(obj, function() {...});</code>
+      <br/>
+      逆に速くしたい場合は、<code>Deferred.forEach.fast(obj, function() {...});</code>
+      <br/>
+      などといった指定が可能です。
+      他には 遅い順に limp, doze, slow, normal, fast, rapid, ninja が指定可能です。
+      その場に応じて使い分けができます。
+      </p>
+    </p>
 </p>
+<h2>Documentation</h2>
+<dl>
+  <dt><strong>potlite.js</strong></dt>
+  <dd>
+   <p>
+    Deferred と Iterators のみに限定したライトバージョン。
+   </p>
+   <p>
+    potlite.min.js は potlite.js を minify した実用向け。
+   </p>
+  </dd>
+  <dt><strong>pot.js</strong></dt>
+  <dd>
+   <p>
+    すべてのオブジェクトが利用できるフルバージョン。
+   </p>
+   <p>
+    (現在調整中)
+   </p>
+  </dd>
+</dl>
+<div>
+ <ul>
+  <li><a href="jsdoc/potlite/index.html">PotLite.js JSDoc</a></li>
+  <li>(フルバージョンは調整中です。)</li>
+ </ul>
+</div>
+<p><br/></p>
+<h2>Compatibility</h2>
+<div>
+ <p>About Web Browser Compatibility</p>
+ <ul>
+  <li>Firefox *</li>
+  <li>Internet Explorer 6+</li>
+  <li>Safari *</li>
+  <li>Opera *</li>
+  <li>Google Chrome *</li>
+ </ul>
+ <p>And, will be can runs with the following systems:</p>
+ <ul>
+  <li>Greasemonkey</li>
+  <li>Mozilla firefox Add-On (on XUL)</li>
+  <li>Node.js</li>
+  <li>Other non-browser environment</li>
+ </ul>
+</div>
+<h2>Install</h2>
+<div>
+<p>require &quot;pot.js&quot; or &quot;potlite.js&quot;.</p>
+<pre>
+  &lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;
+    or
+  &lt;script type="text/javascript" src="pot.min.js"&gt;&lt;/script&gt;
+</pre>
+</div>
+<h2>Usage</h2>
+<div>
+<p>Example of the simple Deferred usage.</p>
+<pre>
+<span class="comment">// Globalize all of Pot methods.</span>
+<span class="keyword">Pot</span>.<span class="keyword">globalize</span>();
+
+<span class="reserved">var</span> result = [];
+<span class="reserved">var</span> d = <span class="reserved">new</span> <span class="keyword">Deferred</span>();
+d.<span class="keyword">then</span>(<span class="reserved">function</span>() {
+  <span class="reserved">return</span> [1, 2, 3, 4, 5];
+}).<span class="keyword">forEach</span>(<span class="reserved">function</span>(val, key) {
+  result.push(val + 10);
+}).<span class="keyword">then</span>(<span class="reserved">function</span>() {
+  alert(result); <span class="comment">// [11, 12, 13, 14, 15]</span>
+  <span class="reserved">return</span> <span class="keyword">begin</span>(<span class="reserved">function</span>() {
+    <span class="reserved">return</span> result;
+  }).<span class="keyword">map</span>.<span class="keyword">slow</span>(<span class="reserved">function</span>(val) {
+    <span class="comment">// Specify speed is &quot;slow&quot;.</span>
+    <span class="reserved">return</span> val + 100;
+  });
+}).<span class="keyword">wait</span>(1).<span class="keyword">then</span>(<span class="reserved">function</span>(res) {
+  <span class="comment">// Wait 1 second.</span>
+  alert(res); <span class="comment">// [111, 112, 113, 114, 115]</span>
+  <span class="reserved">return</span> res;
+}).<span class="keyword">async</span>(<span class="reserved">true</span>).<span class="keyword">speed</span>(<span class="string">&#039;slow&#039;</span>).<span class="keyword">then</span>(<span class="reserved">function</span>(res) {
+  <span class="comment">// Set the async and speed for callback chain.</span>
+  <span class="comment">// Occurs an error.</span>
+  undefinedFunc.call();
+}).<span class="keyword">rescue</span>(<span class="reserved">function</span>(err) {
+  <span class="comment">// Catch the error.</span>
+  alert(err);
+  <span class="reserved">return</span> {foo: 1, bar: 10, baz: 100};
+}).<span class="keyword">reduce</span>(<span class="reserved">function</span>(a, b) {
+  <span class="reserved">return</span> a + b;
+}).<span class="keyword">then</span>(<span class="reserved">function</span>(res) {
+  alert(res); <span class="comment">// 111</span>
+  <span class="reserved">return</span> res;
+}).<span class="keyword">begin</span>(); <span class="comment">// Begin callback chain.</span>
+<span class="comment">// Then continue chains.</span>
+d.<span class="keyword">then</span>(<span class="reserved">function</span>(res) {
+  result = res;
+  alert(result); <span class="comment">// 111</span>
+}).<span class="keyword">end</span>(); <span class="comment">// Optionally, end the chain.</span>
+</pre>
+</div>
+
 <h2>License</h2>
 <p>Dual licensed under the MIT and GPL v2 licenses.</p>
 <h2>Authors</h2>
