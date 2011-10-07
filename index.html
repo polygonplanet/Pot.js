@@ -67,9 +67,9 @@
     <p>
       主に非同期/同期/非ブロックでのループ処理を扱う JavaScript ライブラリ。
       <br/>
-      MochKit ライクな <strong>Deferred</strong> オブジェクトにより
+      MochiKit ライクな <strong>Deferred</strong> オブジェクトにより
       <br/>
-      CPU 負荷を軽減するイテレート (forEach, repeat, forEver など) を可能とします。
+      CPU 負荷を軽減するイテレート (forEach, filter, map, repeat, some など) を可能とします。
     </p>
     <p>
       元々は JSDeferred の概要から派生しています。
@@ -98,7 +98,7 @@
       (例： <code>(new Deferred()).forEach(function(val, key) {...}).begin([1, 2, 3]);</code> )
       <br/>
       <p>
-       この処理をすることで、例えば 10000 程の巨大なアイテム数を持つオブジェクトに対して
+       この処理をすることで、例えば 10000 程の巨大なアイテム数を持つ配列に対して
        for-in でループした場合と
        Deferred.forEach で実行した場合、
        全体の処理の重さは大きな差が出ます。
@@ -226,9 +226,11 @@ d.<span class="keyword">then</span>(<span class="reserved">function</span>(res) 
 <h2>License</h2>
 <p>Dual licensed under the MIT and GPL v2 licenses.</p>
 <h2>Authors</h2>
-<p>polygon planet (polygon.planet@gmail.com)<br/></p>
+<p>polygon planet (polygon.planet@gmail.com)
+<br/></p>
 <h2>Contact</h2>
-<p>polygon planet (polygon.planet@gmail.com)<br/></p>
+<p>polygon planet (polygon.planet@gmail.com)
+<br/></p>
 
 
     <h2>Download</h2>

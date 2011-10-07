@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred.begin</title>
+		<title>JsDoc Reference - Pot.Debug</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -264,7 +264,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Function Namespace Pot.Deferred.begin
+				Namespace Pot.Debug
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -281,8 +281,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred.begin.">
-				<caption>Function Namespace Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Debug.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -294,9 +294,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#constructor">Pot.Deferred.begin</a></b>(x)
+								<b><a href="../symbols/Pot.Debug.html#constructor">Pot.Debug</a></b>
 							</div>
-							<div class="description">A shortcut faster way of creating new Deferred sequence.</div>
+							<div class="description">Debugging utilities.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -305,85 +305,27 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred.begin.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.Debug.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#doze">doze</a></b>
+								<div class="fixedFont">Pot.Debug.<b><a href="../symbols/Pot.Debug.html#.debug">debug</a></b>(msg)
 								</div>
-								<div class="description">Return new Deferred with slower speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#fast">fast</a></b>
-								</div>
-								<div class="description">Return new Deferred with fast speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#limp">limp</a></b>
-								</div>
-								<div class="description">Return new Deferred with slowest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#ninja">ninja</a></b>
-								</div>
-								<div class="description">Return new Deferred with fastest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#normal">normal</a></b>
-								</div>
-								<div class="description">Return new Deferred with normal speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#rapid">rapid</a></b>
-								</div>
-								<div class="description">Return new Deferred with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.begin.html#slow">slow</a></b>
-								</div>
-								<div class="description">Return new Deferred with slow speed.</div>
+								<div class="description">Output to the console using log function for debug.</div>
 							</td>
 						</tr>
 					
@@ -393,9 +335,6 @@ ul.inheritsList
 				
 				
 			
-
-<!-- ============================== methods summary ======================== -->
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -403,52 +342,25 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Function Namespace Detail
+					Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.Deferred.begin</b>(x)
+						<b>Pot.Debug</b>
 				</div>
 				
 				<div class="description">
-					A shortcut faster way of creating new Deferred sequence.
+					Debugging utilities.
 					
 				</div>
 				
 				
 				
-				<pre class="code">  Pot.Deferred.begin(function() {
-    debug('Begin Deferred.begin');
-  }).wait(1).then(function() {
-    debug('End Deferred.begin');
-  });
-  // Without having to call  the ".begin()", has already executed.</pre>
-				
-				
-				
 				
 					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								<span class="light fixedFont">{Function|*}</span>  <b>x</b>
-								
-							</dt>
-								<dd>A callback function or any value.</dd>
-						
-						</dl>
 					
 					
 					
-					
-					
-						<dl class="detailList">
-						<dt class="heading">Returns:</dt>
-						
-								<dd><span class="light fixedFont">{Deferred}</span> Return a new Deferred.</dd>
-						
-						</dl>
 					
 					
 					
@@ -458,167 +370,53 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="doze"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>doze</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slower speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with fast speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slowest speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with fastest speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with normal speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with faster speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slow speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name=".debug"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Debug.</span><b>debug</b>(msg)
+					
+					</div>
+					<div class="description">
+						Output to the console using log function for debug.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug('hoge'); // hoge</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>msg</b>
+									
+								</dt>
+								<dd>A log message, or variable.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					
+				
 			
 			
 <!-- ============================== event details ========================= -->		
