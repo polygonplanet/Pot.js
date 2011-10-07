@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.01, 2011-10-07
+ * Version 1.02, 2011-10-07
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -29,7 +29,7 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.01
+ * @version        1.02
  * @date           2011-10-07
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -63,7 +63,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.01', TYPE : 'lite'},
+var Pot = {VERSION : '1.02', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -1390,9 +1390,7 @@ function debug(msg) {
       } catch (e) {
         try {
           console.log(msg);
-        } catch (e) {
-          throw msg;
-        }
+        } catch (e) {}
       }
     }
   }
@@ -7701,6 +7699,368 @@ update(Pot.Crypt, {
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of Net.
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Net utilities.
+   *
+   * @name Pot.Net
+   * @type Object
+   * @class
+   * @static
+   * @public
+   */
+  Net : {}
+});
+
+update(Pot.Net, {
+  /**
+   * @lends Pot.Net
+   */
+  /**
+   * The XMLHttpRequest handler object.
+   *
+   * @type Object
+   * @class
+   * @public
+   * @static
+   */
+  XHR : {
+    /**
+     * @lends Pot.Net.XHR
+     */
+    /**
+     * Send HTTP request with the XMLHttpRequest.
+     *
+     *
+     * @example
+     *   Pot.Net.XHR.request('/data.cgi', {
+     *     method : 'POST',
+     *     sendContent : {
+     *       query  : 'Book OR Media',
+     *       start  : 0,
+     *       length : 15,
+     *       format : 'json'
+     *     },
+     *     headers : {
+     *       'Content-Type' : 'text/javascript'
+     *     }
+     *   }).then(function(res) {
+     *     debug(res.responseText);
+     *   }, function(err) {
+     *     debug('Error!');
+     *     debug(err);
+     *   });
+     *
+     *
+     * @param  {String}     url      The request URL.
+     * @param  {Object}   (options)  Request options.
+     *                                 +----------------------------------
+     *                                 | Available options:
+     *                                 +----------------------------------
+     *                                 - method      : {String}    'GET'
+     *                                 - sendContent : {Object}    null
+     *                                 - queryString : {Object}    null
+     *                                 - username    : {String}    null
+     *                                 - password    : {String}    null
+     *                                 - headers     : {Object}    null
+     *                                 - mimeType    : {String}    null
+     *
+     * @return {Deferred}            Return the instance of Pot.Deferred.
+     * @type Function
+     * @function
+     * @class
+     * @public
+     * @static
+     */
+    request : (function() {
+      var jsonp;
+      /**@ignore*/
+      function encode(s) {
+        return encodeURIComponent(stringify(s, false));
+      }
+      /**@ignore*/
+      function serialize(query) {
+        var queries = [];
+        if (Pot.isString(query)) {
+          return stringify(query);
+        } else if (!query) {
+          return '';
+        }
+        if (Pot.isObject(query) || Pot.isArrayLike(query)) {
+          each(query, function(v, k) {
+            var item, key, val, sep, ok = true;
+            item = Pot.isArray(v) ? v : [k, v];
+            try {
+              key = stringify(item[0], false);
+              val = stringify(item[1], false);
+            } catch (e) {
+              ok = false;
+            }
+            if (ok && (key || val)) {
+              sep = key ? '=' : '';
+              queries[queries.length] = encode(key) + sep + encode(val);
+            }
+          });
+        }
+        return queries.join('&');
+      }
+      /**@ignore*/
+      function buildURL(url, query) {
+        var u, q, p;
+        u = stringify(url);
+        p = (~u.indexOf('?')) ? '&' : '?';
+        q = stringify(serialize(query));
+        while (u.slice(-1) === p) {
+          u = u.slice(0, -1);
+        }
+        while (q.charAt(0) === p) {
+          q = q.substring(1);
+        }
+        if (q) {
+          q = p + q;
+        }
+        return u ? u + q : null;
+      }
+      /**@ignore*/
+      function factory() {
+        try {
+          return new XMLHttpRequest();
+        } catch (e) {
+          try {
+            return new ActiveXObject('Microsoft.XMLHTTP');
+          } catch (e) {}
+        }
+      }
+      /**@ignore*/
+      jsonp = (function() {
+        /**@ignore*/
+        var PATTERNS = {
+          KEY  : /json|call/i,
+          DONE : /loaded|complete/
+        };
+        /**@ignore*/
+        function getDoc() {
+          try {
+            return (typeof document !== 'undefined' && document) ||
+                    (globals && globals.document) ||
+                    (Pot.Global && Pot.Global.document);
+          } catch (e) {}
+        }
+        /**@ignore*/
+        function getHead(doc) {
+          try {
+            return doc.head ||
+                  doc.getElementsByTagName('head')[0] ||
+                  doc.documentElement;
+          } catch (e) {}
+        }
+        /**@ignore*/
+        function insertId(url, id, defaults) {
+          var uri = stringify(url), c;
+          c = '=?';
+          if (~uri.indexOf(c)) {
+            uri = uri.replace(c, '=' + id);
+          } else {
+            c = '?';
+            if (~uri.indexOf(c)) {
+              uri = uri.replace(c, c + defaults + '=' + id);
+            } else {
+              while (uri.slice(-1) === '&') {
+                uri = uri.slice(0, -1);
+              }
+              uri = uri + c + defaults + '=' + id;
+            }
+          }
+          return uri;
+        }
+        /**@ignore*/
+        return function(url, options) {
+          var d, opts, context, id;
+          var doc, uri, head, script, done, defaults;
+          defaults = 'callback';
+          d = new Pot.Deferred();
+          opts    = options || {};
+          context = globals || Pot.Global;
+          doc     = getDoc();
+          head    = getHead(doc);
+          if (!context || !doc || !head || !url) {
+            return d.raise(context || url || head || doc);
+          }
+          try {
+            do {
+              id = buildSerial(Pot, '');
+            } while (id in context);
+            uri = buildURL(
+              insertId(url, id, defaults),
+              opts.queryString || opts.sendContent
+            );
+            script = doc.createElement('script');
+            script.async = 'async';
+            if (opts.type) {
+              script.type = opts.type;
+            }
+            if (opts.charset) {
+              script.charset = opts.charset;
+            }
+            /**@ignore*/
+            context[id] = function() {
+              try {
+                delete context[id];
+              } catch (e) {
+                try {
+                  context[id] = null;
+                } catch (e) {}
+              }
+              try {
+                if (script) {
+                  script.parentNode.removeChild(script);
+                }
+                script = undefined;
+              } catch (e) {}
+              d.begin.apply(d, arguments);
+            };
+            script.src = uri;
+            /**@ignore*/
+            script.onload =
+            /**@ignore*/
+            script.onreadystatechange = function(a, isAbort) {
+              if (!done &&
+                  (isAbort === 1 || !script.readyState ||
+                   PATTERNS.DONE.test(script.readyState))
+              ) {
+                done = true;
+                try {
+                  script.onload = script.onreadystatechange = null;
+                } catch (e) {}
+                if (head && script.parentNode) {
+                  try {
+                    head.removeChild(script);
+                  } catch (e) {}
+                }
+                script = undefined;
+              }
+            };
+            d.canceller(function() {
+              try {
+                if (script) {
+                  script.onload(0, 1);
+                }
+              } catch (e) {}
+            });
+            head.insertBefore(script, head.firstChild);
+          } catch (e) {
+            d.raise(e);
+          }
+          return d;
+        };
+      })();
+      /**@ignore*/
+      return update(function(url, options) {
+        var d, req, opts, method, uri, data, type;
+        d = new Pot.Deferred();
+        req = factory();
+        if (!req || !url) {
+          return d.raise(req || url);
+        }
+        try {
+          opts = options || {};
+          method = trim(opts.method).toUpperCase() || 'GET';
+          uri = buildURL(url, opts.queryString);
+          if (opts.sendContent) {
+            data = serialize(opts.sendContent);
+          }
+          if (data && method === 'GET') {
+            method = 'POST';
+          }
+          if (opts.username != null) {
+            req.open(
+              method, uri, true,
+              stringify(opts.username, false),
+              stringify(opts.password, false)
+            );
+          } else {
+            req.open(method, uri, true);
+          }
+          try {
+            if (req.overrideMimeType && opts.mimeType) {
+              req.overrideMimeType(opts.mimeType);
+            }
+          } catch (e) {}
+          type = opts.contentType;
+          if (opts.headers) {
+            each(opts.headers, function(v, k) {
+              if (!type && /^Content-?Type/i.test(k)) {
+                type = v;
+              } else {
+                req.setRequestHeader(k, v);
+              }
+            });
+          }
+          if (!type && method === 'POST') {
+            type = 'application/x-www-form-urlencoded';
+          }
+          if (type) {
+            req.setRequestHeader('Content-Type', type);
+          }
+          /**@ignore*/
+          req.onreadystatechange = function() {
+            if (req.readyState == 4) {
+              try {
+                req.onreadystatechange = Pot.noop || null;
+              } catch (e) {}
+              d.begin(req);
+            }
+          };
+          req.send(data || null);
+        } catch (e) {
+          d.raise(e);
+        }
+        d.xhr = req;
+        return d;
+      }, {
+        /**
+         * @lends Pot.Net.XHR.request
+         */
+        /**
+         * Send request by JSONP.
+         *
+         *
+         * @example
+         *   // Same as jQuery.jsonp usage.
+         *   var url = 'http://www.example.com/jsonpTest?callback=?';
+         *   Pot.Net.XHR.request.jsonp(url, {
+         *     queryString : {
+         *       q : 'JavaScript OR ECMAScript'
+         *     }
+         *   }).then(function(data) {
+         *     debug(data.results[0].text);
+         *   });
+         *
+         *
+         * @param  {String}     url      The request URL.
+         * @param  {Object}   (options)  Request options.
+         *                                 +----------------------------------
+         *                                 | Available options:
+         *                                 +----------------------------------
+         *                                 - queryString : {Object}    null
+         *
+         * @return {Deferred}            Return the instance of Pot.Deferred.
+         * @type Function
+         * @function
+         * @public
+         * @static
+         */
+        jsonp : jsonp
+      })
+    })()
+  }
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
 Pot.update({
   /**
@@ -8103,6 +8463,8 @@ update(Pot.Internal, {
     range           : Pot.range,
     indexOf         : Pot.indexOf,
     lastIndexOf     : Pot.lastIndexOf,
+    request         : Pot.Net.XHR.request,
+    jsonp           : Pot.Net.XHR.request.jsonp,
     rescape         : rescape,
     arrayize        : arrayize,
     invoke          : invoke,
