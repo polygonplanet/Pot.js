@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred.filter</title>
+		<title>JsDoc Reference - GLOBAL</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -270,7 +270,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Function Namespace Pot.Deferred.filter
+				Built-In Namespace GLOBAL
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -281,40 +281,16 @@ ul.inheritsList
 				
 				
 				
-					<br /><i>Defined in: </i> &lt;potlite.js&gt;.
-				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
-			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred.filter.">
-				<caption>Function Namespace Summary</caption>
-				<thead>
-					<tr>
-						<th scope="col">Constructor Attributes</th>
-						<th scope="col">Constructor Name and Description</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td class="attributes">&nbsp;</td>
-						<td class="nameDescription" >
-							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#constructor">Pot.Deferred.filter</a></b>(object, callback, (context))
-							</div>
-							<div class="description">Creates a new object with all elements that
- pass the test implemented by the provided function.</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
 			
 
 <!-- ============================== properties summary ===================== -->
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred.filter.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class GLOBAL.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -328,69 +304,9 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#doze">doze</a></b>
+								<!--b><a href="../symbols/GLOBAL.html#value">value</a></b-->
 								</div>
-								<div class="description">Iterates "filter" loop with slower speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#fast">fast</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with fast speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#limp">limp</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with slowest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#ninja">ninja</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with fastest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#normal">normal</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with default speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#rapid">rapid</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.filter.html#slow">slow</a></b>
-								</div>
-								<div class="description">Iterates "filter" loop with slow speed.</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -408,79 +324,6 @@ ul.inheritsList
 
 <!-- ============================== constructor details ==================== -->		
 			
-			<div class="details"><a name="constructor"> </a>
-				<div class="sectionTitle">
-					Function Namespace Detail
-				</div>
-				
-				<div class="fixedFont">
-						<b>Pot.Deferred.filter</b>(object, callback, (context))
-				</div>
-				
-				<div class="description">
-					Creates a new object with all elements that
- pass the test implemented by the provided function.
-
-Iteration will use the results of the previous chain.
-
-This method like Array.prototype.filter
-					
-				</div>
-				
-				
-				
-				<pre class="code">  var numbers = [12, 5, 8, 130, 44];
-  Pot.Deferred.filter(numbers, function(value, index, array) {
-    return (value >= 10);
-  }).then(function(result) {
-    debug(result);
-  });
-  // @results result = [12, 130, 44]</pre>
-				
-				
-				
-				
-					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								<span class="light fixedFont">{Array|Object|*}</span>  <b>object</b>
-								
-							</dt>
-								<dd>A target object.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{Function}</span>  <b>callback</b>
-								
-							</dt>
-								<dd>A callback function.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{*}</span>  <b>(context)</b>
-								
-							</dt>
-								<dd>(Optional) Object to use
-                                     as `this` when executing callback.</dd>
-						
-						</dl>
-					
-					
-					
-					
-					
-						<dl class="detailList">
-						<dt class="heading">Returns:</dt>
-						
-								<dd><span class="light fixedFont">{*}</span> Return the result of each callbacks.</dd>
-						
-						</dl>
-					
-					
-					
-
-			</div>
-			
 
 <!-- ============================== field details ========================== -->		
 			
@@ -488,147 +331,15 @@ This method like Array.prototype.filter
 					Field Detail
 				</div>
 				
-					<a name="doze"> </a>
+					<a name="value"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{Function}</span>
-					<b>doze</b>
+					
+					<!--b>value</b-->
 					
 					</div>
 					<div class="description">
-						Iterates "filter" loop with slower speed.
 						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with fast speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with slowest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with fastest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with default speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with faster speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Iterates "filter" loop with slow speed.
 						
 						
 					</div>
@@ -657,7 +368,7 @@ This method like Array.prototype.filter
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Oct 08 2011 01:48:58 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Oct 08 2011 01:48:57 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

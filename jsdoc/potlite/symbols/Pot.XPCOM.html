@@ -189,7 +189,7 @@ ul.inheritsList
 <h2>Classes</h2>
 <ul class="classList">
 	
-	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	<li><i><a href="../symbols/GLOBAL.html">GLOBAL</a></i></li>
 	
 	<li><a href="../symbols/Pot.html">Pot</a></li>
 	
@@ -244,6 +244,12 @@ ul.inheritsList
 	<li><a href="../symbols/Pot.iterate.html">Pot.iterate</a></li>
 	
 	<li><a href="../symbols/Pot.map.html">Pot.map</a></li>
+	
+	<li><a href="../symbols/Pot.Net.html">Pot.Net</a></li>
+	
+	<li><a href="../symbols/Pot.Net.XHR.html">Pot.Net.XHR</a></li>
+	
+	<li><a href="../symbols/Pot.Net.XHR.request.html">Pot.Net.XHR.request</a></li>
 	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
@@ -336,60 +342,6 @@ ul.inheritsList
 
 <!-- ============================== methods summary ======================== -->
 			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.XPCOM.">
-					<caption>Method Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Method Attributes</th>
-							<th scope="col">Method Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.evalInSandbox">evalInSandbox</a></b>(code, url)
-								</div>
-								<div class="description">Evaluate JavaScript code in the sandbox.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.getChromeWindow">getChromeWindow</a></b>(uri)
-								</div>
-								<div class="description">Get the specific XUL Window.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.getMostRecentWindow">getMostRecentWindow</a></b>()
-								</div>
-								<div class="description">Get a browser window that was active last.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.till">till</a></b>(cond)
-								</div>
-								<div class="description">Wait until condition is true on the thread in non-blocking.</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -455,173 +407,6 @@ ul.inheritsList
 
 <!-- ============================== method details ========================= -->		
 			
-				<div class="sectionTitle">
-					Method Detail
-				</div>
-				
-					<a name=".evalInSandbox"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.XPCOM.</span><b>evalInSandbox</b>(code, url)
-					
-					</div>
-					<div class="description">
-						Evaluate JavaScript code in the sandbox.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>code</b>
-									
-								</dt>
-								<dd>The expression.</dd>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>url</b>
-									
-								</dt>
-								<dd>The sandbox url.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{*}</span> Return the result of expression.</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getChromeWindow"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.XPCOM.</span><b>getChromeWindow</b>(uri)
-					
-					</div>
-					<div class="description">
-						Get the specific XUL Window.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>uri</b>
-									
-								</dt>
-								<dd>The target URI to get.
-                       Will be the browser window if omitted.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Object}</span> XULWindow.</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getMostRecentWindow"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.XPCOM.</span><b>getMostRecentWindow</b>()
-					
-					</div>
-					<div class="description">
-						Get a browser window that was active last.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Window}</span> Return the browser window.</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".till"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.XPCOM.</span><b>till</b>(cond)
-					
-					</div>
-					<div class="description">
-						Wait until condition is true on the thread in non-blocking.
-If true returned, waiting state will end.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Function|*}</span> <b>cond</b>
-									
-								</dt>
-								<dd>A function or value as condition.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					
-				
-			
 			
 <!-- ============================== event details ========================= -->		
 			
@@ -633,7 +418,7 @@ If true returned, waiting state will end.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Oct 07 2011 10:53:53 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Oct 08 2011 01:48:58 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
