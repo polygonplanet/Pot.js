@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.00, 2011-10-04
+ * Version 1.01, 2011-10-07
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -29,8 +29,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.00
- * @date           2011-10-04
+ * @version        1.01
+ * @date           2011-10-07
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -63,7 +63,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.00', TYPE : 'lite'},
+var Pot = {VERSION : '1.01', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -320,16 +320,23 @@ update(Pot, {
    * Temporary storage place.
    *
    * @type  Object
+   * @private
+   * @ignore
    */
   tmp : {},
   /**
    * Treats the internal properties/methods.
    *
    * @internal
+   * @type Object
+   * @class
    * @private
    * @ignore
    */
   Internal : {
+    /**
+     * @lends Pot.Internal
+     */
     /**
      * Numbering the magic numbers for the constructor.
      *
@@ -515,7 +522,7 @@ update(Pot, {
 // Aggregate in this obejct for global functions. (HTML5 Task)
 update(Pot.Internal, {
   /**
-   * @lends Pot
+   * @lends Pot.Internal
    */
   /**
    * Alias for window.setTimeout function. (for non-window-environment)
@@ -1118,7 +1125,7 @@ function arrayize(object, index) {
     // NodeList cannot convert to the Array in the Blackberry, IE browsers.
     if (globals) {
       try {
-        slice.call(globals.documentElement.childNodes, 0)[0].nodeType;
+        slice.call(globals.documentElement.childNodes)[0].nodeType;
         me.canNodeList = true;
       } catch (e) {
         me.canNodeList = false;
@@ -1233,6 +1240,90 @@ function rescape(s) {
 /**
  * @ignore
  */
+function invoke(/*object[, method[, ...args]]*/) {
+  var args = arrayize(arguments), argn = args.length;
+  var object, method, params, emit, p, t, i, len, err;
+  try {
+    switch (argn) {
+      case 0:
+          throw false;
+      case 1:
+          method = args[0];
+          break;
+      case 2:
+          object = args[0];
+          method = args[1];
+          break;
+      case 3:
+          object = args[0];
+          method = args[1];
+          params = arrayize(args[2]);
+          break;
+      default:
+          object = args[0];
+          method = args[1];
+          params = arrayize(args, 2);
+          break;
+    }
+    if (!method) {
+      throw method;
+    }
+    if (!object && Pot.isString(method)) {
+      object = (object && object[method] && object)  ||
+             (globals && globals[method] && globals) ||
+          (Pot.Global && Pot.Global[method] && Pot.Global);
+    }
+    if (Pot.isString(method)) {
+      emit = true;
+      if (!object) {
+        object = (globals || Pot.Global);
+      }
+    }
+  } catch (e) {
+    err = e;
+    throw Pot.isError(err) ? err : new Error(err);
+  }
+  if (Pot.isFunction(method.apply) && Pot.isFunction(method.call)) {
+    if (params == null || !params.length) {
+      return method.call(object);
+    } else {
+      return method.apply(object, params);
+    }
+  } else {
+    p = params || [];
+    len = p.length || 0;
+    if (emit) {
+      // faster way.
+      switch (len) {
+        case 0: return object[method]();
+        case 1: return object[method](p[0]);
+        case 2: return object[method](p[0], p[1]);
+        case 3: return object[method](p[0], p[1], p[2]);
+        default: break;
+      }
+    } else {
+      switch (len) {
+        case 0: return method();
+        case 1: return method(p[0]);
+        case 2: return method(p[0], p[1]);
+        case 3: return method(p[0], p[1], p[2]);
+        default: break;
+      }
+    }
+    t = [];
+    for (i = 0; i < len; i++) {
+      t[t.length] = 'p[' + i + ']';
+    }
+    return (new Function(
+      'e,o,m,p',
+      ['return e ? o[m](', ') : m(', ');'].join(t.join(','))
+    ))(emit, object, method, p);
+  }
+}
+
+/**
+ * @ignore
+ */
 function debug(msg) {
   var func, firebug, consoleService;
   /**@ignore*/
@@ -1240,7 +1331,7 @@ function debug(msg) {
     var result = false, win, fbConsole;
     try {
       if (!Pot.XPCOM.isEnabled) {
-        throw 0;
+        throw false;
       }
       win = Pot.XPCOM.getMostRecentWindow();
       if (!win) {
@@ -1267,7 +1358,7 @@ function debug(msg) {
   try {
     if (!firebug('log', arguments)) {
       if (!Pot.XPCOM.isEnabled) {
-        throw 0;
+        throw false;
       }
       consoleService = Cc['@mozilla.org/consoleservice;1']
                       .getService(Ci.nsIConsoleService);
@@ -1313,25 +1404,6 @@ Pot.update({
   /**
    * @lends Pot
    */
-  /**
-   * Escape RegExp patterns.
-   *
-   *
-   * @example
-   *   var pattern = '*[hoge]*';
-   *   var regex = new RegExp('^(' + rescape(pattern) + ')$', 'g');
-   *   debug(regex.toString());
-   *   // @results /^(\*\[hoge\]\*)$/g
-   *
-   *
-   * @param  {String}  s  A target string.
-   * @return {String}     The escaped string.
-   * @type Function
-   * @function
-   * @public
-   * @static
-   */
-  rescape : rescape,
   /**
    * Treated as an array of arguments given then
    *  return it as an array.
@@ -1479,17 +1551,54 @@ Pot.update({
    */
   trim : trim,
   /**
-   * Get the current time as milliseconds.
+   * Escape RegExp patterns.
    *
-   * @return    Return the current time as milliseconds.
+   *
+   * @example
+   *   var pattern = '*[hoge]*';
+   *   var regex = new RegExp('^(' + rescape(pattern) + ')$', 'g');
+   *   debug(regex.toString());
+   *   // @results /^(\*\[hoge\]\*)$/g
+   *
+   *
+   * @param  {String}  s  A target string.
+   * @return {String}     The escaped string.
    * @type Function
    * @function
    * @public
    * @static
    */
-  now : now,
+  rescape : rescape,
+  /**
+   * Call the function with unknown number arguments.
+   * That is for cases where JavaScript sucks
+   *   built-in function like alert() on IE or other-browser when
+   *   calls the Function.apply.
+   *
+   *
+   * @example
+   *   debug(invoke(window, 'alert', 100));
+   *   debug(invoke(document, 'getElementById', 'container'));
+   *   debug(invoke(window, 'setTimeout', function() { debug(1); }, 2000));
+   *
+   *
+   * @param  {Object}      object  The context object (e.g. window)
+   * @param  {String}      method  The callable function name.
+   * @param  {Array|...*}  (args)  The function arguments.
+   * @return {*}                   The result of the called function.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  invoke : invoke,
   /**
    * Output to the console using log function for debug.
+   *
+   *
+   * @example
+   *   debug('hoge'); // hoge
+   *
    *
    * @param  {*}  msg  A log message, or variable
    * @type Function
@@ -1515,7 +1624,7 @@ function each(object, callback, context) {
   if (object) {
     len = object.length;
     try {
-      if (len && ((len - 1) in object)) {
+      if (Pot.isArrayLike(object)) {
         for (i = 0; i < len; i++) {
           if (i in object) {
             try {
@@ -1616,6 +1725,12 @@ function extendDeferredOptions(o, x) {
           a.stoppers = arrayize(b.stoppers);
         }
       }
+    }
+    if ('storage' in b) {
+      a.storage = b.storage || {};
+    }
+    if (!a.storage) {
+      a.storage = {};
     }
   }
 }
@@ -2279,18 +2394,24 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    *   d.begin();
    *
    *
-   * @param  {*}         value  Some value to pass next callback sequence.
+   * @param  {...*}      (...)  Some value to pass next callback sequence.
    * @return {Deferred}         Returns the Deferred.
    * @type Function
    * @function
    * @public
    */
-  begin : function(value) {
-    var that = this;
+  begin : function(/*[ ...args]*/) {
+    var that = this, arg, args = arrayize(arguments), value;
+    arg = args[0];
+    if (args.length > 1) {
+      value = args;
+    } else {
+      value = args[0];
+    }
     if (!this.cancelled && this.state === Pot.Deferred.states.unfired) {
-      if (Pot.isDeferred(value) && !value.cancelled) {
-        value.ensure(function(result) {
-          that.begin(result);
+      if (Pot.isDeferred(arg) && !arg.cancelled) {
+        arg.ensure(function() {
+          that.begin.apply(this, arguments);
         });
       } else {
         this.options.cancellers = [];
@@ -2315,14 +2436,24 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    *   // This will be output 'Error Deferred!'
    *
    *
-   * @param  {*}         value  Some value to pass next callback sequence.
+   * @param  {...*}      (...)  Some value to pass next callback sequence.
    * @return {Deferred}         Returns the Deferred.
    * @type Function
    * @function
    * @public
    */
-  raise : function(value) {
-    return this.begin(Pot.isError(value) ? value : new Error(value));
+  raise : function(/*[ ...args]*/) {
+    var args = arrayize(arguments), arg, value;
+    arg = args[0];
+    if (!Pot.isError(arg)) {
+      args[0] = new Error(arg);
+    }
+    if (args.length > 1) {
+      value = args;
+    } else {
+      value = args[0];
+    }
+    return this.begin.apply(this, arrayize(value));
   },
   /**
    * Ending the callback chains.
@@ -2483,6 +2614,202 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
       });
       return d;
     });
+  },
+  /**
+   * Set the arguments into the callback chain.
+   *
+   *
+   * @example
+   *   var d = new Pot.Deferred();
+   *   d.then(function(res) {
+   *     debug(res); // undefined
+   *     // Set the argument into callback chain result.
+   *   }).args('hoge').then(function(res) {
+   *     debug(res);
+   *     // @results  res = 'hoge'
+   *   });
+   *   d.begin();
+   *
+   *
+   * @example
+   *   var d = new Pot.Deferred();
+   *   d.then(function(res) {
+   *     debug(res); // undefined
+   *     // Set the argument into callback chain result.
+   *   }).args({
+   *     foo : 1,
+   *     bar : 2,
+   *     baz : 3
+   *   }).then(function(res) {
+   *     debug(res);
+   *     // @results  res = {foo: 1, bar: 2, baz: 3}
+   *   });
+   *   d.begin();
+   *
+   *
+   * @example
+   *   var d = new Pot.Deferred();
+   *   d.then(function() {
+   *     return 'hoge';
+   *   }).then(function() {
+   *     debug( d.args() ); // @results 'hoge'
+   *   });
+   *   d.begin();
+   *
+   *
+   * @param  {...*}         (args)  The specific arguments.
+   * @return {Deferred|*}           Return the Pot.Deferred.
+   *                                  Return the last callback chain result
+   *                                  if passed no arguments.
+   * @type   Function
+   * @function
+   * @public
+   */
+  args : function(/*[... args]*/) {
+    var a = arrayize(arguments), len = a.length;
+    if (len === 0) {
+      return Pot.Deferred.lastResult(this);
+    } else {
+      return this.then(function() {
+        var reply, reps = arrayize(arguments);
+        if (reps.length > 1) {
+          reply = reps;
+        } else {
+          reply = reps[0];
+        }
+        if (len > 1) {
+          return a;
+        } else {
+          if (Pot.isFunction(a[0])) {
+            return a[0].apply(this, arrayize(reply));
+          } else {
+            return a[0];
+          }
+        }
+      });
+    }
+  },
+  /**
+   * Handle the data storage in the current callback chain.
+   *
+   *
+   * @example
+   *   var d = new Pot.Deferred();
+   *   d.data({
+   *     // Set the data to callback chain.
+   *     count : 0,
+   *     begin : 'BEGIN',
+   *     end   : 'END'
+   *   }).then(function() {
+   *     debug( this.data('begin') );
+   *     return this.data('count') + 1;
+   *   }).then(function(res) {
+   *     debug(res);
+   *     this.data('count', res + 1);
+   *     return this.data('count');
+   *   }).then(function(res) {
+   *     debug(res);
+   *     debug( this.data('end') );
+   *   });
+   *   d.begin();
+   *   // output:
+   *   //
+   *   //   BEGIN
+   *   //   1
+   *   //   2
+   *   //   END
+   *   //
+   *
+   *
+   * @param  {String|Object|*}  (key/obj)  The key name to get the data.
+   *                                         Or, an key-value object for
+   *                                         set the data.
+   * @param  {*}                (value)    The value to set.
+   * @return {Deferred|*}                  Return the current instance of
+   *                                         Pot.Deferred if set the data.
+   *                                       Return the value if specify key
+   *                                         to get.
+   * @type   Function
+   * @function
+   * @public
+   */
+  data : function(/*[key/obj [, value [, ...args]]]*/) {
+    var that = this, result = this, args = arrayize(arguments);
+    var i, len = args.length, prefix = '.';
+    if (this.options) {
+      if (!this.options.storage) {
+        this.options.storage = {};
+      }
+      switch (len) {
+        case 0:
+            result = {};
+            each(this.options.storage, function(val, key) {
+              try {
+                if (key && key.charAt(0) === prefix) {
+                  result[key.substring(1)] = val;
+                }
+              } catch (e) {}
+            });
+            break;
+        case 1:
+            if (args[0] == null) {
+              this.options.storage = {};
+            } else if (Pot.isObject(args[0])) {
+              each(args[0], function(val, key) {
+                that.options.storage[prefix + stringify(key)] = val;
+              });
+            } else {
+              result = this.options.storage[prefix + stringify(args[0])];
+            }
+            break;
+        case 2:
+            this.options.storage[prefix + stringify(args[0])] = args[1];
+            break;
+        default:
+            i = 0;
+            do {
+              this.options.storage[prefix + stringify(args[i++])] = args[i++];
+            } while (i < len);
+            break;
+      }
+    }
+    return result;
+  },
+  /**
+   * Update the Pot.Deferred.prototype.
+   *
+   *
+   * @example
+   *   // Update Pot.Deferred.prototype.
+   *   Pot.Deferred.fn.update({
+   *     addHoge : function() {
+   *       return this.then(function(res) {
+   *         return res + 'hoge';
+   *       });
+   *     }
+   *   });
+   *   var d = new Pot.Deferred();
+   *   d.then(function() {
+   *     return 'fuga';
+   *   }).addHoge().then(function(res) {
+   *     debug(res);
+   *     // @results  res = 'fugahoge';
+   *   });
+   *   d.begin();
+   *
+   *
+   * @param  {Object}    (...)  The object to update.
+   * @return {Deferred}         Return the current instance.
+   * @type   Function
+   * @function
+   * @public
+   * @static
+   */
+  update : function() {
+    var that = Pot.Deferred.fn, args = arrayize(arguments);
+    args.unshift(that);
+    update.apply(that, args);
+    return this;
   }
 });
 
@@ -2598,7 +2925,12 @@ function fireProcedure() {
       continue;
     }
     try {
-      result = callback.call(this, result);
+      if (Pot.isNumber(callback.length) && callback.length > 1 &&
+          Pot.isArray(result) && result.length === callback.length) {
+        result = callback.apply(this, result);
+      } else {
+        result = callback.call(this, result);
+      }
       this.state = setState.call({}, result);
       if (Pot.isDeferred(result)) {
         /**@ignore*/
@@ -2698,6 +3030,7 @@ function initOptions(args, defaults) {
     }
   }
   this.options = this.options || {};
+  this.options.storage = this.options.storage || {};
   if (!Pot.isArray(this.options.cancellers)) {
     this.options.cancellers = [];
   }
@@ -2769,12 +3102,8 @@ update(Pot.Deferred, {
    * @ignore
    */
   extendSpeeds : function(target, name, construct, speeds) {
-    /**@ignore*/
     var refers = {}, methods = {};
-    /**
-     * @private
-     * @ignore
-     */
+    /**@ignore*/
     var create = function(speedName, speed) {
       return function() {
         var opts = {}, args = arguments, me = args.callee;
@@ -3163,19 +3492,8 @@ update(Pot.Deferred, {
    * @static
    */
   maybeDeferred : function(x) {
-    var result, r;
-    if (Pot.isFunction(x)) {
-      try {
-        r = x();
-        if (Pot.isDeferred(r)) {
-          result = r;
-        } else {
-          result = Pot.Deferred.succeed(r);
-        }
-      } catch (e) {
-        result = Pot.Deferred.failure(e);
-      }
-    } else if (Pot.isDeferred(x)) {
+    var result;
+    if (Pot.isDeferred(x)) {
       result = x;
     } else {
       result = Pot.Deferred.succeed(x);
@@ -3200,6 +3518,10 @@ update(Pot.Deferred, {
    * @param  {Deferred}  deferred  The target Deferred object.
    * @return {Boolean}             Return whether the
    *                                 callback chain was fired.
+   * @type Function
+   * @function
+   * @public
+   * @static
    */
   isFired : function(deferred) {
     return Pot.isDeferred(deferred) &&
@@ -3225,6 +3547,10 @@ update(Pot.Deferred, {
    *
    * @param  {Deferred}  deferred  The target Deferred object.
    * @return {*}                   Return the last result if exist.
+   * @type Function
+   * @function
+   * @public
+   * @static
    */
   lastResult : function(deferred) {
     var result;
@@ -3257,6 +3583,10 @@ update(Pot.Deferred, {
    *
    * @param  {Deferred}  deferred  The target Deferred object.
    * @return {*}                   Return the last Error if exist.
+   * @type Function
+   * @function
+   * @public
+   * @static
    */
   lastError : function(deferred) {
     var result;
@@ -3268,6 +3598,325 @@ update(Pot.Deferred, {
       } catch (e) {}
     }
     return result;
+  },
+  /**
+   * Register the new method into Pot.Deferred.prototype.
+   *
+   *
+   * @example
+   *   // Register the new method for waiting 5 seconds.
+   *   Pot.Deferred.register('wait5', function(args) {
+   *     return Pot.Deferred.wait(5).then(function() {
+   *       return args.result;
+   *     });
+   *   });
+   *   // Use registered method.
+   *   var d = new Pot.Deferred();
+   *   d.then(function() {
+   *     debug('begin');
+   *     return 1;
+   *   }).wait5().then(function(res) {
+   *     debug(res); // @results  res = 1
+   *     debug('end');
+   *   });
+   *   d.begin();
+   *
+   *
+   * @example
+   *   // Register a new method for add the input value and the result.
+   *   Pot.Deferred.register('add', function(args) {
+   *     return args.input + args.result;
+   *   });
+   *   // Use registered method.
+   *   var d = new Pot.Deferred();
+   *   d.then(function() {
+   *     debug('begin');
+   *     return 100;
+   *   }).add(50).then(function(res) {
+   *     debug(res); // @results  res = 150
+   *     debug('end');
+   *   });
+   *   d.begin();
+   *
+   *
+   * @param  {String|Object}  name  The name of the new method.
+   *                                  Or, the new methods as key-value object.
+   * @param  {Function}       func  The new method.
+   *                                  A new function has defined argument
+   *                                    that is an object.
+   *                                  <pre>
+   *                                  -------------------------------------
+   *                                  function(args)
+   *                                    - args.input  :
+   *                                        The original input arguments.
+   *                                    - args.result :
+   *                                        The result of previous
+   *                                          callback chain.
+   *                                  -------------------------------------
+   *                                  </pre>
+   * @return {Number}               Return the registered count.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  register : function(/*name, func*/) {
+    var result, that = Pot.Deferred.fn, args = arrayize(arguments), methods;
+    result  = 0;
+    methods = [];
+    switch (args.length) {
+      case 0:
+          break;
+      case 1:
+          if (Pot.isObject(args[0])) {
+            each(args[0], function(val, key) {
+              if (Pot.isFunction(val) && Pot.isString(key)) {
+                methods.push([key, val]);
+              } else if (Pot.isFunction(key) && Pot.isString(val)) {
+                methods.push([val, key]);
+              }
+            });
+          }
+          break;
+      case 2:
+      default:
+          if (Pot.isFunction(args[0])) {
+            methods.push([args[1], args[0]]);
+          } else {
+            methods.push([args[0], args[1]]);
+          }
+          break;
+    }
+    if (methods && methods.length) {
+      each(methods, function(item) {
+        var subs = {}, name, func, method;
+        if (item && item.length >= 2 && Pot.isFunction(item[1])) {
+          name = stringify(item[0], true);
+          func = item[1];
+          /**@ignore*/
+          method = function() {
+            var params = {}, a = arrayize(arguments);
+            params.input = (a.length > 1) ? a : a[0];
+            return this.then(function() {
+              var ar = arrayize(arguments);
+              params.result = (ar.length > 1) ? ar : ar[0];
+              return func.apply(this, arrayize(params));
+            });
+          };
+          subs[name] = method;
+          update(that, subs);
+          result++;
+        }
+      });
+    }
+    return result;
+  },
+  /**
+   * Unregister the user defined method from Pot.Deferred.prototype.
+   *
+   *
+   * @example
+   *   // Register a new method for add the input value and the result.
+   *   Pot.Deferred.register('add', function(args) {
+   *     return args.input + args.result;
+   *   });
+   *   // Use registered method.
+   *   var d = new Pot.Deferred();
+   *   d.then(function() {
+   *     debug('begin');
+   *     return 100;
+   *   }).add(50).then(function(res) {
+   *     debug(res); // @results  res = 150
+   *     debug('end');
+   *   });
+   *   d.begin();
+   *   // Unregister the user defined method from Pot.Deferred.prototype.
+   *   Pot.Deferred.unregister('add');
+   *   var dfd = new Pot.Deferred();
+   *   dfd.then(function() {
+   *     debug('After unregister');
+   *     return 10;
+   *     // Next chain will be occur an error: add is undefined.
+   *   }).add(20).then(function(res) {
+   *     debug(res);
+   *   });
+   *   dfd.begin();
+   *
+   *
+   * @param  {String|Array}  name  The name of the user defined method.
+   * @return {Number}              Return the unregistered count.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  unregister : function(/*name*/) {
+    var result, that = Pot.Deferred.fn, args = arrayize(arguments), names;
+    result = 0;
+    if (args.length > 1) {
+      names = args;
+    } else {
+      names = args[0];
+    }
+    each(arrayize(names), function(name) {
+      try {
+        delete that[name];
+        result++;
+      } catch (e) {}
+    });
+    return result;
+  },
+  /**
+   * Create new defer function from static function.
+   * That returns a new instance of Pot.Deferred that
+   *   has already ".begin()" called.
+   *
+   *
+   * @example
+   *   var timer = Pot.Deferred.deferrize(window, 'setTimeout');
+   *   // Call the defer function with same as the original arguments usage.
+   *   timer(function() {
+   *     debug('in timer (2000 ms.)');
+   *   }, 2000).then(function() {
+   *     debug('End timer');
+   *   });
+   *
+   *
+   * @example
+   *   var byId = Pot.Deferred.deferrize(document, 'getElementById');
+   *   // Call the defer function with same as the original arguments usage.
+   *   byId('container').then(function(element) {
+   *     debug('End byId()');
+   *     debug('tagName = ' + element.tagName);
+   *     // @results  tagName = 'DIV'
+   *   });
+   *
+   *
+   * @example
+   *   // Example of user defined function.
+   *   var toCharCode = Pot.Deferred.deferrize(function(string) {
+   *     var chars = [], i, len = string.length;
+   *     for (i = 0; i < len; i++) {
+   *       chars.push(string.charCodeAt(i));
+   *     }
+   *     return chars;
+   *   });
+   *   var string = 'abcdef';
+   *   Pot.Deferred.begin(function() {
+   *     debug('string = ' + string);
+   *     return toCharCode(string).then(function(result) {
+   *       debug('result = ' + result);
+   *       // @results  result = [97, 98, 99, 100, 101, 102]
+   *     });
+   *   });
+   *
+   *
+   * @param  {Object|Function}   object   The context object.
+   *                                        or the target function.
+   * @param  {String|Function}  (method)  The target function name.
+   *                                        or the target function.
+   * @return {Function}                   The defer function that
+   *                                        returns Deferred object.
+   * @based  JSDeferred.connect
+   * @type   Function
+   * @function
+   * @public
+   * @static
+   */
+  deferrize : function(object, method) {
+    var args = arguments, func, context, err;
+    try {
+      switch (args.length) {
+        case 0:
+            throw false;
+        case 1:
+            func = object;
+            break;
+        case 2:
+        default:
+            func = method;
+            context = object;
+            break;
+      }
+      if (!func) {
+        throw func;
+      }
+    } catch (e) {
+      err = e;
+      throw (Pot.isError(err) ? err : new Error(err));
+    }
+    return function() {
+      var that = this, args = arrayize(arguments), d = new Pot.Deferred();
+      d.then(function() {
+        var dd, result, params = [], done = false, error;
+        dd = new Pot.Deferred();
+        each(args, function(val) {
+          if (!done && Pot.isFunction(val)) {
+            params.push(function() {
+              var r, er;
+              try {
+                r = val.apply(that, arguments);
+              } catch (e) {
+                er = e;
+                dd.raise(er);
+              } finally {
+                dd.begin(r);
+              }
+              if (er) {
+                throw Pot.isError(er) ? er : new Error(er);
+              }
+              return r;
+            });
+            done = true;
+          } else {
+            params[params.length] = val;
+          }
+        });
+        try {
+          result = invoke(context, func, params);
+        } catch (e) {
+          error = e;
+          if (!done) {
+            dd.raise(error);
+          }
+        } finally {
+          if (!done) {
+            dd.begin(result);
+          }
+        }
+        if (error) {
+          throw Pot.isError(error) ? error : new Error(error);
+        }
+        return dd;
+      }).begin();
+      return d;
+    };
+  },
+  /**
+   * Update the Pot.Deferred.
+   *
+   *
+   * @example
+   *   // Update Pot.Deferred.
+   *   Pot.Deferred.update({
+   *     sayHoge : function() {
+   *       alert('hoge');
+   *     }
+   *   });
+   *   Pot.Deferred.sayHoge(); // hoge
+   *
+   *
+   * @param  {Object}        (...)  The object to update.
+   * @return {Pot.Deferred}         Return Pot.Deferred.
+   * @type   Function
+   * @function
+   * @public
+   * @static
+   */
+  update : function() {
+    var that = Pot.Deferred, args = arrayize(arguments);
+    args.unshift(that);
+    return update.apply(that, args);
   }
 });
 
@@ -3728,7 +4377,7 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'begin', function(opts, x) {
   });
   d = new Pot.Deferred(opts);
   timer = Pot.Internal.setTimeout(function() {
-    d.begin(callable ? undefined : x);
+    d.begin(callable ? (void 0) : x);
   }, opts.options && opts.options.speed || opts.speed);
   if (callable) {
     d.then(function() {
@@ -4435,12 +5084,8 @@ update(Pot.tmp, {
    * @ignore
    */
   createLightIterateConstructor : function(creator) {
-    /**@ignore*/
     var methods, construct, name;
-    /**
-     * @private
-     * @ignore
-     */
+    /**@ignore*/
     var create = function(speed) {
       var interval;
       if (Pot.Internal.LightIterator.speeds[speed] === undefined) {
@@ -5249,7 +5894,16 @@ update(Pot.Iter, {
     arrayLike  = object && Pot.isArrayLike(object);
     objectLike = object && !arrayLike && Pot.isObject(object);
     if (initial === undefined) {
-      value = Pot.Struct.first(object);
+      value = (function() {
+        var first;
+        if (arrayLike || objectLike) {
+          each(object, function(v) {
+            first = v;
+            throw Pot.StopIteration;
+          });
+        }
+        return first;
+      })();
     } else {
       value = initial;
     }
@@ -5790,7 +6444,7 @@ update(Pot.tmp, {
           sp.methods = function(speed) {
             return {
               iter    : iter.method,
-              context : { iterateSpeed : iter.context.iterateSpeed[speed] }
+              context : {iterateSpeed : iter.context.iterateSpeed[speed]}
             };
           };
         }
@@ -5820,12 +6474,8 @@ update(Pot.tmp, {
    * @ignore
    */
   createSyncIterator : function(creator) {
-    /**@ignore*/
     var methods, construct;
-    /**
-     * @private
-     * @ignore
-     */
+    /**@ignore*/
     var create = function(speed) {
       var key = speed;
       if (!key) {
@@ -6995,6 +7645,9 @@ delete Pot.tmp.createSyncIterator;
 // Definition of Crypt.
 Pot.update({
   /**
+   * @lends Pot
+   */
+  /**
    * Crypt and Hash utilities.
    *
    * @name Pot.Crypt
@@ -7048,8 +7701,7 @@ update(Pot.Crypt, {
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-// Mozilla XPCOM interfaces/methods
-
+// Definition of Mozilla XPCOM interfaces/methods.
 Pot.update({
   /**
    * XPCOM utilities.
@@ -7224,6 +7876,43 @@ update(Pot.XPCOM, {
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of Debug.
+Pot.update({
+  /**
+   * Debugging utilities.
+   *
+   * @name Pot.Debug
+   * @type Object
+   * @class
+   * @static
+   * @public
+   */
+  Debug : {}
+});
+
+update(Pot.Debug, {
+  /**
+   * @lends Pot.Debug
+   */
+  /**
+   * Output to the console using log function for debug.
+   *
+   *
+   * @example
+   *   debug('hoge'); // hoge
+   *
+   *
+   * @param  {*}  msg  A log message, or variable.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  debug : debug
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of globalize method.
 
 Pot.update({
@@ -7392,6 +8081,9 @@ update(Pot.Internal, {
     isFired         : Pot.Deferred.isFired,
     lastResult      : Pot.Deferred.lastResult,
     lastError       : Pot.Deferred.lastError,
+    register        : Pot.Deferred.register,
+    unregister      : Pot.Deferred.unregister,
+    deferrize       : Pot.Deferred.deferrize,
     begin           : Pot.Deferred.begin,
     flush           : Pot.Deferred.flush,
     till            : Pot.Deferred.till,
@@ -7413,22 +8105,21 @@ update(Pot.Internal, {
     lastIndexOf     : Pot.lastIndexOf,
     rescape         : rescape,
     arrayize        : arrayize,
+    invoke          : invoke,
     stringify       : stringify,
     trim            : trim,
     now             : now,
     hashCode        : Pot.Crypt.hashCode,
     globalize       : Pot.globalize,
-    debug           : debug
+    debug           : Pot.Debug.debug
   }
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Register the Pot object into global.
-
 update(globals || Pot.Global || {}, {
   Pot : Pot
 });
-
 
 })(this || {});
 
