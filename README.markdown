@@ -1,6 +1,6 @@
 Pot.js
 ========
-**Pot.js** - JavaScript utility library for asynchronous (i.e. Deferred).
+**Pot.js** - JavaScript utility library for asynchronous processing with Deferred.
 
 #[Pot.js ドキュメント/リファレンス][Documentation]
   
