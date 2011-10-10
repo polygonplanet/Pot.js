@@ -189,11 +189,13 @@ ul.inheritsList
 <h2>Classes</h2>
 <ul class="classList">
 	
-	<li><i><a href="../symbols/_global_.html">_global_</a></i></li>
+	<li><i><a href="../symbols/GLOBAL.html">GLOBAL</a></i></li>
 	
 	<li><a href="../symbols/Pot.html">Pot</a></li>
 	
 	<li><a href="../symbols/Pot.Crypt.html">Pot.Crypt</a></li>
+	
+	<li><a href="../symbols/Pot.Debug.html">Pot.Debug</a></li>
 	
 	<li><a href="../symbols/Pot.Deferred.html">Pot.Deferred</a></li>
 	
@@ -242,6 +244,12 @@ ul.inheritsList
 	<li><a href="../symbols/Pot.iterate.html">Pot.iterate</a></li>
 	
 	<li><a href="../symbols/Pot.map.html">Pot.map</a></li>
+	
+	<li><a href="../symbols/Pot.Net.html">Pot.Net</a></li>
+	
+	<li><a href="../symbols/Pot.Net.XHR.html">Pot.Net.XHR</a></li>
+	
+	<li><a href="../symbols/Pot.Net.XHR.request.html">Pot.Net.XHR.request</a></li>
 	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
@@ -429,6 +437,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#args">args</a></b>((args))
+								</div>
+								<div class="description">Set the arguments into the callback chain.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#async">async</a></b>(sync)
 								</div>
 								<div class="description">Set the asynchronous for processing.</div>
@@ -438,7 +455,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#begin">begin</a></b>(value)
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#begin">begin</a></b>()
 								</div>
 								<div class="description">Begin the callback chains without Error.</div>
 							</td>
@@ -493,6 +510,24 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#data">data</a></b>((key/obj), (value))
+								</div>
+								<div class="description">Handle the data storage in the current callback chain.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.deferrize">deferrize</a></b>(object, (method))
+								</div>
+								<div class="description">Create new defer function from static function.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#end">end</a></b>()
 								</div>
 								<div class="description">Ending the callback chains.</div>
@@ -536,20 +571,20 @@ ul.inheritsList
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#isDeferred">isDeferred</a></b>()
-								</div>
-								<div class="description">isDeferred.</div>
-							</td>
-						</tr>
-					
-						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.isDeferred">isDeferred</a></b>(x)
 								</div>
 								<div class="description">Check whether the argument object is an instance of Pot.Deferred.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#isDeferred">isDeferred</a></b>()
+								</div>
+								<div class="description">isDeferred.</div>
 							</td>
 						</tr>
 					
@@ -574,7 +609,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.lastError">lastError</a></b>(deferred)
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.lastError">lastError</a></b>(deferred, (value))
 								</div>
 								<div class="description">Get the last Error of the callback chains.</div>
 							</td>
@@ -583,7 +618,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.lastResult">lastResult</a></b>(deferred)
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.lastResult">lastResult</a></b>(deferred, (value))
 								</div>
 								<div class="description">Get the last result of the callback chains.</div>
 							</td>
@@ -611,9 +646,18 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#raise">raise</a></b>(value)
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#raise">raise</a></b>()
 								</div>
 								<div class="description">Begin the callback chains with Error.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.register">register</a></b>(name, func)
+								</div>
+								<div class="description">Register the new method into Pot.Deferred.prototype.</div>
 							</td>
 						</tr>
 					
@@ -695,6 +739,33 @@ ul.inheritsList
 								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#toString">toString</a></b>()
 								</div>
 								<div class="description">toString.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.unregister">unregister</a></b>(name)
+								</div>
+								<div class="description">Unregister the user defined method from Pot.Deferred.prototype.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#update">update</a></b>()
+								</div>
+								<div class="description">Update the Pot.Deferred.prototype.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.update">update</a></b>()
+								</div>
+								<div class="description">Update the Pot.Deferred.</div>
 							</td>
 						</tr>
 					
@@ -1021,6 +1092,85 @@ Ability to establish a chain method asynchronously.
 					Method Detail
 				</div>
 				
+					<a name="args"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>args</b>((args))
+					
+					</div>
+					<div class="description">
+						Set the arguments into the callback chain.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var d = new Pot.Deferred();
+  d.then(function(res) {
+    debug(res); // undefined
+    // Set the argument into callback chain result.
+  }).args('hoge').then(function(res) {
+    debug(res);
+    // @results  res = 'hoge'
+  });
+  d.begin();</pre>
+					
+					<pre class="code">  var d = new Pot.Deferred();
+  d.then(function(res) {
+    debug(res); // undefined
+    // Set the argument into callback chain result.
+  }).args({
+    foo : 1,
+    bar : 2,
+    baz : 3
+  }).then(function(res) {
+    debug(res);
+    // @results  res = {foo: 1, bar: 2, baz: 3}
+  });
+  d.begin();</pre>
+					
+					<pre class="code">  var d = new Pot.Deferred();
+  d.then(function() {
+    return 'hoge';
+  }).then(function() {
+    debug( d.args() ); // @results 'hoge'
+  });
+  d.begin();</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{...*}</span> <b>(args)</b>
+									
+								</dt>
+								<dd>The specific arguments.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred|*}</span> Return the Pot.Deferred.
+                                 Return the last callback chain result
+                                 if passed no arguments.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="async"> </a>
 					<div class="fixedFont">
 					
@@ -1097,7 +1247,7 @@ Ability to establish a chain method asynchronously.
 					<div class="fixedFont">
 					
 					<span class="light">{Function}</span>
-					<b>begin</b>(value)
+					<b>begin</b>()
 					
 					</div>
 					<div class="description">
@@ -1121,7 +1271,7 @@ Ability to establish a chain method asynchronously.
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{*}</span> <b>value</b>
+									<span class="light fixedFont">{...*}</span> <b>(...)</b>
 									
 								</dt>
 								<dd>Some value to pass next callback sequence.</dd>
@@ -1531,6 +1681,177 @@ If callback is a Deferred, then will call .begin(args)
 
 					<hr />
 				
+					<a name="data"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>data</b>((key/obj), (value))
+					
+					</div>
+					<div class="description">
+						Handle the data storage in the current callback chain.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var d = new Pot.Deferred();
+  d.data({
+    // Set the data to callback chain.
+    count : 0,
+    begin : 'BEGIN',
+    end   : 'END'
+  }).then(function() {
+    debug( this.data('begin') );
+    return this.data('count') + 1;
+  }).then(function(res) {
+    debug(res);
+    this.data('count', res + 1);
+    return this.data('count');
+  }).then(function(res) {
+    debug(res);
+    debug( this.data('end') );
+  });
+  d.begin();
+  // output:
+  //
+  //   BEGIN
+  //   1
+  //   2
+  //   END
+  //</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Object|*}</span> <b>(key/obj)</b>
+									
+								</dt>
+								<dd>The key name to get the data.
+                                        Or, an key-value object for
+                                        set the data.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>(value)</b>
+									
+								</dt>
+								<dd>The value to set.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred|*}</span> Return the current instance of
+                                        Pot.Deferred if set the data.
+                                      Return the value if specify key
+                                        to get.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".deferrize"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>deferrize</b>(object, (method))
+					
+					</div>
+					<div class="description">
+						Create new defer function from static function.
+That returns a new instance of Pot.Deferred that
+  has already ".begin()" called.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var timer = Pot.Deferred.deferrize(window, 'setTimeout');
+  // Call the defer function with same as the original arguments usage.
+  timer(function() {
+    debug('in timer (2000 ms.)');
+  }, 2000).then(function() {
+    debug('End timer');
+  });</pre>
+					
+					<pre class="code">  var byId = Pot.Deferred.deferrize(document, 'getElementById');
+  // Call the defer function with same as the original arguments usage.
+  byId('container').then(function(element) {
+    debug('End byId()');
+    debug('tagName = ' + element.tagName);
+    // @results  tagName = 'DIV'
+  });</pre>
+					
+					<pre class="code">  // Example of user defined function.
+  var toCharCode = Pot.Deferred.deferrize(function(string) {
+    var chars = [], i, len = string.length;
+    for (i = 0; i < len; i++) {
+      chars.push(string.charCodeAt(i));
+    }
+    return chars;
+  });
+  var string = 'abcdef';
+  Pot.Deferred.begin(function() {
+    debug('string = ' + string);
+    return toCharCode(string).then(function(result) {
+      debug('result = ' + result);
+      // @results  result = [97, 98, 99, 100, 101, 102]
+    });
+  });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|Function}</span> <b>object</b>
+									
+								</dt>
+								<dd>The context object.
+                                       or the target function.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String|Function}</span> <b>(method)</b>
+									
+								</dt>
+								<dd>The target function name.
+                                       or the target function.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Function}</span> The defer function that
+                                       returns Deferred object.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="end"> </a>
 					<div class="fixedFont">
 					
@@ -1852,31 +2173,6 @@ The available methods are below.
 
 					<hr />
 				
-					<a name="isDeferred"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>isDeferred</b>()
-					
-					</div>
-					<div class="description">
-						isDeferred.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name=".isDeferred"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1929,10 +2225,35 @@ The available methods are below.
 
 					<hr />
 				
+					<a name="isDeferred"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>isDeferred</b>()
+					
+					</div>
+					<div class="description">
+						isDeferred.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".isFired"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{Boolean}</span>
+					<span class="light">{Function}</span>
 					<span class="light">Pot.Deferred.</span><b>isFired</b>(deferred)
 					
 					</div>
@@ -2046,8 +2367,8 @@ The available methods are below.
 					<a name=".lastError"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{*}</span>
-					<span class="light">Pot.Deferred.</span><b>lastError</b>(deferred)
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>lastError</b>(deferred, (value))
 					
 					</div>
 					<div class="description">
@@ -2082,6 +2403,12 @@ The available methods are below.
 								</dt>
 								<dd>The target Deferred object.</dd>
 							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>(value)</b>
+									
+								</dt>
+								<dd>(Optional) The input value.</dd>
+							
 							</dl>
 						
 						
@@ -2103,8 +2430,8 @@ The available methods are below.
 					<a name=".lastResult"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{*}</span>
-					<span class="light">Pot.Deferred.</span><b>lastResult</b>(deferred)
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>lastResult</b>(deferred, (value))
 					
 					</div>
 					<div class="description">
@@ -2138,6 +2465,12 @@ The available methods are below.
 									
 								</dt>
 								<dd>The target Deferred object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>(value)</b>
+									
+								</dt>
+								<dd>(Optional) The input value.</dd>
 							
 							</dl>
 						
@@ -2337,7 +2670,7 @@ The DeferredList can be as Array or Object.
 					<div class="fixedFont">
 					
 					<span class="light">{Function}</span>
-					<b>raise</b>(value)
+					<b>raise</b>()
 					
 					</div>
 					<div class="description">
@@ -2364,7 +2697,7 @@ The DeferredList can be as Array or Object.
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{*}</span> <b>value</b>
+									<span class="light fixedFont">{...*}</span> <b>(...)</b>
 									
 								</dt>
 								<dd>Some value to pass next callback sequence.</dd>
@@ -2379,6 +2712,102 @@ The DeferredList can be as Array or Object.
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Deferred}</span> Returns the Deferred.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".register"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>register</b>(name, func)
+					
+					</div>
+					<div class="description">
+						Register the new method into Pot.Deferred.prototype.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // Register the new method for waiting 5 seconds.
+  Pot.Deferred.register('wait5', function(args) {
+    return Pot.Deferred.wait(5).then(function() {
+      return args.result;
+    });
+  });
+  // Use registered method.
+  var d = new Pot.Deferred();
+  d.then(function() {
+    debug('begin');
+    return 1;
+  }).wait5().then(function(res) {
+    debug(res); // @results  res = 1
+    debug('end');
+  });
+  d.begin();</pre>
+					
+					<pre class="code">  // Register a new method for add the input value and the result.
+  Pot.Deferred.register('add', function(args) {
+    return args.input + args.result;
+  });
+  // Use registered method.
+  var d = new Pot.Deferred();
+  d.then(function() {
+    debug('begin');
+    return 100;
+  }).add(50).then(function(res) {
+    debug(res); // @results  res = 150
+    debug('end');
+  });
+  d.begin();</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Object}</span> <b>name</b>
+									
+								</dt>
+								<dd>The name of the new method.
+                                 Or, the new methods as key-value object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>func</b>
+									
+								</dt>
+								<dd>The new method.
+                                 A new function has defined argument
+                                   that is an object.
+                                 <pre>
+                                 -------------------------------------
+                                 function(args)
+                                   - args.input  :
+                                       The original input arguments.
+                                   - args.result :
+                                       The result of previous
+                                         callback chain.
+                                 -------------------------------------
+                                 </pre></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> Return the registered count.</dd>
 							
 							</dl>
 						
@@ -2907,6 +3336,192 @@ If true returned, waiting state will end.
 
 					<hr />
 				
+					<a name=".unregister"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>unregister</b>(name)
+					
+					</div>
+					<div class="description">
+						Unregister the user defined method from Pot.Deferred.prototype.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // Register a new method for add the input value and the result.
+  Pot.Deferred.register('add', function(args) {
+    return args.input + args.result;
+  });
+  // Use registered method.
+  var d = new Pot.Deferred();
+  d.then(function() {
+    debug('begin');
+    return 100;
+  }).add(50).then(function(res) {
+    debug(res); // @results  res = 150
+    debug('end');
+  });
+  d.begin();
+  // Unregister the user defined method from Pot.Deferred.prototype.
+  Pot.Deferred.unregister('add');
+  var dfd = new Pot.Deferred();
+  dfd.then(function() {
+    debug('After unregister');
+    return 10;
+    // Next chain will be occur an error: add is undefined.
+  }).add(20).then(function(res) {
+    debug(res);
+  });
+  dfd.begin();</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Array}</span> <b>name</b>
+									
+								</dt>
+								<dd>The name of the user defined method.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> Return the unregistered count.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="update"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>update</b>()
+					
+					</div>
+					<div class="description">
+						Update the Pot.Deferred.prototype.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // Update Pot.Deferred.prototype.
+  Pot.Deferred.fn.update({
+    addHoge : function() {
+      return this.then(function(res) {
+        return res + 'hoge';
+      });
+    }
+  });
+  var d = new Pot.Deferred();
+  d.then(function() {
+    return 'fuga';
+  }).addHoge().then(function(res) {
+    debug(res);
+    // @results  res = 'fugahoge';
+  });
+  d.begin();</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>(...)</b>
+									
+								</dt>
+								<dd>The object to update.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred}</span> Return the current instance.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".update"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>update</b>()
+					
+					</div>
+					<div class="description">
+						Update the Pot.Deferred.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // Update Pot.Deferred.
+  Pot.Deferred.update({
+    sayHoge : function() {
+      alert('hoge');
+    }
+  });
+  Pot.Deferred.sayHoge(); // hoge</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>(...)</b>
+									
+								</dt>
+								<dd>The object to update.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/Pot.Deferred.html">Pot.Deferred</a>}</span> Return Pot.Deferred.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="wait"> </a>
 					<div class="fixedFont">
 					
@@ -3057,7 +3672,7 @@ If true returned, waiting state will end.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 04 2011 13:36:19 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Oct 10 2011 18:52:57 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

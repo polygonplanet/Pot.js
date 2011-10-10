@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred#every</title>
+		<title>JsDoc Reference - Pot.Net</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -270,7 +270,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class Pot.Deferred#every
+				Namespace Pot.Net
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -287,8 +287,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred#every.">
-				<caption>Class Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Net.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -300,10 +300,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#constructor">Pot.Deferred#every</a></b>(callback, (context))
+								<b><a href="../symbols/Pot.Net.html#constructor">Pot.Net</a></b>
 							</div>
-							<div class="description">Tests whether all elements in the object pass the
- test implemented by the provided function.</div>
+							<div class="description">Net utilities.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -311,94 +310,6 @@ ul.inheritsList
 			
 
 <!-- ============================== properties summary ===================== -->
-			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred#every.">
-					<caption>Field Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#doze">doze</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with slower speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#fast">fast</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with fast speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#limp">limp</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with slowest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#ninja">ninja</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with fastest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#normal">normal</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with default speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#rapid">rapid</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23every.html#slow">slow</a></b>
-								</div>
-								<div class="description">Iterates "every" loop with slow speed.</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
 			
 
 <!-- ============================== methods summary ======================== -->
@@ -410,75 +321,25 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Class Detail
+					Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.Deferred#every</b>(callback, (context))
+						<b>Pot.Net</b>
 				</div>
 				
 				<div class="description">
-					Tests whether all elements in the object pass the
- test implemented by the provided function.
-
-Iteration will use the results of the previous chain.
-
-This method like Array.prototype.every
+					Net utilities.
 					
 				</div>
 				
 				
 				
-				<pre class="code">  var d = new Pot.Deferred();
-  d.then(function() {
-    return [12, 5, 8, 130, 44];
-  }).every(function(value, index, array) {
-    return (value >= 10);
-  }).then(function(result) {
-    debug(result);
-    // @results false
-  }).then(function() {
-    return [12, 54, 18, 130, 44];
-  }).every(function(value, index, array) {
-    return (value >= 10);
-  }).then(function(result) {
-    debug(result);
-    // @results true
-  });
-  d.begin();</pre>
-				
-				
-				
 				
 					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								<span class="light fixedFont">{Function}</span>  <b>callback</b>
-								
-							</dt>
-								<dd>A callback function.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{*}</span>  <b>(context)</b>
-								
-							</dt>
-								<dd>(Optional) Object to use
-                                  as `this` when executing callback.</dd>
-						
-						</dl>
 					
 					
 					
-					
-					
-						<dl class="detailList">
-						<dt class="heading">Returns:</dt>
-						
-								<dd><span class="light fixedFont">{Boolean}</span> Return the Boolean result by callback.</dd>
-						
-						</dl>
 					
 					
 					
@@ -487,165 +348,6 @@ This method like Array.prototype.every
 			
 
 <!-- ============================== field details ========================== -->		
-			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="doze"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>doze</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with slower speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with fast speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with slowest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with fastest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with default speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with faster speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Iterates "every" loop with slow speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
 			
 
 <!-- ============================== method details ========================= -->		
@@ -661,7 +363,7 @@ This method like Array.prototype.every
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Oct 10 2011 18:52:57 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Oct 10 2011 18:52:58 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
