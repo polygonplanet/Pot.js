@@ -1,0 +1,1466 @@
+@charset "UTF-8";
+/**
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * Project: Pot
+ *
+ * Pot:
+ *   The multiple languages library which contains a web framework.
+ *   Simple and tiny, trust and operability with a concept,
+ *   project goes develop for new culture.
+ *
+ * Pot Project Style Sheet.
+ * Simple type of Style.
+ *
+ * Confirmed browsers are as follows:
+ *   IE 6+
+ *   Firefox 2, 3.6+
+ *   Mozilla 1.8b+
+ *   Safari 3.0+
+ *   Opera 9.0+
+ *   Chrome 7.0+
+ *
+ * @theme      Blue
+ * @author     polygon planet <polygon.planet@gmail.com>
+ * @link       http://sourceforge.jp/projects/pot/
+ * @link       http://polygonpla.net/
+ * @license    Dual licensed under the MIT and GPL licenses
+ * @copyright  Copyright (c) 2011 polygon planet
+ * @version    $Id: pot.css,v 1.01 2011/01/05 02:51:15 polygon Exp $
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+**/
+/**
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * @section  Element Definition
+ *
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+**/
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * basics
+ *
+ * *-* *-* *-* *-* *-*
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  font-style: normal;
+  font-weight: normal;
+  font-family: verdana, sans-serif;
+  word-break: keep-all;
+}
+
+html, body, img, legend {
+  border: 0 none;
+}
+
+html {
+  overflow: auto;
+}
+
+head {}
+
+html, body, table, caption, th, td, legend {
+  color: #333366;
+  background: #f8f8ff;
+  line-height: 1.4;
+}
+
+html, body {
+  color: #f0f0fc;
+  background: #68686d;
+}
+
+body {
+  width: 100%;
+  padding: 15px 0;
+  /* padding for noscript. Fix layout using javascript after. */
+  /*padding-top: 78px;*/
+  text-align: center;
+}
+
+/* Settings for base font-size */
+html, body, table, caption, th, td, legend,
+pre, plaintext, listing, xmp,
+textarea, keygen, select, option {
+  font-size: 13px;
+}
+
+input[type="text"], input[type="file"],
+input[type="password"], optgroup[label] {
+  font-size: 13px;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * comments
+ *
+ * *-* *-* *-* *-* *-*
+ */
+comment {
+  display: none;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * document structures
+ *
+ * *-* *-* *-* *-* *-*
+ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  font-weight: bolder;
+}
+
+h1 {
+  font-size: 231%; /* 30px = 230.76% */
+  margin: 7px 0;
+}
+
+h2 {
+  font-size: 185%; /* 24px = 184.61% */
+  margin: 6px 0;
+}
+
+h3 {
+  font-size: 138%; /* 18px = 138.46% */
+  margin: 5px 0;
+}
+
+h4 {
+  font-size: 100%; /* 13px = 100.00% */
+  margin: 4px 0;
+}
+
+h5 {
+  font-size: 85%; /* 11px = 84.61% */
+  margin: 3px 0;
+}
+
+h6 {
+  font-size: 69%; /* 9px 69.23% */
+  margin: 2px 0;
+}
+
+p {
+  margin: 1em;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * line feeds
+ *
+ * *-* *-* *-* *-* *-*
+ */
+br {}
+
+nobr, .nobr {
+  white-space: nowrap;
+}
+
+wbr {}
+
+.wbr {
+  display: inline;
+  white-space: normal;
+}
+
+nobr *, .nobr * {
+  display: inline;
+}
+
+nobr br, .nobr br {
+  display: none;
+}
+
+nobr wbr, .nobr wbr,
+nobr .wbr, .nobr .wbr {
+  display: inline;
+  white-space: normal;
+  letter-spacing: 0;
+  line-height: 0;
+  content: "";
+  content: none;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * horizontal lines
+ *
+ * *-* *-* *-* *-* *-*
+ */
+hr {
+  width: 98%;
+  height: 0;
+  margin: 0 0 6px 0;
+  padding: 0 0 6px 0;
+  *margin: 0;
+  border: 1px dashed #333366;
+  border-width: 0;
+  border-bottom-width: 1px;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * links
+ *
+ * *-* *-* *-* *-* *-*
+ */
+a {}
+
+a:link,
+a:visited {
+  text-decoration: underline;
+}
+
+a:visited, a:visited * {
+  color: #514cae;
+}
+
+a:link, a:link * {
+  color: #3d42cf;
+}
+
+a:hover, a:hover * {
+  *text-decoration: none;
+  *color: #267cff;
+}
+
+a[href]:hover, a[href]:hover * {
+  text-decoration: none;
+  color: #267cff;
+}
+
+a:link img,
+a:visited img {
+  border: 1px solid transparent;
+  _border: 1px solid #f8f8ff;
+}
+
+a:hover img {
+  border: 1px dashed #5454ef;
+}
+
+area {}
+
+map {}
+
+base {}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * lists
+ *
+ * *-* *-* *-* *-* *-*
+ */
+dir, menu, ul, ol {
+  margin-left: 32px;
+}
+
+dir.compact,
+menu.compact,
+ul.compact {
+  margin-left: 1em;
+}
+
+ol.compact {
+  margin-left: 1.5em;
+}
+
+li {
+  list-style-position: outside;
+  list-style-image: none;
+}
+
+dir, menu, ul {
+  list-style-type: disc;
+}
+
+ul ul {
+  list-style-type: circle;
+}
+
+ul ul ul {
+  list-style-type: square;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+dl, dt {
+  margin: 2px;
+}
+
+dd {
+  margin: 4px 6px 2px 20px;
+}
+
+dl dl, dl dl dt {
+  margin-left: 0;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * form elements
+ *
+ * *-* *-* *-* *-* *-*
+ */
+form {
+  display: inline;
+}
+
+fieldset {
+  margin: 6px;
+  padding: 6px;
+  border: 1px solid;
+  border-color: #9999bf #7a7a9b #7a7a9b #9999bf;
+}
+
+legend {
+  padding: 4px;
+}
+
+label {}
+
+/* isindex is not supported for style yet at present. */
+isindex {}
+
+button, input, select, keygen, textarea {
+  margin: 2px;
+}
+
+input[type="hidden"] {}
+
+textarea,
+input[type="text"],
+input[type="file"],
+input[type="password"] {
+  padding: 2px;
+  color: #333;
+  background: #fff;
+  border: 1px solid;
+  border-color: #544fa6 #bab2f2 #bab2f2 #544fa6;
+  font-family: "ms gothic", monospace;
+  line-height: 1;
+}
+
+input[type="file"] {
+  border: 1px solid #6368ce;
+}
+
+textarea[disabled],
+input[type="text"][disabled],
+input[type="file"][disabled],
+input[type="password"][disabled] {
+  color: #666677;
+  background: #eeeeff;
+  border: 1px solid #9999aa;
+  text-shadow: #fff 1px 1px;
+  cursor: default;
+}
+
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  padding: 2px 6px 2px 6px;
+  *padding: 1px 4px 0 4px;
+  color: #6368ce;
+  background: #ccccff;
+  border: 1px solid;
+  border-color: #bab2f2 #544fa6 #544fa6 #bab2f2;
+  font-size: 12px;
+  font-family: verdana, sans-serif;
+  line-height: 1.2;
+  vertical-align: bottom;
+  cursor: pointer;
+  /* IE7 (hasLayout) */
+  overflow: visible;
+}
+
+/* Firefox */
+button:not([disabled]):active,
+input[type="button"]:not([disabled]):active,
+input[type="submit"]:not([disabled]):active,
+input[type="reset"]:not([disabled]):active,
+x:not([ie7]):-moz-any-link {
+  padding: 3px 5px 1px 7px;
+}
+
+/* Chrome or Safari */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  button:not([disabled]):active,
+  input[type="button"]:not([disabled]):active,
+  input[type="submit"]:not([disabled]):active,
+  input[type="reset"]:not([disabled]):active {
+    padding: 3px 5px 1px 7px;
+  }
+}
+
+button[disabled],
+input[type="button"][disabled],
+input[type="submit"][disabled],
+input[type="reset"][disabled] {
+  color: #666677;
+  background: #ddddee;
+  border: 1px solid #9999aa;
+  text-shadow: #eeeeff 1px 1px;
+  cursor: default;
+}
+
+button[disabled] *,
+input[type="button"][disabled] *,
+input[type="submit"][disabled] *,
+input[type="reset"][disabled] * {
+  color: #666677;
+  background: #ddddee;
+  cursor: default;
+}
+
+input[type="image"] {
+  cursor: pointer;
+}
+
+input[type="image"][disabled] {
+  cursor: default;
+  opacity: 0.85;
+  -moz-opacity: 0.85;
+  filter: alpha(opacity=85);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+keygen,
+select,
+optgroup[label],
+option {
+  padding: 1px 4px;
+  color: #333366;
+  background: #fdfdfe;
+  border: 0 none;
+  font-family: verdana, sans-serif;
+  font-weight: normal;
+}
+
+keygen,
+select {
+  padding: 2px;
+  border: 1px solid #6368ce;
+}
+
+optgroup[label],
+option[selected] {
+  font-weight: bold;
+}
+
+optgroup[label] option {
+  padding-left: 13px;
+}
+
+keygen[disabled],
+select[disabled] {
+  border: 1px solid #9999aa;
+}
+
+keygen[disabled],
+keygen[disabled] *,
+select[disabled],
+select[disabled] * {
+  color: #666677;
+  background: #eeeeff;
+  text-shadow: #fff 1px 1px;
+  cursor: default;
+}
+
+label:focus {
+  outline: 0 none;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="image"]:hover {
+  outline: 2px solid #5e75dd;
+  -moz-outline-radius: 5px;
+}
+
+button[disabled]:hover,
+input[type="button"][disabled]:hover,
+input[type="submit"][disabled]:hover,
+input[type="reset"][disabled]:hover,
+input[type="image"][disabled]:hover {
+  outline: 0 none;
+}
+
+button:not([disabled]):hover,
+button:not([disabled]):focus,
+input[type="button"]:not([disabled]):hover,
+input[type="button"]:not([disabled]):focus,
+input[type="submit"]:not([disabled]):hover,
+input[type="submit"]:not([disabled]):focus,
+input[type="reset"]:not([disabled]):hover,
+input[type="reset"]:not([disabled]):focus,
+input[type="image"]:not([disabled]):hover,
+input[type="image"]:not([disabled]):focus {
+  outline: 2px solid #5e75dd;
+  -moz-outline-radius: 5px;
+}
+
+keygen:focus,
+select:focus,
+textarea:focus,
+input[type="text"]:focus,
+input[type="file"]:focus,
+input[type="password"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  /* Opera 10.63 will display the crushed outline, but ignores it. */
+  outline: 2px solid #5e75dd;
+  -moz-outline-radius: 5px;
+}
+
+/* Chrome or Safari */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  button:not([disabled]):hover,
+  button:not([disabled]):focus,
+  input[type="button"]:not([disabled]):hover,
+  input[type="button"]:not([disabled]):focus,
+  input[type="submit"]:not([disabled]):hover,
+  input[type="submit"]:not([disabled]):focus,
+  input[type="reset"]:not([disabled]):hover,
+  input[type="reset"]:not([disabled]):focus,
+  input[type="image"]:not([disabled]):hover,
+  input[type="image"]:not([disabled]):focus {
+    outline: auto -webkit-focus-ring-color;
+  }
+
+  keygen:focus,
+  select:focus,
+  textarea:focus,
+  input[type="text"]:focus,
+  input[type="file"]:focus,
+  input[type="password"]:focus,
+  input[type="radio"]:focus,
+  input[type="checkbox"]:focus {
+    outline: auto -webkit-focus-ring-color;
+  }
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * tables
+ *
+ * *-* *-* *-* *-* *-*
+ */
+table, th, td {
+  border: 0 none;
+  background: #f6f6fa;
+}
+
+caption, th, td {
+  padding: 4px 6px;
+}
+
+table {
+  margin: 4px;
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+}
+
+caption {
+  background: transparent;
+  border: 0 none;
+  font-weight: bold;
+  text-align: center;
+  caption-side: top;
+}
+
+th {
+  font-weight: bold;
+  text-align: center;
+}
+
+td {
+  text-align: left;
+}
+
+table.grid,
+table.grid th,
+table.grid td {
+  border: 1px solid #6368ac;
+}
+
+table.grid th {
+  background: #d7d2ff;
+}
+
+table.layout,
+table.layout th,
+table.layout td {
+  border: 0 none;
+  background: transparent;
+}
+
+col {}
+
+colgroup {}
+
+thead {}
+
+tbody {}
+
+tfoot {}
+
+thead, tbody, tfoot, tr, th, td {
+  vertical-align: middle;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * fonts
+ *
+ * *-* *-* *-* *-* *-*
+ */
+basefont {}
+
+font {}
+
+big {
+  font-size: 120%;
+}
+
+small {
+  font-size: 85%; /* 11px */
+}
+
+small small {
+  font-size: 80%; /* 9px */
+}
+
+blink {
+  text-decoration: blink;
+}
+
+b, strong {
+  font-weight: bold;
+  font-weight: bolder;
+}
+
+i, i * {
+  font-style: italic;
+}
+
+s, strike {
+  text-decoration: line-through;
+}
+
+u {
+  text-decoration: underline;
+}
+
+tt, tt * {
+  font-family: "courier new", consolas, "lucida console", monaco, monospace;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * meanings
+ *
+ * *-* *-* *-* *-* *-*
+ */
+abbr, acronym {
+  margin: 0 2px;
+}
+
+abbr[title],
+acronym[title] {
+  cursor: help;
+  border: 0 none;
+  border-bottom: 1px dotted #333366;
+}
+
+address {
+  display: block;
+}
+
+address, address * {
+  font-style: italic;
+}
+
+blockquote {
+  margin: 8px 40px;
+  padding: 4px 25px;
+  border: 0 none;
+  border-left: 5px solid #ccc;
+  background-color: transparent;
+  /* a quote image on google picasa. */
+  background-image: url(http://lh3.ggpht.com/_4TAXTQzJyY4/TOwHt-pTD8I/AAAAAAAAAIs/sVF8MVUtE8s/blockquote-ae-16x16.gif);
+  background-repeat: no-repeat;
+  background-position: 4px 4px;
+  *background-position: 8px 4px;
+}
+
+q {
+  display: inline;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+cite, cite * {
+  font-style: italic;
+}
+
+blockquote cite {
+  display: block;
+  margin: 2px;
+  margin-left: 20px;
+}
+
+dfn {
+  font-weight: bold;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+ins {
+  text-decoration: none;
+}
+
+em, em * {
+  font-style: italic;
+}
+
+sub {
+  vertical-align: sub;
+}
+
+sup {
+  vertical-align: super;
+}
+
+sup, sub {
+  font-size: 85%; /* 11px */
+}
+
+var {}
+
+ruby {
+  ruby-align: auto;
+  ruby-overhang: auto;
+  ruby-position: above;
+}
+
+rb {}
+
+rt {
+  font-size: 85%; /* 11px */
+}
+
+rp {}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * codings
+ *
+ * *-* *-* *-* *-* *-*
+ */
+code, kbd {
+  display: inline-block;
+  margin: 0 4px;
+  padding: 2px 4px;
+  color: #333366;
+  background: #fffffe;
+  border: 1px solid;
+  border-color: #ededf9 #f0f0fe #f0f0fe #ededf9;
+}
+
+kbd {
+  font-family: "ms gothic", monospace;
+}
+
+samp {
+  display: inline-block;
+  margin: 0 4px;
+  padding: 2px 4px;
+  color: #443391;
+  background: #fdfdff;
+  border: 1px solid;
+  border-color: #eae8f9 #f0f0fe #f0f0fe #eae8f9;
+}
+
+pre, plaintext, listing, xmp {
+  display: block;
+}
+
+pre,
+plaintext,
+listing,
+xmp {
+  margin: 6px;
+  padding: 6px;
+  color: #333;
+  background: #f2f2fc;
+  border: 1px solid;
+  border-color: #7575c1 #9e9eed #9e9eed #7575c1;
+  *overflow: auto;
+}
+
+pre, pre *,
+plaintext, plaintext *,
+listing, listing *,
+xmp, xmp * {
+  white-space: pre;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  white-space: -pre-wrap;
+  *white-space: pre;
+  word-wrap: break-word;
+}
+
+pre code {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  color: #333;
+  background: transparent;
+}
+
+code, samp, pre, plaintext, listing, xmp,
+code *, samp *, pre *, plaintext *, listing *, xmp *,
+.tt, .tt * {
+  font-family: "courier new", consolas, "lucida console", monaco, monospace;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * embedded objects
+ *
+ * *-* *-* *-* *-* *-*
+ */
+img {}
+
+bgsound {}
+
+script {}
+
+applet, embed, object {}
+
+param {}
+
+frame, frameset {}
+
+iframe {
+  border: 2px solid;
+  border-color: #636380 #9393b5 #9393b5 #636380;
+  *overflow: hidden;
+}
+
+noscript {}
+
+noembed {}
+
+noframes {}
+
+/* past elements */
+layer, ilayer, nolayer {}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * layout
+ *
+ * *-* *-* *-* *-* *-*
+ */
+style {}
+
+span {}
+
+div {}
+
+center {
+  text-align: center;
+}
+
+/* a past element */
+multicol {}
+
+/* a past element */
+spacer, .spacer {
+  display: inline;
+  white-space: pre;
+  visibility: hidden;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * i18n
+ *
+ * *-* *-* *-* *-* *-*
+ */
+bdo[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: bidi-override;
+}
+
+bdo[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
+
+*[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+*[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: embed;
+}
+
+/*
+ * *-* *-* *-* *-* *-*
+ *
+ * others
+ *
+ * *-* *-* *-* *-* *-*
+ */
+meta {}
+
+link {}
+
+marquee {}
+
+/* a past element */
+nextid {}
+
+/* a past element. Server Side JavaScript by Netscape. */
+server {}
+
+/*
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * @section  Class
+ *
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ */
+.error {
+  color: #ce6042;
+}
+
+.success {
+  color: #4f5ba8;
+}
+
+.note {
+  display: block;
+  margin: 6px;
+  padding: 6px;
+  color: #333366;
+  background: #eeeeff;
+  border: 1px solid #6252ea;
+  font-weight: bold;
+}
+
+.warn {
+  display: block;
+  margin: 6px;
+  padding: 6px;
+  color: #c65b3a;
+  background: #ffeeee;
+  border: 1px solid #e27751;
+  font-weight: bold;
+}
+
+.note *,
+.warn * {
+  font-weight: bold;
+}
+
+/* 2ch */
+.vip, .vip * {
+  font-family: "IPAMonaPGothic", monapo, mona, "MS PGothic", sans-serif;
+}
+
+/* IE SUCKS */
+/*
+noscript {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 99%;
+  margin: 6px;
+  text-align: center;
+  background: transparent;
+}
+*/
+
+/**
+ * <div class="layout-script-warn-container">
+ *  <div class="layout-script-warn-wrapper">
+ *    <div class="script-warning">
+ *      This page requires JavaScript to display properly.
+ *    </div>
+ *  </div>
+ *</div>
+**/
+.layout-script-warn-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  _width: 99.99%;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  text-align: center;
+}
+
+.layout-script-warn-container .layout-script-warn-wrapper {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 10px;
+  padding: 0;
+  border-style: solid;
+  border-color: #585860;
+  border-width: 0 1px 1px 0;
+}
+
+.layout-script-warn-container .script-warning {
+  margin: 0;
+  padding: 10px 6px;
+  color: #c65b3a;
+  background: #ffeeee;
+  border: 1px solid #e27751;
+  font-weight: bold;
+}
+
+.layout-script-warn-container .script-warning * {
+  font-weight: bold;
+}
+
+/* clearfix css */
+.clearfix {
+  *zoom: 1;
+}
+
+.clearfix:after {
+  content: ".";
+  display: block;
+  width: 0;
+  height: 0;
+  max-width: 1px;
+  max-height: 1px;
+  font-size: 0;
+  line-height: 0;
+  clear: both;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+/*
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * @section  Identifiers
+ *
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ */
+#pot {}
+
+
+/*
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * @section  Layout Template
+ *
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ */
+
+/*DEBUG*/
+.debug.header    { background: #ccccff; }
+.debug.content   { background: #ccffcc; }
+.debug.leftside  { background: #ffcccc; }
+.debug.rightside { background: #aaccff; }
+.debug.footer    { background: #ffeecc; }
+
+/*
+ * Base style for multi column layouts
+ *
+ * .layout-solid/liquid-container
+ *   must be inserted after the <body> element as first child.
+ *
+ * Example:
+ *  <body>
+ *   <div class="layout-liquid-container">
+ *     Your contents here.
+ *   </div>
+ *  </body>
+ */
+.layout-solid-container,
+.layout-liquid-container {
+  margin: 0 auto;
+  padding: 10px;
+  text-align: left;
+  color: #333366;
+  background: #f8f8ff;
+  border-style: solid;
+  border-color: #6d6d75 #585860 #585860 #6d6d75;
+  border-width: 0 2px 2px 0;
+}
+
+.layout-2-column-left-menu .content,
+.layout-2-column-left-menu .leftside,
+.layout-2-column-double-page .rightside,
+.layout-3-column-center-style .layout-3-column-wrapper,
+.layout-3-column-center-style .rightside {
+  float: right;
+}
+
+.layout-2-column-right-menu .content,
+.layout-2-column-right-menu .rightside,
+.layout-2-column-double-page .content,
+.layout-2-column-double-page .leftside,
+.layout-3-column-center-style .leftside,
+.layout-3-column-center-style .content {
+  float: left;
+}
+
+.layout-3-column-center-style .layout-3-column-wrapper,
+.layout-3-column-center-style .content,
+.layout-3-column-center-style .rightside,
+.layout-3-column-center-style .leftside {
+  position: relative;
+}
+
+.layout-liquid-container .layout-2-column-left-menu .content,
+.layout-liquid-container .layout-2-column-right-menu .content,
+.layout-liquid-container .layout-2-column-double-page .leftside,
+.layout-liquid-container .layout-2-column-double-page .content,
+.layout-liquid-container .layout-3-column-center-style .content,
+.layout-solid-container .layout-2-column-left-menu .content,
+.layout-solid-container .layout-2-column-right-menu .content,
+.layout-solid-container .layout-2-column-double-page .content,
+.layout-solid-container .layout-3-column-center-style .content {
+  *overflow: hidden;
+}
+
+/*
+ * -- Liquid --
+ *
+ * These templates are composed of the liquid design (i.e. percent).
+ *
+ */
+.layout-liquid-container {
+  width: 95%;
+  max-width: 950px;
+}
+
+.layout-liquid-container .header,
+.layout-liquid-container .footer {
+  width: 100%;
+}
+
+.layout-liquid-container,
+.layout-liquid-container .header,
+.layout-liquid-container .footer,
+.layout-liquid-container .layout-2-column-left-menu .content,
+.layout-liquid-container .layout-2-column-left-menu .leftside,
+.layout-liquid-container .layout-2-column-right-menu .content,
+.layout-liquid-container .layout-2-column-right-menu .rightside,
+.layout-liquid-container .layout-2-column-double-page .content,
+.layout-liquid-container .layout-2-column-double-page .leftside,
+.layout-liquid-container .layout-2-column-double-page .rightside,
+.layout-liquid-container .layout-3-column-center-style .leftside,
+.layout-liquid-container .layout-3-column-center-style .content,
+.layout-liquid-container .layout-3-column-center-style .rightside {
+  min-width: 100px;
+}
+
+/*
+ * Liquid layout: 2 Column Left Menu
+ *
+ *   +---------------+
+ *   |     header    |
+ *   +-----+---------+
+ *   | 27% |   73%   |
+ *   +-----+---------+
+ *   |     footer    |
+ *   +---------------+
+ */
+.layout-liquid-container .layout-2-column-left-menu {
+  width: 100%;
+  max-width: 950px;
+}
+
+.layout-liquid-container .layout-2-column-left-menu .content {
+  width: 73%;
+  max-width: 700px;
+}
+
+.layout-liquid-container .layout-2-column-left-menu .leftside {
+  width: 27%;
+  _width: 26.99%;
+  max-width: 300px;
+}
+
+/*
+ * Liquid layout: 2 Column Right Menu 
+ *
+ *   +---------------+
+ *   |     header    |
+ *   +---------+-----+
+ *   |   73%   | 27% |
+ *   +---------+-----+
+ *   |     footer    |
+ *   +---------------+
+ */
+.layout-liquid-container .layout-2-column-right-menu {
+  width: 100%;
+  max-width: 950px;
+}
+
+.layout-liquid-container .layout-2-column-right-menu .content {
+  width: 73%;
+  max-width: 700px;
+}
+
+.layout-liquid-container .layout-2-column-right-menu .rightside {
+  width: 27%;
+  _width: 26.99%;
+  max-width: 300px;
+}
+
+/*
+ * Liquid layout: 2 Column Double Page
+ *
+ *   +---------------+
+ *   |     header    |
+ *   +-------+-------+
+ *   |  50%  |  50%  |
+ *   +-------+-------+
+ *   |     footer    |
+ *   +---------------+
+ */
+.layout-liquid-container .layout-2-column-double-page {
+  width: 100%;
+  max-width: 950px;
+}
+
+.layout-liquid-container .layout-2-column-double-page .content,
+.layout-liquid-container .layout-2-column-double-page .leftside {
+  width: 50%;
+  max-width: 500px;
+}
+
+.layout-liquid-container .layout-2-column-double-page .rightside {
+  width: 50%;
+  _width: 49.99%;
+  max-width: 500px;
+}
+
+/*
+ * Liquid layout: 3 Column Center Style
+ *
+ *   +---------------------+
+ *   |        header       |
+ *   +-----+---------+-----+
+ *   | 25% |   50%   | 25% |
+ *   +-----+---------+-----+
+ *   |        footer       |
+ *   +---------------------+
+ */
+.layout-liquid-container .layout-3-column-center-style {}
+
+.layout-liquid-container .layout-3-column-center-style .layout-3-column-wrapper {
+  width: 75%;
+  max-width: 780px;
+}
+
+.layout-liquid-container .layout-3-column-center-style .leftside {
+  width: 25%;
+  *width: 24.99%;
+  max-width: 280px;
+}
+
+.layout-liquid-container .layout-3-column-center-style .content {
+  width: 66%;
+  max-width: 500px; /* (950 * 0.75) * 0.66 + alpha */
+}
+
+.layout-liquid-container .layout-3-column-center-style .rightside {
+  width: 34%;
+  *width: 33.99%;
+  max-width: 280px; /* (950 * 0.75) * 0.34 + alpha */
+}
+
+/*
+ * -- Solid --
+ *
+ * These templates are composed of the solid design (i.e. pixel).
+ *
+ */
+.layout-solid-container {
+  width: 950px;
+}
+
+.layout-solid-container .header {
+  width: 950px;
+}
+
+.layout-solid-container .footer {
+  width: 950px;
+}
+
+/*
+ * Solid layout: 2 Column Left Menu
+ *
+ *   <------- 950px ------>
+ *   +--------------------+
+ *   |       header       |
+ *   +-------+------------+
+ *   | 260px |    690px   |
+ *   +-------+------------+
+ *   |       footer       |
+ *   +--------------------+
+ */
+.layout-solid-container .layout-2-column-left-menu {
+  width: 950px;
+}
+
+.layout-solid-container .layout-2-column-left-menu .content {
+  width: 690px;
+}
+
+.layout-solid-container .layout-2-column-left-menu .leftside {
+  width: 260px;
+}
+
+/*
+ * Solid layout: 2 Column Right Menu 
+ *
+ *   <------- 950px ------>
+ *   +--------------------+
+ *   |       header       |
+ *   +------------+-------+
+ *   |   690px    | 260px |
+ *   +------------+-------+
+ *   |       footer       |
+ *   +--------------------+
+ */
+.layout-solid-container .layout-2-column-right-menu {
+  width: 950px;
+}
+
+.layout-solid-container .layout-2-column-right-menu .content {
+  width: 690px;
+}
+
+.layout-solid-container .layout-2-column-right-menu .rightside {
+  width: 260px;
+}
+
+/*
+ * Solid layout: 2 Column Double Page
+ *
+ *   <------- 950px ----->
+ *   +-------------------+
+ *   |       header      |
+ *   +---------+---------+
+ *   |  475px  |  475px  |
+ *   +---------+---------+
+ *   |       footer      |
+ *   +-------------------+
+ */
+.layout-solid-container .layout-2-column-double-page {
+  width: 950px;
+}
+
+.layout-solid-container .layout-2-column-double-page .content,
+.layout-solid-container .layout-2-column-double-page .leftside {
+  width: 475px;
+}
+
+.layout-solid-container .layout-2-column-double-page .rightside {
+  width: 475px;
+}
+
+/*
+ * Solid layout: 3 Column Center Style
+ *
+ *   <---------- 950px ---------->
+ *   +---------------------------+
+ *   |          header           |
+ *   +-------+-----------+-------+
+ *   | 240px |   470px   | 240px |
+ *   +-------+-----------+-------+
+ *   |          footer           |
+ *   +---------------------------+
+ */
+.layout-solid-container .layout-3-column-center-style {
+  width: 950px;
+}
+
+.layout-solid-container .layout-3-column-center-style .layout-3-column-wrapper {
+  width: 710px;
+}
+
+.layout-solid-container .layout-3-column-center-style .leftside {
+  width: 240px;
+}
+
+.layout-solid-container .layout-3-column-center-style .content {
+  width: 470px;
+}
+
+.layout-solid-container .layout-3-column-center-style .rightside {
+  width: 240px;
+}
+
+/*
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ *
+ * @media  Print
+ *
+ * *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-* *-*
+ */
+/*
+@media print {
+  noscript {
+    display: none;
+  }
+}
+*/
+
