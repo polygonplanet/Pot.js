@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.02, 2011-10-07
+ * Version 1.10, 2011-10-10
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -23,14 +23,16 @@
  *
  * @description
  *  <p>
- *  主に非同期/同期/非ブロックでのループ処理を扱うJavaScriptライブラリ
+ *  非ブロックでの非同期処理を直列的に書けるようにし、
+ *  UI や CPU への負担を軽減する
+ *  ループ処理を中心に実装された JavaScript ライブラリ。
  *  </p>
  *
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.02
- * @date           2011-10-07
+ * @version        1.10
+ * @date           2011-10-10
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -63,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.02', TYPE : 'lite'},
+var Pot = {VERSION : '1.10', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -140,7 +142,7 @@ update(Pot, {
       o.hasActiveXObject = true;
     }
     try {
-      if (typeof ((function() { yield; })()).next === 'function') {
+      if (typeof ((function() { yield (0); })()).next === 'function') {
         o.isYieldable = true;
       }
     } catch (e) {}
@@ -525,6 +527,108 @@ update(Pot.Internal, {
    * @lends Pot.Internal
    */
   /**
+   * Call the function in the background (i.e. in non-blocking).
+   *
+   * @param  {Function}  callback  The callback function.
+   *
+   * @type  Object
+   * @class
+   * @static
+   * @private
+   * @ignore
+   * @based JSDeferred.next
+   */
+  callInBackground : {
+    /**
+     * @lends Pot.Internal.callInBackground
+     */
+    /**
+     * Call the function in the background (i.e. in non-blocking).
+     *
+     * @param  {Function}  callback  The callback function.
+     *
+     * @type  Function
+     * @function
+     * @static
+     * @private
+     * @ignore
+     * @based JSDeferred.next
+     */
+    flush : function(callback) {
+      var handler = this.byEvent || this.byTick || this.byTimer;
+      handler(callback);
+    },
+    /**
+     * @private
+     * @ignore
+     * @based JSDeferred.next
+     */
+    byEvent : (function() {
+      var IMAGE;
+      if (Pot.System.isNonBrowser || Pot.System.isNodeJS ||
+          typeof window !== 'object'  || typeof document !== 'object' ||
+          typeof Image !== 'function' || window.opera || Pot.Browser.opera ||
+          typeof document.addEventListener !== 'function'
+      ) {
+        return false;
+      }
+      try {
+        if (typeof (new Image()).addEventListener !== 'function') {
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+      // Dummy 1x1 gif image.
+      IMAGE = 'data:image/gif;base64,' +
+              'R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+      /**@ignore*/
+      return function (callback) {
+        var done, img, handler;
+        img = new Image();
+        /**@ignore*/
+        handler = function() {
+          try {
+            img.removeEventListener('load', handler, false);
+            img.removeEventListener('error', handler, false);
+          } catch (e) {}
+          if (!done) {
+            done = true;
+            callback();
+          }
+        };
+        img.addEventListener('load', handler, false);
+        img.addEventListener('error', handler, false);
+        try {
+          img.src = IMAGE;
+        } catch (e) {
+          this.byEvent = this.byTimer;
+        }
+      };
+    })(),
+    /**
+     * @private
+     * @ignore
+     */
+    byTick : (function() {
+      if (!Pot.System.isNodeJS || typeof process !== 'object' ||
+          typeof process.nextTick !== 'function') {
+        return false;
+      }
+      /**@ignore*/
+      return function (callback) {
+        process.nextTick(callback);
+      };
+    })(),
+    /**
+     * @private
+     * @ignore
+     */
+    byTimer : function(callback, msec) {
+      return setTimeout(callback, msec || 0);
+    }
+  },
+  /**
    * Alias for window.setTimeout function. (for non-window-environment)
    *
    * @type  Function
@@ -535,7 +639,7 @@ update(Pot.Internal, {
    */
   setTimeout : function(func, msec) {
     try {
-      return setTimeout(func, msec || 0);
+      return Pot.Internal.callInBackground.byTimer(func, msec || 0);
     } catch (e) {}
   },
   /**
@@ -1325,9 +1429,59 @@ function invoke(/*object[, method[, ...args]]*/) {
  * @ignore
  */
 function debug(msg) {
-  var func, firebug, consoleService;
-  /**@ignore*/
-  firebug = function(method, args) {
+  var args = arguments, me = args.callee, func, firebug, consoleService;
+  try {
+    if (!me.firebug('log', args)) {
+      if (!Pot.XPCOM.isEnabled) {
+        throw false;
+      }
+      consoleService = Cc['@mozilla.org/consoleservice;1']
+                      .getService(Ci.nsIConsoleService);
+      consoleService.logStringMessage(String(msg));
+    }
+  } catch (e) {
+    if (typeof GM_log !== 'undefined') {
+      /**@ignore*/
+      func = GM_log;
+    } else if (typeof console !== 'undefined') {
+      /**@ignore*/
+      func = console.debug || console.dir || console.log;
+    } else if (typeof opera !== 'undefined' && opera.postError) {
+      /**@ignore*/
+      func = opera.postError;
+    } else {
+      /**@ignore*/
+      func = function(x) { throw x; };
+    }
+    try {
+      if (func.apply) {
+        func.apply(func, args);
+      } else {
+        throw func;
+      }
+    } catch (e) {
+      try {
+        func(msg);
+      } catch (e) {
+        try {
+          console.log(msg);
+        } catch (e) {
+          try {
+            me.divConsole(msg);
+          } catch (e) {}
+        }
+      }
+    }
+  }
+  return msg;
+}
+
+// Update debug function.
+update(debug, {
+  /**
+   * @ignore
+   */
+  firebug : function(method, args) {
     var result = false, win, fbConsole;
     try {
       if (!Pot.XPCOM.isEnabled) {
@@ -1354,48 +1508,133 @@ function debug(msg) {
       }
     } catch (e) {}
     return result;
-  };
-  try {
-    if (!firebug('log', arguments)) {
-      if (!Pot.XPCOM.isEnabled) {
-        throw false;
-      }
-      consoleService = Cc['@mozilla.org/consoleservice;1']
-                      .getService(Ci.nsIConsoleService);
-      consoleService.logStringMessage(String(msg));
-    }
-  } catch (e) {
-    if (typeof GM_log !== 'undefined') {
-      /**@ignore*/
-      func = GM_log;
-    } else if (typeof console !== 'undefined') {
-      /**@ignore*/
-      func = console.debug || console.dir || console.log;
-    } else if (typeof opera !== 'undefined' && opera.postError) {
-      /**@ignore*/
-      func = opera.postError;
-    } else {
-      /**@ignore*/
-      func = function(x) { throw x; };
-    }
-    try {
-      if (func.apply) {
-        func.apply(func, arguments);
+  },
+  /**
+   * @ignore
+   */
+  divConsole : update(function(msg) {
+    var me = arguments.callee;
+    if (Pot.Browser.msie && typeof document !== 'undefined') {
+      if (me.done && me.ieConsole) {
+        me.append(msg);
       } else {
-        throw func;
+        if (!me.msgStack) {
+          me.msgStack = [];
+        }
+        me.msgStack.push(msg);
+        if (!me.done) {
+          me.done = true;
+          Pot.Deferred.till(function() {
+            return !!document.body;
+          }).then(function() {
+            var defStyle, style, close;
+            defStyle = {
+              borderWidth : '1px',
+              borderStyle : 'solid',
+              borderColor : '#999',
+              background  : '#fff',
+              color       : '#333',
+              fontSize    : '13px',
+              fontFamily  : 'monospace',
+              position    : 'absolute',
+              padding     : '10px',
+              margin      : '0px'
+            };
+            me.ieConsole = document.createElement('div');
+            me.ieConsole.id = me.ieConsoleId = buildSerial(Pot, '');
+            style = me.ieConsole.style;
+            each(defStyle, function(v, k) {
+              style[k] = v;
+            });
+            style.borderWidth  = '3px';
+            style.position     = 'fixed';
+            style.width        = '96%';
+            style.height       = '20%';
+            style.paddingRight = '15px';
+            style.zIndex       = 9997;
+            style.left         = '0px';
+            style.bottom       = '0px';
+            style.whiteSpace   = 'pre';
+            style.wordWrap     = 'break-word';
+            style.overflowX    = 'hidden';
+            style.overflowY    = 'auto';
+            me.hr = document.createElement('hr');
+            style = me.hr.style;
+            style.width             = '100%';
+            style.height            = '1px';
+            style.borderTopWidth    = '1px';
+            style.borderBottomWidth = '0px';
+            style.borderColor       = '#aaa';
+            style.borderStyle       = 'solid';
+            style.zIndex            = 9998;
+            close = document.createElement('div');
+            style = close.style;
+            each(defStyle, function(v, k) {
+              style[k] = v;
+            });
+            style.zIndex        = 9999;
+            style.fontFamily    = 'sans-serif';
+            style.fontWeight    = 'bold';
+            style.borderWidth   = '1px';
+            style.paddingTop    = '0px';
+            style.paddingRight  = '2px';
+            style.paddingBottom = '1px';
+            style.paddingLeft   = '2px';
+            style.lineHeight    = '1';
+            style.right         = '2%';
+            style.top           = '2%';
+            style.cursor        = 'pointer';
+            close.title         = 'close';
+            close.innerHTML     = 'x';
+            /**@ignore*/
+            close.onclick = function() {
+              me.ieConsole.parentNode.removeChild(me.ieConsole);
+              me.ieConsole = close.onclick = null;
+            };
+            me.ieConsole.appendChild(close);
+            document.body.appendChild(me.ieConsole);
+            me.append();
+          });
+        }
       }
-    } catch (e) {
-      try {
-        func(msg);
-      } catch (e) {
+    }
+  }, {
+    /**
+     * @ignore
+     */
+    append : function(msg) {
+      var me = this, s, v, stack;
+      if (me.ieConsole) {
         try {
-          console.log(msg);
+          stack = arrayize(me.msgStack || []);
+          while (me.msgStack && me.msgStack.length) {
+            me.msgStack.pop();
+          }
+          if (arguments.length) {
+            stack.push(msg);
+          }
+          while (stack.length) {
+            v = stack.shift();
+            if (v == null) {
+              s = String(v);
+            } else {
+              s = v.toString ? v.toString() : toString.call(v);
+            }
+            each([
+              document.createTextNode(s),
+              me.hr.cloneNode(false)
+            ], function(node) {
+              me.ieConsole.appendChild(node);
+            });
+          }
+          Pot.Internal.setTimeout(function() {
+            me.ieConsole.scrollTop = me.ieConsole.scrollHeight;
+          }, 10);
         } catch (e) {}
       }
     }
-  }
-  return msg;
-}
+  })
+});
 
 // Update Pot object.
 Pot.update({
@@ -2869,14 +3108,15 @@ function fire(force) {
  * @ignore
  */
 function fireAsync() {
-  var that = this, speed;
+  var that = this, speed, callback;
   if (this.options && Pot.isNumeric(this.options.speed)) {
     speed = this.options.speed;
   } else {
     speed = Pot.Deferred.defaults.speed;
   }
   this.freezing = true;
-  Pot.Internal.setTimeout(function() {
+  /**@ignore*/
+  callback = function() {
     try {
       fireProcedure.call(that);
     } catch (e) {
@@ -2884,13 +3124,16 @@ function fireAsync() {
       throw e;
     }
     if (chainsEnabled.call(that)) {
-      Pot.Internal.setTimeout(function() {
-        fire.call(that, true);
-      }, 0);
+      fire.call(that, true);
     } else {
       that.freezing = false;
     }
-  }, speed);
+  };
+  if (!speed && this.state === Pot.Deferred.states.unfired) {
+    Pot.Internal.callInBackground.flush(callback);
+  } else {
+    Pot.Internal.setTimeout(callback, speed);
+  }
 }
 
 /**
@@ -3448,7 +3691,7 @@ update(Pot.Deferred, {
    */
   callLazy : function(callback) {
     var args = arrayize(arguments, 1);
-    return Pot.Deferred.wait(0).then(function() {
+    return Pot.Deferred.begin(function() {
       if (Pot.isDeferred(callback)) {
         return callback.begin.apply(callback, args);
       } else if (Pot.isFunction(callback)) {
@@ -3544,19 +3787,24 @@ update(Pot.Deferred, {
    *
    *
    * @param  {Deferred}  deferred  The target Deferred object.
+   * @param  {*}         (value)   (Optional) The input value.
    * @return {*}                   Return the last result if exist.
    * @type Function
    * @function
    * @public
    * @static
    */
-  lastResult : function(deferred) {
-    var result;
+  lastResult : function(deferred, value) {
+    var result, args = arguments, key;
     if (Pot.isDeferred(deferred)) {
       try {
-        result = deferred.results[
-          Pot.Deferred.states[Pot.Deferred.states.success]
-        ];
+        key = Pot.Deferred.states[Pot.Deferred.states.success];
+        if (args.length <= 1) {
+          result = deferred.results[key];
+        } else {
+          deferred.results[key] = value;
+          result = deferred;
+        }
       } catch (e) {}
     }
     return result;
@@ -3580,19 +3828,27 @@ update(Pot.Deferred, {
    *
    *
    * @param  {Deferred}  deferred  The target Deferred object.
+   * @param  {*}         (value)   (Optional) The input value.
    * @return {*}                   Return the last Error if exist.
    * @type Function
    * @function
    * @public
    * @static
    */
-  lastError : function(deferred) {
-    var result;
+  lastError : function(deferred, value) {
+    var result, args = arguments, key;
     if (Pot.isDeferred(deferred)) {
       try {
-        result = deferred.results[
-          Pot.Deferred.states[Pot.Deferred.states.failure]
-        ];
+        key = Pot.Deferred.states[Pot.Deferred.states.failure];
+        if (args.length <= 1) {
+          result = deferred.results[key];
+        } else {
+          if (!Pot.isError(value)) {
+            value = new Error(value);
+          }
+          deferred.results[key] = value;
+          result = deferred;
+        }
       } catch (e) {}
     }
     return result;
@@ -3945,24 +4201,19 @@ update(Pot.Deferred, {
    * @static
    */
   begin : function(x) {
-    var d, timer, args = arrayize(arguments, 1), callable;
-    d = new Pot.Deferred({
-      async     : true,
-      canceller : function() {
-        try {
-          Pot.Internal.clearTimeout(timer);
-        } catch (e) {}
-      }
-    });
-    callable = x && Pot.isFunction(x);
-    timer = Pot.Internal.setTimeout(function() {
-      d.begin(callable ? (void 0) : x);
-    }, 0);
-    if (callable) {
+    var d, args = arrayize(arguments, 1), isCallable, value;
+    d = new Pot.Deferred();
+    isCallable = (x && Pot.isFunction(x));
+    if (isCallable) {
       d.then(function() {
         return x.apply(this, args);
       });
+    } else {
+      value = x;
     }
+    Pot.Internal.callInBackground.flush(function() {
+      d.begin(value);
+    });
     return d;
   },
   /**
@@ -4362,24 +4613,35 @@ update(Pot.Deferred, {
  *           Return new Deferred with fastest speed. (static)
  */
 Pot.Deferred.extendSpeeds(Pot.Deferred, 'begin', function(opts, x) {
-  var d, timer, args = arrayize(arguments, 2), callable, op;
-  callable = Pot.isFunction(x);
+  var d, timer, args = arrayize(arguments, 2), isCallable, op, speed, value;
+  isCallable = (x && Pot.isFunction(x));
   op = opts.options || opts || {};
   if (!op.cancellers) {
     op.cancellers = [];
   }
   op.cancellers.push(function() {
     try {
-      Pot.Internal.clearTimeout(timer);
+      if (timer != null) {
+        Pot.Internal.clearTimeout(timer);
+      }
     } catch (e) {}
   });
-  d = new Pot.Deferred(opts);
-  timer = Pot.Internal.setTimeout(function() {
-    d.begin(callable ? (void 0) : x);
-  }, opts.options && opts.options.speed || opts.speed);
-  if (callable) {
+  d = new Pot.Deferred(op);
+  if (isCallable) {
     d.then(function() {
       return x.apply(this, args);
+    });
+  } else {
+    value = x;
+  }
+  speed = (((opts.options && opts.options.speed) || opts.speed) - 0) || 0;
+  if (Pot.isNumeric(speed) && speed > 0) {
+    timer = Pot.Internal.setTimeout(function() {
+      d.begin(value);
+    }, speed);
+  } else {
+    Pot.Internal.callInBackground.flush(function() {
+      d.begin(value);
     });
   }
   return d;
@@ -4508,7 +4770,7 @@ each(Pot.Internal.LightIterator.speeds, function(v, k) {
   Pot.Internal.LightIterator.revSpeeds[v] = k;
 });
 
-Pot.Internal.LightIterator.prototype =
+Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
   update(Pot.Internal.LightIterator.prototype, {
   /**
    * @lends Pot.Internal.LightIterator.prototype
@@ -4670,11 +4932,15 @@ Pot.Internal.LightIterator.prototype =
       this.waiting  = true;
       this.restable = true;
       this.time = {
-        total  : null,
-        loop   : null,
-        count  : 1,
-        rest   : 100,
-        limit  : 255
+        start : now(),
+        total : null,
+        loop  : null,
+        diff  : null,
+        risk  : null,
+        axis  : null,
+        count : 1,
+        rest  : 100,
+        limit : 255
       };
       this.setIter(object, callback);
       if (!this.async && !this.isWaitable()) {
@@ -4735,12 +5001,12 @@ Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   revback : function() {
-    var err, cutback = false, diff, ax;
+    var that = this, result, err, cutback = false, time;
     this.time.loop = now();
     REVOLVE: {
       do {
         try {
-          this.iter.next();
+          result = this.iter.next();
         } catch (e) {
           err = e;
           if (Pot.isStopIter(err)) {
@@ -4748,32 +5014,49 @@ Pot.Internal.LightIterator.prototype =
           }
           throw err;
         }
+        if (this.async && Pot.isDeferred(result)) {
+          return result.ensure(function(res) {
+            if (Pot.isError(res)) {
+              Pot.Deferred.lastError(this, res);
+            } else {
+              Pot.Deferred.lastResult(this, res);
+            }
+            that.flush(that.revback, true);
+          });
+        }
+        time = now();
         if (this.isWaitable()) {
           if (this.time.total === null) {
-            this.time.total = now();
-          } else if (now() - this.time.total >= this.time.rest) {
+            this.time.total = time;
+          } else if (time - this.time.total >= this.time.rest) {
             Pot.XPCOM.till(0);
-            this.time.total = now();
+            this.time.total = time;
           }
         } else if (!this.async) {
           if (this.restable && this.time.count >= this.time.limit) {
             this.restable = false;
           }
         }
-        diff = now() - this.time.loop;
-        if (diff >= this.interval) {
+        this.time.risk = time - this.time.start;
+        this.time.diff = time - this.time.loop;
+        if (this.time.diff >= this.interval) {
           if (this.async &&
               this.interval < Pot.Internal.LightIterator.speeds.normal) {
             cutback = true;
           } else if (this.async || this.restable || this.isWaitable()) {
-            if (diff < this.interval + 8) {
-              ax = 2;
-            } else if (diff < this.interval + 36) {
-              ax = 5;
+            if (this.time.diff < this.interval + 8) {
+              this.time.axis = 2;
+            } else if (this.time.diff < this.interval + 36) {
+              this.time.axis = 5;
+            } else if (this.time.diff < this.interval + 48) {
+              this.time.axis = 7;
             } else {
-              ax = 7;
+              this.time.axis = 10;
             }
-            cutback = (Math.random() * 10 < ax);
+            if (this.time.axis >= 10 ||
+                (Math.random() * 10 < this.time.axis)) {
+              cutback = true;
+            }
           }
         }
       } while (!cutback);
@@ -4798,9 +5081,9 @@ Pot.Internal.LightIterator.prototype =
     de = this.createDeferred();
     d.then(function() {
       var dd = that.createDeferred();
+      that.revDeferred = that.createDeferred();
       dd.then(function() {
-        that.revDeferred = that.createDeferred();
-        that.revback();
+        return that.revback();
       }).begin();
       return that.revDeferred;
     }).ensure(function(er) {
@@ -4831,7 +5114,7 @@ Pot.Internal.LightIterator.prototype =
         if (Pot.isDeferred(callback)) {
           callback.begin();
         } else {
-          callback.apply(that);
+          callback.call(that);
         }
       });
       if (lazy) {
@@ -4842,16 +5125,25 @@ Pot.Internal.LightIterator.prototype =
               Pot.isNumeric(Pot.Internal.LightIterator.delays[speedKey])) {
             speed = Pot.Internal.LightIterator.delays[speedKey];
           }
+          if (Math.random() * 10 < Math.max(2, (this.time.axis || 2) / 2.75)) {
+            speed += Math.min(
+              this.time.rest,
+              Math.max(1,
+                Math.ceil(
+                  (this.time.risk / (this.time.rest + this.time.diff)) +
+                   this.time.diff
+                )
+              )
+            );
+          }
         }
-        if (speed === 0) {
-          Pot.Deferred.callLazy(d);
-        } else {
-          Pot.Deferred.callLater(speed / 1000, d);
-        }
+        Pot.Internal.setTimeout(function() {
+          d.begin();
+        }, speed);
       } else {
         d.begin();
       }
-      return d;
+      return void 0;
     }
   },
   /**
@@ -4884,7 +5176,7 @@ Pot.Internal.LightIterator.prototype =
   forEver : function(callback, context) {
     var i = 0;
     if (!Pot.isFunction(callback)) {
-      return this.noop;
+      return this.noop();
     }
     return {
       /**@ignore*/
@@ -4897,6 +5189,7 @@ Pot.Internal.LightIterator.prototype =
         } catch (ex) {
           i = 0;
         }
+        return result;
       }
     };
   },
@@ -4909,7 +5202,7 @@ Pot.Internal.LightIterator.prototype =
   repeat : function(max, callback, context) {
     var i, loops, n, last;
     if (!Pot.isFunction(callback)) {
-      return this.noop;
+      return this.noop();
     }
     if (!max || max == null) {
       n = 0;
@@ -4945,6 +5238,7 @@ Pot.Internal.LightIterator.prototype =
           throw Pot.StopIteration;
         }
         i += loops.step;
+        return result;
       }
     };
   },
@@ -4957,7 +5251,7 @@ Pot.Internal.LightIterator.prototype =
   forLoop : function(object, callback, context) {
     var copy, i = 0;
     if (!object || !object.length || !Pot.isFunction(callback)) {
-      return this.noop;
+      return this.noop();
     }
     copy = arrayize(object);
     return {
@@ -4980,7 +5274,7 @@ Pot.Internal.LightIterator.prototype =
           }
           result = callback.call(context, val, i, object);
           i++;
-          break;
+          return result;
         }
       }
     };
@@ -5006,7 +5300,7 @@ Pot.Internal.LightIterator.prototype =
       }
     }
     if (!copy || !copy.length) {
-      return this.noop;
+      return this.noop();
     }
     return {
       /**@ignore*/
@@ -5030,7 +5324,7 @@ Pot.Internal.LightIterator.prototype =
           }
           result = callback.call(context, val, key, object);
           i++;
-          break;
+          return result;
         }
       }
     };
@@ -5045,7 +5339,7 @@ Pot.Internal.LightIterator.prototype =
     var that = this, iterable;
     iterable = Pot.Iter.toIter(object);
     if (!Pot.isIter(iterable)) {
-      return this.noop;
+      return this.noop();
     }
     if (Pot.isFunction(callback)) {
       return {
@@ -5054,6 +5348,7 @@ Pot.Internal.LightIterator.prototype =
           var results = iterable.next();
           results.push(object);
           that.result = callback.apply(context, results);
+          return that.result;
         }
       };
     } else {
@@ -5061,6 +5356,7 @@ Pot.Internal.LightIterator.prototype =
         /**@ignore*/
         next : function() {
           that.result = iterable.next();
+          return that.result;
         }
       };
     }
@@ -5069,6 +5365,113 @@ Pot.Internal.LightIterator.prototype =
 
 Pot.Internal.LightIterator.prototype.doit.prototype =
   Pot.Internal.LightIterator.prototype;
+
+// Update internal synchronous iteration.
+update(Pot.Internal.LightIterator, {
+  /**
+   * @lends Pot.Internal.LightIterator
+   */
+  /**
+   * Quick iteration for synchronous.
+   *
+   * @type Object
+   * @class
+   * @private
+   * @ignore
+   */
+  QuickIteration : {
+    /**
+     * @lends Pot.Internal.LightIterator.QuickIteration
+     */
+    /**
+     * @private
+     * @ignore
+     */
+    resolve : function(iter) {
+      var err;
+      try {
+        while (true) {
+          iter.next();
+        }
+      } catch (e) {
+        err = e;
+        if (!Pot.isStopIter(err)) {
+          throw err;
+        }
+      }
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    forEach : function(object, callback, context) {
+      var result, that, iter;
+      that = Pot.Internal.LightIterator.fn;
+      if (!object) {
+        result = {};
+      } else {
+        result = object;
+        if (Pot.isArrayLike(object)) {
+          iter = that.forLoop(object, callback, context);
+        } else {
+          iter = that.forInLoop(object, callback, context);
+        }
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+      }
+      return result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    repeat : function(max, callback, context) {
+      var result, that, iter;
+      that = Pot.Internal.LightIterator.fn;
+      result = {};
+      if (max) {
+        iter = that.repeat(max, callback, context);
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+      }
+      return result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    forEver : function(callback, context) {
+      var result, that, iter;
+      that = Pot.Internal.LightIterator.fn;
+      result = {};
+      if (callback) {
+        iter = that.forEver(callback, context);
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+      }
+      return result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    iterate : function(object, callback, context) {
+      var result, that, iter, o;
+      that = Pot.Internal.LightIterator.fn;
+      if (!object) {
+        result = {};
+      } else {
+        result = null;
+        o = {
+          noop   : that.noop,
+          result : null
+        };
+        iter = that.iterate.call(o, object, callback, context);
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        result = o.result;
+      }
+      return result;
+    }
+  }
+});
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Define the main iterators.
 
@@ -5172,15 +5575,24 @@ Pot.update({
    * @property {Function} ninja  Iterates "for each" loop with fastest speed.
    */
   forEach : Pot.tmp.createLightIterateConstructor(function(interval) {
-    return function(object, callback, context) {
-      var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.forLoop |
-                  Pot.Internal.LightIterator.types.forInLoop;
-      opts.interval = interval;
-      opts.async = false;
-      opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).result;
-    };
+    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(object, callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.forLoop |
+                    Pot.Internal.LightIterator.types.forInLoop;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+      };
+    } else {
+      return function(object, callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.forEach(
+          object, callback, context
+        );
+      };
+    }
   }),
   /**
    * "repeat" loop iterates a specified number.
@@ -5246,14 +5658,23 @@ Pot.update({
    * @property {Function} ninja  Iterates "repeat" loop with fastest speed.
    */
   repeat : Pot.tmp.createLightIterateConstructor(function(interval) {
-    return function(max, callback, context) {
-      var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.repeat;
-      opts.interval = interval;
-      opts.async = false;
-      opts.context = context;
-      return (new Pot.Internal.LightIterator(max, callback, opts)).result;
-    };
+    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(max, callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.repeat;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(max, callback, opts)).result;
+      };
+    } else {
+      return function(max, callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.repeat(
+          max, callback, context
+        );
+      };
+    }
   }),
   /**
    * Iterates indefinitely until "Pot.StopIteration" is thrown.
@@ -5289,14 +5710,23 @@ Pot.update({
    * @property {Function} ninja  Iterates "forEver" loop with fastest speed.
    */
   forEver : Pot.tmp.createLightIterateConstructor(function(interval) {
-    return function(callback, context) {
-      var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.forEver;
-      opts.interval = interval;
-      opts.async = false;
-      opts.context = context;
-      return (new Pot.Internal.LightIterator(callback, null, opts)).result;
-    };
+    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.forEver;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(callback, null, opts)).result;
+      };
+    } else {
+      return function(callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.forEver(
+          callback, context
+        );
+      };
+    }
   }),
   /**
    * Iterate an iterable object. (using Pot.Iter)
@@ -5322,14 +5752,23 @@ Pot.update({
    * @property {Function} ninja  Iterates "iterate" loop with fastest speed.
    */
   iterate : Pot.tmp.createLightIterateConstructor(function(interval) {
-    return function(object, callback, context) {
-      var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.iterate;
-      opts.interval = interval;
-      opts.async = false;
-      opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).result;
-    };
+    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(object, callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.iterate;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+      };
+    } else {
+      return function(object, callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.iterate(
+          object, callback, context
+        );
+      };
+    }
   })
 });
 
@@ -5892,6 +6331,7 @@ update(Pot.Iter, {
     arrayLike  = object && Pot.isArrayLike(object);
     objectLike = object && !arrayLike && Pot.isObject(object);
     if (initial === undefined) {
+      /**@ignore*/
       value = (function() {
         var first;
         if (arrayLike || objectLike) {
@@ -6361,6 +6801,12 @@ update(Pot.Iter, {
     return result;
   }
 });
+
+// Update methods for reference.
+Pot.update({
+  toIter : Pot.Iter.toIter
+});
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Update the Pot.Deferred object for iterators.
 
@@ -7577,6 +8023,7 @@ Pot.update({
    *
    *
    * @param  {Array|Object|*} object  A target object.
+   * @param  {*}              subject A subject object.
    * @param  {*}              (from)  (Optional) The index at
    *                                    which to begin the search.
    *                                  Defaults to 0.
@@ -7623,6 +8070,7 @@ Pot.update({
    *
    *
    * @param  {Array|Object|*} object  A target object.
+   * @param  {*}              subject A subject object.
    * @param  {*}             (from)   (Optional) The index at which to
    *                                    start searching backwards.
    *                                  Defaults to the array's length.
@@ -7698,6 +8146,11 @@ update(Pot.Crypt, {
   }
 });
 
+// Update methods for reference.
+Pot.update({
+  hashCode : Pot.Crypt.hashCode
+});
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Net.
 Pot.update({
@@ -7758,6 +8211,7 @@ update(Pot.Net, {
      *
      * @param  {String}     url      The request URL.
      * @param  {Object}   (options)  Request options.
+     *                                 <pre>
      *                                 +----------------------------------
      *                                 | Available options:
      *                                 +----------------------------------
@@ -7768,7 +8222,7 @@ update(Pot.Net, {
      *                                 - password    : {String}    null
      *                                 - headers     : {Object}    null
      *                                 - mimeType    : {String}    null
-     *
+     *                                 </pre>
      * @return {Deferred}            Return the instance of Pot.Deferred.
      * @type Function
      * @function
@@ -7862,24 +8316,26 @@ update(Pot.Net, {
         function insertId(url, id, defaults) {
           var uri = stringify(url), c;
           c = '=?';
-          if (~uri.indexOf(c)) {
-            uri = uri.replace(c, '=' + id);
-          } else {
-            c = '?';
+          if (!~uri.indexOf(c) || !~uri.indexOf(defaults + '=')) {
             if (~uri.indexOf(c)) {
-              uri = uri.replace(c, c + defaults + '=' + id);
+              uri = uri.replace(c, '=' + id);
             } else {
-              while (uri.slice(-1) === '&') {
-                uri = uri.slice(0, -1);
+              c = '?';
+              if (~uri.indexOf(c)) {
+                uri = uri.replace(c, c + defaults + '=' + id);
+              } else {
+                while (uri.slice(-1) === '&') {
+                  uri = uri.slice(0, -1);
+                }
+                uri = uri + c + defaults + '=' + id;
               }
-              uri = uri + c + defaults + '=' + id;
             }
           }
           return uri;
         }
         /**@ignore*/
         return function(url, options) {
-          var d, opts, context, id;
+          var d, opts, context, id, callback, key;
           var doc, uri, head, script, done, defaults;
           defaults = 'callback';
           d = new Pot.Deferred();
@@ -7891,9 +8347,26 @@ update(Pot.Net, {
             return d.raise(context || url || head || doc);
           }
           try {
-            do {
-              id = buildSerial(Pot, '');
-            } while (id in context);
+            if (opts.callback) {
+              if (Pot.isString(opts.callback)) {
+                id = opts.callback;
+              } else if (Pot.isFunction(opts.callback)) {
+                callback = opts.callback;
+              } else if (Pot.isObject(opts.callback)) {
+                for (key in opts.callback) {
+                  id = key;
+                  if (Pot.isFunction(opts.callback[key])) {
+                    callback = opts.callback[key];
+                  }
+                  break;
+                }
+              }
+            }
+            if (!id || !(id in context)) {
+              do {
+                id = buildSerial(Pot, '');
+              } while (id in context);
+            }
             uri = buildURL(
               insertId(url, id, defaults),
               opts.queryString || opts.sendContent
@@ -7908,6 +8381,7 @@ update(Pot.Net, {
             }
             /**@ignore*/
             context[id] = function() {
+              var args = arguments;
               try {
                 delete context[id];
               } catch (e) {
@@ -7921,7 +8395,10 @@ update(Pot.Net, {
                 }
                 script = undefined;
               } catch (e) {}
-              d.begin.apply(d, arguments);
+              if (Pot.isFunction(callback)) {
+                callback.apply(callback, args);
+              }
+              d.begin.apply(d, args);
             };
             script.src = uri;
             /**@ignore*/
@@ -8043,11 +8520,13 @@ update(Pot.Net, {
          *
          * @param  {String}     url      The request URL.
          * @param  {Object}   (options)  Request options.
+         *                                 <pre>
          *                                 +----------------------------------
          *                                 | Available options:
          *                                 +----------------------------------
-         *                                 - queryString : {Object}    null
-         *
+         *                                 - queryString : {Object} null
+         *                                 - callback    : {String} 'callback'
+         *                                 </pre>
          * @return {Deferred}            Return the instance of Pot.Deferred.
          * @type Function
          * @function
@@ -8058,6 +8537,12 @@ update(Pot.Net, {
       })
     })()
   }
+});
+
+// Update methods for reference.
+Pot.update({
+  request : Pot.Net.XHR.request,
+  jsonp   : Pot.Net.XHR.request.jsonp
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
