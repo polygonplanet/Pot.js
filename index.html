@@ -52,6 +52,7 @@ td.marker, td.marker * {
               <ul>
                 <li><a href="#callbackChain">チェイン</a></li>
                 <li><a href="#exception">例外処理</a></li>
+                <li><a href="#Destructuring-Assignment">分割代入</a></li>
                 <li><a href="#controlSpeed">速度の操作</a></li>
                 <li><a href="#fireChain">チェインを実行</a></li>
                 <li><a href="#replaceToDeferred">関数を Deferred 化</a></li>
@@ -284,7 +285,7 @@ td.marker, td.marker * {
                <table class="grid" id="DeferredLibraryMap">
                  <tr>
                    <td class="header marker" style="width: 19%;">
-                     Pot.Deferred
+                     <a href="http://polygonplanet.github.com/Pot.js/index.html">Pot.Deferred</a>
                    </td>
                    <td class="header" style="width: 19%;">
                      <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred">MochiKit.Async.Deferred</a>
@@ -410,7 +411,7 @@ begin(function() {
             <pre>var urls = ['/foo.json', '/bar.json', '/baz.json'];
 var result = [];
 Deferred.forEach(urls, function(url) {
-    request(url).then(function(data) {
+    return request(url).then(function(data) {
         result.push(data);
     });
 }).then(function() {
@@ -549,6 +550,38 @@ Deferred.forEach(urls, function(url) {
              といったことが可能です。
              最終的な結果 (return された) 値が次のコールバックの引数として渡されます。
             </p>
+            <h4 id="Destructuring-Assignment">分割代入</h4>
+            <p>
+             チェインのコールバック関数は、
+             引数の数を調節して結果値から分割代入 (Destructuring-Assignment) のようなことができます。
+            </p>
+            <pre>begin(function() {
+    // 配列で返す
+    return [1, 2, 3];
+}).then(function(a, b, c) { // 結果の配列のアイテム数と引数の数を合わせる
+
+    debug(a); // 1
+    debug(b); // 2
+    debug(c); // 3
+
+    return [c, b, a]; // 逆順にして返す
+
+}).then(function(a, b, c) {
+    // 上と逆順になる
+
+    debug(a); // 3
+    debug(b); // 2
+    debug(c); // 1
+
+    return [c, b, a];
+
+}).then(function(res) { // 通常通り引数一つで取得
+    // 引数一つの時は分割代入されない
+
+    debug(res); // [1, 2, 3]
+
+});</pre>
+            <p><br></p>
             <h4 id="controlSpeed">速度の操作</h4>
             <p>
              Pot.Deferred は、コールバックチェインの速度を変更することができます。
@@ -1481,7 +1514,7 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
               <pre>request('/data.cgi', {
     method : 'POST',
     sendContent : {
-        query  : 'Book OR Media',
+        query  : 'Book OR Media', // 文字列は URL エンコードされる
         start  : 0,
         length : 15,
         format : 'json'
@@ -1545,7 +1578,7 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
 var url = 'http://www.example.com/jsonpTest?callback=?';
 jsonp(url, {
     queryString : {
-        q : 'JavaScript OR ECMAScript'
+        q : 'JavaScript OR ECMAScript' // 文字列は URL エンコードされる
     }
 }).then(function(data) {
     debug(data.results[0].text);
@@ -1764,6 +1797,421 @@ passed = some([12, 5, 8, 1, 4], isBigEnough);
 debug(passed); // true</pre>
              </dd>
             </dl>
+            <p><br></p>
+            <h4 id="PotDeferredMethods">Pot.Deferred のメソッド</h4>
+            <div>
+              <p>
+               以下は、Deferred (Pot.Deferred) のメソッドです。
+               <br>
+               コールバックチェイン上で実行できます。
+              </p>
+            </div>
+            <dl>
+             <dt><dfn>then</dfn>(callback[, errback])</dt>
+             <dd>
+              コールバック関数 callback をチェインに追加します。
+              <br>
+              関数 errback が与えられると、
+              エラーバックとしてチェインに追加します。
+              エラーバック関数は rescue で登録することと同じです。
+              <br>
+              2 つの関数を、成功時、エラー時
+              として追加することで手間が省けます。
+              <pre>var d = new Deferred();
+d.then(function() {
+    return someFunc();
+}).then(function(res) {
+    // 成功時
+    debug(res);
+}, function(err) {
+    // エラー時
+    debug(err);
+});
+d.begin();</pre>
+             </dd>
+             <dt><dfn>rescue</dfn>(errback)</dt>
+             <dd>
+              エラーバック関数をチェインに追加します。
+              <br>
+              エラーバックはコールバックチェインで
+              エラーが発生したときに、引数にエラーを持ち実行されます。
+              <pre>var d = new Deferred();
+d.then(function() {
+    // エラーを発生させる
+    throw new Error('MyError');
+}).rescue(function(err) {
+    // エラーをキャッチ
+    debug(err); // Error: MyError
+    return 1;
+}).then(function(res) {
+    // チェインを継続
+    if (res == 1) {
+        // 再度エラーを発生させる
+        // Error オブジェクトでなくても throw されるとエラー扱い
+        throw res;
+    }
+}).rescue(function(err) {
+    // エラーを捕捉
+    debug(err); // Error: 1
+});
+d.begin();</pre>
+             </dd>
+             <dt><dfn>ensure</dfn>(callback)</dt>
+             <dd>
+              成功時、エラー時どちらでも実行される
+              コールバック関数をチェインに追加します。
+              <br>
+              必ず実行したい場合などに有用です。
+              <pre>var d = new Deferred();
+d.then(function() {
+    // ランダムにエラーを発生させる
+    if (Math.random() * 10 &lt; 5) {
+        return 'OK';
+    } else {
+        throw 'NG';
+    }
+}).ensure(function(res) {
+    // エラーが起きても実行される
+    if (isError(res)) {
+        // なんらかのエラー対処
+        return errorHandler();
+    } else {
+        return res;
+    }
+}).then(function(res) {
+    someFunc(res);
+}).begin();</pre>
+             </dd>
+             <dt><dfn>begin</dfn>([value[, ...]])</dt>
+             <dd>
+              コールバックチェインを開始します。
+              <br>
+              任意に、引数に値を持たせ
+              次のコールバック関数の引数に渡すことができます。
+              <pre>var d = new Deferred();
+d.then(function() {
+    debug(1);
+    return 1;
+});
+// この時点ではチェインは実行されていない
+
+// なんらかの条件が通ればコールバック関数を追加
+if (check()) {
+    d.then(function(res) {
+        return someFunc(res);
+    });
+}
+// チェインを実行
+d.begin();
+
+// その後は追加した時に実行される
+d.then(function(res) {
+    return 'hoge';
+});
+d.then(function(res) {
+    debug(res); // 'hoge'
+});</pre>
+             </dd>
+             <dt><dfn>raise</dfn>([error[, ...]])</dt>
+             <dd>
+              エラーと共にチェインを開始します。
+              <br>
+              begin のエラー版のようなものです。
+              <br>
+              何らかの事情でエラー扱いにしたい時に有用です。
+              <pre>var d = new Deferred();
+d.then(function() {
+    // 成功時
+    successFunc();
+}).rescue(function(err) {
+    // エラー時
+    errorFunc(err);
+}).ensure(function() {
+    // 最終的な処理
+    finalFunc();
+});
+// チェックが通らなければエラーとする
+if (!someCheck()) {
+    d.raise();
+} else {
+    d.begin();
+}</pre>
+             </dd>
+             <dt><dfn>end</dfn>()</dt>
+             <dd>
+              チェインを終了し、閉じます。
+              <br>
+              終了したチェインは
+              then などでコールバックを追加しても実行されません。
+              <pre>var d = begin(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+}).end(); // チェインを終了する
+
+// その後に関数を追加しても何も起こらない
+d.then(function() {
+    debug('Help me!');
+});</pre>
+             </dd>
+             <dt><dfn>wait</dfn>(seconds[, value])</dt>
+             <dd>
+              秒単位で待機します。
+              <br>
+              seconds 秒たつまで次のチェインは実行されません。
+              <pre>begin(function() {
+    return 1;
+}).wait(1).then(function(res) { // 1 秒待つ
+    debug(res);
+    return res + 1;
+}).wait(1.5).then(function(res) { // 1.5 秒待つ
+    debug(res); // 2
+    return res + 1;
+}).wait(0).then(function(res) { // 瞬間的な間隔をおく
+    debug(res); // 3
+});</pre>
+             </dd>
+             <dt><dfn>till</dfn>(cond)</dt>
+             <dd>
+              条件式 cond が 真 (TRUE) を返すまで待機する。
+              <br>
+              引数 cond は、真偽値を返す関数を指定します。
+              <br>
+              cond が 真 (TRUE) となる値を返すまで
+              次のチェインは実行されません。
+              <pre>var d = new Pot.Deferred();
+d.then(function() {
+    debug('Begin till');
+}).till(function() {
+    // body が読み込まれるまで待機
+    if (!document.body) {
+        return false;
+    } else {
+        return true;
+    }
+}).then(function() {
+    debug('End till');
+    document.body.innerHTML += 'hoge';
+}).begin();</pre>
+             </dd>
+             <dt><dfn>cancel</dfn>()</dt>
+             <dd>
+              チェインを中止します。
+              <br>
+              <pre>var d = new Pot.Deferred();
+d.then(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+});
+// チェックが通れば開始
+if (check()) {
+    d.begin();
+} else {
+    // 通らなければ中止
+    d.cancel();
+    // キャンセルしたチェインに追加しても何も起きない
+    d.then(function() {
+        debug('hoge');
+    });
+    d.begin(); // begin も無視される
+}</pre>
+              コールバックチェインの中で cancel する場合。
+              <pre>
+
+begin(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+    // ここでキャンセル
+    this.cancel();
+}).then(function() {
+    // このコールバック関数は実行されない
+    debug(3);
+});</pre>
+              <br>
+              チェイン上で実行される
+              コールバック関数内の this は、
+              自身の Pot.Deferred インスタンスです。
+              <br>
+             </dd>
+             <dt><dfn>canceller</dfn>(func)</dt>
+             <dd>
+              キャンセル時に実行される関数を登録する。
+              <br>
+              cancel が呼ばれた時に実行される関数を登録します。
+              <br>
+              canceller はスタッカブルに関数を保持しているため、
+              複数の関数を登録することができます。
+              <pre>var d = new Deferred();
+d.canceller(function() {
+    debug('cancelled!');
+}).canceller(function() {
+    debug('cancelled!!');
+}).then(function() {
+    debug('start chain');
+});
+d.cancel();
+// cancelled!
+// cancelled!!
+// と出力される</pre>
+             </dd>
+             <dt><dfn>speed</dfn>(sp)</dt>
+             <dd>
+              各チェイン間の実行速度を設定または取得します。
+              <br>
+              引数 sp には、文字列定数での速度指定
+              またはミリ秒単位の数値で設定します。
+              <br>
+              定義されている速度値については、
+              <a href="#controlSpeedMap">速度の表</a> を参照ください。
+              <br>
+              引数に何も渡さないでコールすると、現在の速度を返します。
+              <pre>var n = 0;
+var testFunc = function() { debug(++n); };
+var d = new Deferred();
+d.then(testFunc).then(testFunc).then(testFunc)
+ .then(function() { debug('最も遅い速度に変更 (limp)'); })
+ .speed('limp')
+ .then(testFunc).then(testFunc).then(testFunc)
+ .then(function() { debug('50 ミリ秒に設定'); })
+ .speed(50)
+ .then(testFunc).then(testFunc).then(testFunc)
+ .then(function() { debug('End'); })
+ .begin();</pre>
+             </dd>
+             <dt><dfn>async</dfn>(sync)</dt>
+             <dd>
+              処理の同期と非同期を切り替え設定します。
+              <br>
+              デフォルトは非同期です。
+              同期にするには false を渡します。
+              非同期で実行するには true を渡します。
+              <br>
+              同期的に実行するには、
+              <pre>var d = new Deferred();</pre>
+              とコンストラクタから開始した場合のみ適応できます。
+              なぜなら Pot.Deferred.begin などの関数は、
+              関数内で非同期として new Deferred と生成しているからです。
+              最初の実行時に非同期だった場合、同期にしたとしても意味はありません。
+              <br>
+              または、同期にする場合
+              コンストラクタの引数にオプションで、
+              <pre>var syncDederred = new Deferred({ async : false });</pre>
+              と設定することもできます。
+              <pre>var value = null;
+var d = new Deferred();
+// 同期に設定
+d.async(false).then(function() {
+    return 'sync';
+}).then(function(res) {
+    return res + 'hron';
+}).then(function(res) {
+    return res + 'ous';
+}).then(function(res) {
+    value = res;
+}).begin();
+
+debug(value); // 'synchronous'</pre>
+              非同期で実行。
+              <pre>var value = null;
+var d = new Deferred();
+// 非同期に設定
+d.async(true).then(function() {
+    return 'async';
+}).then(function(res) {
+    return res + 'hron';
+}).then(function(res) {
+    return res + 'ous';
+}).then(function(res) {
+    value = res;
+}).begin();
+
+// 非同期のためすぐには取得できない
+debug(value); // null
+
+wait(1).then(function() {
+    debug(value); // 'asynchronous'
+});</pre>
+             </dd>
+             <dt><dfn>args</dfn>([...args])</dt>
+             <dd>
+              チェインの結果となる値を設定または取得します。
+              <br>
+              この値は、前のコールバック関数で return された値です。
+              <br>
+              args を使用することで、任意の値に設定または上書きできます。
+              <pre>var d = new Deferred();
+d.then(function(res) {
+    debug(res); // undefined
+// args により値を設定
+}).args('hoge').then(function(res) {
+    debug(res); // 'hoge'
+    return res + res;
+});
+d.begin();
+
+d.then(function(res) {
+    // 現在の値を取得
+    debug( this.args() ); // 'hogehoge'
+    // res と同じものです
+    debug( this.args() === res ); // true
+});
+
+// 分割代入ぽいことするには楽です
+d.args(1, 2, 3).then(function(a, b, c) {
+    debug(a); // 1
+    debug(b); // 2
+    debug(c); // 3
+});
+// 配列でも可
+d.args(['A', 'B', 'C']).then(function(a, b, c) {
+    debug(a); // 'A'
+    debug(b); // 'B'
+    debug(c); // 'C'
+});</pre>
+             </dd>
+             <dt><dfn>data</dfn>([key [, value [, ...args]]])</dt>
+             <dd>
+              現在のチェイン上で使えるストレージとして値を設定または取得する。
+              <br>
+              実行中の Pot.Deferred のインスタンスに対して、
+              自由に設定や取得ができるデータストレージです。
+              <br>
+              ちょっとした一時的な変数や、
+              チェインの外側で定義してチェイン上で使う変数などの省略になります。
+              特に、オブジェクトをハッシュとして使うときには代用できます。
+              <br>
+              設定するときは、第一引数 key にキー名を、
+              value に任意の値を渡します。
+              <br>
+              取得する場合は、設定したキー名を key に渡します。
+              対応する値があればそれを返します。
+              <pre>var d = new Deferred();
+d.data({
+    // データを設定する (オブジェクトの場合は引数一つ)
+    count : 0,
+    begin : 'BEGIN',
+    end   : 'END'
+}).then(function() {
+    // データを取得
+    debug( this.data('begin') ); // BEGIN
+
+    return this.data('count') + 1;
+
+}).then(function(res) {
+    debug(res); // 1
+
+    // データを更新
+    this.data('count', res + 1);
+
+    return this.data('count');
+}).then(function(res) {
+    debug(res); // 2
+    debug( this.data('end') ); // END
+});
+d.begin();</pre>
+             </dd>
            </div>
          </div>
         </div>
