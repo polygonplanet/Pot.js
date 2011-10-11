@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Pot.js + PotLite.js -ドキュメントリファレンス</title>
+<title>Pot.js + PotLite.js - ドキュメントリファレンス</title>
 <link rel="stylesheet" type="text/css" href="pot.css">
 <style>
 /*
@@ -28,7 +28,7 @@ td.marker, td.marker * {
 <body>
   <div class="layout-liquid-container">
     <div class="header">
-      <h1>Pot.js</h1>
+      <h1 id="top">Pot.js</h1>
       <p>
        JavaScript utility library for asynchronous processing with Deferred.
       </p>
@@ -59,7 +59,15 @@ td.marker, td.marker * {
                 <li><a href="#iterator">イテレータ</a></li>
                 <li><a href="#replaceLoop">ループ処理を置き換える</a></li>
                 <li><a href="#StopIteration">イテレートを止める</a></li>
-                <li><a href="#otherFunctions">その他の関数</a></li>
+                <li>
+                  <a href="#referenceFunctions">関数リファレンス</a>
+                  <ul>
+                    <li><a href="#PotObjectFunctions">Pot オブジェクトの関数</a></li>
+                    <li><a href="#iteratorFunctions">イテレータ関数</a></li>
+                    <li><a href="#PotDeferredMethods">Pot.Deferred のメソッド</a></li>
+                    <li><a href="#PotDeferredFunctions">Pot.Deferred の関数</a></li>
+                  </ul>
+                </li>
               </ul>
             </li>
           </ul>
@@ -168,7 +176,7 @@ td.marker, td.marker * {
           <strong>Author</strong>: polygon planet
          </p>
          <p>
-          <a href="http://twitter.com/polygon_planet">@polygon_planet</a>
+          <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">@polygon_planet</a>
           または (polygon.planet[at]gmail.com) まで、
           <br>
           意見・感想・要望などなんでも送っていただけるとうれしいです。
@@ -1216,7 +1224,7 @@ debug(foo);</pre>
              isStopIter (Pot.isStopIter) が確実です。
             </p>
            </div>
-           <h3 id="otherFunctions">その他の関数</h3>
+           <h3 id="referenceFunctions">関数リファレンス</h3>
            <div>
             <p>
              Pot.js および PotLite.js には、
@@ -1230,8 +1238,13 @@ debug(foo);</pre>
              <a href="jsdoc/potlite/index.html">JSDoc ドキュメント (PotLite.js)</a>
              または直接ソースコードを参照ください。
             </p>
+            <p><br></p>
+            <h4 id="PotObjectFunctions">Pot オブジェクトの関数</h4>
             <p>
-             以下の関数は Pot.globalize() がされてない場合、
+             以下の関数は、Pot オブジェクトから実行できる
+             static な関数です。
+             <br>
+             Pot.globalize() がされてない場合、
              Pot.xxx としてアクセスできます (e.g. Pot.update)。
              <br>
              Pot.globalize() が適応済みの場合、
@@ -1803,6 +1816,9 @@ debug(passed); // true</pre>
               <p>
                以下は、Deferred (Pot.Deferred) のメソッドです。
                <br>
+               インスタンスから実行できる、
+               つまり Pot.Deferred.prototype メソッドです。
+               <br>
                コールバックチェイン上で実行できます。
               </p>
             </div>
@@ -2017,9 +2033,7 @@ if (check()) {
     d.begin(); // begin も無視される
 }</pre>
               コールバックチェインの中で cancel する場合。
-              <pre>
-
-begin(function() {
+              <pre>begin(function() {
     debug(1);
 }).then(function() {
     debug(2);
@@ -2212,16 +2226,511 @@ d.data({
 });
 d.begin();</pre>
              </dd>
+            </dl>
+            <p><br></p>
+            <h4 id="PotDeferredFunctions">Pot.Deferred の関数</h4>
+            <div>
+              <p>
+               以下は、Deferred (Pot.Deferred) オブジェクトの関数です。
+               <br>
+               static にコールできます。
+              </p>
+              <p>
+               Pot.globalize() がされてない場合は、
+               Pot.Deferred.xxx としてコールできます (例えば Pot.Deferred.begin)。
+               <br>
+               Pot.globalize() が適応されてる場合は、
+               定義名のままコールできます (例: begin)。
+              </p>
+            </div>
+            <dl>
+             <dt><dfn>succeed</dfn>([...args])</dt>
+             <dd>
+              コールバックとして発動済みの Pot.Deferred オブジェクトのインスタンスを返す。
+              <br>
+              発動済みとは、.begin() が実行済みということです。
+              ただしコールバック関数自体は 1 つも追加されていないので、
+              空の状態で実行済みということです。
+              <br>
+              なので、then などでコールバック関数を追加すると
+              即座に実行します。
+              <br>
+              引数に何らかの値を渡すと、その値が次のコールバックの引数に渡ります。
+              <pre>request('/foo.json').then(function(data) {
+    return (
+
+        // 結果が取得できたら次のチェインに繋げるため、
+        //  succeed を使用して整合性をとる。
+        // 失敗したら別の request により取得する
+
+        data.result ? succeed(data)
+                    : request('/bar.json')
+
+    ).then(function(data) {
+        // データが取得できる
+        return data.result;
+    });
+}).then(function(res) {
+    debug(res);
+});</pre>
+              用途は様々ですが、一例として上のような場面で
+              非 Deferred な値を Deferred 化するために便利です。
+             </dd>
+             <dt><dfn>failure</dfn>([...args])</dt>
+             <dd>
+              エラーバックとして発動済みの Pot.Deferred オブジェクトのインスタンスを返す。
+              <br>
+              succeed のエラー版のようなものです。
+              空のチェインに対して .raise() が実行済みのインスタンスが返ります。
+              <br>
+              引数に何らかの値を渡すと、
+              その値を Error オブジェクトとして
+              次のエラーバックの引数に渡ります。
+              <pre>request('foo.json').then(function(data) {
+    return (
+        data.result ? succeed(data.result) 
+                      // 失敗したらエラーとして処理する場合
+                    : failure(data)
+    ).ensure(function(res) {
+        if (isError(res)) {
+            // 何らかのエラー処理
+            return handleError(res);
+        } else {
+            // 成功時の処理
+            return handleSuccess(res);
+        }
+    });
+}).then(function(res) {
+    // 何らかの最終的な処理
+    handleEnd(res);
+});</pre>
+             </dd>
+             <dt><dfn>wait</dfn>(seconds[, value])</dt>
+             <dd>
+              秒単位で待機します。
+              <br>
+              seconds 秒たつまで次のチェインは実行されません。
+              <br>
+              Pot.Deferred チェイン上での wait() と同じです。
+              <br>
+              新規の Pot.Deferred インスタンスが返ります。
+              value を設定すると、その値を引き継ぎます。
+              <pre>// 5 秒後に実行
+wait(5).then(function() {
+    // 2 秒後に 'fuga' を値として実行
+    return wait(2, 'fuga').then(function(res) {
+        return 'hoge' + res;
+    });
+}).then(function(res) {
+    debug(res); // 'hogefuga'
+});</pre>
+             </dd>
+             <dt><dfn>till</dfn>(cond)</dt>
+             <dd>
+              条件式 cond が 真 (TRUE) を返すまで待機する。
+              <br>
+              引数 cond は、真偽値を返す関数を指定します。
+              <br>
+              この関数は Pot.Deferred のインスタンスを返し、
+              cond が 真 (TRUE) となる値を返すまで
+              返されたインスタンスは実行されません。
+              <pre>debug('Begin till');
+till(function() {
+    // body が読み込まれるまで待機
+    if (!document.body) {
+        return false;
+    } else {
+        return true;
+    }
+}).then(function() {
+    debug('End till');
+    document.body.innerHTML += 'hoge';
+});</pre>
+             </dd>
+             <dt><dfn>begin</dfn>(func)</dt>
+             <dd>
+              コールバック関数 func を追加した
+              Pot.Deferred のインスタンスを作成し、チェインを実行済みにして返します。
+              <br>
+              <pre>var d = new Deferred();
+return d.then(func).begin();</pre>
+              上のような流れのショートカットのようなものです。
+              <br>
+              即座に実行できるため、
+              new Deferred と作成する手間が省けます。
+              <br>
+              返り値のインスタンスは発動済みのため、
+              チェインの最後に .begin() とする必要はありません。
+              <pre>begin(function() {
+    return 1;
+}).then(function(res) {
+    return res + 1;
+}).then(function(res) {
+    debug(res); // 2
+});</pre>
+             </dd>
+             <dt><dfn>flush</dfn>(callback[, ...args])</dt>
+             <dd>
+              関数を実行し Pot.Deferred のインスタンスを返します。
+              <br>
+              begin と似ていますが、
+              関数でなくても扱う点が異なります。
+              <br>
+              callback が Pot.Deferred のインスタンスだった場合は、
+              begin() を実行して次のコールバック関数の引数として返します。
+              <br>
+              それ以外の値だった場合は、そのまま次のコールバックの引数に引き継がれます。
+              <pre>flush(function() {
+    var d = new Deferred();
+    d.then(function() {
+        return 'hoge';
+    });
+    return flush(d).then(function(res) {
+        return res + 'fuga';
+    }).then(function(res) {
+        return flush('piyo').then(function(p) {
+            return res + p;
+        });
+    });
+}).then(function(res) {
+    debug(res); // 'hogefugapiyo'
+});</pre>
+             </dd>
+             <dt><dfn>maybeDeferred</dfn>(x)</dt>
+             <dd>
+              Deferred かどうか分からない値を確実に Deferred インスタンスにして返します。
+              <br>
+              可能な限り、次のチェインに値が渡せるよう Deferred 化して返します。
+              <br>
+              何らかの関数の戻り値などが Deferred インスタンスなのかどうか
+              曖昧なときなどに有用です。
+              <pre>// ランダムに Deferred や Error, 文字列を返す関数
+function randomDeferred() {
+    var n = Math.random() * 10;
+    if (n &lt; 2) {
+        return new Error('error');
+    } else if (n &lt; 5) {
+        return 'string';
+    } else if (n &lt; 7) {
+        return new Deferred().then(function() {
+            return 'unfired';
+        });
+    } else {
+        return begin(function() {
+            return 'fired';
+        });
+    }
+}
+begin(function() {
+    // 不明な値を取得
+    var value = randomDeferred();
+    // 次のチェインに繋げられるように Deferred 化する
+    return maybeDeferred(value);
+}).ensure(function(res) {
+    debug(res); // (Error: error) or 'string' or 'unfired' or 'fired'
+});</pre>
+             </dd>
+             <dt><dfn>callLater</dfn>(seconds, callback)</dt>
+             <dd>
+              seconds 秒後に関数 callback を実行します。
+              <br>
+              Pot.Deferred のインスタンスが返ります。
+              返り値の Deferred は、キャンセルすることもできます。
+              <br>
+              setTimeout の Deferred 版のようなものです。
+              そして、ミリ秒ではなく秒数で指定する関数です。
+              <pre>callLater(5, function() {
+    debug('hoge');
+});</pre>
+              上の例は、5 秒後に debug 関数により
+              コンソールに 'hoge' と出力されます。
+             </dd>
+             <dt><dfn>callLazy</dfn>(callback)</dt>
+             <dd>
+              関数 callback を非同期で実行します。
+              <br>
+              callLater と似ているところもありますが、
+              この関数は callLater(0, function() {...}) とするより速く実行されます。
+              <br>
+              オーバーヘッドが少ないので、単にバックグラウンドで実行したいときなどに適します。
+              (オーバーヘッドに関しては begin のほうがより少ないです。)
+              <br>
+              返り値は callLater と同様 Deferred になります。
+              then などで繋げることもできます。
+              <pre>callLazy(function() {
+    debug('hoge');
+}).then(function() {
+    debug('fuga');
+});</pre>
+             </dd>
+             <dt><dfn>isFired</dfn>(deferred)</dt>
+             <dd>
+              引数 deferred のチェインが開始されているかどうかの真偽値を返します。
+              <br>
+              すでに開始されている場合は true を返し、
+              まだ開始されていない場合は false を返します。
+              <pre>var d = new Deferred();
+debug( isFired(d) ); // false
+d.then(function() {
+    return 'hoge';
+});
+debug( isFired(d) ); // false
+d.begin();
+debug( isFired(d) ); // true</pre>
+             </dd>
+             <dt><dfn>lastResult</dfn>(deferred)</dt>
+             <dd>
+              引数 deferred の保持している最後の結果値を取得します。
+              <br>
+              取得したところで、deferred の結果値がなくなるわけではありません。
+              通常はコールバック関数の引数として取得できますが、
+              何らかの事情で値を確認したい時や、使用したい時に有用です。
+              <pre>
+var d = new Deferred({ async : false });
+d.then(function() {
+    return 'foo';
+}).then(function(res) {
+    return 'bar';
+}).then(function(res) {
+    return 'baz';
+}).begin();
+var result = lastResult(d);
+debug(result); // 'baz'</pre>
+             </dd>
+             <dt><dfn>lastError</dfn>(deferred)</dt>
+             <dd>
+              引数 deferred の保持している最後のエラーを取得します。
+              <br>
+              lastResult のエラー版のようなものです。
+              通常、rescue により取得できるエラーを取得できます。
+              <pre>var d = new Deferred({ async : false });
+d.then(function() {
+  throw new Error('foo');
+}).then(function(res) {
+  throw new Error('bar');
+}).then(function(res) {
+  throw new Error('baz');
+}).begin();
+var result = lastError(d);
+debug(result); // Error: foo</pre>
+             </dd>
+             <dt><dfn>register</dfn>(name, func)</dt>
+             <dd>
+              チェインで使用できるユーザー定義のメソッドを登録します。
+              <br>
+              登録したメソッドは、既存のメソッドと同じく
+              コールバックチェイン上で実行することができます。
+              <br>
+              登録したメソッドは、Pot.Deferred.prototype に影響するため
+              すべてのインスタンスで使用できるようになります。
+              <pre>// チェインの結果値とメソッドの引数の値を足すメソッドを登録
+register('add', function(args) {
+    // 引数 args はオブジェクトで渡されます
+    //  - args.input  : 登録したメソッドに渡された引数
+    //  - args.result : チェインの結果値
+
+    return args.input + args.result;
+});
+
+var d = new Pot.Deferred();
+d.then(function() {
+    return 100;
+// 登録したメソッド add を使用し 50 加算する
+}).add(50).then(function(res) {
+    debug(res); // 150
+});
+d.begin();</pre>
+             </dd>
+             <dt><dfn>unregister</dfn>(name)</dt>
+             <dd>
+              register で登録したメソッドを登録解除します。
+              <br>
+              <pre>// 上の例 (register) で登録したメソッドを解除
+unregister('add');</pre>
+             </dd>
+             <dt><dfn>deferrize</dfn>(object[, method])</dt>
+             <dd>
+              関数を Deferred 化します。
+              <br>
+              コールバック関数を使用するようなものに対して
+              より効果的で、
+              非同期であればさらに適しています。
+              同期で実行される関数に対しても適応できます。
+              <br>
+              Deferred 化した関数オブジェクトが返ります。
+              返り値の関数の仕様方法、引数などは Deferred 化する前と同じです。
+              <br>
+              違いは、Pot.Deferred オブジェクトのインスタンスが返る点です。
+              <pre>// setTimeout を Deferred 化
+var timer = deferrize(window, 'setTimeout');
+
+timer(function() {
+    debug('in timer (2000 ms.)');
+}, 2000).then(function() {
+    debug('End timer');
+});</pre>
+              同期で実行される関数を Deferred 化。
+              <pre>var byId = deferrize(document, 'getElementById');
+
+byId('container').then(function(element) {
+    debug('End byId()');
+    debug('tagName = ' + element.tagName); // e.g. 'DIV'
+});</pre>
+              関数を第一引数に直接与えることができます。
+              その場合、第二引数は必要ありません。
+              <pre>// 文字列を charCode からなる配列に変換する関数
+var toCharCode = deferrize(function(string) {
+    var chars = [], i, len = string.length;
+    for (i = 0; i &lt; len; i++) {
+        chars.push(string.charCodeAt(i));
+    }
+    return chars;
+});
+
+var string = 'abcdef';
+begin(function() {
+    return toCharCode(string).then(function(result) {
+        debug(result); // [97, 98, 99, 100, 101, 102]
+    });
+});</pre>
+             </dd>
+             <dt><dfn>parallel</dfn>(deferredList)</dt>
+             <dd>
+              配列またはオブジェクトからなる Deferred のリスト deferredList の、
+              すべての結果が揃ってから
+              返り値となる Deferred インスタンスを実行します。
+              <br>
+              この関数により、未知数の Deferred を整合性のとれた状態で処理することができます。
+              <br>
+              MochiKit でいう DeferredList と似ています。
+              そして JSDeferred.parallel をベースとしています。
+              <pre>// 配列で指定
+parallel([
+    begin(function() {
+        return 'foo';
+    }),
+    function() {
+        return succeed().then(function() {
+            return wait(1).then(function() {
+                return 'bar';
+            });
+        });
+    },
+    (new Deferred()).then(function() {
+        return 'baz';
+    })
+]).then(function(values) {
+    debug(values);
+    // values[0] == 'foo'
+    // values[1] == 'bar'
+    // values[2] == 'baz'
+});</pre>
+              オブジェクトで指定。
+              <pre>Pot.Deferred.parallel({
+    foo : function() {
+        return 1;
+    },
+    bar : (new Deferred()).then(function() {
+        return begin(function() {
+            return wait(1).then(function() {
+                return succeed(2);
+            });
+        });
+    }),
+    baz : function() {
+        var d = new Deferred();
+        return d.async(false).then(function() {
+            return 3;
+        });
+    }
+}).then(function(values) {
+    debug(values);
+    // values.foo == 1
+    // values.bar == 2
+    // values.baz == 3
+});</pre>
+             </dd>
+             <dt><dfn>chain</dfn>([...args])</dt>
+             <dd>
+              引数に与えられたチェインと共に新しい Pot.Deferred のインスタンスを作成して返します。
+              <br>
+              この関数は、
+              引数に与えられたコールバック関数または、
+              DeferredList となる配列やオブジェクトを
+              Deferred インスタンスにコールバックチェインとして追加し、
+              それを開始して返り値とします。
+              <br>
+              つまり、new Deferred から始まって then などで追加していく一連の流れを
+              引数の指定みで行えるコンストラクタ代わりに使えます。
+              <br>
+              chain は、JSDeferred.chain から由来しています。
+              <pre>var deferred = chain(
+    function() {
+        return wait(1).then(function() {
+            debug(1);
+        });
+    },
+    function(res) {
+        throw new Error('error');
+    },
+    // 関数名に rescue と付けることで rescue メソッド扱いになる
+    function rescue(err) {
+        debug(err);
+    },
+    function(res) {
+        return succeed(res).then(function(val) {
+            debug(2);
+        });
+    },
+    {
+        foo : function(res) {
+            debug(3);
+        },
+        bar : function(res) {
+            return begin(function() {
+                debug(4);
+            });
+        }
+    },
+    function(res) {
+        debug(5);
+    },
+    [
+        function(res) {
+            return wait(1).then(function() {
+                debug(6);
+            });
+        },
+        function(res) {
+            return begin(function() {
+                return succeed(7).then(function(val) {
+                    debug(val);
+                });
+            });
+        }
+    ]
+);
+// 1, (Error: error), 2, 3, 4, 5, 6, 7
+// と出力される</pre>
+             </dd>
+            </dl>
            </div>
          </div>
         </div>
       </div>
     </div>
-    <div class="footer" style="text-align: center">
-      <div><hr></div>
-      <p>
-       2011 <a href="#contact">polygon planet</a>
-      </p>
+    <div class="footer">
+      <div style="width: 100%; text-align: right;">
+        <p style="margin-right: 2em;">
+          <a href="#top">ページ先頭へ</a>
+        </p>
+      </div>
+      <div style="width: 100%; text-align: center;">
+        <div><hr></div>
+        <p>
+         Last modified: 2011 Written by <a href="#contact">polygon planet</a>
+        </p>
+      </div>
     </div>
   </div>
 </body>
