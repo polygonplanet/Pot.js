@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.10, 2011-10-10
+ * Version 1.11, 2011-10-11
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.10
- * @date           2011-10-10
+ * @version        1.11
+ * @date           2011-10-11
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.10', TYPE : 'lite'},
+var Pot = {VERSION : '1.11', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -799,10 +799,10 @@ Pot.update({
     if (!o) {
       return false;
     }
-    len = o.length;
     if (Pot.isArray(o) || o instanceof Array || o.constructor === Array) {
       return true;
     }
+    len = o.length;
     if (!Pot.isNumber(len) || (!Pot.isObject(o) && !Pot.isArray(o)) ||
         o === Pot || o === Pot.Global || o === globals ||
         Pot.isWindow(o) || Pot.isDocument(o) || Pot.isElement(o)
@@ -902,9 +902,11 @@ Pot.update({
    * @public
    */
   isNumeric : function(n) {
-    return  (n == null || n === '' ||
-      (typeof n === 'object' &&
-       n.constructor !== Number)) ? false : !isNaN(n - 0);
+    return  (n == null ||
+      (n === '' ||
+        (n == '' && n && n.constructor === String)) ||
+      (typeof n === 'object' && n.constructor !== Number)) ?
+        false : !isNaN(n - 0);
   },
   /**
    * Returns whether the supplied number represents an integer,
@@ -1429,7 +1431,7 @@ function invoke(/*object[, method[, ...args]]*/) {
  * @ignore
  */
 function debug(msg) {
-  var args = arguments, me = args.callee, func, firebug, consoleService;
+  var args = arguments, me = args.callee, func, consoleService;
   try {
     if (!me.firebug('log', args)) {
       if (!Pot.XPCOM.isEnabled) {
@@ -3520,7 +3522,7 @@ update(Pot.Deferred, {
    * @public
    * @static
    */
-  succeed : function() {
+  succeed : function(/*[...args]*/) {
     var d = new Pot.Deferred();
     d.begin.apply(d, arguments);
     return d;
@@ -3555,7 +3557,7 @@ update(Pot.Deferred, {
    * @public
    * @static
    */
-  failure : function() {
+  failure : function(/*[...args]*/) {
     var d = new Pot.Deferred();
     d.raise.apply(d, arguments);
     return d;
@@ -3735,7 +3737,13 @@ update(Pot.Deferred, {
   maybeDeferred : function(x) {
     var result;
     if (Pot.isDeferred(x)) {
-      result = x;
+      if (Pot.Deferred.isFired(x)) {
+        result = x;
+      } else {
+        result = x.begin();
+      }
+    } else if (Pot.isError(x)) {
+      result = Pot.Deferred.failure(x);
     } else {
       result = Pot.Deferred.succeed(x);
     }
