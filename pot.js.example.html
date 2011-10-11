@@ -76,6 +76,7 @@ begin(function() {
 
         // イテレータ関数 map を doze (遅い速度) で実行
     }).map.doze(function(val) {
+        debug('in map.doze(val) : ' + val);
         return val + '!';
 
     }).then(function(res) {
