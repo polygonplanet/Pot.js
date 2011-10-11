@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js Example - JavaScript Library</title>
+<script>
+// IE SUCKS
+if (window.ActiveXObject) {
+    window.onerror = function(msg, uri, line) {
+        alert([
+            'Error!',
+            'message: ' + msg,
+            'URI: ' + uri,
+            'line: ' + line
+        ].join('\n'));
+    };
+}
+</script>
+<script type="text/javascript" src="potlite.min.js"></script>
+<script>
+
+// Globalize all of Pot methods.
+Pot.globalize();
+
+
+begin(function() {
+    debug('BEGIN example');
+
+}).then(function() {
+    debug('BEGIN request');
+    
+    // JSON を取得
+    return request('pot.js.example.json', {
+        mimeType : 'text/javascript'
+    }).ensure(function(res) {
+        debug(res); // (Object {XMLHttpRequest ...})
+        debug('END request');
+
+        if (isError(res)) {
+            return {
+                foo : 'Error!',
+                bar : 'Error!',
+                baz : 'Error!'
+            };
+        } else {
+            debug(res.responseText); // {foo: 'fooValue', bar: 'barValue', baz: 'bazValue'}
+            return eval('(' + res.responseText + ')');
+        }
+
+        // チェイン上でのイテレート
+    }).forEach(function(val, key) {
+        debug(key + ' : ' + val); // foo : fooValue ... etc.
+        return wait(1); // 1 秒間隔で実行
+
+        // 0.5 秒 待機して、各チェイン間の実行速度を遅くする
+    }).wait(0.5).speed('slow').then(function(res) {
+        var s = '', keys = [];
+        
+        // 同期処理の forEach
+        forEach(res, function(val, key) {
+            s += key;
+            keys.push(key);
+        });
+        keys.push(s);
+        return keys;
+
+        // 次の引数へ分割代入 (Destructuring-Assignment)
+    }).then(function(foo, bar, baz, all) {
+
+        debug('foo = ' + foo); // foo = 'foo'
+        debug('bar = ' + bar); // bar = 'bar'
+        debug('baz = ' + baz); // baz = 'baz'
+        debug('all = ' + all); // all = 'foobarbaz'
+
+        return [foo, bar, baz];
+
+        // イテレータ関数 map を doze (遅い速度) で実行
+    }).map.doze(function(val) {
+        return val + '!';
+
+    }).then(function(res) {
+        
+        debug(res); // ['foo!', 'bar!', 'baz!']
+        
+        var d = new Deferred();
+
+        return d.then(function() {
+            throw new Error('TestError');
+        }).then(function() {
+            // エラーが発生したため、このコールバック関数は実行されない
+            debug('Help me!!');
+        }).rescue(function(err) {
+            // エラーをキャッチ
+            debug(err); // (Error: TestError)
+
+        }).then(function() {
+            // チェインを継続
+
+            // reduce によるイテレート (非同期)
+            return Deferred.reduce(res, function(a, b) {
+                return a + b;
+            }).then(function(result) {
+                return result;
+            });
+        }).begin();
+
+    }).wait(2).then(function(res) {
+        
+        debug(res); // 'foo!bar!baz!'
+    });
+
+}).then(function() {
+    debug('END example');
+
+}).end(); // end によりチェインを閉じる
+
+
+</script>
+</head>
+<body>
+ <header>
+  <h1>Pot.js - JavaScript Library</h1>
+ </header>
+ <article>
+  <p>Demo</p>
+  <div id="status"></div>
+ </article>
+ <footer>
+  <p>2011 &copy; polygon planet</p>
+ </footer>
+</body>
+</html>
