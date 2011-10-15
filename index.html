@@ -137,9 +137,39 @@ td.marker, td.marker * {
          <p>
           例:
          </p>
-         <pre>&lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;
-    or
-&lt;script type="text/javascript" src="pot.min.js"&gt;&lt;/script&gt;</pre>
+         <pre>&lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;</pre>
+         <p>
+          Node.js
+         </p>
+         <pre>// Example to define Pot object on Node.js.
+var Pot = require('./potlite').Pot;
+Pot.debug(Pot);
+// ...</pre>
+         <p>
+          jQuery プラグインとして。
+         </p>
+         <pre>// jQuery を読み込んだ後に実行。
+Pot.deferrizejQueryAjax();
+
+// Ajax 系の関数が Pot.Deferred を返すようになる
+$.getJSON('/hoge.json').then(function(data) {
+    alert(data.results[0].text);
+}).rescue(function(err) {
+    alert('Error! ' + err);
+}).ensure(function() {
+    return someNextProcess();
+});
+
+// エフェクトなどを Deferred 化する 'deferred' が追加される
+$('div#hoge').deferred('hide', 'slow').then(function() {
+    // (hide() が終了したあとの処理)
+});</pre>
+         <p>
+          Pot.deferrizejQueryAjax() は現状、
+          ライブラリ側で実行しません。
+          なので、プラグインを使用する場合は
+          コードの最初などで実行する必要があります。
+         </p>
         </div>
         <h2 id="compatibility">動作環境</h2>
         <div>
@@ -209,6 +239,7 @@ td.marker, td.marker * {
             このドキュメントは、PotLite.js について扱います。
            </p>
            <p>
+            Version 1.11 以前の
             Pot.js および PotLite.js は、
             他のライブラリと名前などが衝突しないよう
             <br>
@@ -223,6 +254,17 @@ td.marker, td.marker * {
             <br>
             もし、他のライブラリ等と衝突してしまう場合は
             無理と短い記述をする必要ありません。
+           </p>
+           <p>
+            <br>
+            Version 1.12 以降、
+            いちいち先頭で globalize の宣言をしなくて済むよう
+            Pot.globalize() はライブラリ内で実行されるようになりました。
+            <br>
+            なので、読み込んだ時点で begin などの関数をコールすることができます。
+            <br>
+            globalize は任意のオブジェクトをグローバルスコープに置きたい時に活用できます。
+            <br>
            </p>
          </div>
         </div>
@@ -2714,6 +2756,28 @@ parallel([
 // と出力される</pre>
              </dd>
             </dl>
+           </div>
+           <div>
+            <h3 id="otherPropertiesAndMethods">その他のプロパティ</h3>
+            <p>
+             読み取り専用として、
+             Pot.OS, Pot.System, Pot.VERSION, Pot.Browser, Pot.LANG
+             などがあります。
+             <br>
+             いくつか例を示します。
+            </p>
+            <pre>// OS やデバイスを判別
+debug( Pot.OS.win ); // Windows なら true
+debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
+            <pre>if (Pot.Browser.firefox) {
+    // ブラウザは Firefox
+    debug( Pot.Browser.firefox.version ); // バージョンを出力
+}</pre>
+            <p>
+             などが定義されています。
+             <br>
+             より詳しくは、(圧縮されてない) ソースコードを参照ください。
+            </p>
            </div>
          </div>
         </div>
