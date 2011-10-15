@@ -249,8 +249,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.Net.XHR.html">Pot.Net.XHR</a></li>
 	
-	<li><a href="../symbols/Pot.Net.XHR.request.html">Pot.Net.XHR.request</a></li>
-	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
 	<li><a href="../symbols/Pot.repeat.html">Pot.repeat</a></li>
@@ -311,14 +309,17 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.XPCOM.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.XPCOM.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -326,10 +327,36 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.isEnabled">isEnabled</a></b>
+								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.evalInSandbox">evalInSandbox</a></b>(code, url)
 								</div>
-								<div class="description">Check whether XPCOM Components are enabled</div>
+								<div class="description">Evaluate JavaScript code in the sandbox.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.getChromeWindow">getChromeWindow</a></b>(uri)
+								</div>
+								<div class="description">Get the specific XUL Window.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.getMostRecentWindow">getMostRecentWindow</a></b>()
+								</div>
+								<div class="description">Get a browser window that was active last.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.XPCOM.<b><a href="../symbols/Pot.XPCOM.html#.throughout">throughout</a></b>(cond)
+								</div>
+								<div class="description">Wait until condition is true on the thread in non-blocking.</div>
 							</td>
 						</tr>
 					
@@ -338,9 +365,6 @@ ul.inheritsList
 				
 				
 				
-			
-
-<!-- ============================== methods summary ======================== -->
 			
 <!-- ============================== events summary ======================== -->
 			
@@ -377,25 +401,168 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
+
+<!-- ============================== method details ========================= -->		
+			
 				<div class="sectionTitle">
-					Field Detail
+					Method Detail
 				</div>
 				
-					<a name=".isEnabled"> </a>
+					<a name=".evalInSandbox"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
-					<span class="light">{Boolean}</span>
-					<span class="light">Pot.XPCOM.</span><b>isEnabled</b>
+					<span class="light">{Function}</span>
+					<span class="light">Pot.XPCOM.</span><b>evalInSandbox</b>(code, url)
 					
 					</div>
 					<div class="description">
-						Check whether XPCOM Components are enabled
+						Evaluate JavaScript code in the sandbox.
 						
 						
 					</div>
 					
 					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>code</b>
+									
+								</dt>
+								<dd>The expression.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>url</b>
+									
+								</dt>
+								<dd>The sandbox URL.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{*}</span> Return the result of expression.</dd>
+							
+							</dl>
+						
+						
+						
 
+					<hr />
+				
+					<a name=".getChromeWindow"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.XPCOM.</span><b>getChromeWindow</b>(uri)
+					
+					</div>
+					<div class="description">
+						Get the specific XUL Window.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>uri</b>
+									
+								</dt>
+								<dd>The target URI to get.
+                       Will be the browser window if omitted.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> XULWindow.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".getMostRecentWindow"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.XPCOM.</span><b>getMostRecentWindow</b>()
+					
+					</div>
+					<div class="description">
+						Get a browser window that was active last.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Window}</span> Return the browser window.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".throughout"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.XPCOM.</span><b>throughout</b>(cond)
+					
+					</div>
+					<div class="description">
+						Wait until condition is true on the thread in non-blocking.
+If true returned, waiting state will end.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Function|*}</span> <b>cond</b>
+									
+								</dt>
+								<dd>A function or value as condition.</dd>
+							
+							</dl>
+						
+						
+						
 						
 						
 						
@@ -403,9 +570,6 @@ ul.inheritsList
 
 					
 				
-			
-
-<!-- ============================== method details ========================= -->		
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -418,7 +582,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 11 2011 11:34:07 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Oct 16 2011 06:31:08 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

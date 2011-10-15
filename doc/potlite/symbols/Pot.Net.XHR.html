@@ -249,8 +249,6 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.Net.XHR.html">Pot.Net.XHR</a></li>
 	
-	<li><a href="../symbols/Pot.Net.XHR.request.html">Pot.Net.XHR.request</a></li>
-	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
 	<li><a href="../symbols/Pot.repeat.html">Pot.repeat</a></li>
@@ -311,6 +309,37 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Net.XHR.">
+					<caption>Field Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.ReadyState">ReadyState</a></b>
+								</div>
+								<div class="description">Status constants for XMLHTTP:
+
+{@link http://msdn.microsoft.com/library/default.asp?url=/library/
+        en-us/xmlsdk/html/0e6a34e4-f90c-489d-acff-cb44242fafc6.asp }</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
 
 <!-- ============================== methods summary ======================== -->
 			
@@ -329,36 +358,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.evalInSandbox">evalInSandbox</a></b>(code, url)
+								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.factory">factory</a></b>()
 								</div>
-								<div class="description">Evaluate JavaScript code in the sandbox.</div>
+								<div class="description">XMLHttpRequest factory.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.getChromeWindow">getChromeWindow</a></b>(uri)
+								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.request">request</a></b>(url, (options))
 								</div>
-								<div class="description">Get the specific XUL Window.</div>
+								<div class="description">Send HTTP request with the XMLHttpRequest.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.getMostRecentWindow">getMostRecentWindow</a></b>()
+								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.requestByJSONP">requestByJSONP</a></b>(url, (options))
 								</div>
-								<div class="description">Get a browser window that was active last.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.Net.XHR.<b><a href="../symbols/Pot.Net.XHR.html#.till">till</a></b>(cond)
-								</div>
-								<div class="description">Wait until condition is true on the thread in non-blocking.</div>
+								<div class="description">Send request by JSONP.</div>
 							</td>
 						</tr>
 					
@@ -403,6 +423,36 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
+				<div class="sectionTitle">
+					Field Detail
+				</div>
+				
+					<a name=".ReadyState"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.Net.XHR.</span><b>ReadyState</b>
+					
+					</div>
+					<div class="description">
+						Status constants for XMLHTTP:
+
+{@link http://msdn.microsoft.com/library/default.asp?url=/library/
+        en-us/xmlsdk/html/0e6a34e4-f90c-489d-acff-cb44242fafc6.asp }
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					
+				
+			
 
 <!-- ============================== method details ========================= -->		
 			
@@ -410,36 +460,100 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name=".evalInSandbox"> </a>
+					<a name=".factory"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Net.XHR.</span><b>evalInSandbox</b>(code, url)
+					<span class="light">Pot.Net.XHR.</span><b>factory</b>()
 					
 					</div>
 					<div class="description">
-						Evaluate JavaScript code in the sandbox.
+						XMLHttpRequest factory.
 						
 						
 					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> The XMLHttpRequest object.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".request"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Net.XHR.</span><b>request</b>(url, (options))
+					
+					</div>
+					<div class="description">
+						Send HTTP request with the XMLHttpRequest.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.Net.XHR.request('/data.cgi', {
+    method : 'POST',
+    sendContent : {
+      query  : 'Book OR Media',
+      start  : 0,
+      length : 15,
+      format : 'json'
+    },
+    headers : {
+      'Content-Type' : 'text/javascript'
+    }
+  }).then(function(res) {
+    debug(res.responseText);
+  }, function(err) {
+    debug('Error!');
+    debug(err);
+  });</pre>
 					
 					
 					
 						
 							<dl class="detailList">
 							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{String}</span> <b>code</b>
-									
-								</dt>
-								<dd>The expression.</dd>
 							
 								<dt>
 									<span class="light fixedFont">{String}</span> <b>url</b>
 									
 								</dt>
-								<dd>The sandbox url.</dd>
+								<dd>The request URL.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>(options)</b>
+									
+								</dt>
+								<dd>Request options.
+                                <pre>
+                                +----------------------------------
+                                | Available options:
+                                +----------------------------------
+                                - method      : {String}    'GET'
+                                - sendContent : {Object}    null
+                                - queryString : {Object}    null
+                                - username    : {String}    null
+                                - password    : {String}    null
+                                - headers     : {Object}    null
+                                - mimeType    : {String}    null
+                                </pre></dd>
 							
 							</dl>
 						
@@ -450,7 +564,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{*}</span> Return the result of expression.</dd>
+								<dd><span class="light fixedFont">{Deferred}</span> Return the instance of Pot.Deferred.</dd>
 							
 							</dl>
 						
@@ -459,18 +573,30 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name=".getChromeWindow"> </a>
+					<a name=".requestByJSONP"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Net.XHR.</span><b>getChromeWindow</b>(uri)
+					<span class="light">Pot.Net.XHR.</span><b>requestByJSONP</b>(url, (options))
 					
 					</div>
 					<div class="description">
-						Get the specific XUL Window.
+						Send request by JSONP.
 						
 						
 					</div>
+					
+					
+					
+					<pre class="code">  // Same as jQuery.jsonp usage.
+  var url = 'http://www.example.com/jsonpTest?callback=?';
+  Pot.Net.requestByJSONP(url, {
+    queryString : {
+      q : 'JavaScript OR ECMAScript'
+    }
+  }).then(function(data) {
+    debug(data.results[0].text);
+  });</pre>
 					
 					
 					
@@ -479,93 +605,36 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>uri</b>
+									<span class="light fixedFont">{String}</span> <b>url</b>
 									
 								</dt>
-								<dd>The target URI to get.
-                       Will be the browser window if omitted.</dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Object}</span> XULWindow.</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".getMostRecentWindow"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.Net.XHR.</span><b>getMostRecentWindow</b>()
-					
-					</div>
-					<div class="description">
-						Get a browser window that was active last.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{Window}</span> Return the browser window.</dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name=".till"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					<span class="light">{Function}</span>
-					<span class="light">Pot.Net.XHR.</span><b>till</b>(cond)
-					
-					</div>
-					<div class="description">
-						Wait until condition is true on the thread in non-blocking.
-If true returned, waiting state will end.
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
+								<dd>The request URL.</dd>
 							
 								<dt>
-									<span class="light fixedFont">{Function|*}</span> <b>cond</b>
+									<span class="light fixedFont">{Object}</span> <b>(options)</b>
 									
 								</dt>
-								<dd>A function or value as condition.</dd>
+								<dd>Request options.
+                                <pre>
+                                +----------------------------------
+                                | Available options:
+                                +----------------------------------
+                                - queryString : {Object} null
+                                - callback    : {String} 'callback'
+                                </pre></dd>
 							
 							</dl>
 						
 						
 						
 						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred}</span> Return the instance of Pot.Deferred.</dd>
+							
+							</dl>
 						
 						
 						
@@ -584,7 +653,7 @@ If true returned, waiting state will end.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Oct 11 2011 11:34:07 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Oct 16 2011 06:31:08 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
