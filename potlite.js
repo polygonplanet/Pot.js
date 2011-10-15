@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.11, 2011-10-11
+ * Version 1.12, 2011-10-16
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.11
- * @date           2011-10-11
+ * @version        1.12
+ * @date           2011-10-16
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.11', TYPE : 'lite'},
+var Pot = {VERSION : '1.12', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -73,9 +73,10 @@ concat = Array.prototype.concat,
 toString = Object.prototype.toString,
 
 // Regular expression patterns.
-RE_ARRAYLIKE = /List|Collection/i,
-RE_TRIM      = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,
-RE_RESCAPE   = /([-.*+?^${}()|[\]\/\\])/g,
+RE_ARRAYLIKE       = /List|Collection/i,
+RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,
+RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
+RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
 
 // Mozilla XPCOM Components.
 Ci, Cc, Cr, Cu;
@@ -119,36 +120,24 @@ update(Pot, {
    *           Whether the environment is running on Node.js.
    * @property {Boolean} isWaitable
    *           Whether the user agent can to wait as synchronously.
+   * @property {Boolean} hasComponents
+   *           Whether the environment has Components (XPCOM).
    * @property {Boolean} hasActiveXObject
    *           Whether the environment has ActiveXObject.
    * @property {Boolean} isYieldable
-   *            Whether the environment can use "yield" operator.
+   *           Whether the environment can use "yield" operator.
+   * @property {Boolean} isFirefoxExtension
+   *           Whether the environment is running on Firefox extension.
+   * @property {Boolean} isChromeExtension
+   *           Whether the environment is running on Chrome extension.
+   * @property {Boolean} isSafariExtension
+   *           Whether the environment is running on Safari extension.
+   * @property {Boolean} isGreasemonkey
+   *           Whether the environment is running on Greasemonkey.
+   * @property {Boolean} isJetpack
+   *           Whether the environment is running on Jetpack.
    */
-  System : (function(o) {
-    if (typeof window === 'undefined') {
-      o.isNonBrowser = true;
-    } else {
-      o.isWebBrowser = true;
-    }
-    if (o.isNonBrowser &&
-        typeof process !== 'undefined' && process && process.version &&
-        typeof require === 'function' &&
-        (typeof exports === 'object' ||
-        (typeof module === 'object' && typeof module.exports === 'object'))
-    ) {
-      o.isNodeJS = true;
-    }
-    if (this && this.ActiveXObject || typeof ActiveXObject !== 'undefined') {
-      o.hasActiveXObject = true;
-    }
-    try {
-      if (typeof ((function() { yield (0); })()).next === 'function') {
-        o.isYieldable = true;
-      }
-    } catch (e) {}
-    o.isWaitable = false;
-    return o;
-  })({}),
+  System : {},
   /**
    * toString.
    *
@@ -350,7 +339,7 @@ update(Pot, {
       return me.INITIAL_NUMBER + (me.count++);
     }, {
       count : 0,
-      INITIAL_NUMBER : Number('0xC26BEB642C0A') || (16 ^ 6)
+      INITIAL_NUMBER : Number('0xC26BEB642C0A') || (2147483647 ^ 2047)
     }),
     /**
      * Get the export object.
@@ -371,6 +360,9 @@ update(Pot, {
         }
       } else {
         outputs = globals;
+      }
+      if (!outputs) {
+        outputs = globals || Pot.Global;
       }
       return outputs;
     }
@@ -397,6 +389,92 @@ update(Pot, {
   update : update
 });
 })(typeof navigator !== 'undefined' && navigator || {});
+
+// Definition of System.
+update(Pot.System, (function() {
+  var o = {}, g;
+  o.isWaitable = false;
+  if (typeof window === 'object' && 'setTimeout' in window &&
+      window.window == window &&
+      typeof document === 'object' && document.nodeType > 0 &&
+      typeof document.documentElement === 'object'
+  ) {
+    o.isWebBrowser = true;
+    if (window.location &&
+        /^(?:chrome|resource):?$/.test(window.location.protocol)) {
+      try {
+        if (typeof Components !== 'object') {
+          throw false;
+        }
+        Cc = Components.classes;
+        Ci = Components.interfaces;
+        Cr = Components.results;
+        Cu = Components.utils;
+        o.isWaitable = true;
+        o.hasComponents = true;
+        if (Pot.Browser.firefox || Pot.Browser.mozilla) {
+          o.isFirefoxExtension = true;
+        }
+      } catch (e) {
+        // If you need XPCOM, try following privilege.
+        // e.g.
+        //   netscape.security.PrivilegeManager
+        //           .enablePrivilege('UniversalXPConnect');
+        //   or
+        //   about:config :
+        //   signed.applets.codebase_principal_support : true (default=false)
+        //
+        Ci = Cc = Cr = Cu = null;
+      }
+    }
+  } else {
+    o.isNonBrowser = true;
+    if (typeof process !== 'undefined' && process && process.version &&
+        typeof require === 'function' &&
+        (typeof exports === 'object' ||
+        (typeof module === 'object' && typeof module.exports === 'object'))
+    ) {
+      o.isNodeJS = true;
+    }
+  }
+  if (Pot.Global && Pot.Global.ActiveXObject ||
+      typeof ActiveXObject !== 'undefined' && (ActiveXObject)) {
+    o.hasActiveXObject = true;
+  }
+  if (!o.isFirefoxExtension) {
+    if (Pot.Browser.chrome || Pot.Browser.webkit) {
+      if (typeof chrome === 'object' &&
+          typeof chrome.extension === 'object') {
+        o.isChromeExtension = true;
+      } else if (typeof safari === 'object' &&
+                 typeof safari.extension === 'object') {
+        o.isSafariExtension = true;
+      }
+    }
+  }
+  if (!o.isChromeExtension && !o.isSafariExtension) {
+    if (typeof GM_log === 'function' &&
+        typeof GM_xmlhttpRequest === 'function') {
+      o.isGreasemonkey = true;
+    } else if (typeof require === 'function') {
+      try {
+        if ('title' in require('windows').browserWindows.activeWindow) {
+          o.isJetpack = true;
+        }
+      } catch (e) {}
+    }
+  }
+  try {
+    /**@ignore*/
+    g = (function() {
+      yield (0);
+    })();
+    if (g && typeof g.next === 'function') {
+      o.isYieldable = true;
+    }
+  } catch (e) {}
+  return o;
+})());
 
 /**
  * Creates methods to detect the type definition.
@@ -484,7 +562,8 @@ update(Pot, {
      * @public
      */
     typeOf : function(o) {
-      return o == null ? String(o) : (typeMaps[toString.call(o)] || 'object');
+      return (o == null) ? String(o)
+                         : (typeMaps[toString.call(o)] || 'object');
     },
     /**
      * Get the object type like of array or any types.
@@ -760,10 +839,10 @@ Pot.update({
           (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
         result = true;
       } else if (typeof StopIteration !== 'undefined' &&
-                 (o == StopIteration || o instanceof StopIteration)) {
+                  (o == StopIteration || o instanceof StopIteration)) {
         result = true;
       } else if (this && this.StopIteration !== undefined &&
-                (o == this.StopIteration || o instanceof this.StopIteration)) {
+               (o == this.StopIteration || o instanceof this.StopIteration)) {
         result = true;
       } else if (~toString.call(o).indexOf(SI) ||
                  ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
@@ -872,6 +951,29 @@ Pot.update({
                 typeof x.next  === 'function'));
   },
   /**
+   * Check whether the value is percent encoded.
+   *
+   *
+   * @example
+   *   debug(isPercentEncoded('abc'));              // false
+   *   debug(isPercentEncoded('1234567890'));       // false
+   *   debug(isPercentEncoded('%7B%20hoge%20%7D')); // true
+   *   debug(isPercentEncoded(null));               // false
+   *   debug(isPercentEncoded((void 0)));           // false
+   *
+   *
+   * @param  {String|*}   s   The target string to test.
+   * @return {Boolean}        Return true if the value is encoded,
+   *                            otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isPercentEncoded : function(s) {
+    return RE_PERCENT_ENCODED.test(s);
+  },
+  /**
    * Check whether the value can be numeric value.
    *
    *
@@ -902,11 +1004,11 @@ Pot.update({
    * @public
    */
   isNumeric : function(n) {
-    return  (n == null ||
-      (n === '' ||
-        (n == '' && n && n.constructor === String)) ||
-      (typeof n === 'object' && n.constructor !== Number)) ?
-        false : !isNaN(n - 0);
+    return (n == null ||
+           (n === ''  ||
+           (n ==  ''  && n && n.constructor === String)) ||
+           (typeof n === 'object' && n.constructor !== Number)) ?
+            false : !isNaN(n - 0);
   },
   /**
    * Returns whether the supplied number represents an integer,
@@ -1434,7 +1536,7 @@ function debug(msg) {
   var args = arguments, me = args.callee, func, consoleService;
   try {
     if (!me.firebug('log', args)) {
-      if (!Pot.XPCOM.isEnabled) {
+      if (!Pot.System.hasComponents) {
         throw false;
       }
       consoleService = Cc['@mozilla.org/consoleservice;1']
@@ -1486,7 +1588,7 @@ update(debug, {
   firebug : function(method, args) {
     var result = false, win, fbConsole;
     try {
-      if (!Pot.XPCOM.isEnabled) {
+      if (!Pot.System.hasComponents) {
         throw false;
       }
       win = Pot.XPCOM.getMostRecentWindow();
@@ -2181,6 +2283,11 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @private
    * @ignore
    */
+  destassign : false,
+  /**
+   * @private
+   * @ignore
+   */
   options : {},
   /**
    * @private
@@ -2226,18 +2333,19 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
     this.plugins = {};
     initOptions.call(this, arrayize(args), Pot.Deferred.defaults);
     update(this, {
-      state     : Pot.Deferred.states.unfired,
-      results   : {
-        success : null,
-        failure : null
+      results    : {
+        success  : null,
+        failure  : null
       },
-      chains    : [],
-      nested    : 0,
-      chained   : false,
-      cancelled : false,
-      freezing  : false,
-      tilling   : false,
-      waiting   : false
+      state      : Pot.Deferred.states.unfired,
+      chains     : [],
+      nested     : 0,
+      chained    : false,
+      cancelled  : false,
+      freezing   : false,
+      tilling    : false,
+      waiting    : false,
+      destassign : false
     });
     Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
     return this;
@@ -3168,12 +3276,14 @@ function fireProcedure() {
       continue;
     }
     try {
-      if (Pot.isNumber(callback.length) && callback.length > 1 &&
-          Pot.isArray(result) && result.length === callback.length) {
+      if (this.destassign ||
+          (Pot.isNumber(callback.length) && callback.length > 1 &&
+           Pot.isArray(result) && result.length === callback.length)) {
         result = callback.apply(this, result);
       } else {
         result = callback.call(this, result);
       }
+      this.destassign = false;
       this.state = setState.call({}, result);
       if (Pot.isDeferred(result)) {
         /**@ignore*/
@@ -3183,6 +3293,7 @@ function fireProcedure() {
         this.nested++;
       }
     } catch (e) {
+      this.destassign = false;
       this.state = Pot.Deferred.states.failure;
       result = e;
       if (!Pot.isError(result)) {
@@ -4096,8 +4207,13 @@ update(Pot.Deferred, {
             break;
         case 2:
         default:
-            func = method;
-            context = object;
+            if (Pot.isObject(method)) {
+              context = method;
+              func    = object;
+            } else {
+              func    = method;
+              context = object;
+            }
             break;
       }
       if (!func) {
@@ -4110,22 +4226,27 @@ update(Pot.Deferred, {
     return function() {
       var that = this, args = arrayize(arguments), d = new Pot.Deferred();
       d.then(function() {
-        var dd, result, params = [], done = false, error;
+        var dd, result, params = [], done = false, error, isFired;
+        isFired = Pot.Deferred.isFired;
         dd = new Pot.Deferred();
         each(args, function(val) {
-          if (!done && Pot.isFunction(val)) {
+          if (Pot.isFunction(val)) {
             params.push(function() {
               var r, er;
               try {
                 r = val.apply(that, arguments);
               } catch (e) {
                 er = e;
-                dd.raise(er);
+                if (!isFired(dd)) {
+                  dd.raise(er);
+                }
               } finally {
-                dd.begin(r);
+                if (!isFired(dd)) {
+                  dd.begin(r);
+                }
               }
-              if (er) {
-                throw Pot.isError(er) ? er : new Error(er);
+              if (er != null) {
+                throw er;
               }
               return r;
             });
@@ -4138,15 +4259,15 @@ update(Pot.Deferred, {
           result = invoke(context, func, params);
         } catch (e) {
           error = e;
-          if (!done) {
+          if (!done && !isFired(dd)) {
             dd.raise(error);
           }
         } finally {
-          if (!done) {
+          if (!done && !isFired(dd)) {
             dd.begin(result);
           }
         }
-        if (error) {
+        if (error != null) {
           throw Pot.isError(error) ? error : new Error(error);
         }
         return dd;
@@ -4914,8 +5035,8 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
   watch : function() {
     var that = this;
     if (!this.async && this.waiting === true) {
-      if (this.isWaitable()) {
-        Pot.XPCOM.till(function() {
+      if (Pot.System.isWaitable) {
+        Pot.XPCOM.throughout(function() {
           return that.waiting !== true;
         });
       } else {
@@ -4951,7 +5072,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         limit : 255
       };
       this.setIter(object, callback);
-      if (!this.async && !this.isWaitable()) {
+      if (!this.async && !Pot.System.isWaitable) {
         this.revback();
         this.waiting = false;
       } else {
@@ -5033,12 +5154,12 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           });
         }
         time = now();
-        if (this.isWaitable()) {
+        if (Pot.System.isWaitable) {
           if (this.time.total === null) {
             this.time.total = time;
           } else if (time - this.time.total >= this.time.rest) {
-            Pot.XPCOM.till(0);
-            this.time.total = time;
+            Pot.XPCOM.throughout(0);
+            this.time.total = now();
           }
         } else if (!this.async) {
           if (this.restable && this.time.count >= this.time.limit) {
@@ -5051,7 +5172,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           if (this.async &&
               this.interval < Pot.Internal.LightIterator.speeds.normal) {
             cutback = true;
-          } else if (this.async || this.restable || this.isWaitable()) {
+          } else if (this.async || this.restable || Pot.System.isWaitable) {
             if (this.time.diff < this.interval + 8) {
               this.time.axis = 2;
             } else if (this.time.diff < this.interval + 36) {
@@ -5111,7 +5232,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   flush : function(callback, useSpeed) {
     var that = this, d, lazy = false, speed, speedKey;
-    if (this.async || this.isWaitable()) {
+    if (this.async || Pot.System.isWaitable) {
       lazy = true;
     }
     if (!lazy && Pot.isFunction(callback)) {
@@ -5153,13 +5274,6 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       }
       return void 0;
     }
-  },
-  /**
-   * @private
-   * @ignore
-   */
-  isWaitable : function() {
-    return !!(Pot.System.isWaitable && Pot.XPCOM && Pot.XPCOM.isEnabled);
   },
   /**
    * Return noop function.
@@ -5583,7 +5697,7 @@ Pot.update({
    * @property {Function} ninja  Iterates "for each" loop with fastest speed.
    */
   forEach : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+    if (Pot.System.isWaitable &&
         interval < Pot.Internal.LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
@@ -5666,7 +5780,7 @@ Pot.update({
    * @property {Function} ninja  Iterates "repeat" loop with fastest speed.
    */
   repeat : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+    if (Pot.System.isWaitable &&
         interval < Pot.Internal.LightIterator.speeds.normal) {
       return function(max, callback, context) {
         var opts = {};
@@ -5718,7 +5832,7 @@ Pot.update({
    * @property {Function} ninja  Iterates "forEver" loop with fastest speed.
    */
   forEver : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+    if (Pot.System.isWaitable &&
         interval < Pot.Internal.LightIterator.speeds.normal) {
       return function(callback, context) {
         var opts = {};
@@ -5760,7 +5874,7 @@ Pot.update({
    * @property {Function} ninja  Iterates "iterate" loop with fastest speed.
    */
   iterate : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.Internal.LightIterator.fn.isWaitable() &&
+    if (Pot.System.isWaitable &&
         interval < Pot.Internal.LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
@@ -8097,6 +8211,7 @@ delete Pot.tmp.createProtoIterators;
 delete Pot.tmp.createSyncIterator;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Crypt.
+
 Pot.update({
   /**
    * @lends Pot
@@ -8161,6 +8276,8 @@ Pot.update({
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Net.
+(function() {
+
 Pot.update({
   /**
    * @lends Pot
@@ -8182,6 +8299,58 @@ update(Pot.Net, {
    * @lends Pot.Net
    */
   /**
+   * Send HTTP request.
+   *
+   *
+   * @example
+   *   Pot.Net.request('/data.cgi', {
+   *     method : 'POST',
+   *     sendContent : {
+   *       query  : 'Book OR Media',
+   *       start  : 0,
+   *       length : 15,
+   *       format : 'json'
+   *     },
+   *     mimeType : 'application/json',
+   *     headers : {
+   *       'Content-Type' : 'text/javascript'
+   *     }
+   *   }).then(function(res) {
+   *     debug(res.responseText);
+   *   }, function(err) {
+   *     debug('Error!');
+   *     debug(err);
+   *   });
+   *
+   *
+   * @param  {String}     url      The request URL.
+   * @param  {Object}   (options)  Request options.
+   *                                 <pre>
+   *                                 +----------------------------------
+   *                                 | Available options:
+   *                                 +----------------------------------
+   *                                 - method      : {String}    'GET'
+   *                                 - sendContent : {Object}    null
+   *                                 - queryString : {Object}    null
+   *                                 - username    : {String}    null
+   *                                 - password    : {String}    null
+   *                                 - headers     : {Object}    null
+   *                                 - mimeType    : {String}    null
+   *                                 </pre>
+   * @return {Deferred}            Return the instance of Pot.Deferred.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  request : function(url, options) {
+    if (Pot.System.isGreasemonkey) {
+      return Pot.Net.requestByGreasemonkey(url, options);
+    } else {
+      return Pot.Net.XHR.request(url, options);
+    }
+  },
+  /**
    * The XMLHttpRequest handler object.
    *
    * @type Object
@@ -8193,6 +8362,66 @@ update(Pot.Net, {
     /**
      * @lends Pot.Net.XHR
      */
+    /**
+     * Status constants for XMLHTTP:
+     *
+     * {@link http://msdn.microsoft.com/library/default.asp?url=/library/
+     *         en-us/xmlsdk/html/0e6a34e4-f90c-489d-acff-cb44242fafc6.asp }
+     *
+     * @enum {Number}
+     * @type Object
+     * @const
+     * @static
+     */
+    ReadyState : {
+      UNINITIALIZED : 0,
+      LOADING       : 1,
+      LOADED        : 2,
+      INTERACTIVE   : 3,
+      COMPLETE      : 4
+    },
+    /**
+     * XMLHttpRequest factory.
+     *
+     * @return {Object}     The XMLHttpRequest object.
+     * @type Function
+     * @function
+     * @public
+     * @static
+     */
+    factory : function() {
+      var x, xhr;
+      if (Pot.System.isNodeJS) {
+        try {
+          // Require XMLHttpRequest.js on Node.js.
+          // https://github.com/driverdan/node-XMLHttpRequest
+          xhr = require('XMLHttpRequest').XMLHttpRequest;
+          x = new xhr;
+        } catch (e) {}
+      }
+      if (!x) {
+        try {
+          x = new XMLHttpRequest();
+        } catch (e) {}
+        if (!x && Pot.System.hasActiveXObject) {
+          each([
+            'MSXML2.XMLHTTP.6.0',
+            'MSXML2.XMLHTTP.3.0',
+            'MSXML2.XMLHTTP',
+            'Microsoft.XMLHTTP',
+            'Msxml2.XMLHTTP.4.0'
+          ], function(prog) {
+            try {
+              x = new ActiveXObject(prog);
+            } catch (e) {}
+            if (x) {
+              throw Pot.StopIteration;
+            }
+          });
+        }
+      }
+      return x;
+    },
     /**
      * Send HTTP request with the XMLHttpRequest.
      *
@@ -8234,325 +8463,657 @@ update(Pot.Net, {
      * @return {Deferred}            Return the instance of Pot.Deferred.
      * @type Function
      * @function
-     * @class
      * @public
      * @static
      */
     request : (function() {
-      var jsonp;
       /**@ignore*/
-      function encode(s) {
-        return encodeURIComponent(stringify(s, false));
-      }
-      /**@ignore*/
-      function serialize(query) {
-        var queries = [];
-        if (Pot.isString(query)) {
-          return stringify(query);
-        } else if (!query) {
-          return '';
-        }
-        if (Pot.isObject(query) || Pot.isArrayLike(query)) {
-          each(query, function(v, k) {
-            var item, key, val, sep, ok = true;
-            item = Pot.isArray(v) ? v : [k, v];
+      var Request = function(url, options) {
+        return new Request.prototype.doit(url, options);
+      };
+      Request.prototype = update(Request.prototype, {
+        /**
+         * @ignore
+         */
+        xhr : null,
+        /**
+         * @ignore
+         */
+        url : null,
+        /**
+         * @ignore
+         */
+        options : {},
+        /**
+         * @ignore
+         */
+        deferred : null,
+        /**
+         * @private
+         * @ignore
+         */
+        doit : function(url, options) {
+          this.url = stringify(url, true);
+          this.deferred = new Pot.Deferred();
+          if (this.url) {
             try {
-              key = stringify(item[0], false);
-              val = stringify(item[1], false);
+              this.setOptions(options);
+              if (this.factory()) {
+                this.open();
+                this.setHeaders();
+                this.setReadyStateChange();
+                this.send();
+              }
             } catch (e) {
-              ok = false;
+              try {
+                this.cancel(true);
+              } catch (ex) {}
+              this.deferred.raise(e);
             }
-            if (ok && (key || val)) {
-              sep = key ? '=' : '';
-              queries[queries.length] = encode(key) + sep + encode(val);
+          }
+          return this;
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        factory : function() {
+          this.xhr = Pot.Net.XHR.factory();
+          if (!this.xhr) {
+            this.deferred.raise('Failed to create XMLHttpRequest');
+            return false;
+          } else {
+            return true;
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        setOptions : function(options) {
+          var query, defaults, opts;
+          defaults = {
+            method      : 'GET',
+            sendContent : null,
+            queryString : null,
+            callback    : null,
+            username    : null,
+            password    : null,
+            headers     : null,
+            mimeType    : null
+          };
+          if (Pot.isObject(options)) {
+            opts = update({}, options);
+          } else {
+            opts = {};
+          }
+          this.options = update({}, defaults, opts || {});
+          this.method = trim(this.options.method).toUpperCase();
+          if (!this.method) {
+            this.method = defaults.method;
+          }
+          this.url = buildURL(this.url, this.options.queryString);
+          this.options.sendContent = stringify(
+            serializeToQueryString(this.options.sendContent),
+            true
+          );
+          if ((this.options.method === 'GET' ||
+               this.options.method === defaults.method) &&
+              (this.options.sendContent)) {
+            this.options.method = 'POST';
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        open : function() {
+          if (this.options.username != null) {
+            this.xhr.open(
+              this.options.method,
+              this.url,
+              true,
+              stringify(this.options.username, true),
+              stringify(this.options.password, true)
+            );
+          } else {
+            this.xhr.open(this.options.method, this.url, true);
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        setHeaders : function() {
+          var that = this, contentType;
+          try {
+            try {
+              if (this.xhr.overrideMimeType &&
+                  this.options.mimeType != null) {
+                this.xhr.overrideMimeType(this.options.mimeType);
+              }
+            } catch (e) {}
+            this.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            if (this.options.contentType != null) {
+              contentType = this.options.contentType;
+            }
+            if (this.options.headers != null) {
+              each(this.options.headers, function(value, name) {
+                if (!contentType && /^Content-?Type/i.test(name)) {
+                  contentType = value;
+                } else {
+                  that.xhr.setRequestHeader(name, value);
+                }
+              });
+            }
+            if (!contentType &&
+                this.options.method === 'POST') {
+              contentType = 'application/x-www-form-urlencoded';
+            }
+            if (contentType) {
+              this.xhr.setRequestHeader('Content-Type', contentType);
+            }
+          } catch (e) {}
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        setReadyStateChange : function() {
+          var that = this;
+          /**@ignore*/
+          this.xhr.onreadystatechange = function() {
+            var status = null;
+            if (that.xhr.readyState == Pot.Net.XHR.ReadyState.COMPLETE) {
+              that.cancel();
+              try {
+                status = parseInt(that.xhr.status);
+                if (!status && that.xhr.responseText) {
+                  // 0 or undefined seems to mean cached or local
+                  status = 304;
+                }
+              } catch (e) {}
+              // 1223 is apparently a bug in IE
+              if ((status >= 200 && status < 300) ||
+                  status === 304 || status === 1223) {
+                if (Pot.isFunction(that.options.callback)) {
+                  Pot.Deferred.flush(function() {
+                    that.options.callback.call(
+                      that.xhr,
+                      that.xhr.responseText, that.xhr
+                    );
+                  }).ensure(function(res) {
+                    that.deferred.begin(that.xhr);
+                  });
+                } else {
+                  that.deferred.begin(that.xhr);
+                }
+              } else {
+                that.deferred.raise(update({}, that.xhr));
+                try {
+                  that.cancel(true);
+                } catch (e) {}
+              }
+            }
+          };
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        cancel : function(isAbort) {
+          // IE SUCKS
+          try {
+            this.xhr.onreadystatechange = null;
+          } catch (e) {
+            try {
+              this.xhr.onreadystatechange = Pot.noop;
+            } catch (e) {}
+          }
+          if (isAbort) {
+            try {
+              this.xhr.abort();
+            } catch (e) {}
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        send : function() {
+          this.xhr.send(this.options.sendContent);
+        }
+      });
+      Request.prototype.doit.prototype = Request.prototype;
+      return function(url, options) {
+        return (new Request(url, options)).deferred;
+      };
+    })()
+  },
+  /**
+   * Send request by Greasemonkey.
+   *
+   * @internal
+   * @private
+   * @ignore
+   */
+  requestByGreasemonkey : function(url, options) {
+    var d, opts, maps, type;
+    d = new Pot.Deferred();
+    opts = update({}, options || {});
+    maps = {
+      sendContent : 'data',
+      mimeType    : 'overrideMimeType',
+      username    : 'user'
+    };
+    each(maps, function(gm, org) {
+      if (org in opts) {
+        opts[gm] = opts[org];
+      }
+    });
+    opts.method = trim(opts.method).toUpperCase() || 'GET';
+    opts.url = buildURL(url, opts.queryString);
+    if (opts.data) {
+      opts.data = serializeToQueryString(opts.data);
+    }
+    if (opts.data && opts.method === 'GET') {
+      opts.method = 'POST';
+    }
+    type = opts.contentType;
+    if (opts.headers) {
+      each(opts.headers, function(v, k) {
+        if (!type && /^Content-?Type/i.test(k)) {
+          type = v;
+          throw Pot.StopIteration;
+        }
+      });
+    }
+    if (!type && opts.method === 'POST') {
+      type = 'application/x-www-form-urlencoded';
+    }
+    if (type) {
+      opts.headers = update(opts.headers || {}, {
+        'Content-Type' : type
+      });
+    }
+    if (opts.onload) {
+      d.then(opts.onload);
+    }
+    if (opts.onerror) {
+      d.rescue(opts.onerror);
+    }
+    update(opts, {
+      /**@ignore*/
+      onload : function() {
+        d.begin.apply(d, arguments);
+      },
+      /**@ignore*/
+      onerror : function() {
+        d.raise.apply(d, arguments);
+      }
+    });
+    Pot.Deferred.callLazy(function() {
+      GM_xmlhttpRequest(opts);
+    });
+    return d;
+  },
+  /**
+   * Send request by JSONP.
+   *
+   *
+   * @example
+   *   // Same as jQuery.jsonp usage.
+   *   var url = 'http://www.example.com/jsonpTest?callback=?';
+   *   Pot.Net.requestByJSONP(url, {
+   *     queryString : {
+   *       q : 'JavaScript OR ECMAScript'
+   *     }
+   *   }).then(function(data) {
+   *     debug(data.results[0].text);
+   *   });
+   *
+   *
+   * @param  {String}     url      The request URL.
+   * @param  {Object}   (options)  Request options.
+   *                                 <pre>
+   *                                 +----------------------------------
+   *                                 | Available options:
+   *                                 +----------------------------------
+   *                                 - queryString : {Object} null
+   *                                 - callback    : {String} 'callback'
+   *                                 </pre>
+   * @return {Deferred}            Return the instance of Pot.Deferred.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  requestByJSONP : (function() {
+    /**@ignore*/
+    var PATTERNS = {
+      KEY  : /json|call/i,
+      DONE : /loaded|complete/
+    };
+    return function(url, options) {
+      var d, opts, context, id, callback, key;
+      var doc, uri, head, script, done, defaults;
+      defaults = 'callback';
+      d = new Pot.Deferred();
+      opts    = update({}, options || {});
+      context = globals || Pot.Global;
+      doc     = getDoc();
+      head    = getHead(doc);
+      if (!context || !doc || !head || !url) {
+        return d.raise(context || url || head || doc);
+      }
+      try {
+        if (opts.callback) {
+          if (Pot.isString(opts.callback)) {
+            id = opts.callback;
+          } else if (Pot.isFunction(opts.callback)) {
+            callback = opts.callback;
+          } else if (Pot.isObject(opts.callback)) {
+            for (key in opts.callback) {
+              defaults = key;
+              if (Pot.isString(opts.callback[key])) {
+                id = opts.callback[key];
+              } else if (Pot.isFunction(opts.callback[key])) {
+                callback = opts.callback[key];
+              }
+              break;
+            }
+          }
+        } else {
+          each(opts, function(v, k) {
+            if (PATTERNS.KEY.test(k)) {
+              defaults = k;
+              if (Pot.isString(v)) {
+                id = v;
+              } else if (Pot.isFunction(v)) {
+                callback = v;
+              }
+              throw Pot.StopIteration;
             }
           });
         }
-        return queries.join('&');
-      }
-      /**@ignore*/
-      function buildURL(url, query) {
-        var u, q, p;
-        u = stringify(url);
-        p = (~u.indexOf('?')) ? '&' : '?';
-        q = stringify(serialize(query));
-        while (u.slice(-1) === p) {
-          u = u.slice(0, -1);
+        if (!id) {
+          do {
+            id = buildSerial(Pot, '');
+          } while (id in context);
         }
-        while (q.charAt(0) === p) {
-          q = q.substring(1);
+        uri = buildURL(
+          insertId(url, id, defaults),
+          opts.queryString || opts.sendContent
+        );
+        if (Pot.System.isGreasemonkey) {
+          return Pot.Net.requestByGreasemonkey(uri, {
+            method : 'GET'
+          }).then(function(res) {
+            var code = trim(res && res.responseText);
+            code = code.replace(/^[^(]*|[^)]*$/g, '');
+            try {
+              return JSON.parse(code);
+            } catch (e) {
+              return (new Function('return (' + code + ');'))();
+            }
+          });
         }
-        if (q) {
-          q = p + q;
+        script = doc.createElement('script');
+        script.async = 'async';
+        if (opts.type) {
+          script.type = opts.type;
         }
-        return u ? u + q : null;
-      }
-      /**@ignore*/
-      function factory() {
-        try {
-          return new XMLHttpRequest();
-        } catch (e) {
+        if (opts.charset) {
+          script.charset = opts.charset;
+        }
+        /**@ignore*/
+        context[id] = function() {
+          var args = arguments;
           try {
-            return new ActiveXObject('Microsoft.XMLHTTP');
-          } catch (e) {}
-        }
-      }
-      /**@ignore*/
-      jsonp = (function() {
-        /**@ignore*/
-        var PATTERNS = {
-          KEY  : /json|call/i,
-          DONE : /loaded|complete/
-        };
-        /**@ignore*/
-        function getDoc() {
-          try {
-            return (typeof document !== 'undefined' && document) ||
-                    (globals && globals.document) ||
-                    (Pot.Global && Pot.Global.document);
-          } catch (e) {}
-        }
-        /**@ignore*/
-        function getHead(doc) {
-          try {
-            return doc.head ||
-                  doc.getElementsByTagName('head')[0] ||
-                  doc.documentElement;
-          } catch (e) {}
-        }
-        /**@ignore*/
-        function insertId(url, id, defaults) {
-          var uri = stringify(url), c;
-          c = '=?';
-          if (!~uri.indexOf(c) || !~uri.indexOf(defaults + '=')) {
-            if (~uri.indexOf(c)) {
-              uri = uri.replace(c, '=' + id);
-            } else {
-              c = '?';
-              if (~uri.indexOf(c)) {
-                uri = uri.replace(c, c + defaults + '=' + id);
-              } else {
-                while (uri.slice(-1) === '&') {
-                  uri = uri.slice(0, -1);
-                }
-                uri = uri + c + defaults + '=' + id;
-              }
-            }
-          }
-          return uri;
-        }
-        /**@ignore*/
-        return function(url, options) {
-          var d, opts, context, id, callback, key;
-          var doc, uri, head, script, done, defaults;
-          defaults = 'callback';
-          d = new Pot.Deferred();
-          opts    = options || {};
-          context = globals || Pot.Global;
-          doc     = getDoc();
-          head    = getHead(doc);
-          if (!context || !doc || !head || !url) {
-            return d.raise(context || url || head || doc);
-          }
-          try {
-            if (opts.callback) {
-              if (Pot.isString(opts.callback)) {
-                id = opts.callback;
-              } else if (Pot.isFunction(opts.callback)) {
-                callback = opts.callback;
-              } else if (Pot.isObject(opts.callback)) {
-                for (key in opts.callback) {
-                  id = key;
-                  if (Pot.isFunction(opts.callback[key])) {
-                    callback = opts.callback[key];
-                  }
-                  break;
-                }
-              }
-            }
-            if (!id || !(id in context)) {
-              do {
-                id = buildSerial(Pot, '');
-              } while (id in context);
-            }
-            uri = buildURL(
-              insertId(url, id, defaults),
-              opts.queryString || opts.sendContent
-            );
-            script = doc.createElement('script');
-            script.async = 'async';
-            if (opts.type) {
-              script.type = opts.type;
-            }
-            if (opts.charset) {
-              script.charset = opts.charset;
-            }
-            /**@ignore*/
-            context[id] = function() {
-              var args = arguments;
-              try {
-                delete context[id];
-              } catch (e) {
-                try {
-                  context[id] = null;
-                } catch (e) {}
-              }
-              try {
-                if (script) {
-                  script.parentNode.removeChild(script);
-                }
-                script = undefined;
-              } catch (e) {}
-              if (Pot.isFunction(callback)) {
-                callback.apply(callback, args);
-              }
-              d.begin.apply(d, args);
-            };
-            script.src = uri;
-            /**@ignore*/
-            script.onload =
-            /**@ignore*/
-            script.onreadystatechange = function(a, isAbort) {
-              if (!done &&
-                  (isAbort === 1 || !script.readyState ||
-                   PATTERNS.DONE.test(script.readyState))
-              ) {
-                done = true;
-                try {
-                  script.onload = script.onreadystatechange = null;
-                } catch (e) {}
-                if (head && script.parentNode) {
-                  try {
-                    head.removeChild(script);
-                  } catch (e) {}
-                }
-                script = undefined;
-              }
-            };
-            d.canceller(function() {
-              try {
-                if (script) {
-                  script.onload(0, 1);
-                }
-              } catch (e) {}
-            });
-            head.insertBefore(script, head.firstChild);
+            delete context[id];
           } catch (e) {
-            d.raise(e);
-          }
-          return d;
-        };
-      })();
-      /**@ignore*/
-      return update(function(url, options) {
-        var d, req, opts, method, uri, data, type;
-        d = new Pot.Deferred();
-        req = factory();
-        if (!req || !url) {
-          return d.raise(req || url);
-        }
-        try {
-          opts = options || {};
-          method = trim(opts.method).toUpperCase() || 'GET';
-          uri = buildURL(url, opts.queryString);
-          if (opts.sendContent) {
-            data = serialize(opts.sendContent);
-          }
-          if (data && method === 'GET') {
-            method = 'POST';
-          }
-          if (opts.username != null) {
-            req.open(
-              method, uri, true,
-              stringify(opts.username, false),
-              stringify(opts.password, false)
-            );
-          } else {
-            req.open(method, uri, true);
+            try {
+              context[id] = null;
+            } catch (e) {}
           }
           try {
-            if (req.overrideMimeType && opts.mimeType) {
-              req.overrideMimeType(opts.mimeType);
+            if (script) {
+              script.parentNode.removeChild(script);
+            }
+            script = undefined;
+          } catch (e) {}
+          if (Pot.isFunction(callback)) {
+            callback.apply(callback, args);
+          }
+          d.begin.apply(d, args);
+        };
+        script.src = uri;
+        /**@ignore*/
+        script.onload =
+        /**@ignore*/
+        script.onreadystatechange = function(a, isAbort) {
+          if (!done && script &&
+              (isAbort === 1 || !script.readyState ||
+               PATTERNS.DONE.test(script.readyState))
+          ) {
+            done = true;
+            try {
+              script.onload = script.onreadystatechange = null;
+            } catch (e) {}
+            if (head && script && script.parentNode) {
+              try {
+                head.removeChild(script);
+              } catch (e) {}
+            }
+            script = undefined;
+          }
+        };
+        d.canceller(function() {
+          try {
+            if (script) {
+              script.onload(0, 1);
             }
           } catch (e) {}
-          type = opts.contentType;
-          if (opts.headers) {
-            each(opts.headers, function(v, k) {
-              if (!type && /^Content-?Type/i.test(k)) {
-                type = v;
-              } else {
-                req.setRequestHeader(k, v);
-              }
-            });
-          }
-          if (!type && method === 'POST') {
-            type = 'application/x-www-form-urlencoded';
-          }
-          if (type) {
-            req.setRequestHeader('Content-Type', type);
-          }
-          /**@ignore*/
-          req.onreadystatechange = function() {
-            if (req.readyState == 4) {
-              try {
-                req.onreadystatechange = Pot.noop || null;
-              } catch (e) {}
-              d.begin(req);
-            }
-          };
-          req.send(data || null);
-        } catch (e) {
-          d.raise(e);
+        });
+        head.insertBefore(script, head.firstChild);
+      } catch (e) {
+        d.raise(e);
+      }
+      return d;
+    };
+  })()
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Private functions.
+
+/**
+ * @private
+ * @ignore
+ */
+function urlEncode(string) {
+  var result = '', me = arguments.callee, s;
+  s = stringify(string, false);
+  if (s) {
+    if (Pot.isPercentEncoded(s)) {
+      result = s;
+    } else {
+      try {
+        result = me.byComponent(s);
+      } catch (e) {
+        result = me.byEncode(s);
+      }
+    }
+  }
+  return stringify(result, true);
+}
+
+// Update URLEncode for Surrogate Pair (URIError).
+update(urlEncode, {
+  /**
+   * @ignore
+   */
+  byComponent : function(string) {
+    return encodeURIComponent(string);
+  },
+  /**
+   * Simple URL encode.
+   *
+   * @private
+   * @ignore
+   */
+  byEncode : function(string) {
+    var result = '', s, re, rep, per;
+    s = stringify(string, true);
+    if (s) {
+      re = /[^!'-*.0-9A-Z_a-z~-]/g;
+      per = '%';
+      /**@ignore*/
+      rep = function(s) {
+        var r, c = s.charCodeAt(0);
+        if (c < 0x10) {
+          r = per + '0' + c.toString(16);
+        } else if (c < 0x80) {
+          r = per + c.toString(16);
+        } else if (c < 0x800) {
+          r = per + (c >> 0x06 | 0xC0).toString(16) +
+              per + (c  & 0x3F | 0x80).toString(16);
+        } else {
+          r = per + (c >> 0x0C | 0xE0).toString(16) +
+              per + (c >> 0x06 & 0x3F | 0x80).toString(16) +
+              per + (c  & 0x3F | 0x80).toString(16);
         }
-        d.xhr = req;
-        return d;
-      }, {
-        /**
-         * @lends Pot.Net.XHR.request
-         */
-        /**
-         * Send request by JSONP.
-         *
-         *
-         * @example
-         *   // Same as jQuery.jsonp usage.
-         *   var url = 'http://www.example.com/jsonpTest?callback=?';
-         *   Pot.Net.XHR.request.jsonp(url, {
-         *     queryString : {
-         *       q : 'JavaScript OR ECMAScript'
-         *     }
-         *   }).then(function(data) {
-         *     debug(data.results[0].text);
-         *   });
-         *
-         *
-         * @param  {String}     url      The request URL.
-         * @param  {Object}   (options)  Request options.
-         *                                 <pre>
-         *                                 +----------------------------------
-         *                                 | Available options:
-         *                                 +----------------------------------
-         *                                 - queryString : {Object} null
-         *                                 - callback    : {String} 'callback'
-         *                                 </pre>
-         * @return {Deferred}            Return the instance of Pot.Deferred.
-         * @type Function
-         * @function
-         * @public
-         * @static
-         */
-        jsonp : jsonp
-      })
-    })()
+        return r.toUpperCase();
+      };
+      result = s.replace(re, rep);
+    }
+    return result;
   }
 });
 
+/**
+ * @private
+ * @ignore
+ */
+function serializeToQueryString(query) {
+  var queries = [];
+  if (Pot.isString(query)) {
+    return stringify(query);
+  } else if (!query || query == false) {
+    return '';
+  }
+  if (Pot.isObject(query) || Pot.isArrayLike(query)) {
+    each(query, function(v, k) {
+      var item, key, val, sep, ok = true;
+      item = Pot.isArray(v) ? v : [k, v];
+      try {
+        key = stringify(item[0], false);
+        val = stringify(item[1], false);
+      } catch (e) {
+        ok = false;
+      }
+      if (ok && (key || val)) {
+        sep = key ? '=' : '';
+        queries[queries.length] = urlEncode(key) + sep + urlEncode(val);
+      }
+    });
+  }
+  return queries.join('&');
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function buildURL(url, query) {
+  var u, q, p;
+  u = stringify(url);
+  p = (~u.indexOf('?')) ? '&' : '?';
+  q = stringify(serializeToQueryString(query));
+  while (u.slice(-1) === p) {
+    u = u.slice(0, -1);
+  }
+  while (q.charAt(0) === p) {
+    q = q.substring(1);
+  }
+  if (q) {
+    q = p + q;
+  }
+  return u ? u + q : null;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function getDoc() {
+  var doc;
+  try {
+    if (typeof document !== 'undefined' && Pot.isDocument(document)) {
+      doc = document;
+    } else if (Pot.isDocument(globals)) {
+      doc = globals;
+    } else if (Pot.isDocument(Pot.Global)) {
+      doc = Pot.Global;
+    } else if (globals && Pot.isDocument(globals.document)) {
+      doc = globals.document;
+    } else if (Pot.Global && Pot.isDocument(Pot.Global.document)) {
+      doc = Pot.Global.document;
+    } else if (globals && globals.content &&
+               Pot.isDocument(globals.content.document)) {
+      doc = globals.content.document;
+    } else if (Pot.Global && Pot.Global.content &&
+               Pot.isDocument(Pot.Global.content.document)) {
+      doc = Pot.Global.content.document;
+    }
+  } catch (e) {
+    doc = null;
+  }
+  return doc;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function getHead(doc) {
+  var context = doc;
+  try {
+    if (!context) {
+      context = getDoc();
+    }
+    return (Pot.isElement(doc.head) && doc.head) ||
+           doc.getElementsByTagName('head')[0]   ||
+           doc.documentElement;
+  } catch (e) {}
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function insertId(url, id, defaults) {
+  var uri = stringify(url);
+  if (~uri.indexOf('=?')) {
+    uri = uri.replace('=?', '=' + id);
+  } else if (~uri.indexOf('?')) {
+    uri = uri.replace('?', '?' + defaults + '=' + id);
+  } else {
+    while (uri.slice(-1) === '&') {
+      uri = uri.slice(0, -1);
+    }
+    uri = uri + '?' + defaults + '=' + id;
+  }
+  return uri;
+}
+
 // Update methods for reference.
 Pot.update({
-  request : Pot.Net.XHR.request,
-  jsonp   : Pot.Net.XHR.request.jsonp
+  request : Pot.Net.request,
+  jsonp   : Pot.Net.requestByJSONP
 });
 
+})();
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
 Pot.update({
@@ -8573,49 +9134,10 @@ update(Pot.XPCOM, {
    * @lends Pot.XPCOM
    */
   /**
-   * Check whether XPCOM Components are enabled
-   *
-   * @type Boolean
-   * @const
-   * @static
-   * @public
-   */
-  isEnabled : (function() {
-    var result = false, x;
-    try {
-      if (typeof window === 'object' && window.location &&
-          /^(?:chrome|resource):$/.test(window.location.protocol)) {
-        try {
-          Cc = Components.classes;
-          Ci = Components.interfaces;
-          Cr = Components.results;
-          Cu = Components.utils;
-          result = true;
-        } catch (e) {
-          // If you need XPCOM, try following privilege.
-          // e.g.
-          //   netscape.security.PrivilegeManager
-          //           .enablePrivilege('UniversalXPConnect');
-          //   or about:config :
-          //   signed.applets.codebase_principal_support : true (default=false)
-          //
-          Ci = Cc = Cr = Cu = null;
-          result = false;
-        }
-      }
-    } catch (err) {
-      result = false;
-    }
-    if (result) {
-      Pot.System.isWaitable = true;
-    }
-    return result;
-  })(),
-  /**
    * Evaluate JavaScript code in the sandbox.
    *
    * @param  {String}  code   The expression.
-   * @param  {String}  url    The sandbox url.
+   * @param  {String}  url    The sandbox URL.
    * @return {*}              Return the result of expression.
    * @type Function
    * @function
@@ -8623,17 +9145,15 @@ update(Pot.XPCOM, {
    * @static
    */
   evalInSandbox : function(code, url) {
-    var result, re, src, uri;
-    if (Pot.XPCOM.isEnabled) {
+    var result, re, src;
+    if (Pot.System.hasComponents) {
       if (!Cu) {
-        Pot.System.isWaitable = Pot.XPCOM.isEnabled = false;
+        Pot.System.isWaitable = Pot.System.hasComponents = false;
         return;
       }
       re = /^[\s;]*|[\s;]*$/g;
       src = ['(', ')'].join(stringify(code).replace(re, ''));
-      //TODO: fix URL for example.
-      uri = url || 'http://www.example.com/';
-      result = Cu.evalInSandbox(src, Cu.Sandbox(uri));
+      result = Cu.evalInSandbox(src, Cu.Sandbox(url));
     }
     return result;
   },
@@ -8648,16 +9168,16 @@ update(Pot.XPCOM, {
    * @public
    * @static
    */
-  till : function(cond) {
+  throughout : function(cond) {
     var thread;
-    if (Pot.XPCOM.isEnabled) {
+    if (Pot.System.hasComponents) {
       try {
         thread = Cc['@mozilla.org/thread-manager;1']
                 .getService(Ci.nsIThreadManager).mainThread;
       } catch (e) {
-        Pot.System.isWaitable = Pot.XPCOM.isEnabled = false;
+        Pot.System.isWaitable = Pot.System.hasComponents = false;
       }
-      if (thread && Pot.XPCOM.isEnabled) {
+      if (thread && Pot.System.hasComponents) {
         do {
           thread.processNextEvent(true);
         } while (cond && !cond());
@@ -8675,13 +9195,13 @@ update(Pot.XPCOM, {
    */
   getMostRecentWindow : function() {
     var cwin;
-    if (Pot.XPCOM.isEnabled) {
+    if (Pot.System.hasComponents) {
       try {
         cwin = Cc['@mozilla.org/appshell/window-mediator;1']
               .getService(Ci.nsIWindowMediator)
               .getMostRecentWindow('navigator:browser');
       } catch (e) {
-        Pot.System.isWaitable = Pot.XPCOM.isEnabled = false;
+        Pot.System.isWaitable = Pot.System.hasComponents = false;
       }
     }
     return cwin;
@@ -8699,7 +9219,7 @@ update(Pot.XPCOM, {
    */
   getChromeWindow : function(uri) {
     var result, win, wins, pref;
-    if (!Pot.XPCOM.isEnabled) {
+    if (!Pot.System.hasComponents) {
       return;
     }
     pref = uri || 'chrome://browser/content/browser.xul';
@@ -8708,7 +9228,7 @@ update(Pot.XPCOM, {
             .getService(Ci.nsIWindowMediator)
             .getXULWindowEnumerator(null);
     } catch (e) {
-      Pot.System.isWaitable = Pot.XPCOM.isEnabled = false;
+      Pot.System.isWaitable = Pot.System.hasComponents = false;
       return;
     }
     while (wins.hasMoreElements()) {
@@ -8956,8 +9476,8 @@ update(Pot.Internal, {
     range           : Pot.range,
     indexOf         : Pot.indexOf,
     lastIndexOf     : Pot.lastIndexOf,
-    request         : Pot.Net.XHR.request,
-    jsonp           : Pot.Net.XHR.request.jsonp,
+    request         : Pot.Net.request,
+    jsonp           : Pot.Net.requestByJSONP,
     rescape         : rescape,
     arrayize        : arrayize,
     invoke          : invoke,
@@ -8971,10 +9491,127 @@ update(Pot.Internal, {
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of jQuery plugin and convert Ajax function to deferred.
+
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Definition of jQuery plugin and convert Ajax function to deferred.
+   *
+   * <pre>
+   *   - $.pot
+   *       {Object}    Pot object.
+   *
+   *   - $.fn.deferred
+   *       {Function}  Deferrize jQuery method.
+   *                     function(method, (original arguments))
+   *                       - method :
+   *                           {String} method name.
+   *                       - (...)  :
+   *                           {*}      original arguments.
+   *  </pre>
+   *
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  deferrizejQueryAjax : (function() {
+    if (typeof jQuery !== 'function' || !jQuery.fn) {
+      return Pot.noop;
+    }
+    return function() {
+      return (function($) {
+        var orgAjax = $.ajax;
+        $.pot = Pot;
+        $.fn.extend({
+          /**@ignore*/
+          deferred : function(method) {
+            var func, args = arrayize(arguments, 1), exists = false;
+            each(args, function(arg) {
+              if (Pot.isFunction(arg)) {
+                exists = true;
+                throw Pot.StopIteration;
+              }
+            });
+            if (!exists) {
+              args.push(function() {
+                return arrayize(arguments);
+              });
+            }
+            func = Pot.Deferred.deferrize(method, this);
+            return func.apply(this, args);
+          }
+        });
+        /**@ignore*/
+        $.ajax = function(options) {
+          var d = new Pot.Deferred(), opts, orgs, er;
+          opts = update({}, options || {});
+          orgs = update({}, opts);
+          update(opts, {
+            /**@ignore*/
+            success : function() {
+              var args = arrayize(arguments), err, done;
+              try {
+                if (orgs.success) {
+                  orgs.success.apply(this, args);
+                }
+              } catch (e) {
+                done = true;
+                err = e || new Error(e);
+                args.push(err);
+                d.raise.apply(d, args);
+              }
+              if (!done) {
+                d.destassign = true;
+                d.begin.apply(d, args);
+              }
+            },
+            /**@ignore*/
+            error : function() {
+              var args = arrayize(arguments), err;
+              try {
+                if (orgs.error) {
+                  orgs.error.apply(this, args);
+                }
+              } catch (e) {
+                err = e || new Error(e);
+                args.unshift(err);
+              } finally {
+                d.raise.apply(d, args);
+              }
+            }
+          });
+          try {
+            d.data({
+              result : orgAjax(opts)
+            });
+          } catch (e) {
+            er = e;
+            d.raise(er);
+          }
+          return d;
+        };
+      })(jQuery);
+    };
+  })()
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Register the Pot object into global.
+
+
+// Update global scope for Pot object.
 update(globals || Pot.Global || {}, {
   Pot : Pot
 });
+
+// Globalize Pot object methods.
+Pot.globalize();
+
 
 })(this || {});
 
