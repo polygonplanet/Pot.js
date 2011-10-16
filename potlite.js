@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.12, 2011-10-16
+ * Version 1.13, 2011-10-17
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.12
- * @date           2011-10-16
+ * @version        1.13
+ * @date           2011-10-17
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.12', TYPE : 'lite'},
+var Pot = {VERSION : '1.13', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -158,8 +158,22 @@ update(Pot, {
    *   }
    *
    * @type  Object
+   * @class
    * @static
    * @const
+   *
+   * @property {Object} webkit     WebKit engine.
+   * @property {Object} opera      Opera.
+   * @property {Object} msie       MSIE.
+   * @property {Object} mozilla    Mozilla engine.
+   * @property {Object} firefox    Mozilla Firefox.
+   * @property {Object} chrome     Google Chrome.
+   * @property {Object} safari     Safari.
+   * @property {Object} iphone     iPhone.
+   * @property {Object} ipod       iPod.
+   * @property {Object} ipad       iPad.
+   * @property {Object} android    Android.
+   * @property {Object} blackberry BlackBerry.
    */
   Browser : (function(n) {
     // Expression from: jquery.browser (based)
@@ -238,8 +252,20 @@ update(Pot, {
    *   }
    *
    * @type Object
+   * @class
    * @static
    * @const
+   *
+   * @property {Boolean}  iphone     iPhone.
+   * @property {Boolean}  ipod       iPod.
+   * @property {Boolean}  ipad       iPad.
+   * @property {Boolean}  blackberry BlackBerry.
+   * @property {Boolean}  android    Android.
+   * @property {Boolean}  mac        Mac.
+   * @property {Boolean}  win        Windows.
+   * @property {Boolean}  linux      Linux.
+   * @property {Boolean}  x11        X11.
+   * @property {Function} toString   Represents OS as a string.
    */
   OS : (function(nv) {
     var r = {}, n = nv || {}, pf, ua, av, maps, i, len, o;
@@ -1404,7 +1430,8 @@ function stringify(x, ignoreBoolean) {
             // Fixed object valueOf. e.g. new String('hoge');
             c = x.constructor;
             if (c === String || c === Number ||
-                (typeof XML !== 'undefined' && c === XML)) {
+                (typeof XML !== 'undefined' && c === XML) ||
+                (typeof Buffer !== 'undefined' && c === Buffer)) {
               result = x;
             } else if (c === Boolean) {
               if (len >= 2 && !ignoreBoolean) {
@@ -2288,6 +2315,11 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @private
    * @ignore
    */
+  chainDebris : null,
+  /**
+   * @private
+   * @ignore
+   */
   options : {},
   /**
    * @private
@@ -2333,19 +2365,20 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
     this.plugins = {};
     initOptions.call(this, arrayize(args), Pot.Deferred.defaults);
     update(this, {
-      results    : {
-        success  : null,
-        failure  : null
+      results     : {
+        success   : null,
+        failure   : null
       },
-      state      : Pot.Deferred.states.unfired,
-      chains     : [],
-      nested     : 0,
-      chained    : false,
-      cancelled  : false,
-      freezing   : false,
-      tilling    : false,
-      waiting    : false,
-      destassign : false
+      state       : Pot.Deferred.states.unfired,
+      chains      : [],
+      nested      : 0,
+      chained     : false,
+      cancelled   : false,
+      freezing    : false,
+      tilling     : false,
+      waiting     : false,
+      destassign  : false,
+      chainDebris : null
     });
     Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
     return this;
@@ -3267,6 +3300,7 @@ function fireSync() {
  */
 function fireProcedure() {
   var that = this, result, callbacks, callback, nesting;
+  clearChainDebris.call(this);
   result  = this.results[Pot.Deferred.states[this.state]];
   nesting = null;
   while (chainsEnabled.call(this)) {
@@ -3296,6 +3330,7 @@ function fireProcedure() {
       this.destassign = false;
       this.state = Pot.Deferred.states.failure;
       result = e;
+      setChainDebris.call(this, result);
       if (!Pot.isError(result)) {
         result = new Error(result);
       }
@@ -3308,6 +3343,7 @@ function fireProcedure() {
   if (nesting && this.nested) {
     result.ensure(nesting).end();
   }
+  reserveChainDebris.call(this);
 }
 
 /**
@@ -3319,6 +3355,84 @@ function fireProcedure() {
 function chainsEnabled() {
   return this.chains  && this.chains.length &&
     this.nested === 0 && !this.cancelled;
+}
+
+/**
+ * Check whether the errback is exists.
+ *
+ * @private
+ * @ignore
+ */
+function hasErrback() {
+  var exists, i, len, key, chains, errback;
+  key = Pot.Deferred.states[Pot.Deferred.states.failure];
+  chains = this.chains;
+  len = chains && chains.length;
+  if (len) {
+    for (i = 0; i < len; i++) {
+      if (chains[i]) {
+        errback = chains[i][key];
+        if (errback && Pot.isFunction(errback)) {
+          exists = true;
+          break;
+        }
+      }
+    }
+  }
+  return exists;
+}
+
+/**
+ * Set the chains debris (i.e., unhandled exception).
+ *
+ * @private
+ * @ignore
+ */
+function setChainDebris(result) {
+  if (!hasErrback.call(this)) {
+    this.chainDebris = {
+      error : result
+    };
+  }
+}
+
+/**
+ * Reserved to handle the chains debris.
+ *
+ * @private
+ * @ignore
+ */
+function reserveChainDebris() {
+  var that = this, speed;
+  if (this.chainDebris && 'error' in this.chainDebris &&
+      (this.cancelled || this.chained ||
+        (!this.chains || !this.chains.length))
+  ) {
+    if (this.options && Pot.isNumeric(this.options.speed)) {
+      speed = this.options.speed;
+    } else {
+      speed = Pot.Deferred.defaults.speed;
+    }
+    this.chainDebris.timerId = Pot.Internal.setTimeout(function() {
+      throw that.chainDebris.error;
+    }, speed);
+  }
+}
+
+/**
+ * Clear the chains debris handler.
+ *
+ * @private
+ * @ignore
+ */
+function clearChainDebris() {
+  if (this.chainDebris && this.chainDebris.timerId != null &&
+      (this.state & Pot.Deferred.states.fired) && hasErrback.call(this)) {
+    Pot.Internal.clearTimeout(this.chainDebris.timerId);
+    delete this.chainDebris.error;
+    delete this.chainDebris.timerId;
+    this.chainDebris = null;
+  }
 }
 
 /**
@@ -3699,6 +3813,7 @@ update(Pot.Deferred, {
    */
   wait : function(seconds, value) {
     var timer, d = new Pot.Deferred({
+      /**@ignore*/
       canceller : function() {
         try {
           Pot.Internal.clearTimeout(timer);
@@ -8346,6 +8461,8 @@ update(Pot.Net, {
   request : function(url, options) {
     if (Pot.System.isGreasemonkey) {
       return Pot.Net.requestByGreasemonkey(url, options);
+    } else if (Pot.System.isNodeJS) {
+      return Pot.Net.requestByNodeJS(url, options);
     } else {
       return Pot.Net.XHR.request(url, options);
     }
@@ -8493,8 +8610,16 @@ update(Pot.Net, {
          * @ignore
          */
         doit : function(url, options) {
+          var that = this;
           this.url = stringify(url, true);
-          this.deferred = new Pot.Deferred();
+          this.deferred = new Pot.Deferred({
+            /**@ignore*/
+            canceller : function() {
+              try {
+                that.cancel(true);
+              } catch (e) {}
+            }
+          });
           if (this.url) {
             try {
               this.setOptions(options);
@@ -8682,6 +8807,9 @@ update(Pot.Net, {
          */
         send : function() {
           this.xhr.send(this.options.sendContent);
+          this.deferred.data({
+            request : this.xhr
+          });
         }
       });
       Request.prototype.doit.prototype = Request.prototype;
@@ -8690,6 +8818,9 @@ update(Pot.Net, {
       };
     })()
   },
+  /**
+   * @lends Pot.Net
+   */
   /**
    * Send request by Greasemonkey.
    *
@@ -8753,10 +8884,291 @@ update(Pot.Net, {
       }
     });
     Pot.Deferred.callLazy(function() {
-      GM_xmlhttpRequest(opts);
+      var req = GM_xmlhttpRequest(opts);
+      d.data({
+        request : req
+      });
+      d.canceller(function() {
+        try {
+          req.abort();
+        } catch (e) {}
+      });
     });
     return d;
   },
+  /**
+   * Send request by Node.js::http(s).
+   *
+   * @internal
+   * @private
+   * @ignore
+   */
+  requestByNodeJS : (function() {
+    /**
+     * @ignore
+     */
+    function SimpleRequestByNode(options) {
+      return new SimpleRequestByNode.prototype.doit(options);
+    }
+    /**
+     * @ignore
+     */
+    function SimpleResponseByNode(res) {
+      return new SimpleResponseByNode.prototype.init(res);
+    }
+    // Definition of prototype.
+    SimpleResponseByNode.prototype = update(SimpleResponseByNode.prototype, {
+      /**
+       * @private
+       * @ignore
+       */
+      responseText : '',
+      /**
+       * @private
+       * @ignore
+       */
+      responseXML : '',
+      /**
+       * @private
+       * @ignore
+       */
+      status : null,
+      /**
+       * @private
+       * @ignore
+       */
+      statusText : null,
+      /**
+       * @private
+       * @ignore
+       */
+      init : function(response) {
+        var res = response || {};
+        update(this, res, {
+          getResponseHeader     : this.getResponseHeader,
+          getAllResponseHeaders : this.getAllResponseHeaders,
+          responseText          : res.responseText,
+          responseXML           : res.responseXML,
+          status                : res.status,
+          statusText            : res.statusText
+        });
+        return this;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      getResponseHeader : function(name) {
+        var result = null, key;
+        key = stringify(name);
+        lkey = key.toLowerCase();
+        if (this.headers) {
+          if (lkey in this.headers) {
+            result = this.headers[lkey];
+          } else if (key in this.headers) {
+            result = this.headers[key];
+          }
+        }
+        return result;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      getAllResponseHeaders : function() {
+        var results = [], key;
+        if (this.headers) {
+          for (key in this.headers) {
+            results.push(key + ': ' + this.headers[key]);
+          }
+        }
+        return results.join('\r\n');
+      }
+    });
+    // Definition of prototype.
+    SimpleRequestByNode.prototype = update(SimpleRequestByNode.prototype, {
+      /**
+       * @private
+       * @ignore
+       */
+      deferred : null,
+      /**
+       * @private
+       * @ignore
+       */
+      request : null,
+      /**
+       * @private
+       * @ignore
+       */
+      response : null,
+      /**
+       * @private
+       * @ignore
+       */
+      headers : {},
+      /**
+       * @private
+       * @ignore
+       */
+      requestOptions : {},
+      /**
+       * @private
+       * @ignore
+       */
+      defaultHeaders : {
+        'Accept'     : '*/*',
+        'User-Agent' : [
+          'Pot.js/', Pot.VERSION,
+          ' ', Pot.TYPE,
+          ' ', '(Node.js; *)'
+        ].join('')
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      doit : function(options) {
+        var that = this;
+        this.deferred = new Pot.Deferred({
+          /**@ignore*/
+          canceller : function() {
+            try {
+              that.abort();
+            } catch (e) {}
+          }
+        });
+        this.setOptions(options);
+        this.send();
+        return this;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      setOptions : function(options) {
+        var opts, method, ssl, uri, host, port, path, auth, data;
+        opts = update({}, options || {});
+        method = trim(opts.method).toUpperCase() || 'GET';
+        ssl = false;
+        uri = require('url').parse(opts.url);
+        switch (uri.protocol) {
+          case 'https:':
+              ssl = true;
+          case 'http:':
+              host = uri.hostname;
+              break;
+          default:
+              throw new Error('Not supported protocol: ' + uri.protocol);
+        }
+        port = uri.port || (ssl ? 443 : 80);
+        path = uri.pathname + (uri.search ? uri.search : '');
+        this.headers = update({}, this.defaultHeaders, opts.headers || {});
+        this.headers['Host'] = host;
+        if (opts.username != null) {
+          auth = new Buffer([
+            stringify(opts.username, true),
+            stringify(opts.password, true)
+          ].join(':'));
+          this.headers['Authorization'] = 'Basic ' + auth.toString('base64');
+        }
+        if (method === 'GET' || method === 'HEAD') {
+          data = null;
+        } else if (data) {
+          this.headers['Content-Length'] = Buffer.byteLength(data);
+          if (!this.headers['Content-Type']) {
+            this.headers['Content-Type'] = 'text/plain;charset=UTF-8';
+          }
+        }
+        this.requestOptions = {
+          data : data,
+          ssl  : ssl,
+          settings  : {
+            host    : host,
+            port    : port,
+            path    : path,
+            method  : method,
+            headers : this.headers
+          }
+        };
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      send : function() {
+        var that = this, doRequest;
+        if (this.requestOptions.ssl) {
+          doRequest = require('https').request;
+        } else {
+          doRequest = require('http').request;
+        }
+        this.request = doRequest(this.requestOptions.settings, function(res) {
+          that.response = new SimpleResponseByNode(res);
+          that.response.responseText = '';
+          that.response.responseXML  = '';
+          that.response.setEncoding('utf8');
+          that.response.status = that.response.statusCode;
+          if (that.response.status == 200 && !that.response.statusText) {
+            that.response.statusText = 'OK';
+          }
+          that.response.on('data', function(chunk) {
+            if (chunk) {
+              that.response.responseText += stringify(chunk, true);
+            }
+          });
+          that.response.on('end', function() {
+            that.deferred.begin(that.response);
+          });
+          that.response.on('error', function(err) {
+            that.handleError(err);
+          });
+        }).on('error', function(err) {
+          that.handleError(err);
+        });
+        if (this.requestOptions.data) {
+          this.request.write(this.requestOptions.data);
+        }
+        this.request.end();
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      handleError : function(error) {
+        this.response.status = 503;
+        this.response.statusText = error;
+        this.response.responseText = error && error.stack;
+        this.deferred.raise(this.response);
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      abort : function() {
+        if (this.response) {
+          this.response.responseText = '';
+          this.response.responseXML  = '';
+        }
+        try {
+          if (this.request && this.request.abort) {
+            this.request.abort();
+          }
+        } catch (e) {}
+      }
+    });
+    SimpleRequestByNode.prototype.doit.prototype =
+      SimpleRequestByNode.prototype;
+    SimpleResponseByNode.prototype.init.prototype =
+      SimpleResponseByNode.prototype;
+    /**@ignore*/
+    return function(url, options) {
+      var opts = update({}, options || {}, {
+        url : url
+      });
+      return (new SimpleRequestByNode(opts)).deferred;
+    };
+  })(),
   /**
    * Send request by JSONP.
    *
@@ -9417,76 +9829,77 @@ update(Pot.Internal, {
    * @internal
    */
   PotExportProps : {
-    Pot             : Pot,
-    update          : update,
-    isBoolean       : Pot.isBoolean,
-    isNumber        : Pot.isNumber,
-    isString        : Pot.isString,
-    isFunction      : Pot.isFunction,
-    isArray         : Pot.isArray,
-    isDate          : Pot.isDate,
-    isRegExp        : Pot.isRegExp,
-    isObject        : Pot.isObject,
-    isError         : Pot.isError,
-    typeOf          : Pot.typeOf,
-    typeLikeOf      : Pot.typeLikeOf,
-    StopIteration   : Pot.StopIteration,
-    isStopIter      : Pot.isStopIter,
-    isArrayLike     : Pot.isArrayLike,
-    isDeferred      : Pot.isDeferred,
-    isIter          : Pot.isIter,
-    isNumeric       : Pot.isNumeric,
-    isInt           : Pot.isInt,
-    isNativeCode    : Pot.isNativeCode,
-    isBuiltinMethod : Pot.isBuiltinMethod,
-    isWindow        : Pot.isWindow,
-    isDocument      : Pot.isDocument,
-    isElement       : Pot.isElement,
-    isNodeLike      : Pot.isNodeLike,
-    isNodeList      : Pot.isNodeList,
-    Deferred        : Pot.Deferred,
-    succeed         : Pot.Deferred.succeed,
-    failure         : Pot.Deferred.failure,
-    wait            : Pot.Deferred.wait,
-    callLater       : Pot.Deferred.callLater,
-    callLazy        : Pot.Deferred.callLazy,
-    maybeDeferred   : Pot.Deferred.maybeDeferred,
-    isFired         : Pot.Deferred.isFired,
-    lastResult      : Pot.Deferred.lastResult,
-    lastError       : Pot.Deferred.lastError,
-    register        : Pot.Deferred.register,
-    unregister      : Pot.Deferred.unregister,
-    deferrize       : Pot.Deferred.deferrize,
-    begin           : Pot.Deferred.begin,
-    flush           : Pot.Deferred.flush,
-    till            : Pot.Deferred.till,
-    parallel        : Pot.Deferred.parallel,
-    chain           : Pot.Deferred.chain,
-    forEach         : Pot.forEach,
-    repeat          : Pot.repeat,
-    forEver         : Pot.forEver,
-    iterate         : Pot.iterate,
-    Iter            : Pot.Iter,
-    toIter          : Pot.Iter.toIter,
-    map             : Pot.map,
-    filter          : Pot.filter,
-    reduce          : Pot.reduce,
-    every           : Pot.every,
-    some            : Pot.some,
-    range           : Pot.range,
-    indexOf         : Pot.indexOf,
-    lastIndexOf     : Pot.lastIndexOf,
-    request         : Pot.Net.request,
-    jsonp           : Pot.Net.requestByJSONP,
-    rescape         : rescape,
-    arrayize        : arrayize,
-    invoke          : invoke,
-    stringify       : stringify,
-    trim            : trim,
-    now             : now,
-    hashCode        : Pot.Crypt.hashCode,
-    globalize       : Pot.globalize,
-    debug           : Pot.Debug.debug
+    Pot              : Pot,
+    update           : update,
+    isBoolean        : Pot.isBoolean,
+    isNumber         : Pot.isNumber,
+    isString         : Pot.isString,
+    isFunction       : Pot.isFunction,
+    isArray          : Pot.isArray,
+    isDate           : Pot.isDate,
+    isRegExp         : Pot.isRegExp,
+    isObject         : Pot.isObject,
+    isError          : Pot.isError,
+    typeOf           : Pot.typeOf,
+    typeLikeOf       : Pot.typeLikeOf,
+    StopIteration    : Pot.StopIteration,
+    isStopIter       : Pot.isStopIter,
+    isArrayLike      : Pot.isArrayLike,
+    isDeferred       : Pot.isDeferred,
+    isIter           : Pot.isIter,
+    isPercentEncoded : Pot.isPercentEncoded,
+    isNumeric        : Pot.isNumeric,
+    isInt            : Pot.isInt,
+    isNativeCode     : Pot.isNativeCode,
+    isBuiltinMethod  : Pot.isBuiltinMethod,
+    isWindow         : Pot.isWindow,
+    isDocument       : Pot.isDocument,
+    isElement        : Pot.isElement,
+    isNodeLike       : Pot.isNodeLike,
+    isNodeList       : Pot.isNodeList,
+    Deferred         : Pot.Deferred,
+    succeed          : Pot.Deferred.succeed,
+    failure          : Pot.Deferred.failure,
+    wait             : Pot.Deferred.wait,
+    callLater        : Pot.Deferred.callLater,
+    callLazy         : Pot.Deferred.callLazy,
+    maybeDeferred    : Pot.Deferred.maybeDeferred,
+    isFired          : Pot.Deferred.isFired,
+    lastResult       : Pot.Deferred.lastResult,
+    lastError        : Pot.Deferred.lastError,
+    register         : Pot.Deferred.register,
+    unregister       : Pot.Deferred.unregister,
+    deferrize        : Pot.Deferred.deferrize,
+    begin            : Pot.Deferred.begin,
+    flush            : Pot.Deferred.flush,
+    till             : Pot.Deferred.till,
+    parallel         : Pot.Deferred.parallel,
+    chain            : Pot.Deferred.chain,
+    forEach          : Pot.forEach,
+    repeat           : Pot.repeat,
+    forEver          : Pot.forEver,
+    iterate          : Pot.iterate,
+    Iter             : Pot.Iter,
+    toIter           : Pot.Iter.toIter,
+    map              : Pot.map,
+    filter           : Pot.filter,
+    reduce           : Pot.reduce,
+    every            : Pot.every,
+    some             : Pot.some,
+    range            : Pot.range,
+    indexOf          : Pot.indexOf,
+    lastIndexOf      : Pot.lastIndexOf,
+    request          : Pot.Net.request,
+    jsonp            : Pot.Net.requestByJSONP,
+    rescape          : rescape,
+    arrayize         : arrayize,
+    invoke           : invoke,
+    stringify        : stringify,
+    trim             : trim,
+    now              : now,
+    hashCode         : Pot.Crypt.hashCode,
+    globalize        : Pot.globalize,
+    debug            : Pot.Debug.debug
   }
 });
 
