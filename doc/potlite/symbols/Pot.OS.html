@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.some</title>
+		<title>JsDoc Reference - Pot.OS</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -272,7 +272,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Function Namespace Pot.some
+				Namespace Pot.OS
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -289,8 +289,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.some.">
-				<caption>Function Namespace Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.OS.">
+				<caption>Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -302,10 +302,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.some.html#constructor">Pot.some</a></b>(object, callback, (context))
+								<b><a href="../symbols/Pot.OS.html#constructor">Pot.OS</a></b>
 							</div>
-							<div class="description">Tests whether some element in the object passes the
- test implemented by the provided function.</div>
+							<div class="description">Detect the user operating system.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -313,6 +312,124 @@ ul.inheritsList
 			
 
 <!-- ============================== properties summary ===================== -->
+			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.OS.">
+					<caption>Field Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Field Attributes</th>
+							<th scope="col">Field Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#android">android</a></b>
+								</div>
+								<div class="description">Android.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#blackberry">blackberry</a></b>
+								</div>
+								<div class="description">BlackBerry.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#ipad">ipad</a></b>
+								</div>
+								<div class="description">iPad.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#iphone">iphone</a></b>
+								</div>
+								<div class="description">iPhone.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#ipod">ipod</a></b>
+								</div>
+								<div class="description">iPod.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#linux">linux</a></b>
+								</div>
+								<div class="description">Linux.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#mac">mac</a></b>
+								</div>
+								<div class="description">Mac.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#toString">toString</a></b>
+								</div>
+								<div class="description">Represents OS as a string.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#win">win</a></b>
+								</div>
+								<div class="description">Windows.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/Pot.OS.html#x11">x11</a></b>
+								</div>
+								<div class="description">X11.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
 			
 
 <!-- ============================== methods summary ======================== -->
@@ -324,69 +441,31 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Function Namespace Detail
+					Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.some</b>(object, callback, (context))
+						<b>Pot.OS</b>
 				</div>
 				
 				<div class="description">
-					Tests whether some element in the object passes the
- test implemented by the provided function.
-
-This method like Array.prototype.some
+					Detect the user operating system.
 					
 				</div>
 				
 				
 				
-				<pre class="code">  function isBigEnough(value, index, array) {
-    return (value >= 10);
-  }
-  var passed = Pot.some([2, 5, 8, 1, 4], isBigEnough);
-  // passed is false
-  passed = Pot.some([12, 5, 8, 1, 4], isBigEnough);
-  // passed is true</pre>
+				<pre class="code">  if (Pot.OS.win) {
+    debug('OS : ' + Pot.OS.toString());
+  }</pre>
 				
 				
 				
 				
 					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								<span class="light fixedFont">{Array|Object|*}</span>  <b>object</b>
-								
-							</dt>
-								<dd>A target object.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{Function}</span>  <b>callback</b>
-								
-							</dt>
-								<dd>A callback function.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{*}</span>  <b>(context)</b>
-								
-							</dt>
-								<dd>(Optional) Object to use
-                                     as `this` when executing callback.</dd>
-						
-						</dl>
 					
 					
 					
-					
-					
-						<dl class="detailList">
-						<dt class="heading">Returns:</dt>
-						
-								<dd><span class="light fixedFont">{Boolean}</span> Return the Boolean result by callback.</dd>
-						
-						</dl>
 					
 					
 					
@@ -395,6 +474,231 @@ This method like Array.prototype.some
 			
 
 <!-- ============================== field details ========================== -->		
+			
+				<div class="sectionTitle">
+					Field Detail
+				</div>
+				
+					<a name="android"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>android</b>
+					
+					</div>
+					<div class="description">
+						Android.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="blackberry"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>blackberry</b>
+					
+					</div>
+					<div class="description">
+						BlackBerry.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="ipad"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>ipad</b>
+					
+					</div>
+					<div class="description">
+						iPad.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="iphone"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>iphone</b>
+					
+					</div>
+					<div class="description">
+						iPhone.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="ipod"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>ipod</b>
+					
+					</div>
+					<div class="description">
+						iPod.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="linux"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>linux</b>
+					
+					</div>
+					<div class="description">
+						Linux.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="mac"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>mac</b>
+					
+					</div>
+					<div class="description">
+						Mac.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="toString"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>toString</b>
+					
+					</div>
+					<div class="description">
+						Represents OS as a string.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="win"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>win</b>
+					
+					</div>
+					<div class="description">
+						Windows.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="x11"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Boolean}</span>
+					<b>x11</b>
+					
+					</div>
+					<div class="description">
+						X11.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					
+				
 			
 
 <!-- ============================== method details ========================= -->		
