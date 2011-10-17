@@ -90,8 +90,12 @@ td.marker, td.marker * {
             <h4>最新</h4>
            </div>
            <ul>
-             <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"><strong>zip</strong></a></li>
-             <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"><strong>tar</strong></a></li>
+             <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"
+                    title="最新のzip"><strong>zip</strong></a>
+             </li>
+             <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"
+                    title="最新のtar.gz"><strong>tar</strong></a>
+             </li>
            </ul>
          </div>
          <div style="margin: 8px;">
@@ -124,7 +128,8 @@ td.marker, td.marker * {
            <pre>$ git clone git://github.com/polygonplanet/Pot.js</pre>
            <div style="margin: 8px;">
              <p>
-              GitHub : <a href="http://github.com/polygonplanet/Pot.js">polygonplanet/Pot.js</a>
+              GitHub : <a href="http://github.com/polygonplanet/Pot.js"
+                          title="polygonplanet/Pot.js - GitHub">polygonplanet/Pot.js</a>
              </p>
            </div>
          </div>
@@ -139,11 +144,15 @@ td.marker, td.marker * {
          </p>
          <pre>&lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;</pre>
          <p>
-          Node.js
+          Node.js の場合。
          </p>
          <pre>// Example to define Pot object on Node.js.
 var Pot = require('./potlite').Pot;
-Pot.debug(Pot);
+Pot.debug(Pot.VERSION);
+
+Pot.Deferred.begin(function() {
+    Pot.debug('Hello Deferred!');
+}).then(function() {...})
 // ...</pre>
          <p>
           jQuery プラグインとして。
@@ -162,7 +171,7 @@ $.getJSON('/hoge.json').then(function(data) {
 
 // エフェクトなどを Deferred 化する 'deferred' が追加される
 $('div#hoge').deferred('hide', 'slow').then(function() {
-    // (hide() が終了したあとの処理)
+    // ( hide() が終了したあとの処理)
 });</pre>
          <p>
           Pot.deferrizejQueryAjax() は現状、
@@ -184,7 +193,7 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
            </ul>
            <p>また、以下の環境でも動作するよう設計されています。</p>
            <ul>
-             <li>Greasemonkey</li>
+             <li>Greasemonkey (userscript)</li>
              <li>Mozilla Firefox Add-On (on XUL)</li>
              <li>Node.js</li>
              <li>Other non-browser environment</li>
@@ -215,10 +224,13 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
         <h2 id="forJSDoc">自動生成されたドキュメント</h2>
         <div>
          <ul>
-          <li><a href="jsdoc/potlite/index.html">JSDoc ドキュメント (PotLite.js)</a></li>
+          <li><a href="jsdoc/potlite/index.html"
+                 title="PotLite.js - JsDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
+          </li>
          </ul>
          <p>
-          <a href="http://code.google.com/intl/ja/closure/compiler/docs/js-for-compiler.html">Closure Compiler</a>
+          <a href="http://code.google.com/intl/ja/closure/compiler/docs/js-for-compiler.html"
+             title="Annotating JavaScript for the Closure Compiler - Closure Compiler - Google Code">Closure Compiler</a>
           によりソースコードから自動生成されたドキュメントです。
          </p>
          <p>
@@ -239,13 +251,21 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
             このドキュメントは、PotLite.js について扱います。
            </p>
            <p>
-            Version 1.11 以前の
             Pot.js および PotLite.js は、
-            他のライブラリと名前などが衝突しないよう
+            Pot というオブジェクトを中核として
+            Pot.Deferred, Pot.Iter などのオブジェクトやコンストラクタを定義しています。
+           </p>
+           <p>
+            Pot.js (PotLite.js) スクリプトの読み込み時に、
+            主な関数は短いメソッド名で呼べるようグローバルスコープにエクスポートされます。
             <br>
-            Pot というオブジェクトのみグローバルに定義されます。
+            (例えば Pot.Deferred.begin が begin だけでコールできるよう定義されます。)
             <br>
-            しかし、そのままでは関数名などが長くなってしまいます。
+            Node.js は例外で、モジュールを用いるためグローバル化されません。
+           </p>
+           <p>
+            Node.js 上やエクスポートが有効でない環境などで、
+            任意にグローバルスコープに各関数を定義したい場合は、
            </p>
            <pre>Pot.globalize();</pre>
            <p>
@@ -256,15 +276,12 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
             無理と短い記述をする必要ありません。
            </p>
            <p>
-            <br>
-            Version 1.12 以降、
-            いちいち先頭で globalize の宣言をしなくて済むよう
-            Pot.globalize() はライブラリ内で実行されるようになりました。
-            <br>
-            なので、読み込んだ時点で begin などの関数をコールすることができます。
-            <br>
-            globalize は任意のオブジェクトをグローバルスコープに置きたい時に活用できます。
-            <br>
+            また、Pot.globalize() は
+           </p>
+           <pre>Pot.globalize(object);</pre>
+           <p>
+            上のように引数に何らかのオブジェクトを与えることで、
+            任意のオブジェクトをグローバルスコープに置きたい時に活用できます。
            </p>
          </div>
         </div>
@@ -335,19 +352,24 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
                <table class="grid" id="DeferredLibraryMap">
                  <tr>
                    <td class="header marker" style="width: 19%;">
-                     <a href="http://polygonplanet.github.com/Pot.js/index.html">Pot.Deferred</a>
+                     <a href="http://polygonplanet.github.com/Pot.js/index.html"
+                        title="Pot.js + PotLite.js - ドキュメントリファレンス">Pot.Deferred</a>
                    </td>
                    <td class="header" style="width: 19%;">
-                     <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred">MochiKit.Async.Deferred</a>
+                     <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred"
+                        title="MochiKit.Async - manage asynchronous tasks">MochiKit.Async.Deferred</a>
                    </td>
                    <td class="header" style="width: 19%;">
-                     <a href="http://cho45.stfuawsc.com/jsdeferred/">JSDeferred</a>
+                     <a href="http://cho45.stfuawsc.com/jsdeferred/"
+                        title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
                    </td>
                    <td class="header" style="width: 19%;">
-                     <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a>
+                     <a href="http://api.jquery.com/category/deferred-object/"
+                        title="Deferred Object -- jQuery API">jQuery.Deferred</a>
                    </td>
                    <td class="header" style="width: 19%;">
-                     <a href="http://docs.dojocampus.org/dojo/Deferred">dojo.Deferred</a>
+                     <a href="http://docs.dojocampus.org/dojo/Deferred"
+                        title="dojo/Deferred - DojoCampus - Docs">dojo.Deferred</a>
                    </td>
                  </tr>
                  <tr>
@@ -396,14 +418,15 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
              </div>
             </div>
             <p>
-             Pot.Deferred は MochiKit および JSDeferred とほぼ同じ動作をします。
+             Pot.Deferred は MochiKit.Async.Deferred および JSDeferred とほぼ同じ動作をします。
             </p>
             <p>
              <br>
             </p>
             <p>
              以降の解説に関して、Deferred の基本的なものは
-             <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html">JSDeferred のドキュメント</a>
+             <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html"
+                title="JSDeferred 紹介">JSDeferred のドキュメント</a>
              を参考にしています。
              ゆえに、内容がそっくりになってしまっていますのでご了承ください。
              なお、問題等ありましたら <a href="#contact">連絡先</a> までお願いします。
@@ -414,7 +437,7 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
              非同期処理は、setTimeout だけでなく
              Ajax や onclick などのイベント時にも発生します。
              <br>
-             request という関数が、第一引数に URL を、
+             例えば request という関数が、第一引数に URL を、
              第二引数にコールバック関数をとるものとします。
              <br>
              これを Deferred なしで書くと、
@@ -473,7 +496,7 @@ Deferred.forEach(urls, function(url) {
             </p>
             <p>
              さらにコンパクトかつ、次の処理待ちという縛りをなくし
-             同時実行として書くなら、
+             同時実行 (並列処理) として書くなら、
             </p>
             <pre>parallel([
     request('/foo.json'),
@@ -483,14 +506,15 @@ Deferred.forEach(urls, function(url) {
     alert(result);
 });</pre>
             <p>
-             このように、parallel を使うこともできます。
+             このように、parallel (Pot.Deferred.parallel) を使うこともできます。
              parallel は、MochiKit でいう DeferredList と同等の処理を可能とします。
              すべての処理が終わった後、次のコールバックが呼ばれます。
              parallel は、オリジナルの JSDeferred.parallel をベースに実装されています。
             </p>
             <h4 id="exception">例外処理</h4>
             <p>
-             非同期処理の中で発生した例外は、何事もなかったかのように振舞われてしまいます。
+             非同期処理の中で発生した例外は、
+             何事もなかったかのように振舞われてしまいます。
             </p>
             <p>
              Pot.Deferred では、これを rescue というメソッドにより捕捉が可能となっています。
@@ -542,6 +566,21 @@ Deferred.forEach(urls, function(url) {
             then の第一引数のコールバック関数は、成功時のみ実行され
             エラーが発生した場合は無視されます。
            </p>
+           <p><br></p>
+           <p>
+            実際のところ、チェインに必ず rescue を入れるような丁寧な実装は
+            そう多くはないと思います。
+            <br>
+            そのため、エラーが発生していても気づかず実装完了してしまうことがあるかもしれません。
+            <br>
+            Pot.Deferred は
+            そのような事例を防ぐため、
+            rescue などによりキャッチされずに終了してしまったチェインは
+            Pot.Deferred 側から再び throw するようになっています。
+            <br>
+            この再スロー機能により、例外を逃さず発見することが可能になっています。
+           </p>
+           <p><br></p>
            <p>
             例外時、成功時の両方
             つまり何が起きても次のチェインを実行したい場合は、
@@ -570,6 +609,11 @@ Deferred.forEach(urls, function(url) {
             <p>
              このような、エラーなのか成功なのか不明な場合や
              必ず実行したい場合に有用です。
+            </p>
+            <p>
+             isError (Pot.isError) は、
+             対象が Error オブジェクトかどうか判別します。
+             この例のような場合には特に有用です。
             </p>
             <p>
              then, rescue, ensure それぞれの使用方法は同じです。
@@ -896,7 +940,8 @@ if (check()) {
             <p><br></p>
             <p>
              他にも関数を Deferred 化するための方法があり、
-             deferrize という関数が Pot.Deferred オブジェクトに定義されています。
+             <br>
+             deferrize (Pot.Deferred.deferrize) という関数が Pot.Deferred オブジェクトに定義されています。
             </p>
             <pre>// setTimeout を Deferred 化する
 var timer = deferrize(window, 'setTimeout');
@@ -943,7 +988,8 @@ timer(function() {
              また、JSDeferred の概要を強く尊重しています。
             </p>
             <p>
-             <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html">JSDeferred 紹介</a> より引用：
+             <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html"
+                title="JSDeferred 紹介">JSDeferred 紹介</a> より引用：
             </p>
             <blockquote>
              <p>
@@ -1277,7 +1323,8 @@ debug(foo);</pre>
              Pot.js, PotLite.js の全ての関数ではありません。
              <br>
              より詳しくは、ソースコードから自動生成された
-             <a href="jsdoc/potlite/index.html">JSDoc ドキュメント (PotLite.js)</a>
+             <a href="jsdoc/potlite/index.html"
+                title="PotLite.js - JsDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
              または直接ソースコードを参照ください。
             </p>
             <p><br></p>
@@ -1320,7 +1367,8 @@ debug(copy); // {foo: 1, bar: 2, baz: 3}</pre>
               E4X が使用できる環境では、XML オブジェクトも適応され toString() されて返ります。
               <br>
               かならず文字列が返り、
-              Object や Function, null, undefined 等は空文字 '' が返ります。
+              Object や Function, false, null, undefined 等は空文字 '' が返ります。
+              true は '1' になります。
               <pre>stringify({});                // ''
 stringify([]);                // ''
 stringify(0);                 // '0'
@@ -1339,9 +1387,14 @@ stringify([100]);             // ''</pre>
              </dd>
              <dt><dfn>arrayize</dfn>(o, index)</dt>
              <dd>
-              任意の値 o を配列として返す。
+              任意の値 o を配列として返します。
               <br>
-              index が指定されるとそこから slice して返す。
+              index が指定されるとそこから slice して返します。
+              <br>
+              Array.prototype.slice を改良したようなものです。
+              <br>
+              NodeList や arguments などに適応すると便利です。
+              配列はコピー扱いで返ります。
               <pre>arrayize(null);               // [null]
 arrayize((void 0));           // [undefined]
 arrayize(true);               // [true]
@@ -1367,7 +1420,7 @@ arrayize(document.getElementsByTagName('div')); // [&lt;div/&gt;, &lt;div/&gt;, 
              </dd>
              <dt><dfn>rescape</dfn>(s)</dt>
              <dd>
-              文字列 s を正規表現パターンとみなしエスケープして返す。
+              文字列 s を正規表現パターンとみなしエスケープして返します。
               <pre>var pattern = '*[hoge]*';
 var regex = new RegExp('^(' + rescape(pattern) + ')$', 'g');
 debug(regex.toString()); // =&gt; /^(\*\[hoge\]\*)$/g</pre>
@@ -1378,7 +1431,7 @@ debug(regex.toString()); // =&gt; /^(\*\[hoge\]\*)$/g</pre>
               <br>
               文字列 chars が指定されると、スペースの代わりに chars を除去して返す。
               <pre>debug( trim(' hoge  ') );          // 'hoge'
-debug( trim('abbbcc cc ', 'ab') ); // 'cc cc '</pre>
+debug( trim('abbbcc cca ', 'ab') ); // 'cc cca '</pre>
              </dd>
              <dt><dfn>now</dfn>()</dt>
              <dd>
@@ -1420,6 +1473,11 @@ debug( isArray('hoge') );    // false</pre>
         throw Pot.StopIteration;
     } catch (ex) {
         debug( isStopIter(ex) ); // true
+        try {
+            throw new Error('hoge');
+        } catch (err) {
+            debug( isStopIter(err) ); // false
+        }
     }
 }</pre>
              </dd>
@@ -1563,9 +1621,14 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
              </dd>
              <dt><dfn>request</dfn>(url[, options])</dt>
              <dd>
-              XMLHttpRequest によるリクエストを実行する。
+              XMLHttpRequest によるリクエストを実行します。
               <br>
-              Pot.Deferred のインスタンスが返る。
+              XMLHttpRequest のない環境 (Node.js など) では
+              http/https request によるリクエストを実行します。
+              返り値などは同じに扱えます (responseText で取得できるなど)。
+              <br>
+              返り値に XHR レスポンスを設定した
+              Pot.Deferred のインスタンスが返ります。
               <pre>request('/data.cgi', {
     method : 'POST',
     sendContent : {
@@ -1574,7 +1637,9 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
         length : 15,
         format : 'json'
     },
-    headers : {
+    mimeType : 'application/json',
+    headers  : {
+        'User-Agent'   : 'Pot.js',
         'Content-Type' : 'text/javascript'
     }
 }).then(function(res) {
@@ -1589,34 +1654,48 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
                <dt><em>{String}</em> <dfn>method</dfn></dt>
                <dd>
                 HTTP メソッド (デフォルト = 'GET')
+                <br>
+                例: 'GET', 'POST', 'HEAD' etc.
                </dd>
                <dt><em>{Object}</em> <dfn>sendContent</dfn></dt>
                <dd>
                 POST 時に送るデータ。
                 <br>
                 queryString と同じ指定の仕方ができる。
+                <br>
+                例: {data: 'hoge', data2: 'fuga'}
                </dd>
                <dt><em>{Object}</em> <dfn>queryString</dfn></dt>
                <dd>
                 GET 時に送るデータ。
                 <br>
                 sendContent と同じ指定の仕方ができる。
+                <br>
+                例: {q: '秋場所', hl: 'ja'}
                </dd>
                <dt><em>{String}</em> <dfn>username</dfn></dt>
                <dd>
                 Basic 認証時に使用するユーザー名。
+                <br>
+                例: 'hoge'
                </dd>
                <dt><em>{String}</em> <dfn>password</dfn></dt>
                <dd>
                 Basic 認証時に使用するパスワード。
+                <br>
+                例: 'hogepass'
                </dd>
                <dt><em>{Object}</em> <dfn>headers</dfn></dt>
                <dd>
                 送信するヘッダー。
+                <br>
+                例: {'Content-Type': 'text/javascript'}
                </dd>
                <dt><em>{String}</em> <dfn>mimeType</dfn></dt>
                <dd>
                 MIMEType を指定する場合。
+                <br>
+                例: 'text/javascript'
                </dd>
               </dl>
              </dd>
@@ -1626,7 +1705,9 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
               <br>
               Pot.Deferred のインスタンスが返る。
               <br>
-              options は request 関数と同じ。
+              options は request 関数と同じ (いくつかは無効)。
+              <br>
+              queryString, callback が使用可能。
               <br>
               例:
               <pre>// jQuery.jsonp と同じ URL コールバックの指定が可能
@@ -1649,7 +1730,7 @@ jsonp(url, {
               Pot オブジェクトからアクセスできます。
               <br>
               Pot.globalize() が適応されている場合は、
-              定義名のままの関数名で呼び出せます (e.g. forEach)。
+              定義名のままの関数名でも呼び出せます (e.g. forEach)。
               <br>
               Pot.Deferred または Deferred を付けない限り、
               同期で処理が行われます。
@@ -1688,7 +1769,7 @@ begin(function() {
     debug(val);
 });</pre>
              <p>
-              上の例は 3 つとも、同じ出力をします。
+              上の例は 3 つとも、1, 2, 3 と同じ出力をします。
              </p>
             </div>
             <dl>
@@ -2642,7 +2723,11 @@ begin(function() {
               すべての結果が揃ってから
               返り値となる Deferred インスタンスを実行します。
               <br>
-              この関数により、未知数の Deferred を整合性のとれた状態で処理することができます。
+              この関数により、未知数の Deferred を同時実行 (並列) で処理することができます。
+              次のチェインの実行完了を待たずに
+              引数の複数コールバックをつぎつぎと実行します。
+              すべての結果が揃うと、
+              返り値の Pot.Deferred インスタンスを開始します。
               <br>
               MochiKit でいう DeferredList と似ています。
               そして JSDeferred.parallel をベースとしています。
@@ -2792,7 +2877,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011 Written by <a href="#contact">polygon planet</a>
+         Last modified: 2011-10-18 Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
     </div>
