@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.13, 2011-10-17
+ * Version 1.14, 2011-10-18
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.13
- * @date           2011-10-17
+ * @version        1.14
+ * @date           2011-10-18
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.13', TYPE : 'lite'},
+var Pot = {VERSION : '1.14', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -321,9 +321,9 @@ update(Pot, {
   Global : (function() {
     if (!globals ||
         typeof globals !== 'object' || !('setTimeout' in globals)) {
-      globals = this;
+      globals = this || {};
     }
-    return this;
+    return this || {};
   })(),
   /**
    * Noop function.
@@ -373,22 +373,36 @@ update(Pot, {
      * @private
      * @ignore
      */
-    getExportObject : function() {
+    getExportObject : function(forGlobalScope) {
       var outputs;
-      if (Pot.System.isNodeJS) {
-        if (typeof module === 'object' &&
-            typeof module.exports === 'object') {
-          outputs = module.exports;
-        } else if (typeof exports === 'object') {
-          outputs = exports;
+      if (forGlobalScope) {
+        if (Pot.System.isNonBrowser) {
+          outputs = Pot.Global || globals;
+        } else {
+          outputs = (Pot.isWindow(globals) && globals) ||
+                    (Pot.isWindow(Pot.Global) && Pot.Global);
+        }
+        if (!outputs &&
+            typeof window !== 'undefined' && Pot.isWindow(window)) {
+          outputs = window;
+        }
+      }
+      if (!outputs) {
+        if (Pot.System.isNodeJS) {
+          if (typeof module === 'object' &&
+              typeof module.exports === 'object') {
+            outputs = module.exports;
+          } else if (typeof exports === 'object') {
+            outputs = exports;
+          } else {
+            outputs = globals;
+          }
         } else {
           outputs = globals;
         }
-      } else {
-        outputs = globals;
-      }
-      if (!outputs) {
-        outputs = globals || Pot.Global;
+        if (!outputs) {
+          outputs = globals || Pot.Global;
+        }
       }
       return outputs;
     }
@@ -468,7 +482,7 @@ update(Pot.System, (function() {
     o.hasActiveXObject = true;
   }
   if (!o.isFirefoxExtension) {
-    if (Pot.Browser.chrome || Pot.Browser.webkit) {
+    if (Pot.Browser.chrome || Pot.Browser.webkit || Pot.Browser.safari) {
       if (typeof chrome === 'object' &&
           typeof chrome.extension === 'object') {
         o.isChromeExtension = true;
@@ -688,7 +702,7 @@ update(Pot.Internal, {
       IMAGE = 'data:image/gif;base64,' +
               'R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
       /**@ignore*/
-      return function (callback) {
+      return function(callback) {
         var done, img, handler;
         img = new Image();
         /**@ignore*/
@@ -721,7 +735,7 @@ update(Pot.Internal, {
         return false;
       }
       /**@ignore*/
-      return function (callback) {
+      return function(callback) {
         process.nextTick(callback);
       };
     })(),
@@ -1354,12 +1368,16 @@ function update() {
  * @ignore
  */
 function arrayize(object, index) {
-  var array, i, len, me = arguments.callee;
+  var array, i, len, me = arguments.callee, t;
   if (me.canNodeList == null) {
     // NodeList cannot convert to the Array in the Blackberry, IE browsers.
-    if (globals) {
+    if (globals || Pot.Global) {
       try {
-        slice.call(globals.documentElement.childNodes)[0].nodeType;
+        t = slice.call(
+          ((globals && globals.documentElement) ||
+           (Pot.Global && Pot.Global.documentElement)).childNodes
+        )[0].nodeType;
+        t = null;
         me.canNodeList = true;
       } catch (e) {
         me.canNodeList = false;
@@ -1658,7 +1676,7 @@ update(debug, {
           Pot.Deferred.till(function() {
             return !!document.body;
           }).then(function() {
-            var defStyle, style, close;
+            var defStyle, style, close, wrapper;
             defStyle = {
               borderWidth : '1px',
               borderStyle : 'solid',
@@ -1671,59 +1689,62 @@ update(debug, {
               padding     : '10px',
               margin      : '0px'
             };
-            me.ieConsole = document.createElement('div');
-            me.ieConsole.id = me.ieConsoleId = buildSerial(Pot, '');
-            style = me.ieConsole.style;
+            wrapper = document.createElement('div');
+            style = wrapper.style;
             each(defStyle, function(v, k) {
               style[k] = v;
             });
             style.borderWidth  = '3px';
             style.position     = 'fixed';
-            style.width        = '96%';
+            style.width        = '95%';
             style.height       = '20%';
             style.paddingRight = '15px';
-            style.zIndex       = 9997;
+            style.zIndex       = 9996;
             style.left         = '0px';
             style.bottom       = '0px';
-            style.whiteSpace   = 'pre';
-            style.wordWrap     = 'break-word';
-            style.overflowX    = 'hidden';
-            style.overflowY    = 'auto';
+            me.ieConsole = wrapper.cloneNode(false);
+            me.ieConsole.id = me.ieConsoleId = buildSerial(Pot, '');
+            style = me.ieConsole.style;
+            style.borderWidth = '1px';
+            style.width       = '97%';
+            style.height      = '87%';
+            style.position    = 'relative';
+            style.zIndex      = 9997;
+            style.padding     = '5px';
+            style.whiteSpace  = 'pre';
+            style.wordWrap    = 'break-word';
+            style.overflowX   = 'hidden';
+            style.overflowY   = 'auto';
             me.hr = document.createElement('hr');
             style = me.hr.style;
-            style.width             = '100%';
-            style.height            = '1px';
-            style.borderTopWidth    = '1px';
-            style.borderBottomWidth = '0px';
-            style.borderColor       = '#aaa';
-            style.borderStyle       = 'solid';
-            style.zIndex            = 9998;
+            style.position    = 'static';
+            style.width       = '100%';
+            style.border      = '1px solid #aaa';
+            style.zIndex      = 9998;
             close = document.createElement('div');
             style = close.style;
             each(defStyle, function(v, k) {
               style[k] = v;
             });
-            style.zIndex        = 9999;
-            style.fontFamily    = 'sans-serif';
-            style.fontWeight    = 'bold';
-            style.borderWidth   = '1px';
-            style.paddingTop    = '0px';
-            style.paddingRight  = '2px';
-            style.paddingBottom = '1px';
-            style.paddingLeft   = '2px';
-            style.lineHeight    = '1';
-            style.right         = '2%';
-            style.top           = '2%';
-            style.cursor        = 'pointer';
-            close.title         = 'close';
-            close.innerHTML     = 'x';
+            style.zIndex      = 9999;
+            style.fontFamily  = 'sans-serif';
+            style.fontWeight  = 'bold';
+            style.borderWidth = '1px';
+            style.padding     = '1px 4px';
+            style.lineHeight  = 1;
+            style.right       = '2px';
+            style.top         = '2px';
+            style.cursor      = 'pointer';
+            close.title       = 'close';
+            close.innerHTML   = 'x';
             /**@ignore*/
             close.onclick = function() {
-              me.ieConsole.parentNode.removeChild(me.ieConsole);
-              me.ieConsole = close.onclick = null;
+              wrapper.parentNode.removeChild(wrapper);
+              wrapper = me.ieConsole = close.onclick = null;
             };
-            me.ieConsole.appendChild(close);
-            document.body.appendChild(me.ieConsole);
+            wrapper.appendChild(close);
+            wrapper.appendChild(me.ieConsole);
+            document.body.appendChild(wrapper);
             me.append();
           });
         }
@@ -4563,13 +4584,15 @@ update(Pot.Deferred, {
    *       var d = new Pot.Deferred();
    *       return d.then(function() { return 2; }).begin();
    *     },
-   *     (new Pot.Deferred()).then(function() {
-   *       debug(3);
-   *       return 3;
+   *     Pot.Deferred.begin(function() {
+   *       return Pot.Deferred.wait(2).then(function() {
+   *         debug(3);
+   *         return 3;
+   *       });
    *     }),
    *     '{4}',
    *     (new Pot.Deferred()).then(function() {
-   *       return Pot.Deferred.wait(1).then(function() {
+   *       return Pot.Deferred.wait(1.5).then(function() {
    *         debug(5);
    *         return 5;
    *       });
@@ -4583,8 +4606,10 @@ update(Pot.Deferred, {
    *       });
    *     },
    *     function() {
-   *       debug('8 [END]');
-   *       return 8;
+   *       return Pot.Deferred.begin(function() {
+   *         debug(8);
+   *         return 8;
+   *       });
    *     }
    *   ]).then(function(values) {
    *     debug(values);
@@ -4595,6 +4620,9 @@ update(Pot.Deferred, {
    *     // ...
    *   });
    *   // @results  values = [1, 2, 3, '{4}', 5, 6.00126, 7, 8]
+   *   //
+   *   // output: 1, 2, 8, 5, 3 ...
+   *   //
    *
    *
    * @example
@@ -4604,9 +4632,9 @@ update(Pot.Deferred, {
    *       return 1;
    *     },
    *     bar : (new Pot.Deferred()).then(function() {
-   *       debug(2);
    *       return Pot.Deferred.begin(function() {
    *         return Pot.Deferred.wait(1).then(function() {
+   *           debug(2);
    *           return Pot.Deferred.succeed(2);
    *         });
    *       });
@@ -4624,7 +4652,10 @@ update(Pot.Deferred, {
    *     // values.bar == 2
    *     // values.baz == 3
    *   });
-   *   // @results  values = {foo: 1, bar: 2, baz: 3}
+   *   // @results  values = {foo: 1, baz: 3, bar: 2}
+   *   //
+   *   // output: 1, 3, 2
+   *   //
    *
    *
    * @param  {...[Array|Object|*]} deferredList  Deferred list to get
@@ -4636,7 +4667,7 @@ update(Pot.Deferred, {
    * @static
    */
   parallel : function(deferredList) {
-    var result, args = arguments, d, deferreds, values;
+    var result, args = arguments, d, deferreds, values, bounds;
     if (args.length === 0) {
       result = Pot.Deferred.succeed();
     } else {
@@ -4650,6 +4681,7 @@ update(Pot.Deferred, {
         deferreds = arrayize(args);
       }
       result = new Pot.Deferred({
+        /**@ignore*/
         canceller : function() {
           each(deferreds, function(deferred) {
             if (Pot.isDeferred(deferred)) {
@@ -4658,43 +4690,44 @@ update(Pot.Deferred, {
           });
         }
       });
-      values = {};
       d = new Pot.Deferred();
+      bounds = [];
+      values = Pot.isObject(deferreds) ? {} : [];
       each(deferreds, function(deferred, key) {
         var defer;
         if (Pot.isDeferred(deferred)) {
           defer = deferred;
+        } else if (Pot.isFunction(deferred)) {
+          defer = new Pot.Deferred();
+          defer.then(function() {
+            var r = deferred();
+            if (Pot.isDeferred(r) &&
+                r.state === Pot.Deferred.states.unfired) {
+              r.begin();
+            }
+            return r;
+          });
         } else {
-          if (Pot.isFunction(deferred)) {
-            defer = new Pot.Deferred();
-            defer.then(function() {
-              var r = deferred();
-              if (Pot.isDeferred(r) &&
-                  r.state === Pot.Deferred.states.unfired) {
-                r.begin();
-              }
-              return r;
-            });
-          } else {
-            defer = Pot.Deferred.succeed(deferred);
-          }
+          defer = Pot.Deferred.succeed(deferred);
         }
+        if (!Pot.isDeferred(defer)) {
+          defer = Pot.Deferred.maybeDeferred(defer);
+        }
+        bounds[bounds.length] = key;
         d.then(function() {
-          if (!Pot.isDeferred(defer)) {
-            defer = Pot.Deferred.maybeDeferred(defer);
-          }
           if (defer.state === Pot.Deferred.states.unfired) {
             Pot.Deferred.callLazy(defer);
           }
-          return defer;
-        }).then(function(value) {
-          values[key] = value;
+          defer.then(function(value) {
+            values[key] = value;
+            bounds.pop();
+            if (bounds.length === 0) {
+              result.begin(values);
+            }
+          }, function(err) {
+            result.raise(err);
+          });
         });
-      });
-      d.then(function() {
-        result.begin(values);
-      }, function(err) {
-        result.raise(err);
       });
       Pot.Deferred.callLazy(d);
     }
@@ -9777,11 +9810,11 @@ Pot.update({
                Pot.isFunction(target) || Pot.isArray(target))) {
       inputs = target;
     }
-    outputs = Pot.Internal.getExportObject();
+    outputs = Pot.Internal.getExportObject(true);
     if (inputs && outputs) {
       if (inputs === Pot) {
         if (Pot.Internal.exportPot && Pot.Internal.PotExportProps) {
-          result = Pot.Internal.exportPot(advised);
+          result = Pot.Internal.exportPot(advised, true);
         }
       } else {
         each(inputs, function(prop, name) {
@@ -9807,9 +9840,9 @@ update(Pot.Internal, {
    * @ignore
    * @internal
    */
-  exportPot : function(advised) {
+  exportPot : function(advised, forGlobalScope, initialize) {
     var outputs, noops = [];
-    outputs = Pot.Internal.getExportObject();
+    outputs = Pot.Internal.getExportObject(forGlobalScope);
     if (outputs) {
       each(Pot.Internal.PotExportProps, function(prop, name) {
         if (advised && name in outputs) {
@@ -9818,6 +9851,14 @@ update(Pot.Internal, {
           outputs[name] = prop;
         }
       });
+    }
+    if (initialize) {
+      if (Pot.System.isWebBrowser) {
+        outputs = Pot.Internal.getExportObject(true);
+        if (outputs && outputs.Pot !== Pot) {
+          update(outputs, {Pot : Pot});
+        }
+      }
     }
     return noops;
   },
@@ -10017,13 +10058,8 @@ Pot.update({
 // Register the Pot object into global.
 
 
-// Update global scope for Pot object.
-update(globals || Pot.Global || {}, {
-  Pot : Pot
-});
-
-// Globalize Pot object methods.
-Pot.globalize();
+// Export the Pot object.
+Pot.Internal.exportPot(false, false, true);
 
 
 })(this || {});
