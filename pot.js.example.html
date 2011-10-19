@@ -44,7 +44,7 @@ begin(function() {
             };
         } else {
             debug(res.responseText); // {foo: 'fooValue', bar: 'barValue', baz: 'bazValue'}
-            return eval('(' + res.responseText + ')');
+            return parseFromJSON(res.responseText);
         }
 
         // チェイン上でのイテレート
@@ -113,7 +113,7 @@ begin(function() {
 }).then(function() {
     debug('END example');
 
-}).end(); // 任意で end によりチェインを閉じる
+}).end(); // 任意で end によりチェインを閉じることが可能
 
 
 </script>
@@ -125,6 +125,9 @@ begin(function() {
  <article>
   <p>Demo</p>
   <div id="status"></div>
+  <p>
+   <a href="http://polygonplanet.github.com/Pot.js/index.html"><strong>Pot.js + PotLite.js - ドキュメントリファレンス</strong></a>
+  </p>
  </article>
  <footer>
   <p>2011 &copy; polygon planet</p>

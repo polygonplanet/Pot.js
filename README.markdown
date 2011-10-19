@@ -4,8 +4,9 @@ Pot.js
 
 #Documentation/Reference
 
-  * [Pot.js ドキュメント/リファレンス][Documentation]  
+  * **[Pot.js/PotLite.js - ドキュメントリファレンス][Documentation]**  
+  
+  
 
-
-[Documentation]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js ドキュメント/リファレンス"
+[Documentation]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js + PotLite.js - ドキュメントリファレンス"
 
