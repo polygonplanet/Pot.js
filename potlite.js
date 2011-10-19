@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.14, 2011-10-18
+ * Version 1.15, 2011-10-19
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.14
- * @date           2011-10-18
+ * @version        1.15
+ * @date           2011-10-19
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,12 +65,13 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.14', TYPE : 'lite'},
+var Pot = {VERSION : '1.15', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
 concat = Array.prototype.concat,
 toString = Object.prototype.toString,
+hasOwnProperty = Object.prototype.hasOwnProperty,
 
 // Regular expression patterns.
 RE_ARRAYLIKE       = /List|Collection/i,
@@ -1335,6 +1336,175 @@ update(Pot.System, {
   isBuiltinArrayLastIndexOf : Pot.isBuiltinMethod(Array.prototype.lastIndexOf)
 });
 
+// Update Pot object methods.
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Evaluates a script in a global context.
+   *
+   *
+   * @example
+   *   globalEval('function hoge() { return "hoge"; }');
+   *   debug(hoge());
+   *   // @results 'hoge'
+   *
+   *
+   * @param  {String}  code  The code to evaluate.
+   * @return {*}             The value of evaluated result.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  globalEval : update(function(code) {
+    var me = arguments.callee, language, id, scope, func, doc, script;
+    if (code && me.patterns.valid.test(code)) {
+      if (Pot.System.hasActiveXObject) {
+        if (typeof execScript !== 'undefined' && execScript &&
+            me.test(execScript)) {
+          return execScript(code, me.language);
+        } else {
+          func = 'execScript';
+          if (func in Pot.Global && me.test(func, Pot.Global)) {
+            return Pot.Global[func](code, me.language);
+          } else if (func in globals && me.test(func, globals)) {
+            return globals[func](code, me.language);
+          }
+        }
+      }
+      if (Pot.System.isGreasemonkey) {
+        // eval does not work to global scope on greasemonkey
+        //   even if using the unsafeWindow.
+        return Pot.localEval.doEval(code);
+      }
+      func = 'eval';
+      if (func in Pot.Global && me.test(func, Pot.Global)) {
+        scope = Pot.Global;
+      } else if (func in globals && me.test(func, globals)) {
+        scope = globals;
+      }
+      if (scope) {
+        if (scope[func].call && scope[func].apply) {
+          return scope[func].call(scope, code);
+        }
+        if (me.worksForGlobal == null) {
+          me.worksForGlobal = false;
+          do {
+            id = buildSerial(Pot, '');
+          } while (id in scope);
+          scope[func]('var ' + id + '=1;');
+          if (id in scope && scope[id] === 1) {
+            me.worksForGlobal = true;
+          }
+          delete scope[id];
+        }
+        if (me.worksForGlobal) {
+          return scope[func](code);
+        }
+      }
+      if (Pot.System.isWebBrowser &&
+          typeof document === 'object' && document.body) {
+        doc = document;
+        script = doc.createElement('script');
+        script.type = 'text/javascript';
+        script.defer = false;
+        script.appendChild(doc.createTextNode(code));
+        doc.body.appendChild(script);
+        doc.body.removeChild(script);
+      } else {
+        return (new Function(code))();
+      }
+    }
+  }, {
+    /**
+     * @private
+     * @ignore
+     * @const
+     */
+    language : 'JavaScript',
+    /**
+     * @private
+     * @ignore
+     */
+    patterns : {
+      valid  : /\S/
+    },
+    /**
+     * @ignore
+     */
+    test : function(func, obj) {
+      var result = false, nop = '(void 0);';
+      try {
+        if (obj) {
+          obj[func](nop);
+        } else {
+          func(nop);
+        }
+        result = true;
+      } catch (e) {
+        result = false;
+      }
+      return result;
+    }
+  }),
+  /**
+   * Evaluates a script in a anonymous context.
+   *
+   *
+   * @example
+   *   localEval('function hoge() { return "hoge"; }');
+   *   debug(hoge());
+   *   // @results (Error: hoge is undefined)
+   *
+   *
+   * @param  {String}  code  The code to evaluate.
+   * @return {*}             The value of evaluated result.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  localEval : update(function(code) {
+    var that = Pot.globalEval, me = arguments.callee, src;
+    if (code && that.patterns.valid.test(code)) {
+      if (typeof eval !== 'undefined') {
+        return me.doEval(code);
+      } else {
+        if (me.isLiteral.test(code) && !me.hasReturn.test(code)) {
+          src = 'return(' + String(code).replace(me.clean, '') + ');';
+        } else {
+          src = code;
+        }
+        return (new Function('return(function(){' + src + '})();'))();
+      }
+    }
+  }, {
+    /**
+     * @private
+     * @ignore
+     * @const
+     */
+    isLiteral :
+      /^\s*(?!(?:return|var|if|do|for|try|while)\b\s*)[\w$.!"'~(){}[\]]/,
+    /**
+     * @ignore
+     */
+    hasReturn : /\breturn\b(?![\s\S]*\breturn\b[\s\S]*$)[\s\S]*$/,
+    /**
+     * @ignore
+     */
+    clean : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g,
+    /**
+     * @ignore
+     */
+    doEval : function() {
+      return eval(arguments[0]);
+    }
+  })
+});
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Shortcut functions.
 
@@ -1662,8 +1832,13 @@ update(debug, {
    * @ignore
    */
   divConsole : update(function(msg) {
-    var me = arguments.callee;
-    if (Pot.Browser.msie && typeof document !== 'undefined') {
+    var me = arguments.callee, ie6, doc, de, onResize, onScroll, onClick;
+    if (Pot.System.hasActiveXObject && typeof document !== 'undefined') {
+      doc = document;
+      de = doc.documentElement || {};
+      try {
+        ie6 = (typeof de.style.maxHeight === 'undefined');
+      } catch (e) {}
       if (me.done && me.ieConsole) {
         me.append(msg);
       } else {
@@ -1674,39 +1849,40 @@ update(debug, {
         if (!me.done) {
           me.done = true;
           Pot.Deferred.till(function() {
-            return !!document.body;
+            return !!(doc && doc.body);
           }).then(function() {
             var defStyle, style, close, wrapper;
             defStyle = {
-              borderWidth : '1px',
-              borderStyle : 'solid',
-              borderColor : '#999',
-              background  : '#fff',
-              color       : '#333',
-              fontSize    : '13px',
-              fontFamily  : 'monospace',
-              position    : 'absolute',
-              padding     : '10px',
-              margin      : '0px'
+              border     : '1px solid #999',
+              background : '#fff',
+              color      : '#333',
+              fontSize   : '13px',
+              fontFamily : 'monospace',
+              position   : 'absolute',
+              padding    : '10px',
+              margin     : '0px'
             };
-            wrapper = document.createElement('div');
+            wrapper = doc.createElement('div');
             style = wrapper.style;
             each(defStyle, function(v, k) {
               style[k] = v;
             });
             style.borderWidth  = '3px';
-            style.position     = 'fixed';
             style.width        = '95%';
-            style.height       = '20%';
-            style.paddingRight = '15px';
             style.zIndex       = 9996;
             style.left         = '0px';
             style.bottom       = '0px';
+            if (ie6) {
+              style.height = Math.floor(de.clientHeight / 3.2) + 'px';
+            } else {
+              style.position = 'fixed';
+              style.height   = '25%';
+            }
             me.ieConsole = wrapper.cloneNode(false);
             me.ieConsole.id = me.ieConsoleId = buildSerial(Pot, '');
             style = me.ieConsole.style;
             style.borderWidth = '1px';
-            style.width       = '97%';
+            style.width       = '95%';
             style.height      = '87%';
             style.position    = 'relative';
             style.zIndex      = 9997;
@@ -1715,13 +1891,13 @@ update(debug, {
             style.wordWrap    = 'break-word';
             style.overflowX   = 'hidden';
             style.overflowY   = 'auto';
-            me.hr = document.createElement('hr');
+            me.hr = doc.createElement('hr');
             style = me.hr.style;
             style.position    = 'static';
             style.width       = '100%';
             style.border      = '1px solid #aaa';
             style.zIndex      = 9998;
-            close = document.createElement('div');
+            close = doc.createElement('div');
             style = close.style;
             each(defStyle, function(v, k) {
               style[k] = v;
@@ -1738,13 +1914,57 @@ update(debug, {
             close.title       = 'close';
             close.innerHTML   = 'x';
             /**@ignore*/
-            close.onclick = function() {
-              wrapper.parentNode.removeChild(wrapper);
-              wrapper = me.ieConsole = close.onclick = null;
+            onResize = function() {
+              var width, height, def = '95%';
+              width = doc.body.clientWidth - 7;
+              wrapper.style.width = (width <= 0) ? def : width + 'px';
+              width = wrapper.offsetWidth - 55;
+              me.ieConsole.style.width = (width <= 0) ? def : width + 'px';
+              height = Math.floor(de.clientHeight / 3.2) + 'px';
+              wrapper.style.height = height;
+              onScroll();
             };
+            /**@ignore*/
+            onScroll = function() {
+              var pos = de.scrollTop +
+                       (de.clientHeight - wrapper.clientHeight) - 7;
+              if (pos > 0) {
+                wrapper.style.top = pos + 'px';
+              }
+            };
+            /**@ignore*/
+            onClick = function() {
+              try {
+                wrapper.parentNode.removeChild(wrapper);
+                window.dettachEvent('onscroll', onScroll);
+                window.dettachEvent('onresize', onResize);
+                wrapper = me.ieConsole = null;
+              } catch (e) {}
+            };
+            if (typeof window !== 'undefined' &&
+                window && window.attachEvent) {
+              if (ie6) {
+                each({
+                  onscroll : onScroll,
+                  onresize : onResize
+                }, function(f, k) {
+                  window.attachEvent(k, f);
+                });
+              }
+              if (close.attachEvent) {
+                close.attachEvent('onclick', onClick);
+              }
+            }
+            if (ie6) {
+              Pot.Deferred.wait(0.25).then(function() {
+                wrapper.style.bottom = '1px';
+              }).wait(0.5).then(function() {
+                wrapper.style.bottom = '0px';
+              });
+            }
             wrapper.appendChild(close);
             wrapper.appendChild(me.ieConsole);
-            document.body.appendChild(wrapper);
+            doc.body.appendChild(wrapper);
             me.append();
           });
         }
@@ -8358,6 +8578,699 @@ delete Pot.tmp.createIterators;
 delete Pot.tmp.createProtoIterators;
 delete Pot.tmp.createSyncIterator;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of Serializer.
+
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Serializer.
+   *
+   * Provides the JSON.stringify and the JSON.parse methods.
+   * If JSON object is in Built-in then will use native method.
+   *
+   * @name  Pot.Serializer
+   * @type  Object
+   * @class
+   * @public
+   * @static
+   */
+  Serializer : {}
+});
+
+(function() {
+  var NULL, JSONSerializer;
+  if (typeof JSON === 'object' &&
+      Pot.isBuiltinMethod(JSON.stringify) &&
+      Pot.isBuiltinMethod(JSON.parse)
+  ) {
+    update(Pot.Serializer, {
+      /**@ignore*/
+      serializeToJSON : function() {
+        return JSON.stringify.apply(null, arguments);
+      },
+      /**@ignore*/
+      parseFromJSON : function() {
+        return JSON.parse.apply(null, arguments);
+      }
+    });
+    return;
+  }
+  NULL = 'null';
+  JSONSerializer = update(function() {}, {
+    /**@ignore*/
+    charsCache : {
+      '\"'   : '\\"',
+      '\\'   : '\\\\',
+      '/'    : '\\/',
+      '\b'   : '\\b',
+      '\f'   : '\\f',
+      '\n'   : '\\n',
+      '\r'   : '\\r',
+      '\t'   : '\\t',
+      '\x0B' : '\\u000B'
+    },
+    /**@ignore*/
+    replaceTo : /\uFFFF/.test('\uFFFF')      ?
+                /[\\\"\x00-\x1F\x7F-\uFFFF]/g :
+                /[\\\"\x00-\x1F\x7F-\xFF]/g
+  });
+  /**
+   * @private
+   * @ignore
+   */
+  JSONSerializer.prototype = update(JSONSerializer.prototype, {
+    /**
+     * @private
+     * @ignore
+     */
+    serialize : function(object) {
+      var json = [];
+      this.serializeAll(object, json);
+      return json.join('');
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeAll : function(object, json) {
+      if (object == null) {
+        json[json.length] = NULL;
+      } else {
+        switch (Pot.typeOf(object)) {
+          case 'string':
+              this.serializeString(object, json);
+              break;
+          case 'number':
+              this.serializeNumber(object, json);
+              break;
+          case 'boolean':
+              json[json.length] = (object == true) ? 'true' : 'false';
+              break;
+          case 'array':
+              this.serializeArray(object, json);
+              break;
+          case 'object':
+          case 'error':
+              this.serializeObject(object, json);
+              break;
+          case 'date':
+              this.serializeDate(object, json);
+              break;
+          case 'regexp':
+              this.serializeString(object.toString(), json);
+              break;
+          case 'function':
+              break;
+          default:
+              json[json.length] = NULL;
+              break;
+        }
+      }
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    padZero : function(n) {
+      return (n < 10) ? '0' + n : n;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeDate : function(d, json) {
+      var pad = this.padZero;
+      result = isFinite(d.valueOf())   ? '"' +
+              d.getUTCFullYear()       + '-' +
+              pad(d.getUTCMonth() + 1) + '-' +
+              pad(d.getUTCDate())      + 'T' +
+              pad(d.getUTCHours())     + ':' +
+              pad(d.getUTCMinutes())   + ':' +
+              pad(d.getUTCSeconds())   + 'Z' + '"' : NULL;
+      json[json.length] = result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeString : function(s, json) {
+      var cs = s.replace(JSONSerializer.replaceTo, function(c) {
+        var cc, rv;
+        if (c in JSONSerializer.charsCache) {
+          return JSONSerializer.charsCache[c];
+        }
+        cc = c.charCodeAt(0);
+        rv = '\\u';
+        if (cc < 16) {
+          rv += '000';
+        } else if (cc < 256) {
+          rv += '00';
+        } else if (cc < 4096) {
+          rv += '0';
+        }
+        rv = rv + cc.toString(16);
+        JSONSerializer.charsCache[c] = rv;
+        return rv;
+      });
+      json[json.length] = '"' + cs + '"';
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeNumber : function(n, json) {
+      json[json.length] = (isFinite(n) && !isNaN(n)) ? n : NULL;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeArray : function(a, json) {
+      var len, sep = '', i, ok, val;
+      len = a && a.length;
+      json[json.length] = '[';
+      for (i = 0; i < len; i++) {
+        ok = true;
+        try {
+          val = a[i];
+        } catch (e) {
+          ok = false;
+        }
+        if (ok) {
+          json[json.length] = sep;
+          this.serializeAll(val, json);
+          sep = ',';
+        }
+      }
+      json[json.length] = ']';
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    serializeObject : function(o, json) {
+      var sep = '', key, ok, value;
+      json[json.length] = '{';
+      for (key in o) {
+        ok = true;
+        if (hasOwnProperty.call(o, key)) {
+          try {
+            value = o[key];
+            if (Pot.isFunction(value)) {
+              throw value;
+            }
+          } catch (e) {
+            ok = false;
+          }
+          if (ok) {
+            json[json.length] = sep;
+            this.serializeString(key, json);
+            json[json.length] = ':';
+            this.serializeAll(value, json);
+            sep = ',';
+          }
+        }
+      }
+      json[json.length] = '}';
+    }
+  });
+  update(Pot.Serializer, {
+    /**
+     * @lends Pot.Serializer
+     */
+    /**
+     * `serializeToJSON` will convert any object to a stringify JSON.
+     *
+     * Arguments `replacer` and `space` are unimplemented.
+     *
+     *
+     * @example
+     *   debug(serializeToJSON(100));
+     *   // @results "100"
+     *   debug(serializeToJSON('100'));
+     *   // @results "\"100\""
+     *   debug(serializeToJSON('hoge'));
+     *   // @results "\"hoge\""
+     *   debug(serializeToJSON(null));
+     *   // @results "null"
+     *   debug(serializeToJSON(true));
+     *   // @results "true"
+     *   debug(serializeToJSON(false));
+     *   // @results "false"
+     *   debug(serializeToJSON('Hello\nWorld!\n'));
+     *   // @results "\"Hello\\nWorld!\\n\""
+     *   debug(serializeToJSON([1, 2, 3]));
+     *   // @results "[1,2,3]"
+     *   debug(serializeToJSON([1E1, '(///"v"///)']));
+     *   // @results "[10,\"(///\\\"v\\\"///)\"]"
+     *   debug(serializeToJSON({'Hello\nWorld!': [1, {a: '{ABC}'}]}));
+     *   // @results "{\"Hello\\nWorld!\":[1,{\"a\":\"{ABC}\"}]}"
+     *   debug(serializeToJSON({key1: function() {}, key2: new Date()}));
+     *   // @results "{\"key2\":\"2011-08-30T16:32:28Z\"}"
+     *
+     *
+     * @param  {*}              value      A target object.
+     * @param  {Function}      (replacer)  (Optional) Unimplemented.
+     * @param  {Number|String} (space)     (Optional) Indent.
+     * @return {String}                    Return a JSON object as string.
+     * @type   Function
+     * @function
+     * @static
+     * @public
+     */
+    serializeToJSON : function(value/*[, replacer[, space]]*/) {
+      return (new JSONSerializer()).serialize(value);
+    },
+    /**
+     * `parseFromJSON` will parse a JSON object and convert to any object.
+     *
+     * Argument `reviver` is unimplemented.
+     *
+     *
+     * @example
+     *   debug(parseFromJSON('"hoge"'));
+     *   // @results 'hoge'
+     *   debug(parseFromJSON('null'));
+     *   // @results null
+     *   debug(parseFromJSON('true'));
+     *   // @results true
+     *   debug(parseFromJSON('false'));
+     *   // @results false
+     *   debug(parseFromJSON('"Hello\\u000aWorld!\\u000a"'));
+     *   // @results 'Hello\nWorld!\n'
+     *   debug(parseFromJSON('[1,2,3]'));
+     *   // @results [1,2,3]
+     *   debug(parseFromJSON('[1E1,"(///\\"v\\"///)"]'));
+     *   // @results [10,'(///"v"///)']
+     *   debug(parseFromJSON('{"Hello\\u000aWorld!":[1,{"a":"{ABC}"}]}'));
+     *   // @results {'Hello\nWorld!':[1,{a:'{ABC}'}]}
+     *   debug(parseFromJSON('{"key1":"12345","key2":null}'));
+     *   // @results {key1:'12345',key2:null}
+     *
+     *
+     * @param  {*}         text      A target JSON string object.
+     * @param  {*}        (reviver)  (Optional) Unimplemented.
+     * @return {String}              Return the parsed object.
+     * @type   Function
+     * @function
+     * @static
+     * @public
+     */
+    parseFromJSON : function(text/*[, reviver]*/) {
+      var re = {
+        meta      : /\\["\\\/bfnrtu]/g,
+        string    : /"[^"\\\n\r\u2028\u2029\x00-\x08\x10-\x1F\x80-\x9F]*"/g,
+        exprs     : /true|false|null|[+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?/g,
+        brackets  : /(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g,
+        remainder : /^[\],:{}\s\u2028\u2029]*$/,
+        space     : /^\s*$/,
+        clean     : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g
+      },
+      /**@ignore*/
+      isValid = function(s) {
+        var at = '@', bracket = '[]'.charAt(1);
+        if (re.space.test(s)) {
+          return false;
+        }
+        return re.remainder.test(
+          s.replace(re.meta,     at)
+           .replace(re.string,   bracket)
+           .replace(re.exprs,    bracket)
+           .replace(re.brackets, '')
+        );
+      },
+      o = String(text).replace(re.clean, '');
+      if (isValid(o)) {
+        return Pot.localEval('(' + o + ')');
+      } else {
+        throw new Error('Invalid JSON string: ' + o);
+      }
+    }
+  });
+})();
+
+update(Pot.Serializer, {
+  /**
+   * @lends Pot.Serializer
+   */
+  /**
+   * Serializes an key-value object to query-string format string.
+   *
+   *
+   * @example
+   *   var query = {foo: 1, bar: 'bar2', baz: null};
+   *   debug(serializeToQueryString(query));
+   *   // @results 'foo=1&bar=bar2&baz='
+   *
+   *
+   * @example
+   *   // Example of the items() format.
+   *   var query = [['prototype', 'value1'], ['__iterator__', 'value2']];
+   *   debug(serializeToQueryString(query));
+   *   // @results 'prototype=value1&__iterator__=value2'
+   *
+   *
+   * @example
+   *   // Example of needless key.
+   *   var query = {'': 'http://www.example.com/'};
+   *   debug(serializeToQueryString(query));
+   *   // @results 'http%3A%2F%2Fwww.example.com%2F'
+   *
+   *
+   * @example
+   *   var query = 'a=value1&b=value2';
+   *   debug(serializeToQueryString(query));
+   *   // @results 'a=value1&b=value2'
+   *
+   *
+   * @param  {Object|Array|*}  params    The target object.
+   * @return {String}                    The query-string of builded result.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  serializeToQueryString : function(params) {
+    var queries = [], encode;
+    if (Pot.isString(params)) {
+      return stringify(params);
+    } else if (!params || params == false) {
+      return '';
+    }
+    if (Pot.isObject(params) || Pot.isArrayLike(params)) {
+      encode = Pot.URI.urlEncode;
+      each(params, function(v, k) {
+        var item, key, val, sep, ok = true;
+        item = Pot.isArray(v) ? v : [k, v];
+        try {
+          key = stringify(item[0], false);
+          val = stringify(item[1], false);
+        } catch (e) {
+          ok = false;
+        }
+        if (ok && (key || val)) {
+          sep = key ? '=' : '';
+          queries[queries.length] = encode(key) + sep + encode(val);
+        }
+      });
+    }
+    return queries.join('&');
+  },
+  /**
+   * Parse the query-string to the items() format array
+   *   or the key-value object.
+   * The default result will be the items() format array.
+   *
+   *
+   * @example
+   *   // Default is the items() format.
+   *   var query = 'foo=1&bar=bar2&baz=';
+   *   debug(parseFromQueryString(query));
+   *   // @results [['foo', '1'], ['bar', 'bar2'], ['baz', '']]
+   *
+   *
+   * @example
+   *   // Specify "toObject".
+   *   var query = 'key1=value1&key2=value2';
+   *   debug(parseFromQueryString(query, true));
+   *   // @results {key1: 'value1', key2: 'value2'}
+   *
+   *
+   * @example
+   *   // Invalid key names.
+   *   var query = 'prototype=value1&__iterator__=value2';
+   *   debug(parseFromQueryString(query));
+   *   // @results [['prototype', 'value1'], ['__iterator__', 'value2']]
+   *
+   *
+   * @example
+   *   // Example of needless key.
+   *   var query = 'http%3A%2F%2Fwww.example.com%2F';
+   *   debug(parseFromQueryString(query));
+   *   // @results [['', 'http://www.example.com/']]
+   *
+   *
+   * @example
+   *   var query = '%40A=16%5E2%262&%40B=(2%2B3%3E%3D1)';
+   *   debug(parseFromQueryString(query, true));
+   *   // @results {'@A': '16^2&2', '@B': '(2+3>=1)'}
+   *
+   *
+   * @param  {String}   queryString   The query-string to parse.
+   * @param  {Boolean}  (toObject)    Whether to return as
+   *                                    an key-value object.
+   *                                  Note that if invalid key name
+   *                                    included then an object will
+   *                                    be broken.
+   *                                    (e.g., "__iterator__" or
+   *                                           "prototype",
+   *                                           "hasOwnProperty" etc.).
+   * @return {Array|Object}           The parsed array or object.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  parseFromQueryString : function(queryString, toObject) {
+    var result = [], decode, query, re;
+    if (Pot.isObject(queryString) || Pot.isArray(queryString)) {
+      return queryString;
+    }
+    if (toObject) {
+      result = {};
+    }
+    query = stringify(queryString, true);
+    if (query) {
+      decode = Pot.URI.urlDecode;
+      re = /&(?:(?:amp|#(?:0*38|[xX]0*26));|)/;
+      while (query.charAt(0) === '?') {
+        query = query.substring(1);
+      }
+      each(query.split(re), function(q) {
+        var key, val, pair;
+        pair = q.split('=');
+        switch (pair.length) {
+          case 0:
+              break;
+          case 1:
+              val = pair[0];
+              break;
+          default:
+              key = pair[0];
+              val = pair[1];
+              break;
+        }
+        if (key || val) {
+          key = stringify(decode(key));
+          val = stringify(decode(val));
+          if (toObject) {
+            result[key] = val;
+          } else {
+            result[result.length] = [key, val];
+          }
+        }
+      });
+    }
+    return result;
+  }
+});
+
+// Update for Pot object.
+Pot.update({
+  serializeToJSON        : Pot.Serializer.serializeToJSON,
+  parseFromJSON          : Pot.Serializer.parseFromJSON,
+  serializeToQueryString : Pot.Serializer.serializeToQueryString,
+  parseFromQueryString   : Pot.Serializer.parseFromQueryString
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of URI.
+
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * URI utilities.
+   *
+   * @name Pot.URI
+   * @type Object
+   * @class
+   * @static
+   * @public
+   */
+  URI : {}
+});
+
+update(Pot.URI, {
+  /**
+   * @lends Pot.URI
+   */
+  /**
+   * Encode the URI string.
+   *
+   * @param  {String}  string  The subject string.
+   * @return {String}          The encoded string.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  urlEncode : update(function(string) {
+    var result = '', me = arguments.callee, s;
+    s = stringify(string, true);
+    if (s) {
+      if (Pot.isPercentEncoded(s)) {
+        result = s;
+      } else {
+        try {
+          result = me.encoder.component(s);
+        } catch (e) {
+          result = me.encoder.encode(s);
+        }
+      }
+    }
+    return stringify(result, true);
+  }, {
+    /**
+     * @ignore
+     */
+    encoder : {
+      /**
+       * @ignore
+       */
+      component : function(string) {
+        return encodeURIComponent(string);
+      },
+      /**
+       * Simple URL encode for Surrogate Pair (URIError).
+       *
+       * @private
+       * @ignore
+       */
+      encode : function(string) {
+        var result = '', s, re, rep, per;
+        s = stringify(string, true);
+        if (s) {
+          re = /[^!'-*.0-9A-Z_a-z~-]/g;
+          per = '%';
+          /**@ignore*/
+          rep = function(s) {
+            var r, c = s.charCodeAt(0);
+            if (c < 0x10) {
+              r = per + '0' + c.toString(16);
+            } else if (c < 0x80) {
+              r = per + c.toString(16);
+            } else if (c < 0x800) {
+              r = per + (c >> 0x06 | 0xC0).toString(16) +
+                  per + (c  & 0x3F | 0x80).toString(16);
+            } else {
+              r = per + (c >> 0x0C | 0xE0).toString(16) +
+                  per + (c >> 0x06 & 0x3F | 0x80).toString(16) +
+                  per + (c  & 0x3F | 0x80).toString(16);
+            }
+            return r.toUpperCase();
+          };
+          result = s.replace(re, rep);
+        }
+        return result;
+      }
+    }
+  }),
+  /**
+   * Decode the URI string.
+   *
+   * @param  {String}  string  The subject string.
+   * @return {String}          The decoded string.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  urlDecode : update(function(string) {
+    var result = '', me = arguments.callee, s;
+    s = stringify(string, true);
+    if (s) {
+      s = s.replace(me.decoder.reSpace.from, me.decoder.reSpace.to);
+      try {
+        result = me.decoder.component(s);
+      } catch (e) {
+        result = me.decoder.decode(s);
+      }
+    }
+    return stringify(result, true);
+  }, {
+    /**
+     * @ignore
+     */
+    decoder : {
+      /**
+       * @ignore
+       */
+      reSpace : {
+        from  : /[+]/g,
+        to    : ' '
+      },
+      /**
+       * @ignore
+       */
+      component : function(string) {
+        return decodeURIComponent(string);
+      },
+      /**
+       * Simple URL decode for Surrogate Pair (URIError).
+       *
+       * @private
+       * @ignore
+       */
+      decode : function(string) {
+        var result = '', s, re, rep;
+        s = stringify(string, true);
+        if (s) {
+          re = new RegExp([
+            '%', '(?:',  'E', '(?:', '0%[AB]',
+                                '|', '[1-CEF]%[89AB]',
+                                '|', 'D%[89]',
+                               ')',  '[0-9A-F]',
+                 '|',    'C[2-9A-F]',
+                 '|',    'D[0-9A-F]',
+                 ')',    '%[89AB][0-9A-F]',
+            '|',         '%[0-7][0-9A-F]'
+          ].join(''), 'gi');
+          /**@ignore*/
+          rep = function(s) {
+            var r, c = parseInt(s.substring(1), 16);
+            if (c < 0x80) {
+              r = c;
+            } else if (c < 0xE0) {
+              r = ((c & 0x1F) << 6 | parseInt(s.substring(4), 16) & 0x3F);
+            } else {
+              r = (((c & 0x0F) << 6 | parseInt(s.substring(4), 16) & 0x3F)
+                               << 6 | parseInt(s.substring(7), 16) & 0x3F);
+            }
+            return String.fromCharCode(r);
+          };
+          result = s.replace(re, rep);
+        }
+        return result;
+      }
+    }
+  })
+});
+
+// Update Pot object.
+Pot.update({
+  urlEncode : Pot.URI.urlEncode,
+  urlDecode : Pot.URI.urlDecode
+});
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Crypt.
 
 Pot.update({
@@ -8712,7 +9625,7 @@ update(Pot.Net, {
           }
           this.url = buildURL(this.url, this.options.queryString);
           this.options.sendContent = stringify(
-            serializeToQueryString(this.options.sendContent),
+            Pot.Serializer.serializeToQueryString(this.options.sendContent),
             true
           );
           if ((this.options.method === 'GET' ||
@@ -8878,7 +9791,7 @@ update(Pot.Net, {
     opts.method = trim(opts.method).toUpperCase() || 'GET';
     opts.url = buildURL(url, opts.queryString);
     if (opts.data) {
-      opts.data = serializeToQueryString(opts.data);
+      opts.data = Pot.Serializer.serializeToQueryString(opts.data);
     }
     if (opts.data && opts.method === 'GET') {
       opts.method = 'POST';
@@ -9295,12 +10208,8 @@ update(Pot.Net, {
             method : 'GET'
           }).then(function(res) {
             var code = trim(res && res.responseText);
-            code = code.replace(/^[^(]*|[^)]*$/g, '');
-            try {
-              return JSON.parse(code);
-            } catch (e) {
-              return (new Function('return (' + code + ');'))();
-            }
+            code = code.replace(/^[^{]*|[^}]*$/g, '');
+            return Pot.Serializer.parseFromJSON(code);
           });
         }
         script = doc.createElement('script');
@@ -9376,105 +10285,11 @@ update(Pot.Net, {
  * @private
  * @ignore
  */
-function urlEncode(string) {
-  var result = '', me = arguments.callee, s;
-  s = stringify(string, false);
-  if (s) {
-    if (Pot.isPercentEncoded(s)) {
-      result = s;
-    } else {
-      try {
-        result = me.byComponent(s);
-      } catch (e) {
-        result = me.byEncode(s);
-      }
-    }
-  }
-  return stringify(result, true);
-}
-
-// Update URLEncode for Surrogate Pair (URIError).
-update(urlEncode, {
-  /**
-   * @ignore
-   */
-  byComponent : function(string) {
-    return encodeURIComponent(string);
-  },
-  /**
-   * Simple URL encode.
-   *
-   * @private
-   * @ignore
-   */
-  byEncode : function(string) {
-    var result = '', s, re, rep, per;
-    s = stringify(string, true);
-    if (s) {
-      re = /[^!'-*.0-9A-Z_a-z~-]/g;
-      per = '%';
-      /**@ignore*/
-      rep = function(s) {
-        var r, c = s.charCodeAt(0);
-        if (c < 0x10) {
-          r = per + '0' + c.toString(16);
-        } else if (c < 0x80) {
-          r = per + c.toString(16);
-        } else if (c < 0x800) {
-          r = per + (c >> 0x06 | 0xC0).toString(16) +
-              per + (c  & 0x3F | 0x80).toString(16);
-        } else {
-          r = per + (c >> 0x0C | 0xE0).toString(16) +
-              per + (c >> 0x06 & 0x3F | 0x80).toString(16) +
-              per + (c  & 0x3F | 0x80).toString(16);
-        }
-        return r.toUpperCase();
-      };
-      result = s.replace(re, rep);
-    }
-    return result;
-  }
-});
-
-/**
- * @private
- * @ignore
- */
-function serializeToQueryString(query) {
-  var queries = [];
-  if (Pot.isString(query)) {
-    return stringify(query);
-  } else if (!query || query == false) {
-    return '';
-  }
-  if (Pot.isObject(query) || Pot.isArrayLike(query)) {
-    each(query, function(v, k) {
-      var item, key, val, sep, ok = true;
-      item = Pot.isArray(v) ? v : [k, v];
-      try {
-        key = stringify(item[0], false);
-        val = stringify(item[1], false);
-      } catch (e) {
-        ok = false;
-      }
-      if (ok && (key || val)) {
-        sep = key ? '=' : '';
-        queries[queries.length] = urlEncode(key) + sep + urlEncode(val);
-      }
-    });
-  }
-  return queries.join('&');
-}
-
-/**
- * @private
- * @ignore
- */
 function buildURL(url, query) {
   var u, q, p;
   u = stringify(url);
   p = (~u.indexOf('?')) ? '&' : '?';
-  q = stringify(serializeToQueryString(query));
+  q = stringify(Pot.Serializer.serializeToQueryString(query));
   while (u.slice(-1) === p) {
     u = u.slice(0, -1);
   }
@@ -9870,77 +10685,85 @@ update(Pot.Internal, {
    * @internal
    */
   PotExportProps : {
-    Pot              : Pot,
-    update           : update,
-    isBoolean        : Pot.isBoolean,
-    isNumber         : Pot.isNumber,
-    isString         : Pot.isString,
-    isFunction       : Pot.isFunction,
-    isArray          : Pot.isArray,
-    isDate           : Pot.isDate,
-    isRegExp         : Pot.isRegExp,
-    isObject         : Pot.isObject,
-    isError          : Pot.isError,
-    typeOf           : Pot.typeOf,
-    typeLikeOf       : Pot.typeLikeOf,
-    StopIteration    : Pot.StopIteration,
-    isStopIter       : Pot.isStopIter,
-    isArrayLike      : Pot.isArrayLike,
-    isDeferred       : Pot.isDeferred,
-    isIter           : Pot.isIter,
-    isPercentEncoded : Pot.isPercentEncoded,
-    isNumeric        : Pot.isNumeric,
-    isInt            : Pot.isInt,
-    isNativeCode     : Pot.isNativeCode,
-    isBuiltinMethod  : Pot.isBuiltinMethod,
-    isWindow         : Pot.isWindow,
-    isDocument       : Pot.isDocument,
-    isElement        : Pot.isElement,
-    isNodeLike       : Pot.isNodeLike,
-    isNodeList       : Pot.isNodeList,
-    Deferred         : Pot.Deferred,
-    succeed          : Pot.Deferred.succeed,
-    failure          : Pot.Deferred.failure,
-    wait             : Pot.Deferred.wait,
-    callLater        : Pot.Deferred.callLater,
-    callLazy         : Pot.Deferred.callLazy,
-    maybeDeferred    : Pot.Deferred.maybeDeferred,
-    isFired          : Pot.Deferred.isFired,
-    lastResult       : Pot.Deferred.lastResult,
-    lastError        : Pot.Deferred.lastError,
-    register         : Pot.Deferred.register,
-    unregister       : Pot.Deferred.unregister,
-    deferrize        : Pot.Deferred.deferrize,
-    begin            : Pot.Deferred.begin,
-    flush            : Pot.Deferred.flush,
-    till             : Pot.Deferred.till,
-    parallel         : Pot.Deferred.parallel,
-    chain            : Pot.Deferred.chain,
-    forEach          : Pot.forEach,
-    repeat           : Pot.repeat,
-    forEver          : Pot.forEver,
-    iterate          : Pot.iterate,
-    Iter             : Pot.Iter,
-    toIter           : Pot.Iter.toIter,
-    map              : Pot.map,
-    filter           : Pot.filter,
-    reduce           : Pot.reduce,
-    every            : Pot.every,
-    some             : Pot.some,
-    range            : Pot.range,
-    indexOf          : Pot.indexOf,
-    lastIndexOf      : Pot.lastIndexOf,
-    request          : Pot.Net.request,
-    jsonp            : Pot.Net.requestByJSONP,
-    rescape          : rescape,
-    arrayize         : arrayize,
-    invoke           : invoke,
-    stringify        : stringify,
-    trim             : trim,
-    now              : now,
-    hashCode         : Pot.Crypt.hashCode,
-    globalize        : Pot.globalize,
-    debug            : Pot.Debug.debug
+    Pot                    : Pot,
+    update                 : update,
+    isBoolean              : Pot.isBoolean,
+    isNumber               : Pot.isNumber,
+    isString               : Pot.isString,
+    isFunction             : Pot.isFunction,
+    isArray                : Pot.isArray,
+    isDate                 : Pot.isDate,
+    isRegExp               : Pot.isRegExp,
+    isObject               : Pot.isObject,
+    isError                : Pot.isError,
+    typeOf                 : Pot.typeOf,
+    typeLikeOf             : Pot.typeLikeOf,
+    StopIteration          : Pot.StopIteration,
+    isStopIter             : Pot.isStopIter,
+    isArrayLike            : Pot.isArrayLike,
+    isDeferred             : Pot.isDeferred,
+    isIter                 : Pot.isIter,
+    isPercentEncoded       : Pot.isPercentEncoded,
+    isNumeric              : Pot.isNumeric,
+    isInt                  : Pot.isInt,
+    isNativeCode           : Pot.isNativeCode,
+    isBuiltinMethod        : Pot.isBuiltinMethod,
+    isWindow               : Pot.isWindow,
+    isDocument             : Pot.isDocument,
+    isElement              : Pot.isElement,
+    isNodeLike             : Pot.isNodeLike,
+    isNodeList             : Pot.isNodeList,
+    Deferred               : Pot.Deferred,
+    succeed                : Pot.Deferred.succeed,
+    failure                : Pot.Deferred.failure,
+    wait                   : Pot.Deferred.wait,
+    callLater              : Pot.Deferred.callLater,
+    callLazy               : Pot.Deferred.callLazy,
+    maybeDeferred          : Pot.Deferred.maybeDeferred,
+    isFired                : Pot.Deferred.isFired,
+    lastResult             : Pot.Deferred.lastResult,
+    lastError              : Pot.Deferred.lastError,
+    register               : Pot.Deferred.register,
+    unregister             : Pot.Deferred.unregister,
+    deferrize              : Pot.Deferred.deferrize,
+    begin                  : Pot.Deferred.begin,
+    flush                  : Pot.Deferred.flush,
+    till                   : Pot.Deferred.till,
+    parallel               : Pot.Deferred.parallel,
+    chain                  : Pot.Deferred.chain,
+    forEach                : Pot.forEach,
+    repeat                 : Pot.repeat,
+    forEver                : Pot.forEver,
+    iterate                : Pot.iterate,
+    Iter                   : Pot.Iter,
+    toIter                 : Pot.Iter.toIter,
+    map                    : Pot.map,
+    filter                 : Pot.filter,
+    reduce                 : Pot.reduce,
+    every                  : Pot.every,
+    some                   : Pot.some,
+    range                  : Pot.range,
+    indexOf                : Pot.indexOf,
+    lastIndexOf            : Pot.lastIndexOf,
+    globalEval             : Pot.globalEval,
+    localEval              : Pot.localEval,
+    serializeToJSON        : Pot.Serializer.serializeToJSON,
+    parseFromJSON          : Pot.Serializer.parseFromJSON,
+    serializeToQueryString : Pot.Serializer.serializeToQueryString,
+    parseFromQueryString   : Pot.Serializer.parseFromQueryString,
+    urlEncode              : Pot.URI.urlEncode,
+    urlDecode              : Pot.URI.urlDecode,
+    request                : Pot.Net.request,
+    jsonp                  : Pot.Net.requestByJSONP,
+    rescape                : rescape,
+    arrayize               : arrayize,
+    invoke                 : invoke,
+    stringify              : stringify,
+    trim                   : trim,
+    now                    : now,
+    hashCode               : Pot.Crypt.hashCode,
+    globalize              : Pot.globalize,
+    debug                  : Pot.Debug.debug
   }
 });
 
