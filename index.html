@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<title>Pot.js + PotLite.js - ドキュメントリファレンス</title>
-<meta name="description" content="Pot.js/PotLite.js - JavaScript utility library for asynchronous processing with Deferred.">
-<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/polygon-planet-favicon.ico">
-<link rel="stylesheet" type="text/css" href="pot.css">
+<title>Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ</title>
+<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico">
+<meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for asynchronous processing with Deferred.">
+<meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
+<meta name="description" lang="ja" content="Pot.js/PotLite.jsは,非ブロックでの非同期処理を直列的に書けるようにし,UIやCPUへの負担を軽減するループ処理を中心にDeferredと共に実装されたJavaScriptライブラリです.">
+<meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="Pot.js Develop Blog" href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css">
 <style>
 /*
 html, body {
@@ -25,12 +31,29 @@ td.header, td.header * {
 td.marker, td.marker * {
   background: #e2e5ff;
 }
+
+.header-logo {
+  width: 500px;
+  height: 265px;
+  background-color: transparent;
+  background-image: url(http://api.polygonpla.net/img/logo/potlite.js.png);
+  background-repeat: no-repeat;
+  background-position: 5px 5px;
+  margin: 5px 5px 5px 25px;
+}
+
+#top {
+  font-size: 120%;
+  display: inline;
+}
 </style>
 <script type="text/javascript" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
 </head>
-<body>
+<body id="doc">
   <div class="layout-liquid-container">
     <div class="header">
+      <div class="header-logo">
+      </div>
       <h1 id="top">Pot.js</h1>
       <p>
        JavaScript utility library for asynchronous processing with Deferred.
@@ -48,6 +71,7 @@ td.marker, td.marker * {
             <li><a href="#compatibility">動作環境</a></li>
             <li><a href="#license">ライセンス</a></li>
             <li><a href="#contact">連絡先</a></li>
+            <li><a href="#thanks">謝辞</a></li>
             <li><a href="#forJSDoc">自動生成されたドキュメント</a></li>
             <li><a href="#introduction">導入</a></li>
             <li>
@@ -150,7 +174,7 @@ td.marker, td.marker * {
           Node.js の場合。
          </p>
          <pre>// Example to define Pot object on Node.js.
-var Pot = require('./potlite').Pot;
+var Pot = require('./potlite.js').Pot;
 Pot.debug(Pot.VERSION);
 
 Pot.Deferred.begin(function() {
@@ -222,6 +246,20 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
           または (polygon.planet[at]gmail.com) まで、
           <br>
           意見・感想・要望などなんでも送っていただけるとうれしいです。
+         </p>
+        </div>
+        <h2 id="thanks">謝辞</h2>
+        <div>
+         <p>
+          ロゴを作成してくれた
+          <a href="http://r-m-t.jp/" title="R M T　|　同人音楽サークル">yinyang302mg</a> さん、
+          そして Pot.js / PotLite.js を作る切欠となった
+          <a href="http://cho45.stfuawsc.com/jsdeferred/" title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
+          ,
+          <a href="http://www.mochimedia.com/" title="Mochi Media, Inc.">MochiKit (Mochi Media, Inc.)</a>
+          ,
+          <a href="https://github.com/to/tombloo/wiki" title="Tombloo - Home - GitHub">Tombloo</a>
+          developers に感謝いたします。
          </p>
         </div>
         <h2 id="forJSDoc">自動生成されたドキュメント</h2>
@@ -1723,6 +1761,111 @@ jsonp(url, {
     debug(data.results[0].text);
 });</pre>
              </dd>
+             <dt><dfn>serializeToJSON</dfn>(value)</dt>
+             <dd>
+              与えられた値 value を JSON エンコードして返します。
+              <br>
+              結果的に、JSON.stringify() と同じです。
+              <br>
+              JSON オブジェクトが未定義の環境でも互換となるよう実装されています。
+              <br>
+              serializeToJSON は Pot.Serializer.serializeToJSON として定義されていますが
+              Pot.serializeToJSON からも参照できます。
+              <pre>var obj = {'Hello\nWorld!': [1, {a: '{ABC}'}]};
+debug( serializeToJSON(obj) );
+// =&gt; &quot;{\&quot;Hello\\nWorld!\&quot;:[1,{\&quot;a\&quot;:\&quot;{ABC}\&quot;}]}&quot;</pre>
+             </dd>
+             <dt><dfn>parseFromJSON</dfn>(text)</dt>
+             <dd>
+              与えられた JSON 文字列 text をデコードして返します。
+              <br>
+              結果的に、JSON.parse() で処理したことと同じです。
+              <br>
+              不正な文字やコードが入ってる場合はその値 (キー) を無視します。
+              <br>
+              JSON オブジェクトが未定義の環境でも互換性がとれるよう実装されています。
+              <br>
+              parseFromJSON は Pot.Serializer.parseFromJSON として定義されていますが
+              Pot.parseFromJSON からも参照できます。
+              <pre>
+var str = '{&quot;Hello\\u000aWorld!&quot;:[1,{&quot;a&quot;:&quot;{ABC}&quot;}]}';
+debug( parseFromJSON(str) );
+// =&gt; {'Hello\nWorld!':[1,{a:'{ABC}'}]}</pre>
+             </dd>
+             <dt><dfn>serializeToQueryString</dfn>(params)</dt>
+             <dd>
+              オブジェクトまたは配列で与えられた引数 params をクエリ文字列にして返します。
+              <br>
+              HTTP GET などで使用される queryString を作成します。
+              <br>
+              文字列が与えられた場合は、単にそのまま返されます。
+              <br>
+              serializeToQueryString は Pot.Serializer.serializeToQueryString として定義されていますが
+              Pot.serializeToQueryString からも参照できます。
+              <pre>var query = {foo: 1, bar: 'bar2', baz: null};
+debug( serializeToQueryString(query) );
+//  =&gt;  'foo=1&amp;bar=bar2&amp;baz='</pre>
+              オブジェクトのキー名として使用できないものを扱う場合は配列 (items 形式) が便利です。
+              <pre>// Example of the items format.
+var query = [['prototype', 'value1'], ['__iterator__', 'value2']];
+debug( serializeToQueryString(query) );
+//  =&gt;  'prototype=value1&amp;__iterator__=value2'</pre>
+             </dd>
+             <dt><dfn>parseFromQueryString</dfn>(queryString[, toObject])</dt>
+             <dd>
+              クエリ文字列 queryString を配列またはオブジェクトにデコードして返します。
+              <br>
+              serializeToQueryString で作成できるクエリ文字列を、
+              2 つのアイテムを持つ配列からなる配列にして返します。
+              <br>
+              引数 toObject が 真 (TRUE) として渡されると、
+              キーバリューのペアでなるオブジェクトとして返します。
+              <br>
+              parseFromQueryString は Pot.Serializer.parseFromQueryString として定義されていますが
+              Pot.parseFromQueryString からも参照できます。
+              <pre>// Default is the items format.
+var query = 'foo=1&amp;bar=bar2&amp;baz=';
+debug( parseFromQueryString(query) );
+//  =&gt;  [['foo', '1'], ['bar', 'bar2'], ['baz', '']]</pre>
+              第二引数 toObject を true で渡した場合はオブジェクトになります。
+              <pre>var query = 'key1=value1&amp;key2=value2';
+debug( parseFromQueryString(query, true) );
+//  =&gt;  {key1: 'value1', key2: 'value2'}</pre>
+              次のような for-in などの動作に影響する未知の名前の可能性がある場合は、
+              配列で扱うと確実です。
+              <pre>var query = 'prototype=value1&amp;__iterator__=value2';
+debug( parseFromQueryString(query) );
+//  =&gt;  [['prototype', 'value1'], ['__iterator__', 'value2']]</pre>
+             </dd>
+             <dt><dfn>urlEncode</dfn>(string)</dt>
+             <dd>
+              引数 string を URL エンコードして返します。
+              <br>
+              encodeURIComponent との違いは、
+              2 重でエンコードされないことと、
+              バイナリ処理などのために
+              サロゲートペアによる URIError が発生しないで処理を続行できることです。
+              <pre>debug( urlEncode('abc(///)ふぇぇ') );
+//    =&gt;    'abc(%2F%2F%2F)%E3%81%B5%E3%81%87%E3%81%87'</pre>
+              <pre>// Firefox (SpiderMonkey) では サロゲートペアによる URI Error が発生
+//debug( encodeURIComponent('\uD800') ); // Error: malformed URI sequence
+
+// バイナリとみなし処理される
+debug( urlEncode('\uD800') ); // '%ED%A0%80'</pre>
+             </dd>
+             <dt><dfn>urlDecode</dfn>(string)</dt>
+             <dd>
+              引数 string を URL デコードして返します。
+              <br>
+              decodeURIComponent との違いは、
+              プラス記号 '+' をスペースに変換する処理が追加されていることです。
+              <pre>var s = 'abc(%2F%2F%2F)%E3%81%B5%E3%81%87%E3%81%87';
+debug( urlDecode(s) ); // 'abc(///)ふぇぇ'</pre>
+              '+' を含むエンコードがされてた場合。
+              <pre>var s = '%23foo+.bar+%3Abaz';
+debug( decodeURIComponent(s) ); // '#foo+.bar+:baz'
+debug( urlDecode(s) );          // '#foo .bar :baz'</pre>
+             </dd>
             </dl>
             <p><br></p>
             <h4 id="iteratorFunctions">イテレータ関数</h4>
@@ -2874,13 +3017,13 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
     <div class="footer">
       <div style="width: 100%; text-align: right;">
         <p style="margin-right: 2em;">
-          <a href="#top">ページ先頭へ</a>
+          <a href="#doc">ページ先頭へ</a>
         </p>
       </div>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-10-18 Written by <a href="#contact">polygon planet</a>
+         Last modified: 2011-10-19 Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
     </div>
