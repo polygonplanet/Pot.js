@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.15, 2011-10-19
+ * Version 1.16, 2011-10-22
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.15
- * @date           2011-10-19
+ * @version        1.16
+ * @date           2011-10-22
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.15', TYPE : 'lite'},
+var Pot = {VERSION : '1.16', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -895,6 +895,45 @@ Pot.update({
     return result;
   },
   /**
+   * Return whether the argument is Iterator or not.
+   *
+   *
+   * @example
+   *   var iter = new Pot.Iter();
+   *   var i = 0;
+   *   iter.next = function() {
+   *     if (i > 5) {
+   *       throw StopIteration;
+   *     }
+   *     return i++;
+   *   };
+   *   debug( isIterable(iter) ); // @results  true
+   *   var func = function() {};
+   *   debug( isIterable(func) ); // @results  false
+   *
+   *
+   * @example
+   *   var iter = (function() {
+   *     for (var i = 0; i < 10; i++) {
+   *       yield;
+   *       debug(i);
+   *     }
+   *   })();
+   *   debug( isIterable(iter) ); // @results  true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is iterable.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isIterable : function(x) {
+    return !!(x && Pot.isFunction(x.next) &&
+         (~x.next.toString().indexOf(SI) || Pot.isNativeCode(x.next)));
+  },
+  /**
    * Return whether the argument object like Array (i.e. iterable)
    *
    *
@@ -1544,8 +1583,18 @@ function arrayize(object, index) {
     if (globals || Pot.Global) {
       try {
         t = slice.call(
-          ((globals && globals.documentElement) ||
-           (Pot.Global && Pot.Global.documentElement)).childNodes
+          ((globals &&
+            (globals.documentElement ||
+              (globals.document && globals.document.documentElement) ||
+              (globals.content && globals.content.document &&
+                globals.content.document.documentElement))) ||
+           (Pot.Global &&
+            (Pot.Global.documentElement ||
+              (Pot.Global.document && Pot.Global.document.documentElement) ||
+              (Pot.Global.content && Pot.Global.content.document &&
+                Pot.Global.content.document.documentElement))) ||
+           (typeof document === 'object' && document.documentElement)
+          ).childNodes
         )[0].nodeType;
         t = null;
         me.canNodeList = true;
@@ -5827,28 +5876,54 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   iterate : function(object, callback, context) {
     var that = this, iterable;
-    iterable = Pot.Iter.toIter(object);
-    if (!Pot.isIter(iterable)) {
-      return this.noop();
-    }
-    if (Pot.isFunction(callback)) {
-      return {
-        /**@ignore*/
-        next : function() {
-          var results = iterable.next();
-          results.push(object);
-          that.result = callback.apply(context, results);
-          return that.result;
-        }
-      };
+    if (Pot.isIterable(object) && !Pot.isIter(object)) {
+      // using "yield" generator.
+      if (Pot.isFunction(callback)) {
+        return {
+          /**@ignore*/
+          next : function() {
+            var res = object.next();
+            that.result = callback.apply(context, arrayize(res));
+            return that.result;
+          }
+        };
+      } else {
+        return {
+          /**@ignore*/
+          next : function() {
+            that.result = object.next();
+            return that.result;
+          }
+        };
+      }
     } else {
-      return {
-        /**@ignore*/
-        next : function() {
-          that.result = iterable.next();
-          return that.result;
-        }
-      };
+      iterable = Pot.Iter.toIter(object);
+      if (!Pot.isIter(iterable)) {
+        return this.noop();
+      }
+      if (Pot.isFunction(callback)) {
+        return {
+          /**@ignore*/
+          next : function() {
+            var results = iterable.next();
+            results = arrayize(results);
+            while (results.length < 2) {
+              results.push((void 0));
+            }
+            results.push(object);
+            that.result = callback.apply(context, results);
+            return that.result;
+          }
+        };
+      } else {
+        return {
+          /**@ignore*/
+          next : function() {
+            that.result = iterable.next();
+            return that.result;
+          }
+        };
+      }
     }
   }
 });
@@ -10700,6 +10775,7 @@ update(Pot.Internal, {
     typeLikeOf             : Pot.typeLikeOf,
     StopIteration          : Pot.StopIteration,
     isStopIter             : Pot.isStopIter,
+    isIterable             : Pot.isIterable,
     isArrayLike            : Pot.isArrayLike,
     isDeferred             : Pot.isDeferred,
     isIter                 : Pot.isIter,
