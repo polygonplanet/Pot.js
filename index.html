@@ -1522,6 +1522,34 @@ debug( isArray('hoge') );    // false</pre>
     }
 }</pre>
              </dd>
+             <dt><dfn>isIterable</dfn>(x)</dt>
+             <dd>
+              x がイテレートできるなら true を返す。
+              <br>
+              ここでいうイテレート可能とは、
+              Pot.iterate() によるイテレートが可能ということです。
+              <br>
+              Pot.Iter のインスタンスまたは yield によって生成したジェネレータが含まれます。
+              <pre>var iter = new Iter(); // Pot.Iter
+var i = 0;
+iter.next = function() {
+    if (i &gt; 5) {
+        throw StopIteration;
+    }
+    return i++;
+};
+debug( isIterable(iter) ); // true
+
+var func = function() {};
+debug( isIterable(func) ); // false</pre>
+              <pre>var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield;
+        debug(i);
+    }
+})();
+debug( isIterable(iter) ); // true</pre>
+             </dd>
              <dt><dfn>isArrayLike</dfn>(x)</dt>
              <dd>
               isArray との違いは、arguments や NodeList も true として返す点。
@@ -1977,19 +2005,49 @@ forEver(function(i) {
 debug(s);
 // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'</pre>
              </dd>
-             <dt><dfn>iterate</dfn>(object, callback[, context])</dt>
+             <dt><dfn>iterate</dfn>(object[, callback[, context]])</dt>
              <dd>
               Iter (Pot.Iter) オブジェクトのインスタンスをイテレート。
+              <br>
+              また、yield によるジェネレータをイテレートすることもできます。
+              <br>
+              <pre>// Pot.Iter インスタンスによるイテレートの例
+var results = [];
+var iter = new Iter();
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw StopIteration;
+        }
+        return i++;
+    };
+})();
+iterate(iter, function(i) {
+    results.push(i);
+});
+debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
+              yield によるジェネレータを使用する例。
+              <pre>var results = [];
+var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield i;
+        results.push(i);
+    }
+})();
+iterate(iter);
+debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
              </dd>
              <dt><em>[new]</em> <dfn>Iter</dfn>()</dt>
              <dd>
               Iter (Pot.Iter) コンストラクタ。
               <br>
-              next という名前のメソッドを定義することで独自のイテレータが作成できる。
+              next という名前のメソッドを定義することで独自のイテレータが作成できます。
              </dd>
              <dt><dfn>toIter</dfn>(x)</dt>
              <dd>
-              x を可能な限りイテレート可能な Iter (Pot.Iter) のインスタンスに変換したものを返す。
+              x を可能な限りイテレート可能な Iter (Pot.Iter) のインスタンスに変換したものを返します。
              </dd>
              <dt><dfn>map</dfn>(object, callback[, context])</dt>
              <dd>
@@ -3023,7 +3081,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-10-19 Written by <a href="#contact">polygon planet</a>
+         Last modified: 2011-10-22 Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
     </div>
