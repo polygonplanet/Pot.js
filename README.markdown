@@ -79,6 +79,115 @@ That is limited with asynchronous processing as lightweight version of Pot.js.
       * [PotLite.js - JsDoc Reference - Index][PotLite_JSDoc]
 
 
+Example
+========
+Example:   
+A simple iterate and Deferred object usage with asynchronous and synchronous.
+
+    begin(function() {
+        debug('BEGIN example');
+    }).then(function() {
+        // A simple HTTP request
+        //  that even works on Node.js (non-browser).
+        return request('pot.js.example.json', {
+            mimeType : 'text/plain'
+        }).ensure(function(res) {
+            if (isError(res)) {
+                return {
+                    foo : 'fooError',
+                    bar : 'barError',
+                    baz : 'bazError'
+                };
+            } else {
+                debug(res.responseText);
+                // e.g., responseText = {
+                //         foo: 'fooValue',
+                //         bar: 'barValue',
+                //         baz: 'bazValue'
+                //       }
+                return parseFromJSON(res.responseText);
+            }
+            // Iterate on chain by "forEach" method.
+        }).forEach(function(val, key) {
+            debug(key + ' : ' + val); // foo : fooValue ... etc.
+            
+            // Executed in one second intervals.
+            return wait(1);
+            
+            // Wait 0.5 seconds
+            //  and set the speed to slow between each chains.
+        }).wait(0.5).speed('slow').then(function(res) {
+            var s = '', keys = [];
+            
+            // Iterate by "forEach" method on synchronous.
+            forEach(res, function(val, key) {
+                s += key;
+                keys.push(key);
+            });
+            keys.push(s);
+            return keys;
+            
+            // Like (Destructuring-Assignment)
+        }).then(function(foo, bar, baz, all) {
+            debug('foo = ' + foo); // foo = 'foo'
+            debug('bar = ' + bar); // bar = 'bar'
+            debug('baz = ' + baz); // baz = 'baz'
+            debug('all = ' + all); // all = 'foobarbaz'
+            
+            return [foo, bar, baz];
+            
+            // Iterate by "map" method at a slower speed.
+        }).map.doze(function(val) {
+            debug('in map.doze(val) : ' + val);
+            
+            return val + '!';
+            
+        }).then(function(res) {
+            debug(res); // ['foo!', 'bar!', 'baz!']
+            
+            var d = new Deferred();
+            return d.then(function() {
+                // Generate an error for testing.
+                throw new Error('TestError');
+                
+            }).then(function() {
+                // This callback chain never executed
+                //  because occured the error.
+                debug('Help me!!');
+                
+            }).rescue(function(err) {
+                // Catch the error.
+                debug(err); // (Error: TestError)
+                
+            }).then(function() {
+                // And, continue the callback chain.
+                
+                // Iterate by "reduce" method on asynchronous.
+                return Deferred.reduce(res, function(a, b) {
+                    return a + b;
+                }).then(function(result) {
+                    return result;
+                });
+            }).begin(); // Begin the callback chain.
+            
+        }).wait(2).then(function(res) {
+            
+            debug(res); // 'foo!bar!baz!'
+            
+            // Iterate by "filter" method on synchronous.
+            return filter(res.split('!'), function(val) {
+                return val && val.length;
+            });
+        });
+        
+    }).then(function(result) {
+        debug(result); // ['foo', 'bar', 'baz']
+        debug('END example');
+        
+    }).end(); // Chain can be closed by the "end" method on any.
+
+Refer document if you want to need more example and usage.
+
 
 
 
