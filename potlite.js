@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.16, 2011-10-22
+ * Version 1.17, 2011-10-29
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.16
- * @date           2011-10-22
+ * @version        1.17
+ * @date           2011-10-29
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.16', TYPE : 'lite'},
+var Pot = {VERSION : '1.17', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -7895,6 +7895,9 @@ Pot.tmp.createProtoIterators([{
    * @ignore
    */
   args : function(arg, args) {
+    if (Pot.isNumeric(arg)) {
+      return [arg - 0].concat(args);
+    }
     if (arg && Pot.isNumber(arg.length)) {
       return [arg.length].concat(args);
     }
