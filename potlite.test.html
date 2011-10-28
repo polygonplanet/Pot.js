@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js + PotLite.js - Test Run - JavaScript Async Library</title>
+<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico">
+<meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for asynchronous processing with Deferred.">
+<meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
+<meta name="description" lang="ja" content="Pot.js/PotLite.jsは,非ブロックでの非同期処理を直列的に書けるようにし,UIやCPUへの負担を軽減するループ処理を中心にDeferredと共に実装されたJavaScriptライブラリ.">
+<meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="Pot.js Develop Blog" href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css">
+<style>
+/*
+html, body {
+  color: #555;
+  background: #f8f8ff;
+}
+*/
+
+dl dd {
+  margin-bottom: 1em;
+}
+
+.header-logo {
+  width: 350px;
+  height: 165px;
+  background-color: transparent;
+  background-image: url(http://api.polygonpla.net/img/logo/potlite.js.mini.png);
+  background-repeat: no-repeat;
+  background-position: 5px 5px;
+  margin: 5px 5px 5px 25px;
+}
+
+#top {
+  font-size: 120%;
+  display: inline;
+}
+
+#output {
+  width: 96%;
+  height: 400px;
+  overflow: auto;
+  overflow-y: auto;
+  background: #f6f6fa;
+  color: #333;
+  margin: 6px;
+  padding: 6px;
+  border: 1px solid;
+  border-color: #7575c1 #9e9eed #9e9eed #7575c1;
+}
+
+.potjs-test .assert-code-block {
+  margin: 8px 6px;
+  padding: 4px;
+}
+
+.potjs-test .assert-expect, .potjs-test .assert-expect * {
+  color: #517f47;
+  background: #e0ffd8;
+}
+
+.potjs-test .assert-actual, .potjs-test .assert-actual * {
+  color: #3f3893;
+  background: #ccc9e5;
+}
+
+.potjs-test .assert-success, .potjs-test .assert-success * {
+  color: #5644db;
+  background: #d3ceed;
+}
+
+.potjs-test .assert-failure, .potjs-test .assert-failure * {
+  color: #c65b3a;
+  background: #ffeeee;
+}
+
+.potjs-test .assert-result {
+  border: 0 none;
+  font-weight: bold;
+  margin: 2px 2px 4px 4px;
+  padding: 2px 6px 6px 18px;
+}
+
+.potjs-test .assert-msg {
+  font-weight: bold;
+  font-size: 135%;
+  margin: 1em;
+}
+
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
+<!--PotLite.js-->
+<script type="text/javascript" src="https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js"></script>
+<script type="text/javascript" src="potlite.test.js"></script>
+<!--/PotLite.js-->
+<script type="text/javascript" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
+</head>
+<body id="doc" class="potjs-test">
+  <div class="layout-liquid-container">
+    <div class="header">
+      <div class="header-logo">
+      </div>
+      <h1 id="top">Pot.js</h1>
+      <p>
+       JavaScript utility library for asynchronous processing with Deferred.
+      </p>
+      <div style="width: 100%; text-align: center;"><hr></div>
+    </div>
+    <div class="clearfix">
+      <div class="content">
+        <div class="leftside">
+          <h1 id="TestRun">Test Run</h1>
+          <div id="output" class="pre-wrap">
+           <hr>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div style="width: 100%; text-align: center;">
+        <div><hr></div>
+        <p>
+         Last modified: 2011-10-29
+         Written by <a href="http://twitter.com/polygon_planet"
+                       title="Twitter @polygon_planet">@polygon_planet</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
