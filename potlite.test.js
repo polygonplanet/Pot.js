@@ -9,7 +9,7 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.00
+ * @version        1.01
  * @date           2011-10-29
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -648,10 +648,10 @@ $(function() {
       code   : function() {
         var url = 'http://api.polygonpla.net/js/pot/potlite.test.json?callback=?';
         return jsonp(url).then(function(data) {
-          return data;
+          return data.foo;
         });
       },
-      expect : '{"foo":"FOO \"1\"","bar":"BAR \"2\"","baz":"BAZ \"3\""}'
+      expect : 'FOO "1"'
     }, {
       title  : 'Pot.serializeToJSON()',
       code   : function() {
