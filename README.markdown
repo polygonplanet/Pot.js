@@ -63,6 +63,12 @@ And, it also designed for operate in following environments.
   * Node.js
   * Other non-browser environment
 
+Test Run
+========
+
+  * [PotLite.js - Test Run][PotLite.js_TestRun]
+
+
 License
 ========
 Dual licensed under the MIT and GPL v2 licenses.    
@@ -192,7 +198,13 @@ Refer document if you want to need more example and usage.
 
 
 
+
+
 [PotLite_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html "PotLite.js - JsDoc Reference - Index"
 
 [Documentation_JA]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js + PotLite.js - Document and Reference (Japanese)"
+
+[PotLite.js_TestRun]: http://polygonplanet.github.com/Pot.js/potlite.test.html "Pot.js + PotLite.js - Test Run - JavaScript Async Library"
+
+
 
