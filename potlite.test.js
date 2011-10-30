@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.01
- * @date           2011-10-29
+ * @version        1.02
+ * @date           2011-10-30
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -146,7 +146,7 @@ $(function() {
               r[r.length] = Object.prototype.toString.call(o);
             } else {
               forEach(o, function(v, k) {
-                r[r.length] = k + ': ' + me(k);
+                r[r.length] = k + ': ' + me(v);
               });
             }
             return '{' + r.join(', ') + '}';
