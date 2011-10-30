@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.17, 2011-10-29
+ * Version 1.18, 2011-10-30
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.17
- * @date           2011-10-29
+ * @version        1.18
+ * @date           2011-10-30
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.17', TYPE : 'lite'},
+var Pot = {VERSION : '1.18', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -874,25 +874,23 @@ Pot.update({
    * @public
    */
   isStopIter : function(o) {
-    var result = false;
-    try {
-      if (Pot.StopIteration !== undefined &&
-          (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
-        result = true;
-      } else if (typeof StopIteration !== 'undefined' &&
-                  (o == StopIteration || o instanceof StopIteration)) {
-        result = true;
-      } else if (this && this.StopIteration !== undefined &&
-               (o == this.StopIteration || o instanceof this.StopIteration)) {
-        result = true;
-      } else if (~toString.call(o).indexOf(SI) ||
-                 ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
-        result = true;
-      }
-    } catch (e) {
-      result = false;
+    if (Pot.StopIteration !== undefined &&
+        (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
+      return true;
     }
-    return result;
+    if (typeof StopIteration !== 'undefined' &&
+        (o == StopIteration || o instanceof StopIteration)) {
+      return true;
+    }
+    if (this && this.StopIteration !== undefined &&
+        (o == this.StopIteration || o instanceof this.StopIteration)) {
+      return true;
+    }
+    if (~toString.call(o).indexOf(SI) ||
+        ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
+      return true;
+    }
+    return false;
   },
   /**
    * Return whether the argument is Iterator or not.
@@ -1880,6 +1878,48 @@ update(debug, {
   /**
    * @ignore
    */
+  dump : function(o) {
+    var r, me = arguments.callee, repr;
+    /**@ignore*/
+    repr = function(x) {
+      return (x == null) ? String(x) :
+              x.toString ? x.toString() : String(x);
+    };
+    if (o == null) {
+      return String(o);
+    }
+    if (typeof uneval === 'function') {
+      return uneval(o);
+    } else if (typeof o.toSource === 'function') {
+      return o.toSource();
+    }
+    r = [];
+    switch (typeLikeOf(o)) {
+      case 'array':
+          each(o, function(v) {
+            r[r.length] = me(v);
+          });
+          return '[' + r.join(', ') + ']';
+      case 'object':
+          if (Pot.isNodeLike(o) || Pot.isWindow(o) || Pot.isDocument(o)) {
+            r[r.length] = toString.call(o);
+          } else {
+            each(o, function(v, k) {
+              r[r.length] = k + ': ' + me(v);
+            });
+          }
+          return '{' + r.join(', ') + '}';
+      case 'string':
+          return '"' + repr(o) + '"';
+      case 'function':
+          return '(' + repr(o) + ')';
+      default:
+          return repr(o);
+    }
+  },
+  /**
+   * @ignore
+   */
   divConsole : update(function(msg) {
     var me = arguments.callee, ie6, doc, de, onResize, onScroll, onClick;
     if (Pot.System.hasActiveXObject && typeof document !== 'undefined') {
@@ -2024,7 +2064,7 @@ update(debug, {
      * @ignore
      */
     append : function(msg) {
-      var me = this, s, v, stack;
+      var me = this, v, s, stack;
       if (me.ieConsole) {
         try {
           stack = arrayize(me.msgStack || []);
@@ -2036,10 +2076,10 @@ update(debug, {
           }
           while (stack.length) {
             v = stack.shift();
-            if (v == null) {
-              s = String(v);
-            } else {
-              s = v.toString ? v.toString() : toString.call(v);
+            s = debug.dump(v);
+            if (Pot.isString(v) &&
+                s.charAt(0) === '"' && s.slice(-1) === '"') {
+              s = s.slice(1, -1);
             }
             each([
               document.createTextNode(s),
@@ -4828,7 +4868,7 @@ update(Pot.Deferred, {
       if (cond && !cond.apply(this, args)) {
         Pot.Internal.setTimeout(function() {
           me.call(that);
-        }, interval + (now() - time));
+        }, Math.min(1000, interval + (now() - time)));
       } else {
         d.begin();
       }
