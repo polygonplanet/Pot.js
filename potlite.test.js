@@ -9,7 +9,7 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.05
+ * @version        1.06
  * @date           2011-10-31
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -640,7 +640,7 @@ $(function() {
       title  : 'Pot.request() and Deferred chain',
       code   : function() {
         return request('./potlite.test.json', {
-          mimeType : 'text/plain'
+          mimeType : 'text/javascript'
         }).then(function(res) {
           return res.responseText;
         }, function(err) {
