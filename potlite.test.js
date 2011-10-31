@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.02
- * @date           2011-10-30
+ * @version        1.03
+ * @date           2011-10-31
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -20,6 +20,15 @@ var Assert = {
 };
 
 $(function() {
+  // IE9 SUCKS
+  try {
+    if (typeof update !== 'function') {
+      throw 'continue';
+    }
+  } catch (e) {
+    setTimeout(arguments.callee, 13);
+    return;
+  }
   update(Assert, {
     results : [],
     OUTPUT  : $('#output').get(0),
