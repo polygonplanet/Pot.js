@@ -9,26 +9,20 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.04
+ * @version        1.05
  * @date           2011-10-31
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
 var Assert = {
   JSON_URL     : './potlite.test.json',
-  JSONP_URL    : 'http://api.polygonpla.net/js/pot/potlite.test.json',
-  POTLITE_URL  : 'https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js',
-  POTLITE_LOAD : false
+  JSONP_URL    : 'http://api.polygonpla.net/js/pot/potlite.test.json'
 };
 
 $(function() {
   // IE9 SUCKS
   try {
     if (typeof update !== 'function') {
-      if (!Assert.POTLITE_LOAD) {
-        Assert.POTLITE_LOAD = true;
-        $.getScript(Assert.POTLITE_URL);
-      }
       throw 'continue';
     }
   } catch (e) {
