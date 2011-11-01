@@ -209,6 +209,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.Deferred%23forEver.html">Pot.Deferred#forEver</a></li>
 	
+	<li><a href="../symbols/Pot.Deferred%23items.html">Pot.Deferred#items</a></li>
+	
 	<li><a href="../symbols/Pot.Deferred%23iterate.html">Pot.Deferred#iterate</a></li>
 	
 	<li><a href="../symbols/Pot.Deferred%23map.html">Pot.Deferred#map</a></li>
@@ -218,6 +220,8 @@ ul.inheritsList
 	<li><a href="../symbols/Pot.Deferred%23repeat.html">Pot.Deferred#repeat</a></li>
 	
 	<li><a href="../symbols/Pot.Deferred%23some.html">Pot.Deferred#some</a></li>
+	
+	<li><a href="../symbols/Pot.Deferred%23zip.html">Pot.Deferred#zip</a></li>
 	
 	<li><a href="../symbols/Pot.Deferred.begin.html">Pot.Deferred.begin</a></li>
 	
@@ -240,6 +244,8 @@ ul.inheritsList
 	<li><a href="../symbols/Pot.forEach.html">Pot.forEach</a></li>
 	
 	<li><a href="../symbols/Pot.forEver.html">Pot.forEver</a></li>
+	
+	<li><a href="../symbols/Pot.items.html">Pot.items</a></li>
 	
 	<li><a href="../symbols/Pot.Iter.html">Pot.Iter</a></li>
 	
@@ -266,6 +272,8 @@ ul.inheritsList
 	<li><a href="../symbols/Pot.URI.html">Pot.URI</a></li>
 	
 	<li><a href="../symbols/Pot.XPCOM.html">Pot.XPCOM</a></li>
+	
+	<li><a href="../symbols/Pot.zip.html">Pot.zip</a></li>
 	
 </ul>
 <hr />
@@ -577,15 +585,6 @@ ul.inheritsList
 						</tr>
 					
 						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.isDeferred">isDeferred</a></b>(x)
-								</div>
-								<div class="description">Check whether the argument object is an instance of Pot.Deferred.</div>
-							</td>
-						</tr>
-					
-						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/Pot.Deferred.html#isDeferred">isDeferred</a></b>()
@@ -597,9 +596,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.isDeferred">isDeferred</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument object is an instance of Pot.Deferred.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.isFired">isFired</a></b>(deferred)
 								</div>
 								<div class="description">Check whether the callback chain was fired.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.items">items</a></b>(object, (callback), (context))
+								</div>
+								<div class="description">Collect the object key and value and make array as items format.</div>
 							</td>
 						</tr>
 					
@@ -791,6 +808,16 @@ ul.inheritsList
 								</div>
 								<div class="description">Return a new cancellable Deferred that will .begin() after
  at least seconds seconds have elapsed.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Deferred.<b><a href="../symbols/Pot.Deferred.html#.zip">zip</a></b>(object, (callback), (context))
+								</div>
+								<div class="description">Create a new array which has the elements at
+  position ith of the provided arrays.</div>
 							</td>
 						</tr>
 					
@@ -2179,6 +2206,31 @@ The available methods are below.
 
 					<hr />
 				
+					<a name="isDeferred"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>isDeferred</b>()
+					
+					</div>
+					<div class="description">
+						isDeferred.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name=".isDeferred"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2225,31 +2277,6 @@ The available methods are below.
                          otherwise return false.</dd>
 							
 							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="isDeferred"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>isDeferred</b>()
-					
-					</div>
-					<div class="description">
-						isDeferred.
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
 						
 						
 						
@@ -2303,6 +2330,65 @@ The available methods are below.
 							
 								<dd><span class="light fixedFont">{Boolean}</span> Return whether the
                                 callback chain was fired.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".items"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>items</b>(object, (callback), (context))
+					
+					</div>
+					<div class="description">
+						Collect the object key and value and make array as items format.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|Array}</span> <b>object</b>
+									
+								</dt>
+								<dd>The target object or an array.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>(callback)</b>
+									
+								</dt>
+								<dd>(Optional) Callback function.
+                                     function({Array} item[, object])
+                                       this == `context`.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>(context)</b>
+									
+								</dt>
+								<dd>(Optional) Object to use
+                                     as `this` when executing callback.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred}</span> Return a new instance of Deferred that has
+                                     the collected items as an array.</dd>
 							
 							</dl>
 						
@@ -3674,6 +3760,87 @@ If true returned, waiting state will end.
 						
 						
 
+					<hr />
+				
+					<a name=".zip"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Deferred.</span><b>zip</b>(object, (callback), (context))
+					
+					</div>
+					<div class="description">
+						Create a new array which has the elements at
+  position ith of the provided arrays.
+This function is handled as seen from the longitudinal for array
+  that is similar to the zip() function in Python.
+
+<pre>
+Example:
+
+  arguments:  [[1, 2, 3],
+               [4, 5, 6]]
+
+  results:    [[1, 4],
+               [2, 5],
+               [3, 6]]
+</pre>
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Array}</span> <b>object</b>
+									
+								</dt>
+								<dd>Objects to be combined.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>(callback)</b>
+									
+								</dt>
+								<dd>(Optional) Callback function.
+                                 function({Array} items[, {*} object])
+                                   this == `context`.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>(context)</b>
+									
+								</dt>
+								<dd>(Optional) Object to use
+                                 as `this` when executing callback.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred}</span> Return a new instance of Deferred that has
+                                 a new array of arrays created from
+                                 provided objects.</dd>
+							
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd>http://docs.python.org/library/functions.html#zip</dd>
+							
+							</dl>
+						
+
 					
 				
 			
@@ -3688,7 +3855,7 @@ If true returned, waiting state will end.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Oct 30 2011 09:31:57 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Nov 01 2011 15:12:32 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
