@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.07
- * @date           2011-11-01
+ * @version        1.08
+ * @date           2011-11-02
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -1957,6 +1957,116 @@ $(function() {
         }).begin();
       },
       expect : 2
+    }, {
+      title : 'Iterate with specific speed for synchronous',
+      code  : function() {
+        var array = ['foo', 'bar', 'baz'];
+        var object = {a: 1, b: 2, c: 3, d: 4, e: 5};
+        var result = [];
+        forEver.slow(function() {
+          forEach.slow(object, function(val, key) {
+            repeat.fast(array.length, function(i) {
+              var value = [];
+              var iter = new Iter();
+              iter.next = (function() {
+                var n = 0;
+                return function() {
+                  if (n >= 5) {
+                    throw StopIteration;
+                  }
+                  return n++;
+                };
+              })();
+              iterate.slow(iter, function(j) {
+                value[j] = [array[i], key, val];
+              });
+              value = filter.ninja(map.rapid(value, function(v) {
+                return items.slow(zip.ninja(v, function(item) {
+                  return item.slice(0, 2);
+                }), function(item) {
+                  return item[item.length - 1];
+                }).shift().join('');
+              }), function(item) {
+                return item && item.length && /a/.test(item);
+              });
+              if (!value || !value.length) {
+                throw StopIteration;
+              }
+              if (!some(value, function(item) {
+                return /f/.test(item);
+              })) {
+                value.push(10);
+              }
+              if (every(value, function(item) {
+                return /o/.test(item);
+              })) {
+                value.push(20);
+              }
+              value = reduce.limp(value, function(a, b) {
+                return a + ':' + b;
+              });
+              result.push(value);
+            });
+          });
+          throw StopIteration;
+        });
+        return result;
+      },
+      expect : [
+        'fooa:fooa:fooa:fooa:fooa:20',
+        'bara:bara:bara:bara:bara:10',
+        'baza:baza:baza:baza:baza:10'
+      ]
+    }, {
+      title  : 'Iterate with specific speed for asynchronous',
+      code   : function() {
+        var array = ['foo', 'bar', 'baz'];
+        var object = {a: 1, b: 2, c: 3, d: 4, e: 5};
+        var result = [];
+        return Deferred.forEach.slow(object, function(val, key) {
+          return Deferred.repeat.fast(array.length, function(i) {
+            result.push([array[i], key, val]);
+          });
+        }).then(function() {
+          return Deferred.zip.slow(result, function(item) {
+            return item.join(':');
+          });
+        });
+      },
+      expect : [
+        'foo:bar:baz:foo:bar:baz:foo:bar:baz:foo:bar:baz:foo:bar:baz',
+        'a:a:a:b:b:b:c:c:c:d:d:d:e:e:e',
+        '1:1:1:2:2:2:3:3:3:4:4:4:5:5:5'
+      ]
+    }, {
+      title  : 'Iterate with specific speed for asynchronous on chain',
+      code   : function() {
+        var array = ['foo', 'bar', 'baz'];
+        var object = {a: 1, b: 2, c: 3, d: 4, e: 5};
+        var result = [];
+        var d = new Deferred();
+        return d.then(function() {
+          return object;
+        }).forEach.slow(function(val, key) {
+          var dd = new Deferred();
+          return dd.repeat.fast(function(i) {
+            result.push([array[i], key, val]);
+          }).then(function() {
+            return result;
+          }).begin(array.length);
+        }).then(function() {
+          return result;
+        }).zip.doze(function(item) {
+          return item.join(':');
+        }).then(function(res) {
+          return res;
+        }).begin();
+      },
+      expect : [
+        'foo:bar:baz:foo:bar:baz:foo:bar:baz:foo:bar:baz:foo:bar:baz',
+        'a:a:a:b:b:b:c:c:c:d:d:d:e:e:e',
+        '1:1:1:2:2:2:3:3:3:4:4:4:5:5:5'
+      ]
     }]
   });
   Assert.run();
