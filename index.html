@@ -24,6 +24,11 @@ dl dd {
   margin-bottom: 1em;
 }
 
+dfn em {
+  font-weight: normal;
+  color: #666;
+}
+
 td.header, td.header * {
   font-weight: bold;
 }
@@ -43,11 +48,72 @@ td.marker, td.marker * {
   font-size: 120%;
   display: inline;
 }
+
+
+body .toggle-trigger {
+  margin: 2px;
+  padding: 0 2px 0 2px;
+  width: 11px;
+  min-width: 10px;
+  height: 14px;
+  color: #555;
+  background: #fafaff;
+  border: 1px solid #555;
+  font-size: 11px;
+  font-family: verdana, sans-serif;
+  font-weight: normal;
+  line-height: 1.2;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+
 </style>
 <!--[if lt IE 7]>
 <script>var IE7_PNG_SUFFIX = '.png';</script>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
 <![endif]-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript">
+$(function() {
+
+  $('.toggle-trigger-pre')
+    .removeClass('toggle-trigger-pre')
+    .addClass('toggle-trigger')
+    .addClass('toggle-shown')
+    .click(function() {
+      var block = $(this).next().next('ul');
+      if ($(this).hasClass('toggle-shown')) {
+        $(this).removeClass('toggle-shown').text('+');
+        block.hide();
+      } else {
+        $(this).addClass('toggle-shown').text('-');
+        block.show();
+      }
+    })
+    .click()
+    .parent('li')
+      .css({
+        listStyleType : 'none'
+      })
+      .parent('ul')
+        .css({
+          marginLeft : 10
+        });
+  
+});
+</script>
 <script type="text/javascript" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
 </head>
 <body id="doc">
@@ -93,10 +159,116 @@ td.marker, td.marker * {
                 <li>
                   <a href="#referenceFunctions">関数リファレンス</a>
                   <ul>
-                    <li><a href="#PotObjectFunctions">Pot オブジェクトの関数</a></li>
-                    <li><a href="#iteratorFunctions">イテレータ関数</a></li>
-                    <li><a href="#PotDeferredMethods">Pot.Deferred のメソッド</a></li>
-                    <li><a href="#PotDeferredFunctions">Pot.Deferred の関数</a></li>
+                    <li>
+                      <span class="toggle-trigger-pre"></span>
+                      <a href="#PotObjectFunctions">Pot オブジェクトの関数</a>
+                      <ul>
+                        <li><a href="#function.Pot.update">update</a></li>
+                        <li><a href="#function.Pot.stringify">stringify</a></li>
+                        <li><a href="#function.Pot.arrayize">arrayize</a></li>
+                        <li><a href="#function.Pot.rescape">rescape</a></li>
+                        <li><a href="#function.Pot.trim">trim</a></li>
+                        <li><a href="#function.Pot.now">now</a></li>
+                        <li><a href="#function.Pot.debug">debug</a></li>
+                        <li><a href="#function.Pot.isBoolean">isBoolean</a></li>
+                        <li><a href="#function.Pot.isNumber">isNumber</a></li>
+                        <li><a href="#function.Pot.isString">isString</a></li>
+                        <li><a href="#function.Pot.isFunction">isFunction</a></li>
+                        <li><a href="#function.Pot.isArray">isArray</a></li>
+                        <li><a href="#function.Pot.isDate">isDate</a></li>
+                        <li><a href="#function.Pot.isRegExp">isRegExp</a></li>
+                        <li><a href="#function.Pot.isObject">isObject</a></li>
+                        <li><a href="#function.Pot.isError">isError</a></li>
+                        <li><a href="#function.Pot.typeOf">typeOf</a></li>
+                        <li><a href="#function.Pot.isStopIter">isStopIter</a></li>
+                        <li><a href="#function.Pot.isIterable">isIterable</a></li>
+                        <li><a href="#function.Pot.isArrayLike">isArrayLike</a></li>
+                        <li><a href="#function.Pot.isDeferred">isDeferred</a></li>
+                        <li><a href="#function.Pot.isIter">isIter</a></li>
+                        <li><a href="#function.Pot.isNumeric">isNumeric</a></li>
+                        <li><a href="#function.Pot.isInt">isInt</a></li>
+                        <li><a href="#function.Pot.isBuiltinMethod">isBuiltinMethod</a></li>
+                        <li><a href="#function.Pot.isWindow">isWindow</a></li>
+                        <li><a href="#function.Pot.isDocument">isDocument</a></li>
+                        <li><a href="#function.Pot.isElement">isElement</a></li>
+                        <li><a href="#function.Pot.isNodeList">isNodeList</a></li>
+                        <li><a href="#function.Pot.isNodeLike">isNodeLike</a></li>
+                        <li><a href="#function.Pot.range">range</a></li>
+                        <li><a href="#function.Pot.indexOf">indexOf</a></li>
+                        <li><a href="#function.Pot.lastIndexOf">lastIndexOf</a></li>
+                        <li><a href="#function.Pot.request">request</a></li>
+                        <li><a href="#function.Pot.jsonp">jsonp</a></li>
+                        <li><a href="#function.Pot.serializeToJSON">serializeToJSON</a></li>
+                        <li><a href="#function.Pot.parseFromJSON">parseFromJSON</a></li>
+                        <li><a href="#function.Pot.serializeToQueryString">serializeToQueryString</a></li>
+                        <li><a href="#function.Pot.parseFromQueryString">parseFromQueryString</a></li>
+                        <li><a href="#function.Pot.urlEncode">urlEncode</a></li>
+                        <li><a href="#function.Pot.urlDecode">urlDecode</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <span class="toggle-trigger-pre"></span>
+                      <a href="#iteratorFunctions">イテレータ関数</a>
+                      <ul>
+                        <li><a href="#function.Pot.forEach">forEach</a></li>
+                        <li><a href="#function.Pot.repeat">repeat</a></li>
+                        <li><a href="#function.Pot.forEver">forEver</a></li>
+                        <li><a href="#function.Pot.iterate">iterate</a></li>
+                        <li><a href="#function.Pot.Iter">Iter</a></li>
+                        <li><a href="#function.Pot.toIter">toIter</a></li>
+                        <li><a href="#function.Pot.items">items</a></li>
+                        <li><a href="#function.Pot.zip">zip</a></li>
+                        <li><a href="#function.Pot.map">map</a></li>
+                        <li><a href="#function.Pot.filter">filter</a></li>
+                        <li><a href="#function.Pot.reduce">reduce</a></li>
+                        <li><a href="#function.Pot.every">every</a></li>
+                        <li><a href="#function.Pot.some">some</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <span class="toggle-trigger-pre"></span>
+                      <a href="#PotDeferredMethods">Pot.Deferred のメソッド</a>
+                      <ul>
+                        <li><a href="#function.Pot.Deferred">Deferred</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.then">then</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.rescue">rescue</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.ensure">ensure</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.begin">begin</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.raise">raise</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.end">end</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.wait">wait</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.till">till</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.cancel">cancel</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.canceller">canceller</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.speed">speed</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.async">async</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.args">args</a></li>
+                        <li><a href="#function.Pot.Deferred.prototype.data">data</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <span class="toggle-trigger-pre"></span>
+                      <a href="#PotDeferredFunctions">Pot.Deferred の関数</a>
+                      <ul>
+                        <li><a href="#function.Pot.Deferred.succeed">succeed</a></li>
+                        <li><a href="#function.Pot.Deferred.failure">failure</a></li>
+                        <li><a href="#function.Pot.Deferred.wait">wait</a></li>
+                        <li><a href="#function.Pot.Deferred.till">till</a></li>
+                        <li><a href="#function.Pot.Deferred.begin">begin</a></li>
+                        <li><a href="#function.Pot.Deferred.flush">flush</a></li>
+                        <li><a href="#function.Pot.Deferred.maybeDeferred">maybeDeferred</a></li>
+                        <li><a href="#function.Pot.Deferred.callLater">callLater</a></li>
+                        <li><a href="#function.Pot.Deferred.callLazy">callLazy</a></li>
+                        <li><a href="#function.Pot.Deferred.isFired">isFired</a></li>
+                        <li><a href="#function.Pot.Deferred.lastResult">lastResult</a></li>
+                        <li><a href="#function.Pot.Deferred.lastError">lastError</a></li>
+                        <li><a href="#function.Pot.Deferred.register">register</a></li>
+                        <li><a href="#function.Pot.Deferred.unregister">unregister</a></li>
+                        <li><a href="#function.Pot.Deferred.deferrize">deferrize</a></li>
+                        <li><a href="#function.Pot.Deferred.parallel">parallel</a></li>
+                        <li><a href="#function.Pot.Deferred.chain">chain</a></li>
+                      </ul>
+                    </li>
                   </ul>
                 </li>
               </ul>
@@ -1396,7 +1568,9 @@ debug(foo);</pre>
              定義名のままで呼び出せます。
             </p>
             <dl>
-             <dt><dfn>update</dfn>(target, ...)</dt>
+             <dt>
+              <dfn id="function.Pot.update"><em>Pot.</em>update</dfn>(target, ...)
+             </dt>
              <dd>
               オブジェクト target をアップデート。
               <br>
@@ -1415,7 +1589,9 @@ debug(obj);
 var copy = update({}, obj);
 debug(copy); // {foo: 1, bar: 2, baz: 3}</pre>
              </dd>
-             <dt><dfn>stringify</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.stringify"><em>Pot.</em>stringify</dfn>(x)
+             </dt>
              <dd>
               任意の値 x を文字列として評価して返します。
               <br>
@@ -1441,7 +1617,9 @@ stringify(new Boolean(false); // ''
 stringify(new Boolean(true);  // '1'
 stringify([100]);             // ''</pre>
              </dd>
-             <dt><dfn>arrayize</dfn>(o, index)</dt>
+             <dt>
+              <dfn id="function.Pot.arrayize"><em>Pot.</em>arrayize</dfn>(o, index)
+             </dt>
              <dd>
               任意の値 o を配列として返します。
               <br>
@@ -1474,14 +1652,18 @@ arrayize(document.getElementsByTagName('div')); // [&lt;div/&gt;, &lt;div/&gt;, 
     arrayize(arguments, 2); // [3]
 })(1, 2, 3);</pre>
              </dd>
-             <dt><dfn>rescape</dfn>(s)</dt>
+             <dt>
+              <dfn id="function.Pot.rescape"><em>Pot.</em>rescape</dfn>(s)
+             </dt>
              <dd>
               文字列 s を正規表現パターンとみなしエスケープして返します。
               <pre>var pattern = '*[hoge]*';
 var regex = new RegExp('^(' + rescape(pattern) + ')$', 'g');
 debug(regex.toString()); // =&gt; /^(\*\[hoge\]\*)$/g</pre>
              </dd>
-             <dt><dfn>trim</dfn>(s, chars)</dt>
+             <dt>
+              <dfn id="function.Pot.trim"><em>Pot.</em>trim</dfn>(s[, chars])
+             </dt>
              <dd>
               文字列 s の両端の (全角スペース U+3000 含む) ホワイトスペースを除去して返す。
               <br>
@@ -1489,36 +1671,60 @@ debug(regex.toString()); // =&gt; /^(\*\[hoge\]\*)$/g</pre>
               <pre>debug( trim(' hoge  ') );          // 'hoge'
 debug( trim('abbbcc cca ', 'ab') ); // 'cc cca '</pre>
              </dd>
-             <dt><dfn>now</dfn>()</dt>
+             <dt>
+              <dfn id="function.Pot.now"><em>Pot.</em>now</dfn>()
+             </dt>
              <dd>
               Date.now or (new Date.getTime()) と同じ。
              </dd>
-             <dt><dfn>debug</dfn>(msg)</dt>
+             <dt>
+              <dfn id="function.Pot.debug"><em>Pot.</em>debug</dfn>(msg)
+             </dt>
              <dd>
               デバッグ用として、引数の値をコンソールに出力する。(cross-browser)
              </dd>
              <dt>
-              <dfn>isBoolean</dfn>,
-              <dfn>isNumber</dfn>,
-              <dfn>isString</dfn>,
-              <dfn>isFunction</dfn>,
-              <dfn>isArray</dfn>,
-              <dfn>isDate</dfn>,
-              <dfn>isRegExp</dfn>,
-              <dfn>isObject</dfn>,
-              <dfn>isError</dfn>
+              <dfn id="function.Pot.isBoolean"><em>Pot.</em>isBoolean</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isNumber"><em>Pot.</em>isNumber</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isString"><em>Pot.</em>isString</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isFunction"><em>Pot.</em>isFunction</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isArray"><em>Pot.</em>isArray</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isDate"><em>Pot.</em>isDate</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isRegExp"><em>Pot.</em>isRegExp</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isObject"><em>Pot.</em>isObject</dfn>(x)
+             </dt>
+             <dt>
+              <dfn id="function.Pot.isError"><em>Pot.</em>isError</dfn>(x)
              </dt>
              <dd>
               それぞれ 適性のオブジェクトかどうか調べて適正なら true を返す。
               <pre>debug( isArray([1, 2, 3]) ); // true
 debug( isArray('hoge') );    // false</pre>
              </dd>
-             <dt><dfn>typeOf</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.typeOf"><em>Pot.</em>typeOf</dfn>(x)
+             </dt>
              <dd>
               x の型を文字列で返す (例えば 'array', 'object', 'null')
               <pre>typeOf([1, 2, 3]); // 'array'</pre>
              </dd>
-             <dt><dfn>isStopIter</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isStopIter"><em>Pot.</em>isStopIter</dfn>(x)
+             </dt>
              <dd>
               x が StopIteration なら true を返す。
               <pre>try {
@@ -1537,7 +1743,9 @@ debug( isArray('hoge') );    // false</pre>
     }
 }</pre>
              </dd>
-             <dt><dfn>isIterable</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isIterable"><em>Pot.</em>isIterable</dfn>(x)
+             </dt>
              <dd>
               x がイテレートできるなら true を返す。
               <br>
@@ -1565,7 +1773,9 @@ debug( isIterable(func) ); // false</pre>
 })();
 debug( isIterable(iter) ); // true</pre>
              </dd>
-             <dt><dfn>isArrayLike</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isArrayLike"><em>Pot.</em>isArrayLike</dfn>(x)
+             </dt>
              <dd>
               isArray との違いは、arguments や NodeList も true として返す点。
               <pre>(function() {
@@ -1573,7 +1783,9 @@ debug( isIterable(iter) ); // true</pre>
     debug( isArrayLike(arguments) ); // true
 })();</pre>
              </dd>
-             <dt><dfn>isDeferred</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isDeferred"><em>Pot.</em>isDeferred</dfn>(x)
+             </dt>
              <dd>
               x が Pot.Deferred のインスタンスなら true を返す。
               <pre>var o = {hoge: 1};
@@ -1581,11 +1793,15 @@ var d = new Deferred();
 debug( isDeferred(o) ); // false
 debug( isDeferred(d) ); // true</pre>
              </dd>
-             <dt><dfn>isIter</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isIter"><em>Pot.</em>isIter</dfn>(x)
+             </dt>
              <dd>
               x が Pot.Iter のインスタンスなら true を返す。
              </dd>
-             <dt><dfn>isNumeric</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isNumeric"><em>Pot.</em>isNumeric</dfn>(x)
+             </dt>
              <dd>
               x が数えられる値なら true を返す。 (1, -1, 1e8, '10', '0xFF' など)。
               <pre>debug(isNumeric(0));               // true
@@ -1604,7 +1820,9 @@ debug(isNumeric(new Date()));      // false
 debug(isNumeric({}));              // false
 debug(isNumeric((function() {}))); // false</pre>
              </dd>
-             <dt><dfn>isInt</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isInt"><em>Pot.</em>isInt</dfn>(x)
+             </dt>
              <dd>
               x が整数なら true を返す。
               <pre>debug(isInt(0));                       // true
@@ -1620,7 +1838,9 @@ debug(isInt('hoge'));                  // false
 debug(isInt(''));                      // false
 debug(isInt([100]));                   // false</pre>
              </dd>
-             <dt><dfn>isBuiltinMethod</dfn>(func)</dt>
+             <dt>
+              <dfn id="function.Pot.isBuiltinMethod"><em>Pot.</em>isBuiltinMethod</dfn>(func)
+             </dt>
              <dd>
               func がビルトイン関数なら true を返す。
               <br>
@@ -1630,21 +1850,27 @@ debug(isBuiltinMethod(Array.prototype.slice));    // true
 debug(isBuiltinMethod(encodeURIComponent));       // true
 debug(isBuiltinMethod(document.getElementById));  // true</pre>
              </dd>
-             <dt><dfn>isWindow</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isWindow"><em>Pot.</em>isWindow</dfn>(x)
+             </dt>
              <dd>
               x が window オブジェクトなら true を返す。
               <pre>debug(isWindow(window));                               // true
 debug(isWindow(document));                             // false
 debug(isWindow(document.body));                        // false</pre>
              </dd>
-             <dt><dfn>isDocument</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isDocument"><em>Pot.</em>isDocument</dfn>(x)
+             </dt>
              <dd>
               x が document オブジェクトなら true を返す。
               <pre>debug(isDocument(window));                               // false
 debug(isDocument(document));                             // true
 debug(isDocument(document.body));                        // false</pre>
              </dd>
-             <dt><dfn>isElement</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isElement"><em>Pot.</em>isElement</dfn>(x)
+             </dt>
              <dd>
               x が DOM Element オブジェクトなら true を返す。
               <pre>debug(isElement(window));                               // false
@@ -1653,7 +1879,9 @@ debug(isElement(document.body));                        // true
 debug(isElement(document.getElementById('container'))); // true (if exists)
 debug(isElement(document.getElementsByTagName('div'))); // false</pre>
              </dd>
-             <dt><dfn>isNodeList</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isNodeList"><em>Pot.</em>isNodeList</dfn>(x)
+             </dt>
              <dd>
               x が DOM NodeList なら true を返す。
               <pre>var obj = new Array({foo: 1, bar: 2, baz: 3});
@@ -1661,7 +1889,9 @@ var nodes = document.getElementsByTagName('div');
 debug(isNodeList(obj));   // false
 debug(isNodeList(nodes)); // true</pre>
              </dd>
-             <dt><dfn>isNodeLike</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.isNodeLike">isNodeLike</dfn>(x)
+             </dt>
              <dd>
               x が DOM Node のようなものなら true を返す。
               <pre>debug(isNodeLike(window));                               // false
@@ -1670,7 +1900,9 @@ debug(isNodeLike(document.body));                        // true
 debug(isNodeLike(document.getElementById('container'))); // true (if exists)
 debug(isNodeLike(document.getElementsByTagName('div'))); // false</pre>
              </dd>
-             <dt><dfn>range</dfn>([begin,] end[, step])</dt>
+             <dt>
+              <dfn id="function.Pot.range"><em>Pot.</em>range</dfn>([begin,] end[, step])
+             </dt>
              <dd>
               begin から end までを step のステップで得られた値を配列で返す。
               <br>
@@ -1678,7 +1910,9 @@ debug(isNodeLike(document.getElementsByTagName('div'))); // false</pre>
               <pre>range(1, 5);     // [1, 2, 3, 4, 5]
 range('a', 'f'); // ['a', 'b', 'c', 'd', 'e', 'f']</pre>
              </dd>
-             <dt><dfn>indexOf</dfn>(object, subject[, from])</dt>
+             <dt>
+              <dfn id="function.Pot.indexOf"><em>Pot.</em>indexOf</dfn>(object, subject[, from])
+             </dt>
              <dd>
               オブジェクトにも使える Array.prototype.indexOf のようなもの。
               <br>
@@ -1688,7 +1922,9 @@ indexOf([2, 5, 9], 7); // -1
 indexOf({a: 2, b: 5, c: 9}, 2); // 'a'
 indexOf({a: 2, b: 5, c: 9}, 7); // -1</pre>
              </dd>
-             <dt><dfn>lastIndexOf</dfn>(object, subject[, from])</dt>
+             <dt>
+              <dfn id="function.Pot.lastIndexOf"><em>Pot.</em>lastIndexOf</dfn>(object, subject[, from])
+             </dt>
              <dd>
               オブジェクトにも使える Array.prototype.lastIndexOf のようなもの。
               <pre>lastIndexOf([2, 5, 9, 2], 2);        // 3
@@ -1703,7 +1939,9 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 7);      // -1
 lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'd'); // 'd'
 lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
              </dd>
-             <dt><dfn>request</dfn>(url[, options])</dt>
+             <dt>
+              <dfn id="function.Pot.request"><em>Pot.</em>request</dfn>(url[, options])
+             </dt>
              <dd>
               XMLHttpRequest によるリクエストを実行します。
               <br>
@@ -1783,7 +2021,9 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
                </dd>
               </dl>
              </dd>
-             <dt><dfn>jsonp</dfn>(url[, options])</dt>
+             <dt>
+              <dfn id="function.Pot.jsonp"><em>Pot.</em>jsonp</dfn>(url[, options])
+             </dt>
              <dd>
               JSONP による通信でデータを取得。
               <br>
@@ -1804,7 +2044,9 @@ jsonp(url, {
     debug(data.results[0].text);
 });</pre>
              </dd>
-             <dt><dfn>serializeToJSON</dfn>(value)</dt>
+             <dt>
+              <dfn id="function.Pot.serializeToJSON"><em>Pot.</em>serializeToJSON</dfn>(value)
+             </dt>
              <dd>
               与えられた値 value を JSON エンコードして返します。
               <br>
@@ -1818,7 +2060,9 @@ jsonp(url, {
 debug( serializeToJSON(obj) );
 // =&gt; &quot;{\&quot;Hello\\nWorld!\&quot;:[1,{\&quot;a\&quot;:\&quot;{ABC}\&quot;}]}&quot;</pre>
              </dd>
-             <dt><dfn>parseFromJSON</dfn>(text)</dt>
+             <dt>
+              <dfn id="function.Pot.parseFromJSON"><em>Pot.</em>parseFromJSON</dfn>(text)
+             </dt>
              <dd>
               与えられた JSON 文字列 text をデコードして返します。
               <br>
@@ -1835,7 +2079,9 @@ var str = '{&quot;Hello\\u000aWorld!&quot;:[1,{&quot;a&quot;:&quot;{ABC}&quot;}]
 debug( parseFromJSON(str) );
 // =&gt; {'Hello\nWorld!':[1,{a:'{ABC}'}]}</pre>
              </dd>
-             <dt><dfn>serializeToQueryString</dfn>(params)</dt>
+             <dt>
+              <dfn id="function.Pot.serializeToQueryString"><em>Pot.</em>serializeToQueryString</dfn>(params)
+             </dt>
              <dd>
               オブジェクトまたは配列で与えられた引数 params をクエリ文字列にして返します。
               <br>
@@ -1854,7 +2100,9 @@ var query = [['prototype', 'value1'], ['__iterator__', 'value2']];
 debug( serializeToQueryString(query) );
 //  =&gt;  'prototype=value1&amp;__iterator__=value2'</pre>
              </dd>
-             <dt><dfn>parseFromQueryString</dfn>(queryString[, toObject])</dt>
+             <dt>
+              <dfn id="function.Pot.parseFromQueryString"><em>Pot.</em>parseFromQueryString</dfn>(queryString[, toObject])
+             </dt>
              <dd>
               クエリ文字列 queryString を配列またはオブジェクトにデコードして返します。
               <br>
@@ -1880,7 +2128,9 @@ debug( parseFromQueryString(query, true) );
 debug( parseFromQueryString(query) );
 //  =&gt;  [['prototype', 'value1'], ['__iterator__', 'value2']]</pre>
              </dd>
-             <dt><dfn>urlEncode</dfn>(string)</dt>
+             <dt>
+              <dfn id="function.Pot.urlEncode"><em>Pot.</em>urlEncode</dfn>(string)
+             </dt>
              <dd>
               引数 string を URL エンコードして返します。
               <br>
@@ -1896,7 +2146,9 @@ debug( parseFromQueryString(query) );
 // バイナリとみなし処理される
 debug( urlEncode('\uD800') ); // '%ED%A0%80'</pre>
              </dd>
-             <dt><dfn>urlDecode</dfn>(string)</dt>
+             <dt>
+              <dfn id="function.Pot.urlDecode"><em>Pot.</em>urlDecode</dfn>(string)
+             </dt>
              <dd>
               引数 string を URL デコードして返します。
               <br>
@@ -1939,7 +2191,7 @@ debug( urlDecode(s) );          // '#foo .bar :baz'</pre>
               もともと使われるはずの第一引数 (object) は 
               Deferred コールバックチェインの実行結果にとって代わります。
               <br>
-              それ以外は同じ扱いです。
+              それ以外は引数の扱いに関して同じです。
              </p>
              <pre>// 同期で実行
 forEach([1, 2, 3], function(val) {
@@ -1962,7 +2214,15 @@ begin(function() {
              </p>
             </div>
             <dl>
-             <dt><dfn>forEach</dfn>(object, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.forEach"><em>Pot.</em>forEach</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.forEach"><em>Pot.</em>Deferred.forEach</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.forEach"><em>Pot.Deferred.prototype.</em>forEach</dfn>(callback[, context])
+             </dt>
              <dd>
               オブジェクトまたは配列をイテレート。
               <br>
@@ -1980,7 +2240,15 @@ forEach({a: 'foo', b: 'bar'}, function(value, key, object) {
 });
 debug(a); // 'a=foo,b=bar,'</pre>
              </dd>
-             <dt><dfn>repeat</dfn>(max, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.repeat"><em>Pot.</em>repeat</dfn>(max, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.repeat"><em>Pot.</em>Deferred.repeat</dfn>(max, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.repeat"><em>Pot.Deferred.prototype.</em>repeat</dfn>(callback[, context])
+             </dt>
              <dd>
               指定回数ループする。
               <pre>var a = [];
@@ -2003,7 +2271,15 @@ repeat({begin: 0, end: 100, step: 10}, function(i) {
 });
 debug(a); // [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]</pre>
              </dd>
-             <dt><dfn>forEver</dfn>(callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.forEver"><em>Pot.</em>forEver</dfn>(callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.forEver"><em>Pot.</em>Deferred.forEver</dfn>(callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.forEver"><em>Pot.Deferred.prototype.</em>forEver</dfn>(callback[, context])
+             </dt>
              <dd>
               StopIteration (Pot.StopIteration) が throw されるまで永久ループ。
               <br>
@@ -2020,7 +2296,15 @@ forEver(function(i) {
 debug(s);
 // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'</pre>
              </dd>
-             <dt><dfn>iterate</dfn>(object[, callback[, context]])</dt>
+             <dt>
+              <dfn id="function.Pot.iterate"><em>Pot.</em>iterate</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.iterate"><em>Pot.</em>Deferred.iterate</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.iterate"><em>Pot.Deferred.prototype.</em>iterate</dfn>([callback[, context]])
+             </dt>
              <dd>
               Iter (Pot.Iter) オブジェクトのインスタンスをイテレート。
               <br>
@@ -2054,17 +2338,100 @@ var iter = (function() {
 iterate(iter);
 debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
              </dd>
-             <dt><em>[new]</em> <dfn>Iter</dfn>()</dt>
+             <dt>
+              <em>[new]</em> <dfn id="function.Pot.Iter"><em>Pot.</em>Iter</dfn>()
+             </dt>
              <dd>
               Iter (Pot.Iter) コンストラクタ。
               <br>
               next という名前のメソッドを定義することで独自のイテレータが作成できます。
              </dd>
-             <dt><dfn>toIter</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.toIter"><em>Pot.</em>toIter</dfn>(x)
+             </dt>
              <dd>
               x を可能な限りイテレート可能な Iter (Pot.Iter) のインスタンスに変換したものを返します。
              </dd>
-             <dt><dfn>map</dfn>(object, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.items"><em>Pot.</em>items</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.items"><em>Pot.</em>Deferred.items</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.items"><em>Pot.Deferred.prototype.</em>items</dfn>([callback[, context]])
+             </dt>
+             <dd>
+              オブジェクト object を 2 つのアイテムからなる配列をもつ配列 (items 形式) に変換します。
+              <br>
+              オブジェクトのキーは 0 番目の要素に、値は 1 番目の要素に割り当てられます。
+              <pre>var obj = {foo: 1, bar: 2, baz: 3};
+debug( items(obj) );
+//   =&gt;  [['foo', 1], ['bar', 2], ['baz', 3]]</pre>
+              配列を対象とした場合。
+              <pre>var array = ['foo', 'bar', 'baz'];
+debug( items(array) );
+//   =&gt;  [[0, 'foo'], [1, 'bar'], [2, 'baz']]</pre>
+              コールバック関数を使う例。
+              <pre>var obj = {foo: 1, bar: 2, baz: 3};
+var callback = function(item) {
+    return [item[0] + '::' + item[1]];
+};
+debug( items(obj, callback) );
+//   =&gt;  [['foo::1'], ['bar::2'], ['baz::3']]</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.zip"><em>Pot.</em>zip</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.zip"><em>Pot.</em>Deferred.zip</dfn>(object[, callback[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.zip"><em>Pot.Deferred.prototype.</em>zip</dfn>([callback[, context]])
+             </dt>
+             <dd>
+              与えられた配列 object の各アイテム n 番目の要素からなる配列を作成して返します。
+              <br>
+              この関数は、Python の zip() のような感じです。
+              <pre style="border-color: #999;">引数が以下のような配列とすると、
+  [ [1, 2, 3],
+    [4, 5, 6] ]
+
+結果は以下のようになります。
+
+  [ [1, 4],
+    [2, 5],
+    [3, 6] ]</pre>
+              各要素を縦に見立てて新しい配列を作ります。
+              <br>
+              要素数の扱いは「最小」であり、溢れたものは除外されます。
+              <pre>var result = zip([[1, 2, 3], [4, 5, 6]]);
+debug(result);
+//   =&gt;  [[1, 4], [2, 5], [3, 6]]</pre>
+              <pre>var result = zip([[1, 2, 3], [1, 2, 3, 4, 5]]);
+debug(result);
+//   =&gt;  [[1, 1], [2, 2], [3, 3]]</pre>
+              <pre>var result = zip([[1], [2], [3]]);
+debug(result);
+//   =&gt;  [[1, 2, 3]]</pre>
+              <pre>var result = zip([[1, 2, 3], ['foo', 'bar', 'baz'], [4, 5]]);
+debug(result);
+//   =&gt;  [[1, 'foo', 4], [2, 'bar', 5]]</pre>
+              コールバック関数を使う例。
+              <pre>var callback = function(items) { return items[0] + items[1]; };
+var result = zip([[1, 2, 3], [4, 5, 6]], callback);
+debug(result);
+//   =&gt;  [5, 7, 9]</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.map"><em>Pot.</em>map</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.map"><em>Pot.</em>Deferred.map</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.map"><em>Pot.Deferred.prototype.</em>map</dfn>(callback[, context])
+             </dt>
              <dd>
               与えられた関数 callback を object のすべての要素に対して実行し、
               その結果からなる新しいオブジェクトを生成して返します。
@@ -2085,7 +2452,15 @@ var result = map(object, function(value, key) {
 debug(result);
 //    =&gt;     {foo: 'foo100', bar: 'bar200', baz: 'baz300'}</pre>
              </dd>
-             <dt><dfn>filter</dfn>(object, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.filter"><em>Pot.</em>filter</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.filter"><em>Pot.</em>Deferred.filter</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.filter"><em>Pot.Deferred.prototype.</em>filter</dfn>(callback[, context])
+             </dt>
              <dd>
               object の各値に、
               与えられた関数 callback を実行し、
@@ -2106,7 +2481,15 @@ var object = {a: 1, b: 20, c: 7, d: 5, e: 27, f: 99};
 var result = filter(object, isBigEnough);
 debug(result); // =&gt; {b: 20, e: 27, f: 99}</pre>
              </dd>
-             <dt><dfn>reduce</dfn>(object, callback[, initial[, context]])</dt>
+             <dt>
+              <dfn id="function.Pot.reduce"><em>Pot.</em>reduce</dfn>(object, callback[, initial[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.reduce"><em>Pot.</em>Deferred.reduce</dfn>(object, callback[, initial[, context]])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.reduce"><em>Pot.Deferred.prototype.</em>reduce</dfn>(callback[, initial[, context]])
+             </dt>
              <dd>
               object の (左から右へ) 2 つの値に対して
               同時に関数 callback を適用し、単一の値にして返します。
@@ -2120,7 +2503,15 @@ debug(total); // 15</pre>
 var total = reduce(object, function(a, b) { return a + b; });
 debug(total); // 6</pre>
              </dd>
-             <dt><dfn>every</dfn>(object, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.every"><em>Pot.</em>every</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.every"><em>Pot.</em>Deferred.every</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.every"><em>Pot.Deferred.prototype.</em>every</dfn>(callback[, context])
+             </dt>
              <dd>
               object のすべての要素について
               与えられた関数 callback によって実行した結果が
@@ -2135,7 +2526,15 @@ debug(passed); // false
 passed = every([12, 54, 18, 130, 44], isBigEnough);
 debug(passed); // true</pre>
              </dd>
-             <dt><dfn>some</dfn>(object, callback[, context])</dt>
+             <dt>
+              <dfn id="function.Pot.some"><em>Pot.</em>some</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.some"><em>Pot.</em>Deferred.some</dfn>(object, callback[, context])
+             </dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.some"><em>Pot.Deferred.prototype.</em>some</dfn>(callback[, context])
+             </dt>
              <dd>
               object のすべての要素について
               与えられた関数 callback によって実行した結果が
@@ -2165,7 +2564,38 @@ debug(passed); // true</pre>
               </p>
             </div>
             <dl>
-             <dt><dfn>then</dfn>(callback[, errback])</dt>
+             <dt>
+              <em>[new]</em> <dfn id="function.Pot.Deferred"><em>Pot.</em>Deferred</dfn>([options])
+             </dt>
+             <dd>
+              Pot.Deferred コンストラクタ。
+              <br>
+              新しい Deferred インスタンスを作成します。
+              <br>
+              引数 options に利用できるキーは、
+              <dl>
+               <dt><em>{Boolean}</em> <dfn>async</dfn></dt>
+               <dd>
+                同期 (false) / 非同期 (true = default) を設定します。
+               </dd>
+               <dt><em>{String|Number}</em> <dfn>speed</dfn></dt>
+               <dd>
+                チェイン間の速度を設定します。
+                <br>
+                数値 (ミリ秒) で指定、
+                または定義された文字列 (<a href="#controlSpeedMap">上の速度の表</a>) で指定できます。
+               </dd>
+               <dt><em>{Function}</em> <dfn>canceller</dfn></dt>
+               <dd>
+                cancel() した時に呼び出される関数を設定します。
+               </dd>
+              </dl>
+              <pre>var deferred = new Deferred();</pre>
+              <pre>var deferred = new Deferred({ speed : 'slow' });</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.then"><em>Pot.Deferred.prototype.</em>then</dfn>(callback[, errback])
+             </dt>
              <dd>
               コールバック関数 callback をチェインに追加します。
               <br>
@@ -2187,7 +2617,9 @@ d.then(function() {
 });
 d.begin();</pre>
              </dd>
-             <dt><dfn>rescue</dfn>(errback)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.rescue"><em>Pot.Deferred.prototype.</em>rescue</dfn>(errback)
+             </dt>
              <dd>
               エラーバック関数をチェインに追加します。
               <br>
@@ -2214,7 +2646,9 @@ d.then(function() {
 });
 d.begin();</pre>
              </dd>
-             <dt><dfn>ensure</dfn>(callback)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.ensure"><em>Pot.Deferred.prototype.</em>ensure</dfn>(callback)
+             </dt>
              <dd>
               成功時、エラー時どちらでも実行される
               コールバック関数をチェインに追加します。
@@ -2240,7 +2674,9 @@ d.then(function() {
     someFunc(res);
 }).begin();</pre>
              </dd>
-             <dt><dfn>begin</dfn>([value[, ...]])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.begin"><em>Pot.Deferred.prototype.</em>begin</dfn>([value[, ...]])
+             </dt>
              <dd>
               コールバックチェインを開始します。
               <br>
@@ -2270,7 +2706,9 @@ d.then(function(res) {
     debug(res); // 'hoge'
 });</pre>
              </dd>
-             <dt><dfn>raise</dfn>([error[, ...]])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.raise"><em>Pot.Deferred.prototype.</em>raise</dfn>([error[, ...]])
+             </dt>
              <dd>
               エラーと共にチェインを開始します。
               <br>
@@ -2295,7 +2733,9 @@ if (!someCheck()) {
     d.begin();
 }</pre>
              </dd>
-             <dt><dfn>end</dfn>()</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.end"><em>Pot.Deferred.prototype.</em>end</dfn>()
+             </dt>
              <dd>
               チェインを終了し、閉じます。
               <br>
@@ -2312,7 +2752,9 @@ d.then(function() {
     debug('Help me!');
 });</pre>
              </dd>
-             <dt><dfn>wait</dfn>(seconds[, value])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.wait"><em>Pot.Deferred.prototype.</em>wait</dfn>(seconds[, value])
+             </dt>
              <dd>
               秒単位で待機します。
               <br>
@@ -2329,7 +2771,9 @@ d.then(function() {
     debug(res); // 3
 });</pre>
              </dd>
-             <dt><dfn>till</dfn>(cond)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.till"><em>Pot.Deferred.prototype.</em>till</dfn>(cond)
+             </dt>
              <dd>
               条件式 cond が 真 (TRUE) を返すまで待機する。
               <br>
@@ -2352,7 +2796,9 @@ d.then(function() {
     document.body.innerHTML += 'hoge';
 }).begin();</pre>
              </dd>
-             <dt><dfn>cancel</dfn>()</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.cancel"><em>Pot.Deferred.prototype.</em>cancel</dfn>()
+             </dt>
              <dd>
               チェインを中止します。
               <br>
@@ -2391,7 +2837,9 @@ if (check()) {
               自身の Pot.Deferred インスタンスです。
               <br>
              </dd>
-             <dt><dfn>canceller</dfn>(func)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.canceller"><em>Pot.Deferred.prototype.</em>canceller</dfn>(func)
+             </dt>
              <dd>
               キャンセル時に実行される関数を登録する。
               <br>
@@ -2412,7 +2860,9 @@ d.cancel();
 // cancelled!!
 // と出力される</pre>
              </dd>
-             <dt><dfn>speed</dfn>(sp)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.speed"><em>Pot.Deferred.prototype.</em>speed</dfn>(sp)
+             </dt>
              <dd>
               各チェイン間の実行速度を設定または取得します。
               <br>
@@ -2436,7 +2886,9 @@ d.then(testFunc).then(testFunc).then(testFunc)
  .then(function() { debug('End'); })
  .begin();</pre>
              </dd>
-             <dt><dfn>async</dfn>(sync)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.async"><em>Pot.Deferred.prototype.</em>async</dfn>(sync)
+             </dt>
              <dd>
               処理の同期と非同期を切り替え設定します。
               <br>
@@ -2490,7 +2942,9 @@ wait(1).then(function() {
     debug(value); // 'asynchronous'
 });</pre>
              </dd>
-             <dt><dfn>args</dfn>([...args])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.args"><em>Pot.Deferred.prototype.</em>args</dfn>([...args])
+             </dt>
              <dd>
               チェインの結果となる値を設定または取得します。
               <br>
@@ -2527,7 +2981,9 @@ d.args(['A', 'B', 'C']).then(function(a, b, c) {
     debug(c); // 'C'
 });</pre>
              </dd>
-             <dt><dfn>data</dfn>([key [, value [, ...args]]])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.prototype.data"><em>Pot.Deferred.prototype.</em>data</dfn>([key [, value [, ...args]]])
+             </dt>
              <dd>
               現在のチェイン上で使えるストレージとして値を設定または取得する。
               <br>
@@ -2586,7 +3042,9 @@ d.begin();</pre>
               </p>
             </div>
             <dl>
-             <dt><dfn>succeed</dfn>([...args])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.succeed"><em>Pot.Deferred.</em>succeed</dfn>([...args])
+             </dt>
              <dd>
               コールバックとして発動済みの Pot.Deferred オブジェクトのインスタンスを返す。
               <br>
@@ -2618,7 +3076,9 @@ d.begin();</pre>
               用途は様々ですが、一例として上のような場面で
               非 Deferred な値を Deferred 化するために便利です。
              </dd>
-             <dt><dfn>failure</dfn>([...args])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.failure"><em>Pot.Deferred.</em>failure</dfn>([...args])
+             </dt>
              <dd>
               エラーバックとして発動済みの Pot.Deferred オブジェクトのインスタンスを返す。
               <br>
@@ -2647,7 +3107,9 @@ d.begin();</pre>
     handleEnd(res);
 });</pre>
              </dd>
-             <dt><dfn>wait</dfn>(seconds[, value])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.wait"><em>Pot.Deferred.</em>wait</dfn>(seconds[, value])
+             </dt>
              <dd>
               秒単位で待機します。
               <br>
@@ -2667,7 +3129,9 @@ wait(5).then(function() {
     debug(res); // 'hogefuga'
 });</pre>
              </dd>
-             <dt><dfn>till</dfn>(cond)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.till"><em>Pot.Deferred.</em>till</dfn>(cond)
+             </dt>
              <dd>
               条件式 cond が 真 (TRUE) を返すまで待機する。
               <br>
@@ -2689,7 +3153,9 @@ till(function() {
     document.body.innerHTML += 'hoge';
 });</pre>
              </dd>
-             <dt><dfn>begin</dfn>(func)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.begin"><em>Pot.Deferred.</em>begin</dfn>(func)
+             </dt>
              <dd>
               コールバック関数 func を追加した
               Pot.Deferred のインスタンスを作成し、チェインを実行済みにして返します。
@@ -2711,7 +3177,9 @@ return d.then(func).begin();</pre>
     debug(res); // 2
 });</pre>
              </dd>
-             <dt><dfn>flush</dfn>(callback[, ...args])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.flush"><em>Pot.Deferred.</em>flush</dfn>(callback[, ...args])
+             </dt>
              <dd>
               関数を実行し Pot.Deferred のインスタンスを返します。
               <br>
@@ -2738,7 +3206,9 @@ return d.then(func).begin();</pre>
     debug(res); // 'hogefugapiyo'
 });</pre>
              </dd>
-             <dt><dfn>maybeDeferred</dfn>(x)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.maybeDeferred"><em>Pot.Deferred.</em>maybeDeferred</dfn>(x)
+             </dt>
              <dd>
               Deferred かどうか分からない値を確実に Deferred インスタンスにして返します。
               <br>
@@ -2772,7 +3242,9 @@ begin(function() {
     debug(res); // (Error: error) or 'string' or 'unfired' or 'fired'
 });</pre>
              </dd>
-             <dt><dfn>callLater</dfn>(seconds, callback)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.callLater"><em>Pot.Deferred.</em>callLater</dfn>(seconds, callback)
+             </dt>
              <dd>
               seconds 秒後に関数 callback を実行します。
               <br>
@@ -2787,7 +3259,9 @@ begin(function() {
               上の例は、5 秒後に debug 関数により
               コンソールに 'hoge' と出力されます。
              </dd>
-             <dt><dfn>callLazy</dfn>(callback)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.callLazy"><em>Pot.Deferred.</em>callLazy</dfn>(callback)
+             </dt>
              <dd>
               関数 callback を非同期で実行します。
               <br>
@@ -2805,7 +3279,9 @@ begin(function() {
     debug('fuga');
 });</pre>
              </dd>
-             <dt><dfn>isFired</dfn>(deferred)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.isFired"><em>Pot.Deferred.</em>isFired</dfn>(deferred)
+             </dt>
              <dd>
               引数 deferred のチェインが開始されているかどうかの真偽値を返します。
               <br>
@@ -2820,7 +3296,9 @@ debug( isFired(d) ); // false
 d.begin();
 debug( isFired(d) ); // true</pre>
              </dd>
-             <dt><dfn>lastResult</dfn>(deferred)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.lastResult"><em>Pot.Deferred.</em>lastResult</dfn>(deferred)
+             </dt>
              <dd>
               引数 deferred の保持している最後の結果値を取得します。
               <br>
@@ -2839,7 +3317,9 @@ d.then(function() {
 var result = lastResult(d);
 debug(result); // 'baz'</pre>
              </dd>
-             <dt><dfn>lastError</dfn>(deferred)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.lastError"><em>Pot.Deferred.</em>lastError</dfn>(deferred)
+             </dt>
              <dd>
               引数 deferred の保持している最後のエラーを取得します。
               <br>
@@ -2856,7 +3336,9 @@ d.then(function() {
 var result = lastError(d);
 debug(result); // Error: foo</pre>
              </dd>
-             <dt><dfn>register</dfn>(name, func)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.register"><em>Pot.Deferred.</em>register</dfn>(name, func)
+             </dt>
              <dd>
               チェインで使用できるユーザー定義のメソッドを登録します。
               <br>
@@ -2883,14 +3365,18 @@ d.then(function() {
 });
 d.begin();</pre>
              </dd>
-             <dt><dfn>unregister</dfn>(name)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.unregister"><em>Pot.Deferred.</em>unregister</dfn>(name)
+             </dt>
              <dd>
               register で登録したメソッドを登録解除します。
               <br>
               <pre>// 上の例 (register) で登録したメソッドを解除
 unregister('add');</pre>
              </dd>
-             <dt><dfn>deferrize</dfn>(object[, method])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.deferrize"><em>Pot.Deferred.</em>deferrize</dfn>(object[, method])
+             </dt>
              <dd>
               関数を Deferred 化します。
               <br>
@@ -2936,7 +3422,9 @@ begin(function() {
     });
 });</pre>
              </dd>
-             <dt><dfn>parallel</dfn>(deferredList)</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.parallel"><em>Pot.Deferred.</em>parallel</dfn>(deferredList)
+             </dt>
              <dd>
               配列またはオブジェクトからなる Deferred のリスト deferredList の、
               すべての結果が揃ってから
@@ -2996,7 +3484,9 @@ parallel([
     // values.baz == 3
 });</pre>
              </dd>
-             <dt><dfn>chain</dfn>([...args])</dt>
+             <dt>
+              <dfn id="function.Pot.Deferred.chain"><em>Pot.Deferred.</em>chain</dfn>([...args])
+             </dt>
              <dd>
               引数に与えられたチェインと共に新しい Pot.Deferred のインスタンスを作成して返します。
               <br>
@@ -3096,7 +3586,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-10-29
+         Last modified: 2011-11-01
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>

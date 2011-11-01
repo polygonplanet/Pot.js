@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.06
- * @date           2011-10-31
+ * @version        1.07
+ * @date           2011-11-01
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -32,6 +32,7 @@ $(function() {
   update(Assert, {
     results : [],
     OUTPUT  : $('#output').get(0),
+    STATUS  : $('#status').get(0),
     isEmpty : function(o) {
       for (var p in o) {
         return false;
@@ -286,7 +287,13 @@ $(function() {
               .text(Assert.dump(actual))
           );
         Assert.results.push(result);
+        Assert.showState(Assert.results.length);
         return wait(0);
+      });
+    },
+    showState : function(count) {
+      callLazy(function() {
+        $(Assert.STATUS).text('Done: ' + count);
       });
     },
     run : function() {
@@ -956,6 +963,119 @@ $(function() {
         return results.join('+');
       },
       expect : '100+200+300+400+500'
+    }, {
+      title  : 'Pot.items() with Array',
+      code   : function() {
+        return items(['foo', 'bar', 'baz']);
+      },
+      expect : [[0, 'foo'], [1, 'bar'], [2, 'baz']]
+    }, {
+      title  : 'Pot.items() with Object',
+      code   : function() {
+        return items({foo: 1, bar: 2, baz: 3});
+      },
+      expect : [['foo', 1], ['bar', 2], ['baz', 3]]
+    }, {
+      title  : 'Pot.Deferred.items() with Array',
+      code   : function() {
+        return Deferred.items(['foo', 'bar', 'baz']);
+      },
+      expect : [[0, 'foo'], [1, 'bar'], [2, 'baz']]
+    }, {
+      title  : 'Pot.Deferred.items() with Object',
+      code   : function() {
+        return Deferred.items({foo: 1, bar: 2, baz: 3});
+      },
+      expect : [['foo', 1], ['bar', 2], ['baz', 3]]
+    }, {
+      title  : 'Pot.Deferred.items() with Array on chain',
+      code   : function() {
+        var d = new Deferred();
+        return d.items().begin(['foo', 'bar', 'baz']);
+      },
+      expect : [[0, 'foo'], [1, 'bar'], [2, 'baz']]
+    }, {
+      title  : 'Pot.Deferred.items() with Object on chain',
+      code   : function() {
+        var d = new Deferred();
+        return d.items().begin({foo: 1, bar: 2, baz: 3});
+      },
+      expect : [['foo', 1], ['bar', 2], ['baz', 3]]
+    }, {
+      title  : 'Pot.items() with callback',
+      code   : function() {
+        return items({foo: 1, bar: 2, baz: 3}, function(item) {
+          return [item[0] + '::' + item[1]];
+        });
+      },
+      expect : [['foo::1'], ['bar::2'], ['baz::3']]
+    }, {
+      title  : 'Pot.Deferred.items() with callback',
+      code   : function() {
+        return Deferred.items({foo: 1, bar: 2, baz: 3}, function(item) {
+          return [item[0] + '::' + item[1]];
+        });
+      },
+      expect : [['foo::1'], ['bar::2'], ['baz::3']]
+    }, {
+      title  : 'Pot.Deferred.items() with callback on chain',
+      code   : function() {
+        var d = new Deferred();
+        return d.items(function(item) {
+          return [item[0] + '::' + item[1]];
+        }).begin({foo: 1, bar: 2, baz: 3});
+      },
+      expect : [['foo::1'], ['bar::2'], ['baz::3']]
+    }, {
+      title  : 'Pot.zip()',
+      code   : function() {
+        return zip([[1, 2, 3], [4, 5, 6]]);
+      },
+      expect : [[1, 4], [2, 5], [3, 6]]
+    }, {
+      title  : 'Pot.zip() for other length',
+      code   : function() {
+        return zip([[1, 2, 3], [1, 2, 3, 4, 5]]);
+      },
+      expect : [[1, 1], [2, 2], [3, 3]]
+    }, {
+      title  : 'Pot.zip() with callback',
+      code   : function() {
+        return zip([[1, 2, 3], [4, 5, 6]], function(items) {
+          return items[0] + items[1];
+        });
+      },
+      expect : [5, 7, 9]
+    }, {
+      title  : 'Pot.Deferred.zip()',
+      code   : function() {
+        return Deferred.zip([[1, 2, 3], [4, 5, 6]]);
+      },
+      expect : [[1, 4], [2, 5], [3, 6]]
+    }, {
+      title  : 'Pot.Deferred.zip() with callback',
+      code   : function() {
+        return zip([[1, 2, 3], [4, 5, 6]], function(items) {
+          return items[0] + items[1];
+        });
+      },
+      expect : [5, 7, 9]
+    }, {
+      title  : 'Pot.Deferred.zip() on chain',
+      code   : function() {
+        var d = new Deferred();
+        return d.zip().begin([[1, 2, 3], [4, 5, 6]]);
+      },
+      expect : [[1, 4], [2, 5], [3, 6]]
+    }, {
+      title  : 'Pot.Deferred.zip() with callback on chain',
+      code   : function() {
+        var d = new Deferred();
+        return d.zip(function(items) {
+          return items[0] + items[1];
+        }).begin([[1, 2, 3], [4, 5, 6]]);
+      },
+      expect : [5, 7, 9]
     }, {
       title  : 'Pot.map() with Array',
       code   : function() {
