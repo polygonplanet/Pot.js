@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.18, 2011-10-30
+ * Version 1.19, 2011-11-01
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.18
- * @date           2011-10-30
+ * @version        1.19
+ * @date           2011-11-01
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.18', TYPE : 'lite'},
+var Pot = {VERSION : '1.19', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -3951,6 +3951,8 @@ update(Pot.Internal, {
       repeat  : true,
       forEver : true,
       iterate : true,
+      items   : true,
+      zip     : true,
       map     : true,
       filter  : true,
       reduce  : true,
@@ -5338,7 +5340,9 @@ update(Pot.Internal, {
       forInLoop : 0x02,
       repeat    : 0x04,
       forEver   : 0x08,
-      iterate   : 0x10
+      iterate   : 0x10,
+      items     : 0x20,
+      zip       : 0x40
     }
   })
 });
@@ -5574,6 +5578,12 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     } else if ((type & types.repeat) === types.repeat) {
       this.result = {};
       this.iter = this.repeat(object, callback, context);
+    } else if ((type & types.items) === types.items) {
+      this.result = [];
+      this.iter = this.items(object, callback, context);
+    } else if ((type & types.zip) === types.zip) {
+      this.result = [];
+      this.iter = this.zip(object, callback, context);
     } else if (Pot.isArrayLike(object)) {
       this.result = object;
       this.iter = this.forLoop(object, callback, context);
@@ -5965,6 +5975,153 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         };
       }
     }
+  },
+  /**
+   * items format loop.
+   *
+   * @private
+   * @ignore
+   */
+  items : function(object, callback, context) {
+    var that = this, copy, i = 0, value, prop, isPair;
+    if (Pot.isObject(object)) {
+      copy = [];
+      for (prop in object) {
+        if (hasOwnProperty.call(object, prop)) {
+          try {
+            value = object[prop];
+          } catch (e) {
+            continue;
+          }
+          copy[copy.length] = [prop, value];
+        }
+      }
+      isPair = true;
+    } else if (Pot.isArrayLike(object)) {
+      copy = arrayize(object);
+    }
+    if (!copy || !copy.length) {
+      return this.noop();
+    }
+    if (Pot.isFunction(callback)) {
+      return {
+        /**@ignore*/
+        next : function() {
+          var result, c, key, val;
+          while (true) {
+            if (i >= copy.length) {
+              throw Pot.StopIteration;
+            }
+            if (!(i in copy)) {
+              i++;
+              continue;
+            }
+            try {
+              c = copy[i];
+              if (isPair) {
+                key = c[0];
+                val = c[1];
+              } else {
+                key = i;
+                val = c;
+              }
+            } catch (e) {
+              i++;
+              continue;
+            }
+            result = callback.call(context, [key, val], object);
+            i++;
+            that.result[that.result.length] = result;
+            return result;
+          }
+        }
+      };
+    } else {
+      return {
+        /**@ignore*/
+        next : function() {
+          var r, t, k, v;
+          while (true) {
+            if (i >= copy.length) {
+              throw Pot.StopIteration;
+            }
+            if (!(i in copy)) {
+              i++;
+              continue;
+            }
+            try {
+              t = copy[i];
+              if (isPair) {
+                k = t[0];
+                v = t[1];
+              } else {
+                k = i;
+                v = t;
+              }
+            } catch (e) {
+              i++;
+              continue;
+            }
+            i++;
+            r = [k, v];
+            that.result[that.result.length] = r;
+            return r;
+          }
+        }
+      };
+    }
+  },
+  /**
+   * zip iteration.
+   *
+   * @private
+   * @ignore
+   */
+  zip : function(object, callback, context) {
+    var that = this, copy, i = 0, max;
+    if (Pot.isArrayLike(object)) {
+      copy = arrayize(object);
+      max = copy.length;
+    }
+    if (!max || !copy || !copy.length) {
+      return this.noop();
+    }
+    if (Pot.isFunction(callback)) {
+      return {
+        /**@ignore*/
+        next : function() {
+          var result, zips = [], j, item;
+          for (j = 0; j < max; j++) {
+            item = arrayize(copy[j]);
+            if (!item || !item.length || i >= item.length) {
+              throw Pot.StopIteration;
+            }
+            zips[zips.length] = item[i];
+          }
+          result = callback.call(context, zips, object);
+          that.result[that.result.length] = result;
+          i++;
+          return result;
+        }
+      };
+    } else {
+      return {
+        /**@ignore*/
+        next : function() {
+          var z = [], k, t;
+          for (k = 0; k < max; k++) {
+            t = arrayize(copy[k]);
+            if (!t || !t.length || i >= t.length) {
+              throw Pot.StopIteration;
+            }
+            z[z.length] = t[i];
+          }
+          that.result[that.result.length] = z;
+          i++;
+          return z;
+        }
+      };
+    }
   }
 });
 
@@ -6069,6 +6226,42 @@ update(Pot.Internal.LightIterator, {
           result : null
         };
         iter = that.iterate.call(o, object, callback, context);
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        result = o.result;
+      }
+      return result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    items : function(object, callback, context) {
+      var result = [], that, iter, o;
+      that = Pot.Internal.LightIterator.fn;
+      if (object) {
+        o = {
+          noop   : that.noop,
+          result : []
+        };
+        iter = that.items.call(o, object, callback, context);
+        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        result = o.result;
+      }
+      return result;
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    zip : function(object, callback, context) {
+      var result = [], that, iter, o;
+      that = Pot.Internal.LightIterator.fn;
+      if (object) {
+        o = {
+          noop   : that.noop,
+          result : []
+        };
+        iter = that.zip.call(o, object, callback, context);
         Pot.Internal.LightIterator.QuickIteration.resolve(iter);
         result = o.result;
       }
@@ -6374,6 +6567,199 @@ Pot.update({
         );
       };
     }
+  }),
+  /**
+   * Collect the object key and value and make array as items format.
+   *
+   *
+   * @example
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   debug(items(obj));
+   *   // @results [['foo', 1], ['bar', 2], ['baz', 3]]
+   *
+   *
+   * @example
+   *   var array = ['foo', 'bar', 'baz'];
+   *   debug(items(array));
+   *   // @results [[0, 'foo'], [1, 'bar'], [2, 'baz']]
+   *
+   *
+   * @example
+   *   // Example for using callback.
+   *   var arr = ['foo', 'bar', 'baz'];
+   *   var func = function(item) {
+   *     return '(' + item[0] + ')' + item[1];
+   *   };
+   *   debug(items(arr, func));
+   *   // @results ['(0)foo', '(1)bar', '(2)baz']
+   *
+   *
+   * @example
+   *   // Example for using callback.
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   var func = function(item) {
+   *     return [item[0] + '::' + item[1]];
+   *   };
+   *   debug(items(obj, func));
+   *   // @results [['foo::1'], ['bar::2'], ['baz::3']]
+   *
+   *
+   * @param  {Object|Array}  object     The target object or an array.
+   * @param  {Function}     (callback)  (Optional) Callback function.
+   *                                      function({Array} item[, object])
+   *                                        this == `context`.
+   * @param  {*}            (context)   (Optional) Object to use
+   *                                      as `this` when executing callback.
+   * @return {Array}                    The collected items as an array.
+   *
+   * @class
+   * @function
+   * @static
+   * @name Pot.items
+   *
+   * @property {Function} limp   Iterates "items" loop with slowest speed.
+   * @property {Function} doze   Iterates "items" loop with slower speed.
+   * @property {Function} slow   Iterates "items" loop with slow speed.
+   * @property {Function} normal Iterates "items" loop with default speed.
+   * @property {Function} fast   Iterates "items" loop with fast speed.
+   * @property {Function} rapid  Iterates "items" loop with faster speed.
+   * @property {Function} ninja  Iterates "items" loop with fastest speed.
+   */
+  items : Pot.tmp.createLightIterateConstructor(function(interval) {
+    if (Pot.System.isWaitable &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(object, callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.items;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+      };
+    } else {
+      return function(object, callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.items(
+          object, callback, context
+        );
+      };
+    }
+  }),
+  /**
+   * Create a new array which has the elements at
+   *   position ith of the provided arrays.
+   * This function is handled as seen from the longitudinal for array
+   *   that is similar to the zip() function in Python.
+   *
+   * <pre>
+   * Example:
+   *
+   *   arguments:  [[1, 2, 3],
+   *                [4, 5, 6]]
+   *
+   *   results:    [[1, 4],
+   *                [2, 5],
+   *                [3, 6]]
+   * </pre>
+   *
+   *
+   * @link http://docs.python.org/library/functions.html#zip
+   *
+   *
+   * @example
+   *   var result = zip([[1, 2, 3], [4, 5, 6]]);
+   *   debug(result);
+   *   // @results
+   *   //   [[1, 4], [2, 5], [3, 6]]
+   *   //
+   *
+   *
+   * @example
+   *   var result = zip([[1, 2, 3], [1, 2, 3, 4, 5]]);
+   *   debug(result);
+   *   // @results
+   *   //   [[1, 1], [2, 2], [3, 3]]
+   *   //
+   *
+   *
+   * @example
+   *   var result = zip([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]]);
+   *   debug(result);
+   *   // @results
+   *   //   [[1, 4, 7, 10], [2, 5, 8, 11]]
+   *   //
+   *
+   *
+   * @example
+   *   var result = zip(['hoge']);
+   *   debug(result);
+   *   // @results
+   *   //   [['hoge']]
+   *   //
+   *
+   *
+   * @example
+   *   var result = zip([[1], [2], [3]]);
+   *   debug(result);
+   *   // @results
+   *   //   [[1, 2, 3]]
+   *   //
+   *
+   *
+   * @example
+   *   var result = zip([[1, 2, 3], ['foo', 'bar', 'baz'], [4, 5]]);
+   *   debug(result);
+   *   // @results
+   *   //   [[1, 'foo', 4], [2, 'bar', 5]]
+   *   //
+   *
+   *
+   * @example
+   *   var callback = function(items) { return items[0] + items[1]; };
+   *   var result = zip([[1, 2, 3], [4, 5, 6]], callback);
+   *   debug(result);
+   *   // @results [5, 7, 9]
+   *
+   *
+   * @param  {Array}     object     An array to be combined.
+   * @param  {Function} (callback)  (Optional) Callback function.
+   *                                  function({Array} items[, {*} object])
+   *                                    this == `context`.
+   * @param  {*}        (context)   (Optional) Object to use
+   *                                  as `this` when executing callback.
+   * @return {Array}                A new array of arrays created from
+   *                                  provided objects.
+   *
+   * @class
+   * @function
+   * @static
+   * @name Pot.zip
+   *
+   * @property {Function} limp   Iterates "zip" loop with slowest speed.
+   * @property {Function} doze   Iterates "zip" loop with slower speed.
+   * @property {Function} slow   Iterates "zip" loop with slow speed.
+   * @property {Function} normal Iterates "zip" loop with default speed.
+   * @property {Function} fast   Iterates "zip" loop with fast speed.
+   * @property {Function} rapid  Iterates "zip" loop with faster speed.
+   * @property {Function} ninja  Iterates "zip" loop with fastest speed.
+   */
+  zip : Pot.tmp.createLightIterateConstructor(function(interval) {
+    if (Pot.System.isWaitable &&
+        interval < Pot.Internal.LightIterator.speeds.normal) {
+      return function(object, callback, context) {
+        var opts = {};
+        opts.type = Pot.Internal.LightIterator.types.zip;
+        opts.interval = interval;
+        opts.async = false;
+        opts.context = context;
+        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+      };
+    } else {
+      return function(object, callback, context) {
+        return Pot.Internal.LightIterator.QuickIteration.zip(
+          object, callback, context
+        );
+      };
+    }
   })
 });
 
@@ -6527,6 +6913,94 @@ update(Pot.Deferred, {
     return function(object, callback, context) {
       var opts = {};
       opts.type = Pot.Internal.LightIterator.types.iterate;
+      opts.interval = interval;
+      opts.async = true;
+      opts.context = context;
+      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+    };
+  }),
+  /**
+   * Collect the object key and value and make array as items format.
+   *
+   * @param  {Object|Array}  object     The target object or an array.
+   * @param  {Function}     (callback)  (Optional) Callback function.
+   *                                      function({Array} item[, object])
+   *                                        this == `context`.
+   * @param  {*}            (context)   (Optional) Object to use
+   *                                      as `this` when executing callback.
+   * @return {Deferred}                 Return a new instance of Deferred that has
+   *                                      the collected items as an array.
+   *
+   * @class
+   * @function
+   * @public
+   * @type Function
+   * @name Pot.Deferred.items
+   *
+   * @property {Function} limp   Iterates "items" loop with slowest speed.
+   * @property {Function} doze   Iterates "items" loop with slower speed.
+   * @property {Function} slow   Iterates "items" loop with slow speed.
+   * @property {Function} normal Iterates "items" loop with default speed.
+   * @property {Function} fast   Iterates "items" loop with fast speed.
+   * @property {Function} rapid  Iterates "items" loop with faster speed.
+   * @property {Function} ninja  Iterates "items" loop with fastest speed.
+   */
+  items : Pot.tmp.createLightIterateConstructor(function(interval) {
+    return function(object, callback, context) {
+      var opts = {};
+      opts.type = Pot.Internal.LightIterator.types.items;
+      opts.interval = interval;
+      opts.async = true;
+      opts.context = context;
+      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+    };
+  }),
+  /**
+   * Create a new array which has the elements at
+   *   position ith of the provided arrays.
+   * This function is handled as seen from the longitudinal for array
+   *   that is similar to the zip() function in Python.
+   *
+   * <pre>
+   * Example:
+   *
+   *   arguments:  [[1, 2, 3],
+   *                [4, 5, 6]]
+   *
+   *   results:    [[1, 4],
+   *                [2, 5],
+   *                [3, 6]]
+   * </pre>
+   *
+   * @link http://docs.python.org/library/functions.html#zip
+   *
+   * @param  {Array}     object     Objects to be combined.
+   * @param  {Function} (callback)  (Optional) Callback function.
+   *                                  function({Array} items[, {*} object])
+   *                                    this == `context`.
+   * @param  {*}        (context)   (Optional) Object to use
+   *                                  as `this` when executing callback.
+   * @return {Deferred}             Return a new instance of Deferred that has
+   *                                  a new array of arrays created from
+   *                                  provided objects.
+   * @class
+   * @function
+   * @public
+   * @type Function
+   * @name Pot.Deferred.zip
+   *
+   * @property {Function} limp   Iterates "zip" loop with slowest speed.
+   * @property {Function} doze   Iterates "zip" loop with slower speed.
+   * @property {Function} slow   Iterates "zip" loop with slow speed.
+   * @property {Function} normal Iterates "zip" loop with default speed.
+   * @property {Function} fast   Iterates "zip" loop with fast speed.
+   * @property {Function} rapid  Iterates "zip" loop with faster speed.
+   * @property {Function} ninja  Iterates "zip" loop with fastest speed.
+   */
+  zip : Pot.tmp.createLightIterateConstructor(function(interval) {
+    return function(object, callback, context) {
+      var opts = {};
+      opts.type = Pot.Internal.LightIterator.types.zip;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
@@ -8051,6 +8525,241 @@ Pot.tmp.createProtoIterators([{
    * @ignore
    */
   iterable : Pot.Deferred.iterate,
+  /**
+   * @ignore
+   */
+  args : function(arg, args) {
+    return [arg].concat(args);
+  }
+}, {
+  /**
+   * Collect the object key and value and make array as items format.
+   *
+   *
+   * @example
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   var d = new Deferred();
+   *   d.items().then(function(res) {
+   *     debug(res);
+   *     // @results [['foo', 1], ['bar', 2], ['baz', 3]]
+   *   }).begin(obj);
+   *
+   *
+   * @example
+   *   var array = ['foo', 'bar', 'baz'];
+   *   var d = new Deferred();
+   *   d.items().then(function(res) {
+   *     debug(res);
+   *     // @results [[0, 'foo'], [1, 'bar'], [2, 'baz']]
+   *   }).begin(array);
+   *
+   *
+   * @example
+   *   // Example for using callback.
+   *   var arr = ['foo', 'bar', 'baz'];
+   *   var func = function(item) {
+   *     return '(' + item[0] + ')' + item[1];
+   *   };
+   *   var d = new Deferred();
+   *   d.items(func).then(function(res) {
+   *     debug(res);
+   *     // @results ['(0)foo', '(1)bar', '(2)baz']
+   *   }).begin(arr);
+   *
+   *
+   * @example
+   *   // Example for using callback.
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   var func = function(item) {
+   *     return [item[0] + '::' + item[1]];
+   *   };
+   *   var d = new Deferred();
+   *   d.items(func).then(function(res) {
+   *     debug(res);
+   *     // @results [['foo::1'], ['bar::2'], ['baz::3']]
+   *   }).begin(obj);
+   *
+   *
+   * @param  {Function}     (callback)  (Optional) Callback function.
+   *                                      function({Array} item[, object])
+   *                                        this == `context`.
+   * @param  {*}            (context)   (Optional) Object to use
+   *                                      as `this` when executing callback.
+   * @return {Array}                    The collected items as an array.
+   *
+   * @name  Pot.Deferred.prototype.items
+   * @class
+   * @public
+   *
+   * @property {Function} limp   Iterates "items" loop with slowest speed.
+   * @property {Function} doze   Iterates "items" loop with slower speed.
+   * @property {Function} slow   Iterates "items" loop with slow speed.
+   * @property {Function} normal Iterates "items" loop with default speed.
+   * @property {Function} fast   Iterates "items" loop with fast speed.
+   * @property {Function} rapid  Iterates "items" loop with faster speed.
+   * @property {Function} ninja  Iterates "items" loop with fastest speed.
+   */
+  NAME : 'items',
+  /**
+   * @ignore
+   */
+  method : Pot.Deferred.items,
+  /**
+   * @ignore
+   */
+  context : null,
+  /**
+   * @ignore
+   */
+  speed : true,
+  /**
+   * @ignore
+   */
+  iterable : Pot.Deferred.items,
+  /**
+   * @ignore
+   */
+  args : function(arg, args) {
+    return [arg].concat(args);
+  }
+}, {
+  /**
+   * Create a new array which has the elements at
+   *   position ith of the provided arrays.
+   * This function is handled as seen from the longitudinal for array
+   *   that is similar to the zip() function in Python.
+   *
+   * <pre>
+   * Example:
+   *
+   *   arguments:  [[1, 2, 3],
+   *                [4, 5, 6]]
+   *
+   *   results:    [[1, 4],
+   *                [2, 5],
+   *                [3, 6]]
+   * </pre>
+   *
+   *
+   * @link http://docs.python.org/library/functions.html#zip
+   *
+   *
+   * @example
+   *   var d = new Deferred();
+   *   d.then(function() {
+   *     return [[1, 2, 3], [4, 5, 6]];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [[1, 4], [2, 5], [3, 6]]
+   *     //
+   *   }).begin();
+   *
+   *
+   * @example
+   *   var d = new Deferred();
+   *   d.then(function() {
+   *     return [[1, 2, 3], [1, 2, 3, 4, 5]];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [[1, 1], [2, 2], [3, 3]]
+   *     //
+   *   }).begin();
+   *
+   *
+   * @example
+   *   var d = new Deferred();
+   *   d.then(function() {
+   *     return [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [[1, 4, 7, 10], [2, 5, 8, 11]]
+   *     //
+   *   }).begin();
+   *
+   *
+   * @example
+   *   begin(function() {
+   *     return ['hoge'];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [['hoge']]
+   *     //
+   *   });
+   *
+   *
+   * @example
+   *   begin(function() {
+   *     return [[1], [2], [3]];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [[1, 2, 3]]
+   *     //
+   *   });
+   *
+   *
+   * @example
+   *   begin(function() {
+   *     return [[1, 2, 3], ['foo', 'bar', 'baz'], [4, 5]];
+   *   }).zip().then(function(res) {
+   *     debug(res);
+   *     // @results
+   *     //     [[1, 'foo', 4], [2, 'bar', 5]]
+   *     //
+   *   });
+   *
+   *
+   * @example
+   *   var callback = function(items) { return items[0] + items[1]; };
+   *   begin(function() {
+   *     return [[1, 2, 3], [4, 5, 6]];
+   *   }).zip(callback).then(function(res) {
+   *     debug(res);
+   *     // @results [5, 7, 9]
+   *   });
+   *
+   *
+   * @param  {Function} (callback)  (Optional) Callback function.
+   *                                  function({Array} items[, {*} object])
+   *                                    this == `context`.
+   * @param  {*}        (context)   (Optional) Object to use
+   *                                  as `this` when executing callback.
+   * @return {Array}                A new array of arrays created from
+   *                                  provided objects.
+   *
+   * @name  Pot.Deferred.prototype.zip
+   * @class
+   * @public
+   *
+   * @property {Function} limp   Iterates "zip" loop with slowest speed.
+   * @property {Function} doze   Iterates "zip" loop with slower speed.
+   * @property {Function} slow   Iterates "zip" loop with slow speed.
+   * @property {Function} normal Iterates "zip" loop with default speed.
+   * @property {Function} fast   Iterates "zip" loop with fast speed.
+   * @property {Function} rapid  Iterates "zip" loop with faster speed.
+   * @property {Function} ninja  Iterates "zip" loop with fastest speed.
+   */
+  NAME : 'zip',
+  /**
+   * @ignore
+   */
+  method : Pot.Deferred.zip,
+  /**
+   * @ignore
+   */
+  context : null,
+  /**
+   * @ignore
+   */
+  speed : true,
+  /**
+   * @ignore
+   */
+  iterable : Pot.Deferred.zip,
   /**
    * @ignore
    */
@@ -10854,6 +11563,8 @@ update(Pot.Internal, {
     repeat                 : Pot.repeat,
     forEver                : Pot.forEver,
     iterate                : Pot.iterate,
+    items                  : Pot.items,
+    zip                    : Pot.zip,
     Iter                   : Pot.Iter,
     toIter                 : Pot.Iter.toIter,
     map                    : Pot.map,
