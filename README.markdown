@@ -25,6 +25,22 @@ For Node.js.
     }).then(function() {...})
     // ...
 
+Example of Greasemonkey (userscript).
+
+    // ==UserScript==
+    // ...
+    // @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
+    // ...
+    // ==/UserScript==
+    begin(function() {
+        return request('http://www.example.com/data.json').then(function(res) {
+            return parseFromJSON(res.responseText);
+        });
+    }).then(function(res) {
+        debug(res);
+        // do something...
+    });
+    //...
 
 As for jQuery plugin.
 
