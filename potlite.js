@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.19, 2011-11-01
+ * Version 1.20, 2011-11-03
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.19
- * @date           2011-11-01
+ * @version        1.20
+ * @date           2011-11-03
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.19', TYPE : 'lite'},
+var Pot = {VERSION : '1.20', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -830,20 +830,20 @@ Pot.update({
    * @public
    */
   StopIteration : (function() {
-    var StopIteration = function() {
-      return StopIteration;
+    /**@ignore*/
+    var f = update(function() {
+      return f;
+    }, {
+      NAME     : SI,
+      toString : Pot.toString
+    });
+    f.prototype = {
+      constructor : f,
+      NAME        : f.NAME,
+      toString    : f.toString
     };
-    (function(s) {
-      s.NAME = SI;
-      s.toString = Pot.toString;
-      s.prototype = {
-        constructor : s,
-        NAME        : s.NAME,
-        toString    : s.toString
-      };
-      s.prototype.constructor.prototype = s.constructor.prototype;
-    })(StopIteration);
-    return new StopIteration();
+    f.prototype.constructor.prototype = f.constructor.prototype;
+    return new f;
   })(),
   /**
    * Return whether the argument is StopIteration or not.
@@ -874,6 +874,9 @@ Pot.update({
    * @public
    */
   isStopIter : function(o) {
+    if (!o) {
+      return false;
+    }
     if (Pot.StopIteration !== undefined &&
         (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
       return true;
@@ -888,6 +891,10 @@ Pot.update({
     }
     if (~toString.call(o).indexOf(SI) ||
         ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
+      return true;
+    }
+    if (Pot.isError(o) && o[SI] && !(SI in o[SI]) &&
+        !Pot.isError(o[SI]) && Pot.isStopIter(o[SI])) {
       return true;
     }
     return false;
@@ -1337,6 +1344,163 @@ if (typeof StopIteration === 'undefined') {
   var StopIteration = Pot.StopIteration;
 }
 
+// Definition of current Document and URI.
+(function() {
+  var win, doc, uri, wp, dp;
+  wp = 'window contentWindow defaultView parentWindow content top'.split(' ');
+  dp = 'ownerDocument document'.split(' ');
+  /**@ignore*/
+  function detectWindow(x) {
+    var w;
+    if (x) {
+      if (Pot.isWindow(x)) {
+        w = x;
+      } else {
+        each(wp, function(p) {
+          try {
+            if (Pot.isWindow(x[p])) {
+              w = x[p];
+            }
+            if (x[p].content && Pot.isWindow(x[p].content)) {
+              w = x[p].content;
+            }
+          } catch (e) {}
+          if (w) {
+            throw Pot.StopIteration;
+          }
+        });
+      }
+    }
+    return w;
+  }
+  /**@ignore*/
+  function detectDocument(x) {
+    var d;
+    if (x) {
+      if (Pot.isDocument(x)) {
+        d = x;
+      } else {
+        each(dp, function(p) {
+          try {
+            if (Pot.isDocument(x[p])) {
+              d = x[p];
+            }
+            if (x[p].content && Pot.isDocument(x[p].content.document)) {
+              d = x[p].content.document;
+            }
+          } catch (e) {}
+          if (d) {
+            throw Pot.StopIteration;
+          }
+        });
+      }
+    }
+    return d;
+  }
+  each([
+    globals,
+    Pot.Global,
+    typeof window   === 'undefined' ? this : window,
+    typeof document === 'undefined' ? this : document
+  ], function(x) {
+    if (x) {
+      if (!win) {
+        win = detectWindow(x);
+      }
+      if (!doc) {
+        doc = detectDocument(x);
+      }
+      if (win && doc) {
+        throw Pot.StopIteration;
+      }
+    }
+  });
+  if (Pot.System.isNodeJS && typeof __filename === 'string') {
+    uri = __filename;
+  } else {
+    if (doc) {
+      try {
+        uri = doc.documentURI || doc.baseURI || doc.URL;
+      } catch (e) {}
+    }
+    if (!uri && win) {
+      try {
+        uri = win.location && win.location.href || win.location;
+      } catch (e) {}
+    }
+  }
+  update(Pot.System, {
+    /**
+     * @lends Pot.System
+     */
+    /**
+     * Current DOM Window object if exists (i.e., on web-browser).
+     *
+     * @type Object
+     * @static
+     * @public
+     */
+    currentWindow : win || {},
+    /**
+     * Current DOM Document object if exists (i.e., on web-browser).
+     *
+     * @type Object
+     * @static
+     * @public
+     */
+    currentDocument : doc || {},
+    /**
+     * The current document URI (on web-browser) or filename (on non-browser).
+     *
+     * @type String
+     * @static
+     * @public
+     */
+    currentURI : stringify(uri, true)
+  });
+  Pot.update({
+    /**
+     * @lends Pot
+     */
+    /**
+     * Get the current DOM Window object if exists (i.e., on web-browser).
+     *
+     * @return {Object} The current DOM window object.
+     * @type Function
+     * @function
+     * @static
+     * @public
+     */
+    currentWindow : function() {
+      return Pot.System.currentWindow;
+    },
+    /**
+     * Get the current DOM Document object if exists (i.e., on web-browser).
+     *
+     * @return {Object} The current DOM Document object.
+     * @type Function
+     * @function
+     * @static
+     * @public
+     */
+    currentDocument : function() {
+      return Pot.System.currentDocument;
+    },
+    /**
+     * Get the current document URI (on web-browser)
+     *   or filename (on non-browser).
+     *
+     * @return {String} The current URI.
+     * @type Function
+     * @static
+     * @public
+     */
+    currentURI : function() {
+      return Pot.System.currentURI;
+    }
+  });
+})();
+
 // Definition of builtin method states.
 update(Pot.System, {
   /**
@@ -1396,7 +1560,7 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, language, id, scope, func, doc, script;
+    var me = arguments.callee, id, scope, func, doc, script;
     if (code && me.patterns.valid.test(code)) {
       if (Pot.System.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
@@ -1578,21 +1742,10 @@ function arrayize(object, index) {
   var array, i, len, me = arguments.callee, t;
   if (me.canNodeList == null) {
     // NodeList cannot convert to the Array in the Blackberry, IE browsers.
-    if (globals || Pot.Global) {
+    if (Pot.System.currentDocument) {
       try {
         t = slice.call(
-          ((globals &&
-            (globals.documentElement ||
-              (globals.document && globals.document.documentElement) ||
-              (globals.content && globals.content.document &&
-                globals.content.document.documentElement))) ||
-           (Pot.Global &&
-            (Pot.Global.documentElement ||
-              (Pot.Global.document && Pot.Global.document.documentElement) ||
-              (Pot.Global.content && Pot.Global.content.document &&
-                Pot.Global.content.document.documentElement))) ||
-           (typeof document === 'object' && document.documentElement)
-          ).childNodes
+          Pot.System.currentDocument.documentElement.childNodes
         )[0].nodeType;
         t = null;
         me.canNodeList = true;
@@ -3629,7 +3782,7 @@ function fireSync() {
  * @ignore
  */
 function fireProcedure() {
-  var that = this, result, callbacks, callback, nesting;
+  var that = this, result, callbacks, callback, nesting, isStop;
   clearChainDebris.call(this);
   result  = this.results[Pot.Deferred.states[this.state]];
   nesting = null;
@@ -3639,6 +3792,7 @@ function fireProcedure() {
     if (!Pot.isFunction(callback)) {
       continue;
     }
+    isStop = false;
     try {
       if (this.destassign ||
           (Pot.isNumber(callback.length) && callback.length > 1 &&
@@ -3657,19 +3811,31 @@ function fireProcedure() {
         this.nested++;
       }
     } catch (e) {
+      result = e;
+      if (Pot.isStopIter(result)) {
+        isStop = true;
+      } else {
+        setChainDebris.call(this, result);
+      }
       this.destassign = false;
       this.state = Pot.Deferred.states.failure;
-      result = e;
-      setChainDebris.call(this, result);
       if (!Pot.isError(result)) {
         result = new Error(result);
+        if (isStop) {
+          update(result, {
+            StopIteration : Pot.StopIteration
+          });
+        }
       }
     }
     if (this.options && this.options.async) {
       break;
     }
   }
-  this.results[Pot.Deferred.states[this.state]] = result;
+  // We ignore undefined result.
+  if (result !== undefined) {
+    this.results[Pot.Deferred.states[this.state]] = result;
+  }
   if (nesting && this.nested) {
     result.ensure(nesting).end();
   }
@@ -3900,7 +4066,6 @@ update(Pot.Deferred, {
    * @ignore
    */
   extendSpeeds : function(target, name, construct, speeds) {
-    var refers = {}, methods = {};
     /**@ignore*/
     var create = function(speedName, speed) {
       return function() {
@@ -3916,7 +4081,8 @@ update(Pot.Deferred, {
         args.unshift(opts);
         return construct.apply(me.instance, args);
       };
-    };
+    },
+    methods = {};
     each(speeds, function(val, key) {
       methods[key] = create(key, val);
     });
@@ -5398,6 +5564,11 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @private
    * @ignore
    */
+  isDeferStopIter : false,
+  /**
+   * @private
+   * @ignore
+   */
   time : {},
   /**
    * @private
@@ -5553,6 +5724,10 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         });
         if (this.async) {
           this.deferred = d.then(function() {
+            if (Pot.isDeferred(that.result) &&
+                Pot.isStopIter(Pot.Deferred.lastError(that.result))) {
+              that.result = Pot.Deferred.lastResult(that.result);
+            }
             return that.result;
           });
         }
@@ -5602,6 +5777,10 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     REVOLVE: {
       do {
         try {
+          if (this.isDeferStopIter) {
+            this.isDeferStopIter = false;
+            throw Pot.StopIteration;
+          }
           result = this.iter.next();
         } catch (e) {
           err = e;
@@ -5612,10 +5791,20 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         }
         if (this.async && Pot.isDeferred(result)) {
           return result.ensure(function(res) {
-            if (Pot.isError(res)) {
-              Pot.Deferred.lastError(this, res);
-            } else {
-              Pot.Deferred.lastResult(this, res);
+            if (res !== undefined) {
+              if (Pot.isError(res)) {
+                if (Pot.isStopIter(res)) {
+                  that.isDeferStopIter = true;
+                  if (Pot.isDeferred(that.result) &&
+                      Pot.isStopIter(Pot.Deferred.lastError(that.result))) {
+                    that.result = Pot.Deferred.lastResult(that.result);
+                  }
+                } else {
+                  Pot.Deferred.lastError(this, res);
+                }
+              } else {
+                Pot.Deferred.lastResult(this, res);
+              }
             }
             that.flush(that.revback, true);
           });
@@ -5739,7 +5928,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       } else {
         d.begin();
       }
-      return void 0;
+      return (void 0);
     }
   },
   /**
@@ -5875,7 +6064,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   forInLoop : function(object, callback, context) {
-    var copy, i = 0, p, v, len;
+    var copy, i = 0, p, v;
     //XXX: Should use "yield" for duplicate loops.
     if (Pot.isFunction(callback)) {
       copy = [];
@@ -7280,12 +7469,24 @@ update(Pot.Iter, {
     it = function() {
       return iterable(object, function(val, key, obj) {
         var res = callback.call(context, val, key, obj);
-        if (arrayLike) {
-          result[result.length] = res;
-        } else if (objectLike) {
-          result[key] = res;
+        if (Pot.isDeferred(res)) {
+          return res.then(function(rv) {
+            if (arrayLike) {
+              result[result.length] = rv;
+            } else if (objectLike) {
+              result[key] = rv;
+            } else {
+              result = rv;
+            }
+          });
         } else {
-          result = res;
+          if (arrayLike) {
+            result[result.length] = res;
+          } else if (objectLike) {
+            result[key] = res;
+          } else {
+            result = res;
+          }
         }
       }, context);
     };
@@ -7350,13 +7551,28 @@ update(Pot.Iter, {
     /**@ignore*/
     it = function() {
       return iterable(object, function(val, key, obj) {
-        if (callback.call(context, val, key, obj)) {
-          if (arrayLike) {
-            result[result.length] = val;
-          } else if (objectLike) {
-            result[key] = val;
-          } else {
-            result = val;
+        var res = callback.call(context, val, key, obj);
+        if (Pot.isDeferred(res)) {
+          return res.then(function(rv) {
+            if (rv) {
+              if (arrayLike) {
+                result[result.length] = val;
+              } else if (objectLike) {
+                result[key] = val;
+              } else {
+                result = val;
+              }
+            }
+          });
+        } else {
+          if (res) {
+            if (arrayLike) {
+              result[result.length] = val;
+            } else if (objectLike) {
+              result[key] = val;
+            } else {
+              result = val;
+            }
           }
         }
       }, context);
@@ -7429,10 +7645,18 @@ update(Pot.Iter, {
     /**@ignore*/
     it = function() {
       return iterable(object, function(val, key, obj) {
+        var res;
         if (skip) {
           skip = false;
         } else {
-          value = callback.call(context, value, val, key, obj);
+          res = callback.call(context, value, val, key, obj);
+          if (Pot.isDeferred(res)) {
+            return res.then(function(rv) {
+              value = rv;
+            });
+          } else {
+            value = res;
+          }
         }
       }, context);
     };
@@ -7480,9 +7704,19 @@ update(Pot.Iter, {
     /**@ignore*/
     it = function() {
       return iterable(object, function(val, key, obj) {
-        if (!callback.call(context, val, key, obj)) {
-          result = false;
-          throw Pot.StopIteration;
+        var res = callback.call(context, val, key, obj);
+        if (Pot.isDeferred(res)) {
+          return res.then(function(rv) {
+            if (!rv) {
+              result = false;
+              throw Pot.StopIteration;
+            }
+          });
+        } else {
+          if (!res) {
+            result = false;
+            throw Pot.StopIteration;
+          }
         }
       }, context);
     };
@@ -7531,9 +7765,19 @@ update(Pot.Iter, {
     /**@ignore*/
     it = function() {
       return iterable(object, function(val, key, obj) {
-        if (callback.call(context, val, key, obj)) {
-          result = true;
-          throw Pot.StopIteration;
+        var res = callback.call(context, val, key, obj);
+        if (Pot.isDeferred(res)) {
+          return res.then(function(rv) {
+            if (rv) {
+              result = true;
+              throw Pot.StopIteration;
+            }
+          });
+        } else {
+          if (res) {
+            result = true;
+            throw Pot.StopIteration;
+          }
         }
       }, context);
     };
@@ -7972,7 +8216,7 @@ update(Pot.tmp, {
           };
         }
         Pot.Deferred.extendSpeeds(Pot.Deferred.fn, iter.NAME, function(opts) {
-          var that = this, iterable, options, args = arrayize(arguments, 1);
+          var iterable, options, args = arrayize(arguments, 1);
           iterable = sp.methods(opts.speedName);
           options  = update({}, this.options);
           return this.then(function(value) {
@@ -9705,36 +9949,43 @@ Pot.update({
      * @static
      * @public
      */
-    parseFromJSON : function(text/*[, reviver]*/) {
-      var re = {
-        meta      : /\\["\\\/bfnrtu]/g,
-        string    : /"[^"\\\n\r\u2028\u2029\x00-\x08\x10-\x1F\x80-\x9F]*"/g,
-        exprs     : /true|false|null|[+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?/g,
-        brackets  : /(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g,
-        remainder : /^[\],:{}\s\u2028\u2029]*$/,
-        space     : /^\s*$/,
-        clean     : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g
-      },
-      /**@ignore*/
-      isValid = function(s) {
-        var at = '@', bracket = '[]'.charAt(1);
-        if (re.space.test(s)) {
-          return false;
-        }
-        return re.remainder.test(
-          s.replace(re.meta,     at)
-           .replace(re.string,   bracket)
-           .replace(re.exprs,    bracket)
-           .replace(re.brackets, '')
-        );
-      },
-      o = String(text).replace(re.clean, '');
-      if (isValid(o)) {
+    parseFromJSON : update(function(text/*[, reviver]*/) {
+      var me = arguments.callee, o;
+      o = String(text).replace(me.PATTERNS.CLEAN, '');
+      if (me.isValid(me, o)) {
         return Pot.localEval('(' + o + ')');
       } else {
         throw new Error('Invalid JSON string: ' + o);
       }
-    }
+    }, {
+      /**
+       * @ignore
+       */
+      PATTERNS : {
+        META      : /\\["\\\/bfnrtu]/g,
+        STRING    : /"[^"\\\n\r\u2028\u2029\x00-\x08\x10-\x1F\x80-\x9F]*"/g,
+        EXPRS     : /true|false|null|[+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?/g,
+        BRACKETS  : /(?:^|:|,)(?:[\s\u2028\u2029]*\[)+/g,
+        REMAINDER : /^[\],:{}\s\u2028\u2029]*$/,
+        SPACE     : /^\s*$/,
+        CLEAN     : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g
+      },
+      /**
+       * @ignore
+       */
+      isValid : function(that, s) {
+        var at = '@', bracket = '[]'.charAt(1), re = that.PATTERNS;
+        if (re.SPACE.test(s)) {
+          return false;
+        }
+        return re.REMAINDER.test(
+          s.replace(re.META,     at)
+           .replace(re.STRING,   bracket)
+           .replace(re.EXPRS,    bracket)
+           .replace(re.BRACKETS, '')
+        );
+      }
+    })
   });
 })();
 
@@ -10429,7 +10680,7 @@ update(Pot.Net, {
          * @ignore
          */
         setOptions : function(options) {
-          var query, defaults, opts;
+          var defaults, opts;
           defaults = {
             method      : 'GET',
             sendContent : null,
@@ -10986,8 +11237,8 @@ update(Pot.Net, {
       d = new Pot.Deferred();
       opts    = update({}, options || {});
       context = globals || Pot.Global;
-      doc     = getDoc();
-      head    = getHead(doc);
+      doc     = Pot.System.currentDocument;
+      head    = getHead();
       if (!context || !doc || !head || !url) {
         return d.raise(context || url || head || doc);
       }
@@ -11133,45 +11384,21 @@ function buildURL(url, query) {
  * @private
  * @ignore
  */
-function getDoc() {
-  var doc;
+function getHead() {
+  var heads, doc = Pot.System.currentDocument;
   try {
-    if (typeof document !== 'undefined' && Pot.isDocument(document)) {
-      doc = document;
-    } else if (Pot.isDocument(globals)) {
-      doc = globals;
-    } else if (Pot.isDocument(Pot.Global)) {
-      doc = Pot.Global;
-    } else if (globals && Pot.isDocument(globals.document)) {
-      doc = globals.document;
-    } else if (Pot.Global && Pot.isDocument(Pot.Global.document)) {
-      doc = Pot.Global.document;
-    } else if (globals && globals.content &&
-               Pot.isDocument(globals.content.document)) {
-      doc = globals.content.document;
-    } else if (Pot.Global && Pot.Global.content &&
-               Pot.isDocument(Pot.Global.content.document)) {
-      doc = Pot.Global.content.document;
+    if (doc.head && Pot.isElement(doc.head)) {
+      return doc.head;
     }
-  } catch (e) {
-    doc = null;
-  }
-  return doc;
-}
-
-/**
- * @private
- * @ignore
- */
-function getHead(doc) {
-  var context = doc;
+  } catch (e) {}
   try {
-    if (!context) {
-      context = getDoc();
+    heads = doc.getElementsByTagName('head');
+    if (heads && Pot.isElement(heads[0])) {
+      return heads[0];
     }
-    return (Pot.isElement(doc.head) && doc.head) ||
-           doc.getElementsByTagName('head')[0]   ||
-           doc.documentElement;
+  } catch (e) {}
+  try {
+    return doc.documentElement;
   } catch (e) {}
 }
 
@@ -11577,6 +11804,9 @@ update(Pot.Internal, {
     lastIndexOf            : Pot.lastIndexOf,
     globalEval             : Pot.globalEval,
     localEval              : Pot.localEval,
+    currentWindow          : Pot.currentWindow,
+    currentDocument        : Pot.currentDocument,
+    currentURI             : Pot.currentURI,
     serializeToJSON        : Pot.Serializer.serializeToJSON,
     parseFromJSON          : Pot.Serializer.parseFromJSON,
     serializeToQueryString : Pot.Serializer.serializeToQueryString,
