@@ -9,7 +9,7 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.09
+ * @version        1.10
  * @date           2011-11-03
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -2071,7 +2071,7 @@ $(function() {
       title  : 'StopIteration on nested iteration',
       code   : function() {
         var result = [];
-        begin(function() {
+        return begin(function() {
           return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         }).forEach(function(value) {
           return begin(function() {
