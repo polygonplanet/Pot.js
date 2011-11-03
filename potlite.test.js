@@ -5,12 +5,12 @@
  *  Run Test for PotLite.js
  *
  * @description
- *  PotLite.js用のテストスクリプト
+ *  JavaScriptライブラリPotLite.js用のテストスクリプト
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.08
- * @date           2011-11-02
+ * @version        1.09
+ * @date           2011-11-03
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -2067,6 +2067,29 @@ $(function() {
         'a:a:a:b:b:b:c:c:c:d:d:d:e:e:e',
         '1:1:1:2:2:2:3:3:3:4:4:4:5:5:5'
       ]
+    }, {
+      title  : 'StopIteration on nested iteration',
+      code   : function() {
+        var result = [];
+        begin(function() {
+          return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        }).forEach(function(value) {
+          return begin(function() {
+            var d = new Deferred();
+            return d.then(function() {
+              if (value > 5) {
+                throw StopIteration;
+              }
+              return value * 100;
+            }).begin();
+          }).then(function(res) {
+            result.push(res);
+          });
+        }).then(function() {
+          return result;
+        });
+      },
+      expect : [100, 200, 300, 400, 500]
     }]
   });
   Assert.run();

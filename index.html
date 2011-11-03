@@ -358,6 +358,23 @@ Pot.Deferred.begin(function() {
 }).then(function() {...})
 // ...</pre>
          <p>
+          Greasemonkey (userscript) の例。
+         </p>
+         <pre>// ==UserScript==
+// ...
+// @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
+// ...
+// ==/UserScript==
+begin(function() {
+    return request('http://www.example.com/data.json').then(function(res) {
+        return parseFromJSON(res.responseText);
+    });
+}).then(function(res) {
+    debug(res);
+    // do something...
+});
+//...</pre>
+         <p>
           jQuery プラグインとして。
          </p>
          <pre>// jQuery を読み込んだ後に実行。
@@ -739,6 +756,34 @@ Deferred.forEach(urls, function(url) {
              すべての処理が終わった後、次のコールバックが呼ばれます。
              parallel は、オリジナルの JSDeferred.parallel をベースに実装されています。
             </p>
+            <p><br></p>
+            <p>
+             各チェインのコールバック関数の結果は、
+             return により undefined 以外が返されると
+             次のチェインの引数として渡されます。
+             <br>
+             コールバック関数から return されなかったり、
+             undefined が返った場合は
+             結果値として無視されます。
+             <br>
+             その場合、前の結果値を引継ぎ次のコールバックに再び渡されます。
+            </p>
+            <pre>begin(function() {
+    return 'foo';
+}).then(function(res) {
+    alert(res); // 'foo'
+
+    // 値を返さずこのコールバックを抜ける
+
+}).then(function(res) {
+    // 前のチェインの結果が引き継がれる
+    alert(res); // 'foo'
+
+    // 値を返す
+    return 'bar';
+}).then(function(res) {
+    alert(res); // 'bar'
+});</pre>
             <h4 id="exception">例外処理</h4>
             <p>
              非同期処理の中で発生した例外は、
@@ -1539,6 +1584,38 @@ debug(foo);</pre>
              おそらく Pot.js ライブラリが実装している
              isStopIter (Pot.isStopIter) が確実です。
             </p>
+            <p><br></p>
+            <p>
+             実装されているすべてのイテレータは、
+             コールバック関数が非同期の Deferred オブジェクトを
+             いくつにもネストしたとしても、
+             <br>
+             throw StopIteration によりスコープ間を超えて
+             実行中のイテレータ関数のスコープまで届くよう設計されています。
+            </p>
+            <pre>var result = [];
+begin(function() {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+}).forEach(function(value) {
+    return begin(function() {
+        var d = new Deferred();
+        return d.then(function() {
+            if (value &gt; 5) {
+
+                // 実行しているイテレータのスコープが対象になるため
+                // この例では いちばん外側の .forEach まで届く
+
+                throw StopIteration;
+            }
+            return value * 100;
+        }).begin();
+    }).then(function(res) {
+        result.push(res);
+    });
+}).then(function() {
+    debug(result);
+    //  =&gt;  [100, 200, 300, 400, 500]
+});</pre>
            </div>
            <h3 id="referenceFunctions">関数リファレンス</h3>
            <div>
@@ -3586,7 +3663,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-01
+         Last modified: 2011-11-03
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
