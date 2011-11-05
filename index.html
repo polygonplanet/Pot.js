@@ -756,6 +756,7 @@ Deferred.forEach(urls, function(url) {
              すべての処理が終わった後、次のコールバックが呼ばれます。
              parallel は、オリジナルの JSDeferred.parallel をベースに実装されています。
             </p>
+            <!--#例外があるため保留#
             <p><br></p>
             <p>
              各チェインのコールバック関数の結果は、
@@ -784,6 +785,7 @@ Deferred.forEach(urls, function(url) {
 }).then(function(res) {
     alert(res); // 'bar'
 });</pre>
+            -->
             <h4 id="exception">例外処理</h4>
             <p>
              非同期処理の中で発生した例外は、
@@ -3663,7 +3665,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-03
+         Last modified: 2011-11-05
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
