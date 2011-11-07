@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.20, 2011-11-03
+ * Version 1.21, 2011-11-08
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.20
- * @date           2011-11-03
+ * @version        1.21
+ * @date           2011-11-08
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.20', TYPE : 'lite'},
+var Pot = {VERSION : '1.21', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -137,6 +137,8 @@ update(Pot, {
    *           Whether the environment is running on Greasemonkey.
    * @property {Boolean} isJetpack
    *           Whether the environment is running on Jetpack.
+   * @property {Boolean} isNotExtension
+   *           Whether the environment is running on non browser-extension.
    */
   System : {},
   /**
@@ -381,7 +383,8 @@ update(Pot, {
           outputs = Pot.Global || globals;
         } else {
           outputs = (Pot.isWindow(globals) && globals) ||
-                    (Pot.isWindow(Pot.Global) && Pot.Global);
+                    (Pot.isWindow(Pot.Global) && Pot.Global) ||
+                     Pot.currentWindow();
         }
         if (!outputs &&
             typeof window !== 'undefined' && Pot.isWindow(window)) {
@@ -402,7 +405,7 @@ update(Pot, {
           outputs = globals;
         }
         if (!outputs) {
-          outputs = globals || Pot.Global;
+          outputs = globals || Pot.Global || Pot.currentWindow();
         }
       }
       return outputs;
@@ -427,7 +430,13 @@ update(Pot, {
    * @function
    * @public
    */
-  update : update
+  update : update,
+  /**
+   * Refer Pot object.
+   *
+   * @ignore
+   */
+  Pot : Pot
 });
 })(typeof navigator !== 'undefined' && navigator || {});
 
@@ -503,6 +512,9 @@ update(Pot.System, (function() {
           o.isJetpack = true;
         }
       } catch (e) {}
+    }
+    if (o.isWebBrowser && !o.isGreasemonkey && !o.isFirefoxExtension) {
+      o.isNotExtension = true;
     }
   }
   try {
@@ -1568,23 +1580,23 @@ Pot.update({
           return execScript(code, me.language);
         } else {
           func = 'execScript';
-          if (func in Pot.Global && me.test(func, Pot.Global)) {
-            return Pot.Global[func](code, me.language);
-          } else if (func in globals && me.test(func, globals)) {
+          if (func in globals && me.test(func, globals)) {
             return globals[func](code, me.language);
+          } else if (func in Pot.Global && me.test(func, Pot.Global)) {
+            return Pot.Global[func](code, me.language);
           }
         }
+      }
+      func = 'eval';
+      if (func in globals && me.test(func, globals)) {
+        scope = globals;
+      } else if (func in Pot.Global && me.test(func, Pot.Global)) {
+        scope = Pot.Global;
       }
       if (Pot.System.isGreasemonkey) {
         // eval does not work to global scope on greasemonkey
         //   even if using the unsafeWindow.
-        return Pot.localEval.doEval(code);
-      }
-      func = 'eval';
-      if (func in Pot.Global && me.test(func, Pot.Global)) {
-        scope = Pot.Global;
-      } else if (func in globals && me.test(func, globals)) {
-        scope = globals;
+        return Pot.localEval.doEval(code, scope);
       }
       if (scope) {
         if (scope[func].call && scope[func].apply) {
@@ -1615,7 +1627,7 @@ Pot.update({
         doc.body.appendChild(script);
         doc.body.removeChild(script);
       } else {
-        return (new Function(code))();
+        return Pot.localEval(code, scope);
       }
     }
   }, {
@@ -1660,25 +1672,35 @@ Pot.update({
    *   // @results (Error: hoge is undefined)
    *
    *
-   * @param  {String}  code  The code to evaluate.
-   * @return {*}             The value of evaluated result.
+   * @param  {String}     code    The code to evaluate.
+   * @param  {Object|*}  (scope)  (Optional) The evaluation scope.
+   * @return {*}                  The value of evaluated result.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  localEval : update(function(code) {
-    var that = Pot.globalEval, me = arguments.callee, src;
+  localEval : update(function(code, scope) {
+    var that = Pot.globalEval, me = arguments.callee, src, func, context;
     if (code && that.patterns.valid.test(code)) {
-      if (typeof eval !== 'undefined') {
-        return me.doEval(code);
+      func = 'eval';
+      if (func in globals && that.test(func, globals)) {
+        context = globals;
+      } else if (func in Pot.Global && that.test(func, Pot.Global)) {
+        context = Pot.Global;
+      }
+      if (context && context[func] &&
+          context[func].call && context[func].apply) {
+        return me.doEval(code, context, scope);
       } else {
-        if (me.isLiteral.test(code) && !me.hasReturn.test(code)) {
+        if (me.isLiteral.test(code) && !Pot.hasReturn(code)) {
           src = 'return(' + String(code).replace(me.clean, '') + ');';
         } else {
           src = code;
         }
-        return (new Function('return(function(){' + src + '})();'))();
+        return (new Function(
+          'return(function(){' + src + '}).call(this);'
+        )).call(scope);
       }
     }
   }, {
@@ -1692,18 +1714,280 @@ Pot.update({
     /**
      * @ignore
      */
-    hasReturn : /\breturn\b(?![\s\S]*\breturn\b[\s\S]*$)[\s\S]*$/,
-    /**
-     * @ignore
-     */
     clean : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g,
     /**
      * @ignore
      */
     doEval : function() {
-      return eval(arguments[0]);
+      return arguments[1]['eval'].call(
+        arguments[2] || arguments[1],
+        arguments[0]
+      );
     }
-  })
+  }),
+  /**
+   * Check whether the function has "return" statement.
+   *
+   *
+   * @example
+   *   var func = function() {
+   *     return 'hoge';
+   *   };
+   *   debug(hasReturn(func));
+   *   // @results  true
+   *
+   *
+   * @example
+   *   var func = function() {
+   *     var hoge = 1;
+   *   };
+   *   debug(hasReturn(func));
+   *   // @results  false
+   *
+   *
+   * @example
+   *   var func = function return_test(return1, return$2) {
+   *     // dummy comment: return 'hoge';
+   *     var $return = 'return(1)' ? (function(a) {
+   *       if (a) {
+   *         return true;
+   *       }
+   *       return false;
+   *     })(/return true/) : "return false";
+   *   };
+   *   debug(hasReturn(func));
+   *   // @results  false
+   *
+   *
+   * @example
+   *   var func = function() {
+   *     if (1) {
+   *       return (function() {
+   *         return 'hoge';
+   *       })();
+   *     }
+   *   };
+   *   debug(hasReturn(func));
+   *   // @results  true
+   *
+   *
+   * @example
+   *   // Using E4X Syntax for test.
+   *   var func = function() {
+   *     // return 'hoge';
+   *     var e1 = <>return</>;
+   *     var e2 = <><![CDATA[
+   *       return 1;
+   *     ]]></>;
+   *     var e3 = <> <div data={(function() {
+   *       return 'hoge';
+   *     })()}>
+   *       return 1;
+   *     </div></>;
+   *     var e4 = <><!--</>-->return 1;</>;
+   *     var re = /<><!--[\/]--><\/>/gim;
+   *     var e5 = <root><hoge fuga={(function() {
+   *       return 1;
+   *     })()} piyo="<root>">
+   *     <root>return</root>return;<!--</root>"<root>"-->return;
+   *     <!--return-->
+   *     </hoge></root>;
+   *     var root = "</root>";
+   *     var r = 'return(1)' ? (function(a) {
+   *       if (a) {
+   *         return true;
+   *       }
+   *       return false;
+   *     })(/return true/) : "return false";
+   *   };
+   *   debug(hasReturn(func));
+   *   // @results  false
+   *
+   *
+   * @param  {Function|String}   func   The code or function to check.
+   * @return {Boolean}                  Whether the function has
+   *                                      "return" statement.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  hasReturn : (function() {
+    var PATTERNS = {
+      STRIP    : new RegExp(
+              '^\\s*function\\b[^{]*[{]' +
+        '|' + '[}][^}]*$' +
+        '|' + '/[*][\\s\\S]*?[*]/' +
+        '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +
+        '|' + '"(?:\\\\.|[^"\\\\])*"' +
+        '|' + "'(?:\\\\.|[^'\\\\])*'",
+        'g'
+      ),
+      RETURN   : /(?:^|\s|[^\w$.]\b)return(?:[^\w$.]\b|\s|$)/,
+      FUNC     : /(?:^|\s|[^\w$.]\b)function(?:[^\w$.]\b|\s|)[^{}]*$/,
+      PREREGEX : /(?:^|[,;:!?=&|!([]|[^\w$.<>%'"@){}\]])\s*\/$/,
+      REGEXP   : /(\/(?![*])(?:\\.|[^\/\r\n\\])+\/)$/,
+      E4X      : /(?:^|[(){}<>&|%*~^!?:;,\/[\]=+-])\s*<([^\s>]*)[^>]*>$/,
+      TAG      : /<([^\s>]*)[^>]*>$/
+    },
+    limit = 0x2000,
+    count = 0,
+    cache = {};
+    return function(func) {
+      var result = false, code, open, close, org,
+          s, i, len, c, s, n, x, z, r, m, cdata, tag, skip;
+      code = stringify(func && func.toString && func.toString() || func);
+      if (code in cache) {
+        return cache[code];
+      }
+      org = code;
+      code = code.replace(PATTERNS.STRIP, '');
+      if (code && PATTERNS.RETURN.test(code)) {
+        n = 0;
+        x = 0;
+        r = '';
+        z = '';
+        s = '';
+        tag = '';
+        skip = false;
+        cdata = false;
+        len = code.length;
+        for (i = 0; i < len; i++) {
+          c = code.charAt(i);
+          if (r && c !== '/') {
+            r += c;
+            continue;
+          }
+          switch (c) {
+            case '{':
+                if (x === 0 && PATTERNS.FUNC.test(s)) {
+                  n++;
+                }
+                break;
+            case '}':
+                if (x === 0 && n > 0) {
+                  n--;
+                }
+                break;
+            case '/':
+                if (!skip && n === 0) {
+                  if (x > 0) {
+                    z += c;
+                  } else if (!r) {
+                    s += c;
+                    if (PATTERNS.PREREGEX.test(s)) {
+                      r = c;
+                      s = s.slice(0, -1) + ' ';
+                    }
+                  } else if (r) {
+                    r += c;
+                    if (PATTERNS.REGEXP.test(r)) {
+                      r = '';
+                    }
+                  }
+                }
+                break;
+            case '-':
+                if (n === 0) {
+                  if (x > 0) {
+                    z += c;
+                    if (z.slice(-4) === '<!--') {
+                      skip = true;
+                      z = z.slice(0, -4) + ' ';
+                    }
+                  } else {
+                    s += c;
+                  }
+                }
+                break;
+            case '[':
+                if ((cdata || !skip) && n === 0) {
+                  if (x > 0) {
+                    z += c;
+                    if (z.slice(-9).toUpperCase() === '<![CDATA[') {
+                      skip = true;
+                      cdata = true;
+                      z = z.slice(0, -9) + ' ';
+                    }
+                  } else {
+                    s += c;
+                  }
+                }
+                break;
+            case ']':
+                if ((cdata || !skip) && n === 0) {
+                  if (x > 0) {
+                    z += c;
+                  } else {
+                    s += c;
+                  }
+                }
+                break;
+            case '<':
+                if ((cdata || !skip) && n === 0) {
+                  if (x > 0) {
+                    z += c;
+                  } else {
+                    s += c;
+                  }
+                }
+                break;
+            case '>':
+                if (n === 0) {
+                  if (x === 0) {
+                    s += c;
+                    if (PATTERNS.E4X.test(s)) {
+                      m = s.match(PATTERNS.TAG);
+                      x++;
+                      s = s.slice(0, -m[0].length) + ' ';
+                      tag = m[1];
+                      close = new RegExp('</' + rescape(tag) + '>$');
+                      open  = new RegExp('<' + rescape(tag) + '\\b[^>]*>$');
+                    }
+                  } else if (x > 0) {
+                    if (skip) {
+                      if ((!cdata && z.slice(-2) === '--') ||
+                           (cdata && z.slice(-2) === ']]')) {
+                        skip = cdata = false;
+                        z = z.slice(0, -2);
+                      }
+                      z += ' ';
+                      break;
+                    }
+                    z += c;
+                    if (close && close.test(z)) {
+                      x--;
+                      if (x === 0) {
+                        tag = z = '';
+                      }
+                    } else if (open && open.test(z)) {
+                      x++;
+                    }
+                  }
+                }
+                break;
+            default:
+                if (!skip && n === 0) {
+                  if (x > 0) {
+                    z += c;
+                  } else {
+                    s += c;
+                  }
+                }
+                break;
+          }
+        }
+        if (PATTERNS.RETURN.test(s)) {
+          result = true;
+        }
+      }
+      if (count < limit) {
+        cache[org] = result;
+        count++;
+      }
+      return result;
+    };
+  })()
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -1939,7 +2223,7 @@ function invoke(/*object[, method[, ...args]]*/) {
     }
     return (new Function(
       'e,o,m,p',
-      ['return e ? o[m](', ') : m(', ');'].join(t.join(','))
+      ['return e?o[m](', '):m(', ');'].join(t.join(','))
     ))(emit, object, method, p);
   }
 }
@@ -2047,7 +2331,7 @@ update(debug, {
       return o.toSource();
     }
     r = [];
-    switch (typeLikeOf(o)) {
+    switch (Pot.typeLikeOf(o)) {
       case 'array':
           each(o, function(v) {
             r[r.length] = me(v);
@@ -3782,7 +4066,7 @@ function fireSync() {
  * @ignore
  */
 function fireProcedure() {
-  var that = this, result, callbacks, callback, nesting, isStop;
+  var that = this, result, reply, callbacks, callback, nesting, isStop;
   clearChainDebris.call(this);
   result  = this.results[Pot.Deferred.states[this.state]];
   nesting = null;
@@ -3797,10 +4081,16 @@ function fireProcedure() {
       if (this.destassign ||
           (Pot.isNumber(callback.length) && callback.length > 1 &&
            Pot.isArray(result) && result.length === callback.length)) {
-        result = callback.apply(this, result);
+        reply = callback.apply(this, result);
       } else {
-        result = callback.call(this, result);
+        reply = callback.call(this, result);
       }
+      // We ignore undefined result when "return" statement is not exists.
+      if (reply === undefined &&
+          !Pot.isError(result) && !Pot.hasReturn(callback)) {
+        reply = result;
+      }
+      result = reply;
       this.destassign = false;
       this.state = setState.call({}, result);
       if (Pot.isDeferred(result)) {
@@ -3832,10 +4122,7 @@ function fireProcedure() {
       break;
     }
   }
-  // We ignore undefined result.
-  if (result !== undefined) {
-    this.results[Pot.Deferred.states[this.state]] = result;
-  }
+  this.results[Pot.Deferred.states[this.state]] = result;
   if (nesting && this.nested) {
     result.ensure(nesting).end();
   }
@@ -11353,6 +11640,109 @@ update(Pot.Net, {
       }
       return d;
     };
+  })(),
+  /**
+   * Non-blocking script loader.
+   *
+   * @param  {String}             url        The script URL or URI.
+   * @param  {Object|Function}   (options)   The loading options.
+   * @return {Deferred}                      Return the Deferred.
+   *
+   * @type   Function
+   * @function
+   * @static
+   * @public
+   */
+  loadScript : (function() {
+    var PATTERNS;
+    if (Pot.System.isNonBrowser || !Pot.System.isNotExtension) {
+      return function(url, options) {
+        return Pot.Net.request(url, update({
+          method   : 'GET',
+          mimeType : 'text/javascript',
+          headers  : {
+            'Content-Type' : 'text/javascript'
+          }
+        }, options || {})).then(function(res) {
+          return Pot.globalEval(res.responseText);
+        });
+      };
+    }
+    /**@ignore*/
+    PATTERNS = {
+      DONE     : /loaded|complete/,
+      CALLBACK : /^callback|(?:on|)(?:load(?:ed|)|ready)/i
+    };
+    return function(url, options) {
+      var d, script, opts, doc, head, uri, callback, done;
+      d = new Pot.Deferred();
+      try {
+        if (Pot.isFunction(options)) {
+          opts = {callback : opts};
+          callback = opts.callback;
+        } else {
+          opts = update({}, options || {});
+          each(opts, function(v, k) {
+            if (Pot.isFunction(v)) {
+              callback = v;
+              if (PATTERNS.CALLBACK.test(k)) {
+                throw Pot.StopIteration;
+              }
+            }
+          });
+        }
+        if (callback) {
+          d.then(function() {
+            return callback.apply(this, arguments);
+          });
+        }
+        uri = buildURL(url, opts.queryString || opts.sendContent);
+        doc = Pot.System.currentDocument;
+        head = getHead();
+        if (!doc || !head || !uri) {
+          return d.raise(uri || head || doc);
+        }
+        script = doc.createElement('script');
+        script.async = 'async';
+        script.type = opts.type || 'text/javascript';
+        if (opts.charset) {
+          script.charset = opts.charset;
+        }
+        script.src = uri;
+        /**@ignore*/
+        script.onload =
+        /**@ignore*/
+        script.onreadystatechange = function(a, isAbort) {
+          if (!done && script &&
+              (isAbort === 1 || !script.readyState ||
+               PATTERNS.DONE.test(script.readyState))
+          ) {
+            done = true;
+            try {
+              script.onload = script.onreadystatechange = null;
+            } catch (e) {}
+            if (head && script && script.parentNode) {
+              try {
+                head.removeChild(script);
+              } catch (e) {}
+            }
+            script = undefined;
+            d.begin();
+          }
+        };
+        d.canceller(function() {
+          try {
+            if (script) {
+              script.onload(0, 1);
+            }
+          } catch (e) {}
+        });
+        head.insertBefore(script, head.firstChild);
+      } catch (e) {
+        d.raise(e);
+      }
+      return d;
+    };
   })()
 });
 
@@ -11423,8 +11813,9 @@ function insertId(url, id, defaults) {
 
 // Update methods for reference.
 Pot.update({
-  request : Pot.Net.request,
-  jsonp   : Pot.Net.requestByJSONP
+  request    : Pot.Net.request,
+  jsonp      : Pot.Net.requestByJSONP,
+  loadScript : Pot.Net.loadScript
 });
 
 })();
@@ -11562,6 +11953,14 @@ update(Pot.XPCOM, {
   }
 });
 
+// Update Pot object.
+Pot.update({
+  evalInSandbox       : Pot.XPCOM.evalInSandbox,
+  throughout          : Pot.XPCOM.throughout,
+  getMostRecentWindow : Pot.XPCOM.getMostRecentWindow,
+  getChromeWindow     : Pot.XPCOM.getChromeWindow
+});
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Debug.
 Pot.update({
@@ -11683,7 +12082,7 @@ Pot.update({
     if (inputs && outputs) {
       if (inputs === Pot) {
         if (Pot.Internal.exportPot && Pot.Internal.PotExportProps) {
-          result = Pot.Internal.exportPot(advised, true);
+          result = Pot.Internal.exportPot(advised, true, true);
         }
       } else {
         each(inputs, function(prop, name) {
@@ -11709,27 +12108,63 @@ update(Pot.Internal, {
    * @ignore
    * @internal
    */
-  exportPot : function(advised, forGlobalScope, initialize) {
+  exportPot : function(advised, forGlobalScope, allProps, initialize) {
     var outputs, noops = [];
     outputs = Pot.Internal.getExportObject(forGlobalScope);
     if (outputs) {
-      each(Pot.Internal.PotExportProps, function(prop, name) {
-        if (advised && name in outputs) {
-          noops[noops.length] = name;
-        } else {
-          outputs[name] = prop;
-        }
-      });
+      if (allProps) {
+        each(Pot.Internal.PotExportProps, function(prop, name) {
+          if (advised && name in outputs) {
+            noops[noops.length] = name;
+          } else {
+            outputs[name] = prop;
+          }
+        });
+      } else {
+        each(Pot.Internal.PotExportObject, function(prop, name) {
+          if (advised && name in outputs) {
+            noops[noops.length] = name;
+          } else {
+            outputs[name] = prop;
+          }
+        });
+      }
     }
     if (initialize) {
-      if (Pot.System.isWebBrowser) {
-        outputs = Pot.Internal.getExportObject(true);
-        if (outputs && outputs.Pot !== Pot) {
-          update(outputs, {Pot : Pot});
+      outputs = Pot.Internal.getExportObject(
+        Pot.System.isNodeJS ? false : true
+      );
+      if (outputs) {
+        update(outputs, Pot.Internal.PotExportObject);
+      }
+      // for Node.js and CommonJS.
+      if ((Pot.System.isNonBrowser ||
+           !Pot.System.isNotExtension) && typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+          exports = module.exports = Pot;
         }
+        exports.Pot = Pot;
+      } else if (typeof define === 'function' && define.amd) {
+        // for AMD.
+        define('pot', function() {
+          return Pot;
+        });
+      }
+      if (outputs && !outputs.Pot) {
+        outputs['Pot'] = Pot;
       }
     }
     return noops;
+  },
+  /**
+   * The object to export.
+   *
+   * @private
+   * @ignore
+   * @internal
+   */
+  PotExportObject : {
+    Pot : Pot
   },
   /**
    * The properties to export.
@@ -11804,6 +12239,7 @@ update(Pot.Internal, {
     lastIndexOf            : Pot.lastIndexOf,
     globalEval             : Pot.globalEval,
     localEval              : Pot.localEval,
+    hasReturn              : Pot.hasReturn,
     currentWindow          : Pot.currentWindow,
     currentDocument        : Pot.currentDocument,
     currentURI             : Pot.currentURI,
@@ -11815,6 +12251,11 @@ update(Pot.Internal, {
     urlDecode              : Pot.URI.urlDecode,
     request                : Pot.Net.request,
     jsonp                  : Pot.Net.requestByJSONP,
+    loadScript             : Pot.Net.loadScript,
+    evalInSandbox          : Pot.XPCOM.evalInSandbox,
+    throughout             : Pot.XPCOM.throughout,
+    getMostRecentWindow    : Pot.XPCOM.getMostRecentWindow,
+    getChromeWindow        : Pot.XPCOM.getChromeWindow,
     rescape                : rescape,
     arrayize               : arrayize,
     invoke                 : invoke,
@@ -11942,7 +12383,7 @@ Pot.update({
 
 
 // Export the Pot object.
-Pot.Internal.exportPot(false, false, true);
+Pot.Internal.exportPot(false, false, false, true);
 
 
 })(this || {});

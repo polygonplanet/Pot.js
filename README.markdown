@@ -17,7 +17,7 @@ Will work with common ways.
 For Node.js.
 
     // Example to define Pot object on Node.js.
-    var Pot = require('./potlite.js').Pot;
+    var Pot = require('./potlite.js');
     Pot.debug(Pot.VERSION);
     
     Pot.Deferred.begin(function() {
@@ -32,12 +32,12 @@ Example of Greasemonkey (userscript).
     // @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
     // ...
     // ==/UserScript==
-    begin(function() {
-        return request('http://www.example.com/data.json').then(function(res) {
-            return parseFromJSON(res.responseText);
+    Pot.Deferred.begin(function() {
+        return Pot.request('http://www.example.com/data.json').then(function(res) {
+            return Pot.parseFromJSON(res.responseText);
         });
     }).then(function(res) {
-        debug(res);
+        Pot.debug(res);
         // do something...
     });
     //...
@@ -106,6 +106,9 @@ Example
 Example:   
 A simple iterate and Deferred object usage with asynchronous and synchronous.
 
+    // This example uses globalize for short function name.
+    Pot.globalize();
+    
     begin(function() {
         debug('BEGIN example');
     }).then(function() {
