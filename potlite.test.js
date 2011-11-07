@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.10
- * @date           2011-11-03
+ * @version        1.11
+ * @date           2011-11-08
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -22,13 +22,14 @@ var Assert = {
 $(function() {
   // IE9 SUCKS
   try {
-    if (typeof update !== 'function') {
+    if (typeof Pot === 'undefined') {
       throw 'continue';
     }
   } catch (e) {
     setTimeout(arguments.callee, 13);
     return;
   }
+  Pot.globalize();
   update(Assert, {
     results : [],
     OUTPUT  : $('#output').get(0),
@@ -2090,6 +2091,22 @@ $(function() {
         });
       },
       expect : [100, 200, 300, 400, 500]
+    }, {
+      title  : 'Statement for return and non-return',
+      code   : function() {
+        return begin(function() {
+          return 'foo';
+        }).then(function(res) {
+          var nop = res;
+        }).then(function(res) {
+          return res + 'bar';
+        }).then(function() {
+          void 0;
+        }).wait(1).then(function(res) {
+          return res + 'baz';
+        });
+      },
+      expect : 'foobarbaz'
     }]
   });
   Assert.run();

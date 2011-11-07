@@ -198,6 +198,7 @@ $(function() {
                         <li><a href="#function.Pot.lastIndexOf">lastIndexOf</a></li>
                         <li><a href="#function.Pot.request">request</a></li>
                         <li><a href="#function.Pot.jsonp">jsonp</a></li>
+                        <li><a href="#function.Pot.loadScript">loadScript</a></li>
                         <li><a href="#function.Pot.serializeToJSON">serializeToJSON</a></li>
                         <li><a href="#function.Pot.parseFromJSON">parseFromJSON</a></li>
                         <li><a href="#function.Pot.serializeToQueryString">serializeToQueryString</a></li>
@@ -346,11 +347,29 @@ $(function() {
           例:
          </p>
          <pre>&lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;</pre>
+         読み込み後の例:
+         <pre>&lt;script type="text/javascript"&gt;
+// 任意に globalize で短い記述にできる (下記参照)
+Pot.globalize();
+
+begin(function() {
+    return request('./hoge.json', {
+        mimeType : 'text/javascript'
+    }).then(function(res) {
+        return parseFromJSON(res.responseText);
+    });
+}).then(function(res) {
+    return Deferred.forEach(res.items, function(value, key) {
+        // ...
+    });
+});
+// ...
+&lt;/script&gt;</pre>
          <p>
           Node.js の場合。
          </p>
          <pre>// Example to define Pot object on Node.js.
-var Pot = require('./potlite.js').Pot;
+var Pot = require('./potlite.js');
 Pot.debug(Pot.VERSION);
 
 Pot.Deferred.begin(function() {
@@ -365,12 +384,13 @@ Pot.Deferred.begin(function() {
 // @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
 // ...
 // ==/UserScript==
-begin(function() {
-    return request('http://www.example.com/data.json').then(function(res) {
-        return parseFromJSON(res.responseText);
+
+Pot.Deferred.begin(function() {
+    return Pot.request('http://www.example.com/data.json').then(function(res) {
+        return Pot.parseFromJSON(res.responseText);
     });
 }).then(function(res) {
-    debug(res);
+    Pot.debug(res);
     // do something...
 });
 //...</pre>
@@ -497,27 +517,23 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
            </p>
            <p>
             Pot.js および PotLite.js は、
-            Pot というオブジェクトを中核として
-            Pot.Deferred, Pot.Iter などのオブジェクトやコンストラクタを定義しています。
+            他のライブラリと名前などが衝突しないよう
+            <br>
+            Pot というオブジェクトのみグローバルに定義されます。
+            <br>
+            Node.js などモジュールが有効な環境では、
+            グローバルに定義する代わりに exports を使用し
+            require によって利用できるよう定義されます。
            </p>
            <p>
-            Pot.js (PotLite.js) スクリプトの読み込み時に、
-            主な関数は短いメソッド名で呼べるようグローバルスコープにエクスポートされます。
-            <br>
-            (例えば Pot.Deferred.begin が begin だけでコールできるよう定義されます。)
-            <br>
-            Node.js は例外で、モジュールを用いるためグローバル化されません。
-           </p>
-           <p>
-            Node.js 上やエクスポートが有効でない環境などで、
-            任意にグローバルスコープに各関数を定義したい場合は、
+            関数名などを短い記述で書きたい場合、
            </p>
            <pre>Pot.globalize();</pre>
            <p>
             と最初に記述することで、
             例えば Pot.Deferred.begin が begin だけの記述で呼び出せるようになります。
             <br>
-            もし、他のライブラリ等と衝突してしまう場合は
+            もし、他のライブラリ等と名前の衝突してしまう場合は
             無理と短い記述をする必要ありません。
            </p>
            <p>
@@ -534,8 +550,7 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
         <div>
          <div>
            <p>
-            以降、Pot.Deferred について
-            ほそぼそとつづります。
+            以降、Pot.Deferred について解説します。
            </p>
            <h3 id="callbackChain">チェイン</h3>
            <div>
@@ -756,18 +771,17 @@ Deferred.forEach(urls, function(url) {
              すべての処理が終わった後、次のコールバックが呼ばれます。
              parallel は、オリジナルの JSDeferred.parallel をベースに実装されています。
             </p>
-            <!--#例外があるため保留#
             <p><br></p>
             <p>
              各チェインのコールバック関数の結果は、
-             return により undefined 以外が返されると
-             次のチェインの引数として渡されます。
+             return した値が次のチェインの引数として渡されます。
              <br>
-             コールバック関数から return されなかったり、
-             undefined が返った場合は
+             コールバック関数から return されなかった場合、
              結果値として無視されます。
              <br>
              その場合、前の結果値を引継ぎ次のコールバックに再び渡されます。
+             <br>
+             コールバック関数スコープ直下に return があるかないかで判断されます。
             </p>
             <pre>begin(function() {
     return 'foo';
@@ -785,7 +799,6 @@ Deferred.forEach(urls, function(url) {
 }).then(function(res) {
     alert(res); // 'bar'
 });</pre>
-            -->
             <h4 id="exception">例外処理</h4>
             <p>
              非同期処理の中で発生した例外は、
@@ -1969,7 +1982,7 @@ debug(isNodeList(obj));   // false
 debug(isNodeList(nodes)); // true</pre>
              </dd>
              <dt>
-              <dfn id="function.Pot.isNodeLike">isNodeLike</dfn>(x)
+              <dfn id="function.Pot.isNodeLike"><em>Pot.</em>isNodeLike</dfn>(x)
              </dt>
              <dd>
               x が DOM Node のようなものなら true を返す。
@@ -2113,7 +2126,7 @@ lastIndexOf({a: 2, b: 5, c: 9, d: 2}, 2, 'c'); // 'a'</pre>
               queryString, callback が使用可能。
               <br>
               例:
-              <pre>// jQuery.jsonp と同じ URL コールバックの指定が可能
+              <pre>// jQuery.getJSON と同じ URL コールバックの指定が可能
 var url = 'http://www.example.com/jsonpTest?callback=?';
 jsonp(url, {
     queryString : {
@@ -2121,6 +2134,26 @@ jsonp(url, {
     }
 }).then(function(data) {
     debug(data.results[0].text);
+});</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.loadScript"><em>Pot.</em>loadScript</dfn>(url[, options])
+             </dt>
+             <dd>
+              非同期でスクリプトを読み込みます。
+              <br>
+              Pot.Deferred のインスタンスが返ります。
+              <br>
+              Web ブラウザ上では、&lt;script&gt; 要素を使います。
+              <br>
+              それ以外の環境では Pot.request 関数によりスクリプトを取得し評価します。
+              <br>
+              スクリプトはグローバルスコープで評価されます。
+              <br>
+              例:
+              <pre>loadScript('http://www.example.com/hoge.js').then(function() {
+    // この時点でスクリプトは評価済み
+    var result = hoge();
 });</pre>
              </dd>
              <dt>
@@ -3665,7 +3698,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-05
+         Last modified: 2011-11-08
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
