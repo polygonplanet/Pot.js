@@ -3462,10 +3462,10 @@ debug(result); // Error: foo</pre>
               <pre>// チェインの結果値とメソッドの引数の値を足すメソッドを登録
 register('add', function(args) {
     // 引数 args はオブジェクトで渡されます
-    //  - args.input  : 登録したメソッドに渡された引数
-    //  - args.result : チェインの結果値
+    //  - args.inputs  : 登録したメソッドに渡された arguments
+    //  - args.results : チェインの結果値となる arguments
 
-    return args.input + args.result;
+    return args.inputs[0] + args.results[0];
 });
 
 var d = new Pot.Deferred();
@@ -3698,7 +3698,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-08
+         Last modified: 2011-11-23
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>

@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.11
- * @date           2011-11-08
+ * @version        1.12
+ * @date           2011-11-23
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -1776,7 +1776,7 @@ $(function() {
       title  : 'Pot.Deferred.register()',
       code   : function() {
         register('add', function(args) {
-          return args.input + args.result;
+          return args.inputs[0] + args.results[0];
         });
         var d = new Pot.Deferred();
         d.then(function() {
@@ -1792,7 +1792,7 @@ $(function() {
       title  : 'Pot.Deferred.unregister()',
       code   : function() {
         register('add', function(args) {
-          return args.input + args.result;
+          return args.inputs[0] + args.results[0];
         });
         var d = new Pot.Deferred();
         return d.then(function() {
@@ -2107,6 +2107,92 @@ $(function() {
         });
       },
       expect : 'foobarbaz'
+    }, {
+      title  : 'Pot.Signal.attachPropBefore',
+      code   : function() {
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key);
+            value.push(a + b);
+          }
+        };
+        var value = [];
+        attachPropBefore(obj, 'method', function(a, b) {
+          value.push(a + b);
+        });
+        attachPropBefore(obj, 'method', function(a, b) {
+          value.push(a + b + a + b);
+        });
+        obj.method(1, 2);
+        return value;
+      },
+      expect : [3, 6, 'obj', 3]
+    }, {
+      title  : 'Pot.Signal.attachPropAfter',
+      code   : function() {
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key);
+            value.push(a + b);
+          }
+        };
+        var value = [];
+        attachPropAfter(obj, 'method', function(a, b) {
+          value.push(a + b);
+        });
+        attachPropAfter(obj, 'method', function(a, b) {
+          value.push(a + b + a + b);
+        });
+        obj.method(1, 2);
+        return value;
+      },
+      expect : ['obj', 3, 3, 6]
+    }, {
+      title  : 'Pot.Signal.attachPropBefore.once',
+      code   : function() {
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key);
+            value.push(a + b);
+          }
+        };
+        var value = [];
+        attachPropBefore.once(obj, 'method', function(a, b) {
+          value.push(a + b);
+        });
+        attachPropBefore.once(obj, 'method', function(a, b) {
+          value.push(a + b + a + b);
+        });
+        obj.method(1, 2);
+        obj.method(1, 2);
+        return value;
+      },
+      expect : [3, 6, 'obj', 3, 'obj', 3]
+    }, {
+      title  : 'Pot.Signal.attachPropAfter.once',
+      code   : function() {
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key);
+            value.push(a + b);
+          }
+        };
+        var value = [];
+        attachPropAfter.once(obj, 'method', function(a, b) {
+          value.push(a + b);
+        });
+        attachPropAfter.once(obj, 'method', function(a, b) {
+          value.push(a + b + a + b);
+        });
+        obj.method(1, 2);
+        obj.method(1, 2);
+        return value;
+      },
+      expect : ['obj', 3, 3, 6, 'obj', 3]
     }]
   });
   Assert.run();
