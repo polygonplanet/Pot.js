@@ -265,6 +265,18 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.Serializer.html">Pot.Serializer</a></li>
 	
+	<li><a href="../symbols/Pot.Signal.html">Pot.Signal</a></li>
+	
+	<li><a href="../symbols/Pot.Signal.attach.html">Pot.Signal.attach</a></li>
+	
+	<li><a href="../symbols/Pot.Signal.attachAfter.html">Pot.Signal.attachAfter</a></li>
+	
+	<li><a href="../symbols/Pot.Signal.attachBefore.html">Pot.Signal.attachBefore</a></li>
+	
+	<li><a href="../symbols/Pot.Signal.attachPropAfter.html">Pot.Signal.attachPropAfter</a></li>
+	
+	<li><a href="../symbols/Pot.Signal.attachPropBefore.html">Pot.Signal.attachPropBefore</a></li>
+	
 	<li><a href="../symbols/Pot.some.html">Pot.some</a></li>
 	
 	<li><a href="../symbols/Pot.System.html">Pot.System</a></li>
@@ -336,6 +348,16 @@ ul.inheritsList
 						</tr>
 					</thead>
 					<tbody>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								Pot.<b><a href="../symbols/Pot.html#.Global">Global</a></b>
+								</div>
+								<div class="description">Global object.</div>
+							</td>
+						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
@@ -728,6 +750,24 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.noop">noop</a></b>()
+								</div>
+								<div class="description">Noop function.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.override">override</a></b>(object, properties, converters/overrider, overrider/converters)
+								</div>
+								<div class="description">Override the method of the object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.range">range</a></b>(end/begin, (end), (step))
 								</div>
 								<div class="description">Create continuously array that
@@ -789,6 +829,15 @@ ul.inheritsList
 							</td>
 						</tr>
 					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.update">update</a></b>(target)
+								</div>
+								<div class="description">Extend target object from arguments.</div>
+							</td>
+						</tr>
+					
 					</tbody>
 				</table>
 				
@@ -833,6 +882,28 @@ ul.inheritsList
 				<div class="sectionTitle">
 					Field Detail
 				</div>
+				
+					<a name=".Global"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>Global</b>
+					
+					</div>
+					<div class="description">
+						Global object. (e.g. window)
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
 				
 					<a name="isArray"> </a>
 					<div class="fixedFont">
@@ -2759,6 +2830,169 @@ This method like Array.prototype.lastIndexOf
 
 					<hr />
 				
+					<a name=".noop"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>noop</b>()
+					
+					</div>
+					<div class="description">
+						Noop function.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".override"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>override</b>(object, properties, converters/overrider, overrider/converters)
+					
+					</div>
+					<div class="description">
+						Override the method of the object.
+That enable replace the return value and the arguments variables.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var Hoge = {
+    addHoge : function(value) {
+      return value + 'hoge';
+    }
+  };
+  debug(Hoge.addHoge('fugafuga'));
+  // @results 'fugafugahoge'
+  override(Hoge, 'addHoge', function(inherits, args, self, prop) {
+    var value = args[0];
+    var modify = '{{Modified:' + value + '}}';
+    args[0] = '';
+    return modify + inherits(args);
+  });
+  var result = Hoge.addHoge('fugafuga');
+  debug(result);
+  // @results '{{Modified:fugafuga}}hoge'</pre>
+					
+					<pre class="code">  var Numbers = {
+    NAME   : 'Numbers',
+    logAdd : function(a, b) {
+      return this.NAME + ':' + (a + b);
+    }
+  };
+  debug(Numbers.logAdd(1, 2));
+  // @results  'Numbers:3'
+  //
+  override(Numbers, 'logAdd', [[
+    /\bthis\.NAME\b/,
+    '"Result"'
+  ], [
+    /(["']):(['"])/,
+    '$1 = $2'
+  ], [
+    /\ba\s*[+]\s*b\b/,
+    '(a * b * 100)'
+  ]]);
+  debug(Numbers.logAdd(1, 2));
+  // @results  'Result = 200'</pre>
+					
+					<pre class="code">  var Numbers = {
+    NAME   : 'Numbers',
+    logAdd : function(a, b) {
+      return this.NAME + ':' + (a + b);
+    }
+  };
+  debug(Numbers.logAdd(1, 2));
+  // @results  'Numbers:3'
+  //
+  override(Numbers, 'logAdd', [
+    /this\.NAME\s*[+]\s*([()])?\s*["']:['"]\s*[+]/,
+    '"(*l_l)/"+$1'
+  ], function(inherits, args, self, prop) {
+    var a = args[0], b = args[1];
+    return '{{' + inherits(a + 100, b + 100) + '}}';
+  });
+  debug(Numbers.logAdd(1, 2));
+  // @results  '{{(*l_l)/203}}'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>object</b>
+									
+								</dt>
+								<dd>The target object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String|RegExp|Array}</span> <b>properties</b>
+									
+								</dt>
+								<dd>The method name. (can be multiple).
+        That can also be specified by regular expressions, and arrays.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Array|RegExp|String}</span> <b>converters/overrider</b>
+									
+								</dt>
+								<dd>(Optional) The converters to replace the function source code
+          by RegExp patterns.
+        e.g.
+          [/\breturn\b\s*([^;]+);/, 'throw $1;']</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>overrider/converters</b>
+									
+								</dt>
+								<dd>(Optional) The processing function.
+        The 4 arguments are passed.
+        <pre>
+          function(inherits, args, self, prop)
+            - inherits : {Function}
+                         Inherits function for the original method.
+            - args     : {Arguments}
+                         The original arguments.
+            - self     : {Object}
+                         The original object self.
+            - prop     : {String}
+                         The target method name.
+        </pre></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> Return the first argument `object`.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".range"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -3174,6 +3408,63 @@ The return types:
 						
 						
 
+					<hr />
+				
+					<a name=".update"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>update</b>(target)
+					
+					</div>
+					<div class="description">
+						Extend target object from arguments.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var obj = {foo: 'v1', bar: 'v2'};
+  var src = {baz: 'v3'};
+  update(obj, src);
+  debug(obj);
+  // @results  obj = {foo: 'v1', bar: 'v2', baz: 'v3'}</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>target</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...Object}</span> <b>(...)</b>
+									
+								</dt>
+								<dd>Subject objects.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> Updated object. (first argument).</dd>
+							
+							</dl>
+						
+						
+						
+
 					
 				
 			
@@ -3188,7 +3479,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Nov 08 2011 01:56:33 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Nov 23 2011 03:21:03 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

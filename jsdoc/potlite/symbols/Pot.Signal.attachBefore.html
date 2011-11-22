@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred#iterate</title>
+		<title>JsDoc Reference - Pot.Signal.attachBefore</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -296,7 +296,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class Pot.Deferred#iterate
+				Function Namespace Pot.Signal.attachBefore
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -313,8 +313,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred#iterate.">
-				<caption>Class Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Signal.attachBefore.">
+				<caption>Function Namespace Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -326,9 +326,11 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#constructor">Pot.Deferred#iterate</a></b>(callback, (context))
+								<b><a href="../symbols/Pot.Signal.attachBefore.html#constructor">Pot.Signal.attachBefore</a></b>(object, signalName, callback, (useCapture), (once))
 							</div>
-							<div class="description">Iterate an iterable object that is previous chain result.</div>
+							<div class="description">Attaches a signal to a slot on before,
+ and return a handler object as a unique identifier that
+ can be used to detach that signal.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -337,85 +339,28 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred#iterate.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.Signal.attachBefore.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#doze">doze</a></b>
+								<div class="fixedFont">Pot.Signal.attachBefore.<b><a href="../symbols/Pot.Signal.attachBefore.html#.once">once</a></b>(object, signalName, callback, (useCapture))
 								</div>
-								<div class="description">Iterates "iterate" loop with slower speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#fast">fast</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with fast speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#limp">limp</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with slowest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#ninja">ninja</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with fastest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#normal">normal</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with default speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#rapid">rapid</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred%23iterate.html#slow">slow</a></b>
-								</div>
-								<div class="description">Iterates "iterate" loop with slow speed.</div>
+								<div class="description">Similar to attach*(),
+  but detaches the signal handler automatically once it has fired.</div>
 							</td>
 						</tr>
 					
@@ -425,9 +370,6 @@ ul.inheritsList
 				
 				
 			
-
-<!-- ============================== methods summary ======================== -->
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -435,17 +377,17 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Class Detail
+					Function Namespace Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.Deferred#iterate</b>(callback, (context))
+						<b>Pot.Signal.attachBefore</b>(object, signalName, callback, (useCapture), (once))
 				</div>
 				
 				<div class="description">
-					Iterate an iterable object that is previous chain result.
-
-Iteration will use the results of the previous chain.
+					Attaches a signal to a slot on before,
+ and return a handler object as a unique identifier that
+ can be used to detach that signal.
 					
 				</div>
 				
@@ -457,20 +399,40 @@ Iteration will use the results of the previous chain.
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
+								<span class="light fixedFont">{Object|Function|String}</span>  <b>object</b>
+								
+							</dt>
+								<dd>The object that be target of the signal.
+          If passed in a string then will be a
+            HTML element by document.getElementById.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String|Array}</span>  <b>signalName</b>
+								
+							</dt>
+								<dd>`signalName` is a string that represents a signal name.
+          If `object` is a DOM object then
+            it can be specify one of the 'onxxx' native events.
+          That case 'on' prefix is optionally.</dd>
+						
+							<dt>
 								<span class="light fixedFont">{Function}</span>  <b>callback</b>
 								
 							</dt>
-								<dd>An iterable function.
-                                 function(value, key, object)
-                                   this == `context`.
-                               Throw Pot.StopIteration
-                                 if you want to stop the loop.</dd>
+								<dd>An action to take when the signal is triggered.</dd>
 						
 							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>(context)</b>
+								<span class="light fixedFont">{Boolean}</span>  <b>(useCapture)</b>
 								
 							</dt>
-								<dd>Optionally, context object. (i.e. this)</dd>
+								<dd>(Optional) `useCapture` will passed its 3rd argument to
+            addEventListener if environment is available it on DOM.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{Boolean}</span>  <b>(once)</b>
+								
+							</dt>
+								<dd>(Optional) Only internal usage.</dd>
 						
 						</dl>
 					
@@ -481,7 +443,8 @@ Iteration will use the results of the previous chain.
 						<dl class="detailList">
 						<dt class="heading">Returns:</dt>
 						
-								<dd><span class="light fixedFont">{Deferred}</span> Return the Deferred.</dd>
+								<dd><span class="light fixedFont">{Object|Array}</span> Return an instance of Pot.Signal.Handler object as
+            a unique identifier that can be used to detach that signal.</dd>
 						
 						</dl>
 					
@@ -493,167 +456,82 @@ Iteration will use the results of the previous chain.
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="doze"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>doze</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with slower speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with fast speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with slowest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with fastest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with default speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with faster speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Iterates "iterate" loop with slow speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name=".once"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Signal.attachBefore.</span><b>once</b>(object, signalName, callback, (useCapture))
+					
+					</div>
+					<div class="description">
+						Similar to attach*(),
+  but detaches the signal handler automatically once it has fired.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|Function|String}</span> <b>object</b>
+									
+								</dt>
+								<dd>The object that be target of the signal.
+          If passed in a string then will be a
+            HTML element by document.getElementById.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>signalName</b>
+									
+								</dt>
+								<dd>`signalName` is a string that represents a signal name.
+          If `object` is a DOM object then
+            it can be specify one of the 'onxxx' native events.
+          That case 'on' prefix is optionally.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>callback</b>
+									
+								</dt>
+								<dd>An action to take when the signal is triggered.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>(useCapture)</b>
+									
+								</dt>
+								<dd>(Optional) `useCapture` will passed its 3rd argument to
+            addEventListener if environment is available it on DOM.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> Return an instance of Pot.Signal.Handler object as
+            a unique identifier that can be used to detach that signal.</dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -666,7 +544,7 @@ Iteration will use the results of the previous chain.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Nov 23 2011 03:21:03 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Nov 23 2011 03:21:04 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
