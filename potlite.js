@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.21, 2011-11-08
+ * Version 1.22, 2011-11-23
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -31,8 +31,8 @@
  *
  * @fileoverview   Pot.js utility library (lite)
  * @author         polygon planet
- * @version        1.21
- * @date           2011-11-08
+ * @version        1.22
+ * @date           2011-11-23
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.21', TYPE : 'lite'},
+var Pot = {VERSION : '1.22', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 slice = Array.prototype.slice,
@@ -299,9 +299,8 @@ update(Pot, {
       r.tablet = true;
     }
     /**
-     * @lends Pot.OS
-     *
      * @return {String}  Return the platform as a string.
+     * @ignore
      */
     r.toString = function() {
       var s = [], p;
@@ -377,7 +376,7 @@ update(Pot, {
      * @ignore
      */
     getExportObject : function(forGlobalScope) {
-      var outputs;
+      var outputs, id, valid;
       if (forGlobalScope) {
         if (Pot.System.isNonBrowser) {
           outputs = Pot.Global || globals;
@@ -389,6 +388,23 @@ update(Pot, {
         if (!outputs &&
             typeof window !== 'undefined' && Pot.isWindow(window)) {
           outputs = window;
+        }
+        if (outputs) {
+          do {
+            id = buildSerial(Pot, '');
+          } while (id in outputs);
+          outputs[id] = 1;
+          valid = (new Function('try{return ' + id + '===1;}catch(e){}'))();
+          try {
+            delete outputs[id];
+          } catch (e) {
+            try {
+              outputs[id] = (void 0);
+            } catch (e) {}
+          }
+          if (!valid) {
+            outputs = Pot.Global;
+          }
         }
       }
       if (!outputs) {
@@ -411,6 +427,9 @@ update(Pot, {
       return outputs;
     }
   },
+  /**
+   * @lends Pot
+   */
   /**
    * Extend target object from arguments.
    *
@@ -1596,10 +1615,11 @@ Pot.update({
       if (Pot.System.isGreasemonkey) {
         // eval does not work to global scope on greasemonkey
         //   even if using the unsafeWindow.
-        return Pot.localEval.doEval(code, scope);
+        return Pot.localEval(code, scope || Pot.Global);
       }
       if (scope) {
-        if (scope[func].call && scope[func].apply) {
+        if (scope[func].call && scope[func].apply &&
+            me.test(func, scope, true)) {
           return scope[func].call(scope, code);
         }
         if (me.worksForGlobal == null) {
@@ -1611,7 +1631,13 @@ Pot.update({
           if (id in scope && scope[id] === 1) {
             me.worksForGlobal = true;
           }
-          delete scope[id];
+          try {
+            delete scope[id];
+          } catch (e) {
+            try {
+              scope[id] = (void 0);
+            } catch (e) {}
+          }
         }
         if (me.worksForGlobal) {
           return scope[func](code);
@@ -1627,7 +1653,7 @@ Pot.update({
         doc.body.appendChild(script);
         doc.body.removeChild(script);
       } else {
-        return Pot.localEval(code, scope);
+        return Pot.localEval(code, scope || Pot.Global);
       }
     }
   }, {
@@ -1647,13 +1673,21 @@ Pot.update({
     /**
      * @ignore
      */
-    test : function(func, obj) {
+    test : function(func, obj, useCall) {
       var result = false, nop = '(void 0);';
       try {
         if (obj) {
-          obj[func](nop);
+          if (useCall) {
+            obj.func.call(null, nop);
+          } else {
+            obj.func(nop);
+          }
         } else {
-          func(nop);
+          if (useCall) {
+            func.call(null, nop);
+          } else {
+            func(nop);
+          }
         }
         result = true;
       } catch (e) {
@@ -1681,7 +1715,7 @@ Pot.update({
    * @public
    */
   localEval : update(function(code, scope) {
-    var that = Pot.globalEval, me = arguments.callee, src, func, context;
+    var that = Pot.globalEval, me = arguments.callee, func, context;
     if (code && that.patterns.valid.test(code)) {
       func = 'eval';
       if (func in globals && that.test(func, globals)) {
@@ -1689,19 +1723,15 @@ Pot.update({
       } else if (func in Pot.Global && that.test(func, Pot.Global)) {
         context = Pot.Global;
       }
-      if (context && context[func] &&
-          context[func].call && context[func].apply) {
-        return me.doEval(code, context, scope);
-      } else {
-        if (me.isLiteral.test(code) && !Pot.hasReturn(code)) {
-          src = 'return(' + String(code).replace(me.clean, '') + ');';
-        } else {
-          src = code;
+      if (context && context[func]) {
+        if (context[func].call && context[func].apply &&
+            that.test(func, context, true)) {
+          return me.doEval(code, context, scope);
+        } else if (scope == null) {
+          return me.doEval(code, context, scope, true);
         }
-        return (new Function(
-          'return(function(){' + src + '}).call(this);'
-        )).call(scope);
       }
+      return me.doEvalByFunc(code, scope);
     }
   }, {
     /**
@@ -1714,15 +1744,44 @@ Pot.update({
     /**
      * @ignore
      */
+    isFunc : /^\s*function\b[^{]*[{][\s\S]*[}][^}]*$/,
+    /**
+     * @ignore
+     */
     clean : /^(?:[{[(']{0}[')\]}]+|)[;\s\u00A0]*|[;\s\u00A0]*$/g,
     /**
      * @ignore
      */
-    doEval : function() {
-      return arguments[1]['eval'].call(
-        arguments[2] || arguments[1],
-        arguments[0]
-      );
+    doEval : function(/*code[, context[, scope[, isSimple]]]*/) {
+      try {
+        return arguments[1]['eval'].call(
+          arguments[2] || arguments[1],
+          arguments[0]
+        );
+      } catch (e) {}
+      if (arguments[3]) {
+        return arguments[1]['eval'](arguments[0]);
+      } else {
+        return Pot.localEval.doEvalByFunc(
+          arguments[0],
+          arguments[2] || arguments[1]
+        );
+      }
+    },
+    /**
+     * @ignore
+     */
+    doEvalByFunc : function(code, scope) {
+      var that = Pot.localEval, src;
+      if (that.isFunc.test(code) ||
+          (that.isLiteral.test(code) && !Pot.hasReturn(code))) {
+        src = 'return(' + String(code).replace(that.clean, '') + ');';
+      } else {
+        src = code;
+      }
+      return (new Function(
+        'return(function(){' + src + '}).call(this);'
+      )).call(scope);
     }
   }),
   /**
@@ -1815,12 +1874,12 @@ Pot.update({
   hasReturn : (function() {
     var PATTERNS = {
       STRIP    : new RegExp(
-              '^\\s*function\\b[^{]*[{]' +
-        '|' + '[}][^}]*$' +
-        '|' + '/[*][\\s\\S]*?[*]/' +
-        '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +
-        '|' + '"(?:\\\\.|[^"\\\\])*"' +
-        '|' + "'(?:\\\\.|[^'\\\\])*'",
+              '^\\s*function\\b[^{]*[{]' +            // function prefix
+        '|' + '[}][^}]*$' +                           // function suffix
+        '|' + '/[*][\\s\\S]*?[*]/' +                  // multiline comment
+        '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +  // single line comment
+        '|' + '"(?:\\\\.|[^"\\\\])*"' +               // string literal
+        '|' + "'(?:\\\\.|[^'\\\\])*'",                // string literal
         'g'
       ),
       RETURN   : /(?:^|\s|[^\w$.]\b)return(?:[^\w$.]\b|\s|$)/,
@@ -1835,8 +1894,10 @@ Pot.update({
     cache = {};
     return function(func) {
       var result = false, code, open, close, org,
-          s, i, len, c, s, n, x, z, r, m, cdata, tag, skip;
-      code = stringify(func && func.toString && func.toString() || func);
+          s, i, len, c, n, x, z, r, m, cdata, tag, skip;
+      code = stringify(
+        func && func.toString && func.toString() || String(func)
+      );
       if (code in cache) {
         return cache[code];
       }
@@ -1915,14 +1976,6 @@ Pot.update({
                 }
                 break;
             case ']':
-                if ((cdata || !skip) && n === 0) {
-                  if (x > 0) {
-                    z += c;
-                  } else {
-                    s += c;
-                  }
-                }
-                break;
             case '<':
                 if ((cdata || !skip) && n === 0) {
                   if (x > 0) {
@@ -1987,7 +2040,205 @@ Pot.update({
       }
       return result;
     };
-  })()
+  })(),
+  /**
+   * Override the method of the object.
+   * That enable replace the return value and the arguments variables.
+   *
+   *
+   * @example
+   *   var Hoge = {
+   *     addHoge : function(value) {
+   *       return value + 'hoge';
+   *     }
+   *   };
+   *   debug(Hoge.addHoge('fugafuga'));
+   *   // @results 'fugafugahoge'
+   *   override(Hoge, 'addHoge', function(inherits, args, self, prop) {
+   *     var value = args[0];
+   *     var modify = '{{Modified:' + value + '}}';
+   *     args[0] = '';
+   *     return modify + inherits(args);
+   *   });
+   *   var result = Hoge.addHoge('fugafuga');
+   *   debug(result);
+   *   // @results '{{Modified:fugafuga}}hoge'
+   *
+   *
+   * @example
+   *   var Numbers = {
+   *     NAME   : 'Numbers',
+   *     logAdd : function(a, b) {
+   *       return this.NAME + ':' + (a + b);
+   *     }
+   *   };
+   *   debug(Numbers.logAdd(1, 2));
+   *   // @results  'Numbers:3'
+   *   //
+   *   override(Numbers, 'logAdd', [[
+   *     /\bthis\.NAME\b/,
+   *     '"Result"'
+   *   ], [
+   *     /(["']):(['"])/,
+   *     '$1 = $2'
+   *   ], [
+   *     /\ba\s*[+]\s*b\b/,
+   *     '(a * b * 100)'
+   *   ]]);
+   *   debug(Numbers.logAdd(1, 2));
+   *   // @results  'Result = 200'
+   *
+   *
+   * @example
+   *   var Numbers = {
+   *     NAME   : 'Numbers',
+   *     logAdd : function(a, b) {
+   *       return this.NAME + ':' + (a + b);
+   *     }
+   *   };
+   *   debug(Numbers.logAdd(1, 2));
+   *   // @results  'Numbers:3'
+   *   //
+   *   override(Numbers, 'logAdd', [
+   *     /this\.NAME\s*[+]\s*([()])?\s*["']:['"]\s*[+]/,
+   *     '"(*l_l)/"+$1'
+   *   ], function(inherits, args, self, prop) {
+   *     var a = args[0], b = args[1];
+   *     return '{{' + inherits(a + 100, b + 100) + '}}';
+   *   });
+   *   debug(Numbers.logAdd(1, 2));
+   *   // @results  '{{(*l_l)/203}}'
+   *
+   *
+   * @param  {Object}  object
+   *         The target object.
+   *
+   * @param  {String|RegExp|Array}  properties
+   *         The method name. (can be multiple).
+   *         That can also be specified by regular expressions, and arrays.
+   *
+   * @param  {Array|RegExp|String}  converters/overrider
+   *         (Optional) The converters to replace the function source code
+   *           by RegExp patterns.
+   *         e.g.
+   *           [/\breturn\b\s*([^;]+);/, 'throw $1;']
+   *
+   * @param  {Function}  overrider/converters
+   *         (Optional) The processing function.
+   *         The 4 arguments are passed.
+   *         <pre>
+   *           function(inherits, args, self, prop)
+   *             - inherits : {Function}
+   *                          Inherits function for the original method.
+   *             - args     : {Arguments}
+   *                          The original arguments.
+   *             - self     : {Object}
+   *                          The original object self.
+   *             - prop     : {String}
+   *                          The target method name.
+   *         </pre>
+   *
+   * @return {Object}    Return the first argument `object`.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   * @based Tombloo.addAround
+   */
+  override : function(object, properties, converters, overrider) {
+    var props = [], t;
+    if (object && properties && (converters || overrider)) {
+      if (overrider) {
+        if (Pot.isFunction(converters)) {
+          t = converters;
+          converters = overrider;
+          overrider = t;
+        }
+      } else {
+        if (Pot.isFunction(converters)) {
+          overrider = converters;
+        }
+      }
+      if (Pot.isRegExp(converters)) {
+        converters = [converters, ''];
+      } else if (Pot.isString(converters)) {
+        converters = [new RegExp(rescape(converters), 'g'), ''];
+      }
+      each(arrayize(properties), function(name) {
+        if (name) {
+          each(object, function(val, prop) {
+            if (Pot.isFunction(val) &&
+                ((Pot.isRegExp(name) && name.test(prop)) || name == prop)) {
+              props[props.length] = prop;
+            }
+          });
+        }
+      });
+      each(props, function(prop) {
+        var method, code, org, patterns, canApply;
+        if (hasOwnProperty.call(object, prop)) {
+          method = object[prop];
+          canApply = !!(object[prop] && object[prop].apply &&
+            typeof object[prop].apply === typeof object[prop].call);
+          if (converters) {
+            code = org = method.toString();
+            patterns = arrayize(converters);
+            if (!Pot.isArray(patterns[0])) {
+              patterns = [patterns];
+            }
+            each(patterns, function(pattern) {
+              var from, to;
+              try {
+                from = pattern[0];
+                to   = pattern[1];
+                if (Pot.isString(from)) {
+                  from = new RegExp(rescape(from), 'g');
+                }
+                if (!Pot.isString(to)) {
+                  to = '';
+                }
+                code = code.replace(from, to);
+              } catch (e) {}
+            });
+            if (org !== code) {
+              method = Pot.localEval(code, object);
+            }
+          }
+          object[prop] = update(function() {
+            var that = this, args = arguments;
+            if (Pot.isFunction(overrider)) {
+              return overrider.call(that, function() {
+                var a = arguments;
+                if (a.length === 1 && a[0] && a[0].callee &&
+                    a[0].callee === args.callee) {
+                  if (canApply) {
+                    return method.apply(that, arrayize(a[0]));
+                  } else {
+                    return invoke(object, prop, arrayize(a[0]));
+                  }
+                } else {
+                  if (canApply) {
+                    return method.apply(that, arrayize(a));
+                  } else {
+                    return invoke(object, prop, arrayize(a));
+                  }
+                }
+              }, args, that, prop);
+            } else {
+              return method.apply(that, args);
+            }
+          }, object[prop]);
+          if (!object[prop].overridden ||
+              Pot.isNumber(object[prop].overridden)) {
+            update(object[prop], {
+              overridden : ((object[prop].overridden || 0) - 0) + 1
+            });
+          }
+        }
+      });
+    }
+    return object;
+  }
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -3077,7 +3328,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @private
    * @ignore
    */
-  destassign : false,
+  destAssign : false,
   /**
    * @private
    * @ignore
@@ -3144,7 +3395,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
       freezing    : false,
       tilling     : false,
       waiting     : false,
-      destassign  : false,
+      destAssign  : false,
       chainDebris : null
     });
     Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
@@ -4078,7 +4329,7 @@ function fireProcedure() {
     }
     isStop = false;
     try {
-      if (this.destassign ||
+      if (this.destAssign ||
           (Pot.isNumber(callback.length) && callback.length > 1 &&
            Pot.isArray(result) && result.length === callback.length)) {
         reply = callback.apply(this, result);
@@ -4087,11 +4338,12 @@ function fireProcedure() {
       }
       // We ignore undefined result when "return" statement is not exists.
       if (reply === undefined &&
+          this.state !== Pot.Deferred.states.failure &&
           !Pot.isError(result) && !Pot.hasReturn(callback)) {
         reply = result;
       }
       result = reply;
-      this.destassign = false;
+      this.destAssign = false;
       this.state = setState.call({}, result);
       if (Pot.isDeferred(result)) {
         /**@ignore*/
@@ -4107,7 +4359,7 @@ function fireProcedure() {
       } else {
         setChainDebris.call(this, result);
       }
-      this.destassign = false;
+      this.destAssign = false;
       this.state = Pot.Deferred.states.failure;
       if (!Pot.isError(result)) {
         result = new Error(result);
@@ -4898,7 +5150,7 @@ update(Pot.Deferred, {
    * @example
    *   // Register a new method for add the input value and the result.
    *   Pot.Deferred.register('add', function(args) {
-   *     return args.input + args.result;
+   *     return args.inputs[0] + args.results[0];
    *   });
    *   // Use registered method.
    *   var d = new Pot.Deferred();
@@ -4920,9 +5172,9 @@ update(Pot.Deferred, {
    *                                  <pre>
    *                                  -------------------------------------
    *                                  function(args)
-   *                                    - args.input  :
+   *                                    - args.inputs  : {Arguments}
    *                                        The original input arguments.
-   *                                    - args.result :
+   *                                    - args.results : {Arguments}
    *                                        The result of previous
    *                                          callback chain.
    *                                  -------------------------------------
@@ -4968,12 +5220,11 @@ update(Pot.Deferred, {
           func = item[1];
           /**@ignore*/
           method = function() {
-            var params = {}, a = arrayize(arguments);
-            params.input = (a.length > 1) ? a : a[0];
+            var params = {};
+            params.inputs = arguments;
             return this.then(function() {
-              var ar = arrayize(arguments);
-              params.result = (ar.length > 1) ? ar : ar[0];
-              return func.apply(this, arrayize(params));
+              params.results = arguments;
+              return func.call(this, params);
             });
           };
           subs[name] = method;
@@ -4991,7 +5242,7 @@ update(Pot.Deferred, {
    * @example
    *   // Register a new method for add the input value and the result.
    *   Pot.Deferred.register('add', function(args) {
-   *     return args.input + args.result;
+   *     return args.inputs[0] + args.results[0];
    *   });
    *   // Use registered method.
    *   var d = new Pot.Deferred();
@@ -5480,20 +5731,23 @@ update(Pot.Deferred, {
         bounds[bounds.length] = key;
         d.then(function() {
           if (defer.state === Pot.Deferred.states.unfired) {
-            Pot.Deferred.callLazy(defer);
+            Pot.Deferred.flush(defer);
           }
           defer.then(function(value) {
-            values[key] = value;
-            bounds.pop();
-            if (bounds.length === 0) {
-              result.begin(values);
+            if (bounds.length) {
+              values[key] = value;
+              bounds.pop();
+              if (bounds.length === 0) {
+                result.begin(values);
+              }
             }
           }, function(err) {
+            bounds = [];
             result.raise(err);
           });
         });
       });
-      Pot.Deferred.callLazy(d);
+      Pot.Deferred.flush(d);
     }
     return result;
   },
@@ -5953,15 +6207,10 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   watch : function() {
     var that = this;
-    if (!this.async && this.waiting === true) {
-      if (Pot.System.isWaitable) {
-        Pot.XPCOM.throughout(function() {
-          return that.waiting !== true;
-        });
-      } else {
-        //XXX: Fix to synchronize loop for perfectly.
-        throw new Error('Failed to synchronize loop');
-      }
+    if (!this.async && this.waiting === true && Pot.System.isWaitable) {
+      Pot.XPCOM.throughout(function() {
+        return that.waiting !== true;
+      });
     }
   },
   /**
@@ -6759,9 +7008,9 @@ update(Pot.tmp, {
    * @ignore
    */
   createLightIterateConstructor : function(creator) {
-    var methods, construct, name;
+    var methods, construct, name,
     /**@ignore*/
-    var create = function(speed) {
+    create = function(speed) {
       var interval;
       if (Pot.Internal.LightIterator.speeds[speed] === undefined) {
         interval = Pot.Internal.LightIterator.defaults.speed;
@@ -8528,9 +8777,9 @@ update(Pot.tmp, {
    * @ignore
    */
   createSyncIterator : function(creator) {
-    var methods, construct;
+    var methods, construct,
     /**@ignore*/
-    var create = function(speed) {
+    create = function(speed) {
       var key = speed;
       if (!key) {
         each(Pot.Internal.LightIterator.speeds, function(v, k) {
@@ -11962,6 +12211,1256 @@ Pot.update({
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of Signal/Event.
+(function() {
+
+Pot.update({
+  /**
+   * Signal/Event utilities.
+   *
+   * @name Pot.Signal
+   * @type Object
+   * @class
+   * @static
+   * @public
+   */
+  Signal : {}
+});
+
+update(Pot.Signal, {
+  /**
+   * @lends Pot.Signal
+   */
+  /**
+   * @ignore
+   */
+  Handler : update(function(params) {
+    return new Pot.Signal.Handler.prototype.init(params);
+  }, {
+    /**
+     * @lends Pot.Signal.Handler
+     */
+    /**
+     * @ignore
+     * @const
+     * @private
+     */
+    advices : {
+      normal     : 0x01,
+      before     : 0x02,
+      around     : 0x04,
+      after      : 0x08,
+      propBefore : 0x10,
+      propAround : 0x20,
+      propAfter  : 0x40
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    beforeTrapper : function(object, sigName, args) {
+      Pot.Signal.signal(object, {
+        signal : sigName,
+        advice : Pot.Signal.Handler.advices.before,
+        args   : args
+      });
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    afterTrapper : function(object, sigName, args) {
+      Pot.Signal.signal(object, {
+        signal : sigName,
+        advice : Pot.Signal.Handler.advices.after,
+        args   : args
+      });
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    beforePropTrapper : function(object, sigName, args) {
+      Pot.Signal.signal(object, {
+        signal : sigName,
+        advice : Pot.Signal.Handler.advices.propBefore,
+        args   : args
+      });
+    },
+    /**
+     * @private
+     * @ignore
+     */
+    afterPropTrapper : function(object, sigName, args) {
+      Pot.Signal.signal(object, {
+        signal : sigName,
+        advice : Pot.Signal.Handler.advices.propAfter,
+        args   : args
+      });
+    }
+  }),
+  /**
+   * @lends Pot.Signal
+   */
+  /**
+   * @private
+   * @ignore
+   */
+  Observer : function(object, ev) {
+    var that = this, evt;
+    if (!this.PotInternal.serial) {
+      this.PotInternal.serial = buildSerial(this);
+    }
+    update(this.PotInternal, {
+      orgEvent : ev || (typeof window === 'object' && window.event) || {},
+      object   : object
+    });
+    evt = this.PotInternal.orgEvent;
+    if (!Pot.isObject(evt)) {
+      this.PotInternal.orgEvent = evt = {type : evt};
+    }
+    each(evt, function(v, p) {
+      if (p) {
+        if (!(p in that)) {
+          that[p] = v;
+        }
+      }
+    });
+    try {
+      if (!evt.target) {
+        evt.target = evt.srcElement || Pot.currentDocument() || {};
+      }
+      if (evt.target.nodeType == 3 && evt.target.parentNode) {
+        evt.target = evt.target.parentNode;
+      }
+      if (evt.metaKey == null) {
+        evt.metaKey = evt.ctrlKey;
+      }
+      if (evt.timeStamp == null) {
+        evt.timeStamp = now();
+      }
+      if (evt.relatedTarget == null) {
+        if (/mouse(?:over|enter)/.test(evt.type)) {
+          evt.relatedTarget = evt.fromElement;
+        } else if (/mouse(?:out|leave)/.test(evt.type)) {
+          evt.relatedTarget = evt.toElement;
+        }
+      }
+    } catch (ex) {}
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  handlers : [],
+  /**
+   * @private
+   * @ignore
+   */
+  locked : false,
+  /**
+   * @private
+   * @ignore
+   */
+  hasDebris : false,
+  /**
+   * Check whether the argument object is an instance of Pot.Signal.Handler.
+   *
+   *
+   * @param  {Object|*}  x  The target object to test.
+   * @return {Boolean}      Return true if the argument object is an
+   *                          instance of Pot.Signal.Handler,
+   *                          otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   */
+  isHandler : function(x) {
+    return x != null && ((x instanceof Pot.Signal.Handler) ||
+     (x.id   != null && x.id   === Pot.Signal.Handler.prototype.id &&
+      x.NAME != null && x.NAME === Pot.Signal.Handler.prototype.NAME));
+  },
+  /**
+   * Check whether the argument object is an instance of Pot.Signal.Observer.
+   *
+   *
+   * @param  {Object|*}  x  The target object to test.
+   * @return {Boolean}      Return true if the argument object is an
+   *                          instance of Pot.Signal.Observer,
+   *                          otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   */
+  isObserver : function(x) {
+    return x != null && ((x instanceof Pot.Signal.Observer) ||
+     (x.PotInternal != null && x.PotInternal.id != null &&
+      x.PotInternal.id === Pot.Signal.Observer.prototype.PotInternal.id &&
+      x.PotInternal.NAME != null &&
+      x.PotInternal.NAME === Pot.Signal.Observer.prototype.PotInternal.NAME));
+  },
+  /**
+   * Attaches a signal to a slot,
+   *  and return a handler object as a unique identifier that
+   *  can be used to detach that signal.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String|Array}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @param  {Boolean}  (once)
+   *           (Optional) Only internal usage.
+   * @return {Object|Array}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @type Function
+   * @function
+   * @class
+   * @public
+   * @static
+   */
+  attach : function(object, signalName, callback, useCapture, once) {
+    var results = [], o, isDOM, isMulti, capture, advice;
+    o = getElement(object);
+    if (!o) {
+      return false;
+    }
+    isDOM = isDOMObject(o);
+    capture = !!useCapture;
+    if (Pot.isArray(signalName)) {
+      isMulti = true;
+    }
+    advice = Pot.Signal.Handler.advices.normal;
+    each(arrayize(signalName), function(sig) {
+      var sigName, handler, listener;
+      sigName = stringify(sig);
+      listener = createListener(
+        o, sigName, callback, capture, isDOM, once, advice
+      );
+      handler = new Pot.Signal.Handler({
+        object     : o,
+        signal     : sigName,
+        listener   : listener,
+        callback   : callback,
+        isDOM      : isDOM,
+        useCapture : capture,
+        advice     : advice,
+        attached   : true
+      });
+      Pot.Signal.handlers.push(handler);
+      if (isDOM) {
+        if (o.addEventListener) {
+          o.addEventListener(
+            adaptSignalForDOM(o, sigName),
+            listener,
+            capture
+          );
+        } else if (o.attachEvent) {
+          o.attachEvent(
+            adaptSignalForDOM(o, sigName),
+            listener
+          );
+        }
+      }
+      results[results.length] = handler;
+    });
+    return isMulti ? results : results[0];
+  },
+  /**
+   * Attaches a signal to a slot on before,
+   *  and return a handler object as a unique identifier that
+   *  can be used to detach that signal.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String|Array}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @param  {Boolean}  (once)
+   *           (Optional) Only internal usage.
+   * @return {Object|Array}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @type Function
+   * @function
+   * @class
+   * @public
+   * @static
+   */
+  attachBefore : function(object, signalName, callback, useCapture, once) {
+    return attachByJoinPoint(
+      object, signalName, callback,
+      Pot.Signal.Handler.advices.before, once
+    );
+  },
+  /**
+   * Attaches a signal to a slot on after,
+   *  and return a handler object as a unique identifier that
+   *  can be used to detach that signal.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String|Array}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @param  {Boolean}  (once)
+   *           (Optional) Only internal usage.
+   * @return {Object|Array}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @type Function
+   * @function
+   * @class
+   * @public
+   * @static
+   */
+  attachAfter : function(object, signalName, callback, useCapture, once) {
+    return attachByJoinPoint(
+      object, signalName, callback,
+      Pot.Signal.Handler.advices.after, once
+    );
+  },
+  /**
+   * Attaches a signal to a slot on before,
+   *  and return a handler object as a unique identifier that
+   *  can be used to detach that signal.
+   * When method is called, this callback will be triggered.
+   *
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String|Array}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @param  {Boolean}  (once)
+   *           (Optional) Only internal usage.
+   * @return {Object|Array}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @type Function
+   * @function
+   * @class
+   * @public
+   * @static
+   */
+  attachPropBefore : function(object, propName, callback, useCapture, once) {
+    return attachPropByJoinPoint(
+      object, propName, callback,
+      Pot.Signal.Handler.advices.propBefore, once
+    );
+  },
+  /**
+   * Attaches a signal to a slot on after,
+   *  and return a handler object as a unique identifier that
+   *  can be used to detach that signal.
+   * When method is called, this callback will be triggered.
+   *
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String|Array}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @param  {Boolean}  (once)
+   *           (Optional) Only internal usage.
+   * @return {Object|Array}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @type Function
+   * @function
+   * @class
+   * @public
+   * @static
+   */
+  attachPropAfter : function(object, propName, callback, useCapture, once) {
+    return attachPropByJoinPoint(
+      object, propName, callback,
+      Pot.Signal.Handler.advices.propAfter, once
+    );
+  },
+  /**
+   * Detaches a signal.
+   * To detach a signal, pass its handler identifier returned by attach().
+   * This is similar to how the setTimeout and clearTimeout works.
+   *
+   * @param  {Object|Function}  object
+   *           An instance identifier of Pot.Signal.Handler object that
+   *             returned by attach().
+   *           Or if signal using DOM object, you can specify the same as the
+   *             removeEventListener arguments usage.
+   * @param  {String}  (signalName)
+   *           (Optional) If `object` is a DOM object,
+   *             you can specify same as the
+   *             removeEventListener arguments usage.
+   *           `signalName` is the signal/event in string.
+   * @param  {Function}  (callback)
+   *           (Optional) If `object` is a DOM object,
+   *             you can specify same as the
+   *             removeEventListener arguments usage.
+   *           `callback` is a trigger function.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) If `object` is a DOM object,
+   *             you can specify same as the
+   *             removeEventListener arguments usage.
+   *           `useCapture` is 3rd argument of
+   *             removeEventListener if environment is available it on DOM.
+   * @return {Boolean}
+   *           Success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  detach : function(object, signalName, callback, useCapture) {
+    var result = false, args = arguments,
+        ps = Pot.Signal, index = -1, i, o, h;
+    o = getElement(object);
+    if (!o) {
+      return false;
+    }
+    if (ps.isHandler(o)) {
+      each(ps.handlers, function(hd, idx) {
+        if (hd && hd === o &&
+            (!signalName || hd.signal === signalName) &&
+            (!callback   || hd.callback === callback)) {
+          index = idx;
+          throw Pot.StopIteration;
+        }
+      });
+      if (~index) {
+        detachHandler(o);
+        if (!ps.locked) {
+          ps.handlers.splice(index, 1);
+        } else {
+          ps.hasDebris = true;
+        }
+        result = true;
+      }
+    } else if (args.length > 1) {
+      for (i = ps.handlers.length - 1; i >= 0; i--) {
+        h = ps.handlers[i];
+        if (h && h.object === o &&
+            h.signal === signalName && h.callback === callback) {
+          detachHandler(h);
+          if (!ps.locked) {
+            ps.handlers.splice(i, 1);
+          } else {
+            ps.hasDebris = true;
+          }
+          result = true;
+          break;
+        }
+      }
+    }
+    return result;
+  },
+  /**
+   * Removes all set of signals connected with object.
+   *
+   * @param  {Object|Function}  (object)
+   *           (Optional) An instance identifier of
+   *             Pot.Signal.Handler object that returned by attach().
+   *           If omitted, a global object will be target.
+   * @param  {String|Array}  (signals)
+   *           (Optional) A signal or an event name in string
+   *             for detach and remove.
+   *           If passed as an Array, will be target all signal items.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  detachAll : function(/*[object[, signals]]*/) {
+    var ps = Pot.Signal, args = arguments,
+        o, signals = [], i, handler, sigs = {};
+    switch (args.length) {
+      case 0:
+          break;
+      case 1:
+          o = args[0];
+          break;
+      case 2:
+          o = args[0];
+          signals = args[1] || [];
+          break;
+      default:
+          o = args[0];
+          signals = arrayize(args, 1);
+          break;
+    }
+    if (o == null) {
+      o = Pot.Global;
+    } else {
+      o = getElement(o);
+    }
+    if (!o) {
+      return false;
+    }
+    signals = arrayize(signals);
+    each(signals, function(sig) {
+      sigs[stringify(sig)] = true;
+    });
+    for (i = ps.handlers.length - 1; i >= 0; i--) {
+      handler = ps.handlers[i];
+      if (!handler || (handler.object === o &&
+          ((!signals || signals.length === 0) ||
+          (signals.length && handler.signal in sigs)))
+      ) {
+        if (handler) {
+          detachHandler(handler);
+        }
+        if (!ps.locked) {
+          ps.handlers.splice(i, 1);
+        } else {
+          ps.hasDebris = true;
+        }
+      }
+    }
+  },
+  /**
+   * `signal` will send signal to a connected with object and triggered.
+   * When signal is called with an object and the specify signal,
+   *   the observer function will be triggered.
+   * Note that when using this function for DOM signals,
+   *   a single event argument is expected by most listeners.
+   *
+   * @param  {Object|Function}  object
+   *           An instance identifier of
+   *             Pot.Signal.Handler object that returned by attach().
+   * @param  {String|Array}  signalName
+   *           A signal or an event name in string for signal.
+   * @return {Array}
+   *           Return result of triggered as an array.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  signal : function(object, signalName) {
+    var results = [], args = arrayize(arguments, 2),
+        errors = [], i, o, ps = Pot.Signal, sigName, advice, signals = {};
+    o = getElement(object);
+    if (!o) {
+      return false;
+    }
+    // Object is only internal usage.
+    if (Pot.isObject(signalName) && signalName.signal != null) {
+      sigName = signalName.signal;
+      advice = signalName.advice;
+      args = arrayize(signalName.args);
+    } else {
+      sigName = signalName;
+      advice = Pot.Signal.Handler.advices.normal;
+    }
+    each(arrayize(sigName), function(sig) {
+      signals[stringify(sig)] = true;
+    });
+    ps.locked = true;
+    each(ps.handlers, function(handler) {
+      if (handler && handler.attached &&
+          handler.advice === advice &&
+          handler.object === o &&
+          handler.signal in signals) {
+        try {
+          results[results.length] = handler.listener.apply(o, args);
+        } catch (e) {
+          errors[errors.length] = e;
+        }
+      }
+    });
+    if (ps.hasDebris) {
+      for (i = ps.handlers.length - 1; i >= 0; i--) {
+        if (!ps.handlers[i] || !ps.handlers[i].attached) {
+          ps.handlers.splice(i, 1);
+        }
+      }
+      ps.hasDebris = false;
+    }
+    ps.locked = false;
+    switch (errors.length) {
+      case 0: break;
+      case 1: throw errors[0];
+      default: throw update(errors[0], {errors : errors});
+    }
+    return results;
+  }
+});
+
+// Definition of prototype.
+Pot.Signal.Handler.prototype = update(Pot.Signal.Handler.prototype, {
+  /**
+   * @lends Pot.Signal.Handler.prototype
+   */
+  /**
+   * @private
+   * @ignore
+   * @internal
+   */
+  constructor : Pot.Signal.Handler,
+  /**
+   * @private
+   * @ignore
+   */
+  id : Pot.Internal.getMagicNumber(),
+  /**
+   * @private
+   * @ignore
+   * @const
+   */
+  NAME : 'Handler',
+  /**
+   * A unique strings.
+   *
+   * @type  String
+   * @const
+   * @ignore
+   */
+  serial : null,
+  /**
+   * toString.
+   *
+   * @return  Return formatted string of object.
+   * @type Function
+   * @function
+   * @static
+   * @ignore
+   */
+  toString : Pot.toString,
+  /**
+   * Initialize properties
+   *
+   * @private
+   * @ignore
+   */
+  init : function(params) {
+    if (!this.serial) {
+      this.serial = buildSerial(this);
+    }
+    update(this, params);
+    return this;
+  }
+});
+Pot.Signal.Handler.prototype.init.prototype = Pot.Signal.Handler.prototype;
+
+Pot.Signal.Observer.prototype = {
+  /**
+   * @lends Pot.Signal.Observer.prototype
+   */
+  /**
+   * @ignore
+   */
+  constructor : Pot.Signal.Observer,
+  /**
+   * @private
+   * @ignore
+   * @internal
+   */
+  PotInternal : {
+    /**
+     * @ignore
+     */
+    id : Pot.Internal.getMagicNumber(),
+    /**
+     * @ignore
+     */
+    NAME : 'Observer',
+    /**
+     * @ignore
+     */
+    serial : null,
+    /**
+     * @ignore
+     */
+    orgEvent : null,
+    /**
+     * @ignore
+     */
+    object : null
+  },
+  /**
+   * toString.
+   *
+   * @return  Return formatted string of object.
+   * @type Function
+   * @function
+   * @ignore
+   */
+  toString : function() {
+    return buildObjectString(this.PotInternal.NAME);
+  },
+  /**
+   * preventDefault.
+   *
+   * @type Function
+   * @function
+   * @ignore
+   */
+  preventDefault : function() {
+    var ev;
+    try {
+      ev = this.PotInternal.orgEvent;
+      if (ev) {
+        if (ev.preventDefault) {
+          ev.preventDefault();
+        } else {
+          ev.returnValue = false;
+        }
+      }
+    } catch (e) {}
+  },
+  /**
+   * stopPropagation.
+   *
+   * @type Function
+   * @function
+   * @ignore
+   */
+  stopPropagation : function() {
+    var ev;
+    try {
+      ev = this.PotInternal.orgEvent;
+      if (ev) {
+        if (ev.stopPropagation) {
+          ev.stopPropagation();
+        }
+        ev.cancelBubble = true;
+      }
+    } catch (e) {}
+  }
+};
+
+// Definition of 'once' methods.
+each({
+  /**
+   * Similar to attach*(),
+   *   but detaches the signal handler automatically once it has fired.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @return {Object}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @name Pot.Signal.attach.once
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  attach : 4,
+  /**
+   * Similar to attach*(),
+   *   but detaches the signal handler automatically once it has fired.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @return {Object}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @name Pot.Signal.attachBefore.once
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  attachBefore : 4,
+  /**
+   * Similar to attach*(),
+   *   but detaches the signal handler automatically once it has fired.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @return {Object}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @name Pot.Signal.attachAfter.once
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  attachAfter : 4,
+  /**
+   * Similar to attach*(),
+   *   but detaches the signal handler automatically once it has fired.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @return {Object}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @name Pot.Signal.attachPropBefore.once
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  attachPropBefore : 4,
+  /**
+   * Similar to attach*(),
+   *   but detaches the signal handler automatically once it has fired.
+   *
+   * @param  {Object|Function|String}  object
+   *           The object that be target of the signal.
+   *           If passed in a string then will be a
+   *             HTML element by document.getElementById.
+   * @param  {String}  signalName
+   *           `signalName` is a string that represents a signal name.
+   *           If `object` is a DOM object then
+   *             it can be specify one of the 'onxxx' native events.
+   *           That case 'on' prefix is optionally.
+   * @param  {Function}  callback
+   *           An action to take when the signal is triggered.
+   * @param  {Boolean}  (useCapture)
+   *           (Optional) `useCapture` will passed its 3rd argument to
+   *             addEventListener if environment is available it on DOM.
+   * @return {Object}
+   *           Return an instance of Pot.Signal.Handler object as
+   *             a unique identifier that can be used to detach that signal.
+   *
+   * @name Pot.Signal.attachPropAfter.once
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  attachPropAfter : 4
+}, function(index, name) {
+  update(Pot.Signal[name], {
+    /**@ignore*/
+    once : function() {
+      var args = arrayize(arguments);
+      args[index] = true;
+      return Pot.Signal[name].apply(Pot.Signal, args);
+    }
+  });
+});
+
+// Private functions.
+/**
+ * @private
+ * @ignore
+ */
+function createListener(object, sigName, callback,
+                        useCapture, isDOM, once, advice) {
+  var onceHandler,
+      re = /^(?:on|)(?:(?:un|)load|DOMContentLoaded)$/,
+      isLoadEvent = (isDOM && re.test(sigName));
+  if (once || isLoadEvent) {
+    /**@ignore*/
+    onceHandler = function(listener) {
+      Pot.Signal.detach(object, sigName, callback, useCapture);
+    };
+  }
+  if (!isDOM) {
+    return function() {
+      var errors = [], a = arguments;
+      try {
+        Pot.Signal.Handler.beforeTrapper(object, sigName, a);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        callback.apply(this, a);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        Pot.Signal.Handler.afterTrapper(object, sigName, a);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      if (once) {
+        onceHandler(a.callee);
+      }
+      if (errors && errors.length) {
+        if (errors.length > 1) {
+          throw update(errors[0], {errors : errors});
+        } else {
+          throw errors[0];
+        }
+      }
+    };
+  }
+  if (isLoadEvent) {
+    return function(ev) {
+      var errors = [], ob = new Pot.Signal.Observer(object, ev);
+      try {
+        Pot.Signal.Handler.beforeTrapper(object, sigName, ob, true);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        callback.call(object, ob);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        Pot.Signal.Handler.afterTrapper(object, sigName, ob, true);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      onceHandler(arguments.callee);
+      if (errors && errors.length) {
+        if (errors.length > 1) {
+          throw update(errors[0], {errors : errors});
+        } else {
+          throw errors[0];
+        }
+      }
+    };
+  } else {
+    return function(ev) {
+      var errors = [], obs = new Pot.Signal.Observer(object, ev);
+      try {
+        Pot.Signal.Handler.beforeTrapper(object, sigName, obs, true);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        callback.call(object, obs);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      try {
+        Pot.Signal.Handler.afterTrapper(object, sigName, obs, true);
+      } catch (e) {
+        errors[errors.length] = e;
+      }
+      if (once) {
+        onceHandler(arguments.callee);
+      }
+      if (errors && errors.length) {
+        if (errors.length > 1) {
+          throw update(errors[0], {errors : errors});
+        } else {
+          throw errors[0];
+        }
+      }
+    };
+  }
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function detachHandler(handler) {
+  var object, signal, listener, capture;
+  if (!handler || !handler.attached) {
+    return;
+  }
+  handler.attached = false;
+  if (handler.isDOM && handler.advice === Pot.Signal.Handler.advices.normal) {
+    object   = handler.object;
+    signal   = handler.signal;
+    capture  = handler.useCapture;
+    listener = handler.listener;
+    try {
+      if (object.removeEventListener) {
+        object.removeEventListener(
+          adaptSignalForDOM(object, signal),
+          listener,
+          capture
+        );
+      } else if (object.detachEvent) {
+        object.detachEvent(
+          adaptSignalForDOM(object, signal),
+          listener
+        );
+      }
+    } catch (e) {}
+  }
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function attachByJoinPoint(object, signalName, callback, advice, once) {
+  var results = [], o, isDOM, isMulti;
+  o = getElement(object);
+  if (!o) {
+    return false;
+  }
+  isDOM = isDOMObject(o);
+  if (Pot.isArray(signalName)) {
+    isMulti = true;
+  }
+  each(arrayize(signalName), function(sig) {
+    var sigName, handler;
+    sigName = stringify(sig);
+    handler = new Pot.Signal.Handler({
+      object     : o,
+      signal     : sigName,
+      listener   : callback,
+      callback   : callback,
+      isDOM      : isDOM,
+      useCapture : false,
+      advice     : advice,
+      attached   : true
+    });
+    Pot.Signal.handlers.push(handler);
+    results[results.length] = handler;
+  });
+  return isMulti ? results : results[0];
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function attachPropByJoinPoint(object, propName, callback, advice, once) {
+  var results = [], i, h, isMulti, props, bindListener,
+      prefix = '.', names = {}, exists, ps = Pot.Signal;
+  if (!object || !Pot.isFunction(callback)) {
+    return false;
+  }
+  if (Pot.isArray(propName)) {
+    isMulti = true;
+  }
+  /**@ignore*/
+  bindListener = function(sigName) {
+    return function() {
+      var a = arguments, me = a.callee;
+      callback.apply(object, a);
+      if (once) {
+        Pot.Signal.detach(object, sigName, me, false);
+      }
+    };
+  };
+  props = arrayize(propName);
+  each(props, function(p) {
+    names[prefix + stringify(p)] = true;
+  });
+  for (i = ps.handlers.length - 1; i >= 0; i--) {
+    h = ps.handlers[i];
+    if (h && h.object === object &&
+        (h.advice === Pot.Signal.Handler.advices.propBefore ||
+         h.advice === Pot.Signal.Handler.advices.propAfter) &&
+        (prefix + h.signal) in names) {
+      exists = true;
+      break;
+    }
+  }
+  if (!exists) {
+    each(props, function(p) {
+      var key = stringify(p);
+      Pot.override(object, key, function(inherits, args) {
+        var result, errors = [];
+        try {
+          Pot.Signal.Handler.beforePropTrapper(object, key, args);
+        } catch (e) {
+          errors[errors.length] = e;
+        }
+        try {
+          result = inherits(args);
+        } catch (e) {
+          errors[errors.length] = e;
+        }
+        try {
+          Pot.Signal.Handler.afterPropTrapper(object, key, args);
+        } catch (e) {
+          errors[errors.length] = e;
+        }
+        if (errors && errors.length) {
+          if (errors.length > 1) {
+            throw update(errors[0], {errors : errors});
+          } else {
+            throw errors[0];
+          }
+        }
+        return result;
+      });
+    });
+  }
+  each(props, function(p) {
+    var prop, handler, listener;
+    prop = stringify(p);
+    listener = bindListener(prop);
+    handler = new Pot.Signal.Handler({
+      object     : object,
+      signal     : prop,
+      listener   : listener,
+      callback   : listener,
+      isDOM      : false,
+      useCapture : false,
+      advice     : advice,
+      attached   : true
+    });
+    Pot.Signal.handlers.push(handler);
+    results[results.length] = handler;
+  });
+  return isMulti ? results : results[0];
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function adaptSignalForDOM(object, signal) {
+  var s = stringify(signal), prefix = 'on';
+  if (object) {
+    if (object.addEventListener) {
+      if (s.indexOf(prefix) === 0) {
+        s = s.substring(2);
+      }
+    } else if (object.attachEvent) {
+      if (s.indexOf(prefix) !== 0) {
+        s = prefix + s;
+      }
+    }
+  }
+  return s;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function isDOMObject(o) {
+  return !!(o &&
+            (o.addEventListener && o.removeEventListener) ||
+            (o.attachEvent && o.detachEvent));
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function getElement(expr) {
+  if (typeof expr === 'object' || Pot.isFunction(expr)) {
+    return expr;
+  }
+  if (Pot.isString(expr)) {
+    try {
+      return Pot.currentDocument().getElementById(
+        stringify(expr).replace(/^#/, '')
+      );
+    } catch (e) {}
+  }
+  return false;
+}
+
+// Update Pot object.
+Pot.update({
+  attach           : Pot.Signal.attach,
+  attachBefore     : Pot.Signal.attachBefore,
+  attachAfter      : Pot.Signal.attachAfter,
+  attachPropBefore : Pot.Signal.attachPropBefore,
+  attachPropAfter  : Pot.Signal.attachPropAfter,
+  detach           : Pot.Signal.detach,
+  detachAll        : Pot.Signal.detachAll,
+  signal           : Pot.Signal.signal
+});
+
+})();
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Debug.
 Pot.update({
   /**
@@ -12240,6 +13739,7 @@ update(Pot.Internal, {
     globalEval             : Pot.globalEval,
     localEval              : Pot.localEval,
     hasReturn              : Pot.hasReturn,
+    override               : Pot.override,
     currentWindow          : Pot.currentWindow,
     currentDocument        : Pot.currentDocument,
     currentURI             : Pot.currentURI,
@@ -12256,6 +13756,14 @@ update(Pot.Internal, {
     throughout             : Pot.XPCOM.throughout,
     getMostRecentWindow    : Pot.XPCOM.getMostRecentWindow,
     getChromeWindow        : Pot.XPCOM.getChromeWindow,
+    attach                 : Pot.Signal.attach,
+    attachBefore           : Pot.Signal.attachBefore,
+    attachAfter            : Pot.Signal.attachAfter,
+    attachPropBefore       : Pot.Signal.attachPropBefore,
+    attachPropAfter        : Pot.Signal.attachPropAfter,
+    detach                 : Pot.Signal.detach,
+    detachAll              : Pot.Signal.detachAll,
+    signal                 : Pot.Signal.signal,
     rescape                : rescape,
     arrayize               : arrayize,
     invoke                 : invoke,
@@ -12344,7 +13852,7 @@ Pot.update({
                 d.raise.apply(d, args);
               }
               if (!done) {
-                d.destassign = true;
+                d.destAssign = true;
                 d.begin.apply(d, args);
               }
             },
