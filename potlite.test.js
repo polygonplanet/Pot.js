@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.12
- * @date           2011-11-23
+ * @version        1.13
+ * @date           2011-12-06
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -34,6 +34,7 @@ $(function() {
     results : [],
     OUTPUT  : $('#output').get(0),
     STATUS  : $('#status').get(0),
+    PROGRES : $('#progres-bar').get(0),
     isEmpty : function(o) {
       for (var p in o) {
         return false;
@@ -294,7 +295,13 @@ $(function() {
     },
     showState : function(count) {
       callLazy(function() {
-        $(Assert.STATUS).text('Done: ' + count);
+        var max = Assert.Units.length - 2,
+            per = (count == max) ? 100 : Math.floor(count / max * 100);
+        $(Assert.STATUS).text(
+          'Done: ' + count + '/' + max +
+          ' (' + per + '%)'
+        );
+        $(Assert.PROGRES).css({width : per + '%'});
       });
     },
     run : function() {
@@ -2108,7 +2115,146 @@ $(function() {
       },
       expect : 'foobarbaz'
     }, {
-      title  : 'Pot.Signal.attachPropBefore',
+      title  : 'Pot.Signal.attach() and Pot.Signal.detach() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        signal(obj, 'push', 0, 1);
+        var handler2 = attach(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        signal(obj, 'push', 2, 0);
+        detach(handler1);
+        var handler3 = attach(obj, 'push', function(a, b) {
+          obj.method(a * 100, b * 100);
+        });
+        signal(obj, 'push', 0, 3);
+        detach(handler2);
+        detach(handler3);
+        signal(obj, 'push', 4, 5);
+        return value;
+      },
+      expect : ['obj1', 'obj2', 'obj20', 'obj30', 'obj300']
+    }, {
+      title  : 'Pot.Signal.attach() and Pot.Signal.detachAll() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        var handler2 = attach(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        var handler3 = attach(obj, 'push', function(a, b) {
+          obj.method(a * 100, b * 100);
+        });
+        signal(obj, 'push', 1, 0);
+        detachAll(obj);
+        return value;
+      },
+      expect : ['obj1', 'obj10', 'obj100']
+    }, {
+      title  : 'Pot.Signal.attachBefore() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        var handler2 = attachBefore(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        signal(obj, 'push', 1, 0);
+        detachAll(obj);
+        return value;
+      },
+      expect : ['obj10', 'obj1']
+    }, {
+      title  : 'Pot.Signal.attachAfter() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        var handler2 = attachAfter(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        signal(obj, 'push', 1, 0);
+        detachAll(obj);
+        return value;
+      },
+      expect : ['obj1', 'obj10']
+    }, {
+      title  : 'Pot.Signal.attachBefore.once() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        var handler2 = attachBefore.once(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        signal(obj, 'push', 1, 0);
+        signal(obj, 'push', 0, 2);
+        detachAll(obj);
+        return value;
+      },
+      expect : ['obj10', 'obj1', 'obj2']
+    }, {
+      title  : 'Pot.Signal.attachAfter.once() for Object',
+      code   : function() {
+        var value = [];
+        var obj = {
+          key : 'obj',
+          method : function(a, b) {
+            value.push(this.key + (a + b));
+          }
+        };
+        var handler1 = attach(obj, 'push', function(a, b) {
+          obj.method(a, b);
+        });
+        var handler2 = attachAfter.once(obj, 'push', function(a, b) {
+          obj.method(a * 10, b * 10);
+        });
+        signal(obj, 'push', 1, 0);
+        signal(obj, 'push', 0, 2);
+        detachAll(obj);
+        return value;
+      },
+      expect : ['obj1', 'obj10', 'obj2']
+    }, {
+      title  : 'Pot.Signal.attachPropBefore()',
       code   : function() {
         var obj = {
           key : 'obj',
@@ -2129,7 +2275,7 @@ $(function() {
       },
       expect : [3, 6, 'obj', 3]
     }, {
-      title  : 'Pot.Signal.attachPropAfter',
+      title  : 'Pot.Signal.attachPropAfter()',
       code   : function() {
         var obj = {
           key : 'obj',
@@ -2150,7 +2296,7 @@ $(function() {
       },
       expect : ['obj', 3, 3, 6]
     }, {
-      title  : 'Pot.Signal.attachPropBefore.once',
+      title  : 'Pot.Signal.attachPropBefore.once()',
       code   : function() {
         var obj = {
           key : 'obj',
@@ -2172,7 +2318,7 @@ $(function() {
       },
       expect : [3, 6, 'obj', 3, 'obj', 3]
     }, {
-      title  : 'Pot.Signal.attachPropAfter.once',
+      title  : 'Pot.Signal.attachPropAfter.once()',
       code   : function() {
         var obj = {
           key : 'obj',

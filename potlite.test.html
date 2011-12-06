@@ -55,6 +55,31 @@ dl dd {
   border-color: #7575c1 #9e9eed #9e9eed #7575c1;
 }
 
+#progres-container {
+  margin: 2px 5px 1px auto;
+  *margin-right: 25px;
+  text-align: right;
+  width: 145px;
+}
+
+#progres {
+  text-align: left;
+  background: transparent;
+  border: 1px solid #8585d1;
+  padding: 0;
+  width: 120px;
+}
+
+#progres-bar {
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  background: #c2d2f8;
+  overflow: hidden;
+  width: 0%;
+  height: 10px;
+}
+
 .potjs-test .assert-code-block {
   margin: 8px 6px;
   padding: 4px;
@@ -98,7 +123,7 @@ dl dd {
 <script>var IE7_PNG_SUFFIX = '.png';</script>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
 <![endif]-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
 <script type="text/javascript" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
 <!--PotLite.js-->
 <script type="text/javascript" src="http://api.polygonpla.net/js/pot/latest.potlite.min.js"></script>
@@ -124,6 +149,9 @@ dl dd {
         <div class="leftside">
           <h1 id="TestRun">Test Run</h1>
           <div id="status"></div>
+          <div id="progres-container">
+           <div id="progres"><div id="progres-bar"></div></div>
+          </div>
           <div id="output" class="pre-wrap">
            <hr>
           </div>
@@ -134,7 +162,7 @@ dl dd {
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-23
+         Last modified: 2011-12-06
          Written by <a href="http://twitter.com/polygon_planet"
                        title="Twitter @polygon_planet">@polygon_planet</a>
         </p>
