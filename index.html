@@ -140,15 +140,17 @@ $(function() {
         listStyleType : 'none'
       });
   
-  setTimeout(function() {
-    $('ul.compact-left').floatingMenu({
-      container : '.layout-liquid-container',
-      footer    : '.layout-liquid-container .footer',
-      triggers  : {
-        'click' : '.toggle-trigger'
-      }
-    });
-  }, 200);
+  if (Math.max(800, $(window).width()) != 800) {
+    setTimeout(function() {
+      $('ul.compact-left').floatingMenu({
+        container : '.layout-liquid-container',
+        footer    : '.layout-liquid-container .footer',
+        triggers  : {
+          'click' : '.toggle-trigger'
+        }
+      });
+    }, 200);
+  }
 
 });
 </script>
