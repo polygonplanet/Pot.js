@@ -37,6 +37,29 @@ td.marker, td.marker * {
   background: #e2e5ff;
 }
 
+.header .frame {
+  padding-left: 4px;
+  padding-bottom: 8px;
+  border: 1px dashed #333366;
+  border-width: 0;
+  border-bottom-width: 1px;
+}
+
+.content .frame {
+  padding-left: 6px;
+  border: 1px dashed #333366;
+  border-width: 0;
+  border-left-width: 1px;
+}
+
+.content .frame #overview {
+  margin-top: 0;
+}
+
+body .compact-left {
+  margin-left: 1.5em;
+}
+
 .header-logo {
   width: 350px;
   height: 165px;
@@ -49,9 +72,9 @@ td.marker, td.marker * {
   display: inline;
 }
 
-
 body .toggle-trigger {
   margin: 2px;
+  margin-left: -1em;
   padding: 0 2px 0 2px;
   width: 11px;
   min-width: 10px;
@@ -79,12 +102,21 @@ body .toggle-trigger {
   *zoom: 1;
 }
 
+.layout-2-column-left-menu .leftside ul ul {
+  list-style-type: square;
+}
+
+.layout-2-column-left-menu .leftside ul ul ul {
+  list-style-type: square;
+}
+
 </style>
 <!--[if lt IE 7]>
 <script>var IE7_PNG_SUFFIX = '.png';</script>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
 <![endif]-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://api.polygonpla.net/js/jquery/jquery.floatingmenu.min.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -106,12 +138,18 @@ $(function() {
     .parent('li')
       .css({
         listStyleType : 'none'
-      })
-      .parent('ul')
-        .css({
-          marginLeft : 10
-        });
+      });
   
+  setTimeout(function() {
+    $('ul.compact-left').floatingMenu({
+      container : '.layout-liquid-container',
+      footer    : '.layout-liquid-container .footer',
+      triggers  : {
+        'click' : '.toggle-trigger'
+      }
+    });
+  }, 200);
+
 });
 </script>
 <script type="text/javascript" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
@@ -119,164 +157,20 @@ $(function() {
 <body id="doc">
   <div class="layout-liquid-container">
     <div class="header">
-      <div class="header-logo">
-       <a href="http://polygonplanet.github.com/Pot.js/index.html"
-          title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ"><img src="http://api.polygonpla.net/img/logo/potlite.js.mini.png"></a>
-      </div>
-      <h1 id="top">Pot.js</h1>
-      <p>
-       JavaScript utility library for asynchronous processing with Deferred.
-      </p>
-      <div style="width: 100%; text-align: center;"><hr></div>
-    </div>
-    <div class="clearfix">
-      <div class="content">
-        <div class="leftside">
-          <h2 id="index">目次</h2>
-          <ul>
-            <li><a href="#overview">概要</a></li>
-            <li><a href="#download">ダウンロード</a></li>
-            <li><a href="#install">インストール</a></li>
-            <li><a href="#compatibility">動作環境</a></li>
-            <li><a href="#TestRun">動作テスト</a></li>
-            <li><a href="#license">ライセンス</a></li>
-            <li><a href="#contact">連絡先</a></li>
-            <li><a href="#thanks">謝辞</a></li>
-            <li><a href="#forJSDoc">自動生成されたドキュメント</a></li>
-            <li><a href="#introduction">導入</a></li>
-            <li>
-              <a href="#reference">リファレンス</a>
-              <ul>
-                <li><a href="#callbackChain">チェイン</a></li>
-                <li><a href="#exception">例外処理</a></li>
-                <li><a href="#Destructuring-Assignment">分割代入</a></li>
-                <li><a href="#controlSpeed">速度の操作</a></li>
-                <li><a href="#fireChain">チェインを実行</a></li>
-                <li><a href="#replaceToDeferred">関数を Deferred 化</a></li>
-                <li><a href="#iterator">イテレータ</a></li>
-                <li><a href="#replaceLoop">ループ処理を置き換える</a></li>
-                <li><a href="#StopIteration">イテレートを止める</a></li>
-                <li>
-                  <a href="#referenceFunctions">関数リファレンス</a>
-                  <ul>
-                    <li>
-                      <span class="toggle-trigger-pre"></span>
-                      <a href="#PotObjectFunctions">Pot オブジェクトの関数</a>
-                      <ul>
-                        <li><a href="#function.Pot.update">update</a></li>
-                        <li><a href="#function.Pot.stringify">stringify</a></li>
-                        <li><a href="#function.Pot.arrayize">arrayize</a></li>
-                        <li><a href="#function.Pot.rescape">rescape</a></li>
-                        <li><a href="#function.Pot.trim">trim</a></li>
-                        <li><a href="#function.Pot.now">now</a></li>
-                        <li><a href="#function.Pot.debug">debug</a></li>
-                        <li><a href="#function.Pot.isBoolean">isBoolean</a></li>
-                        <li><a href="#function.Pot.isNumber">isNumber</a></li>
-                        <li><a href="#function.Pot.isString">isString</a></li>
-                        <li><a href="#function.Pot.isFunction">isFunction</a></li>
-                        <li><a href="#function.Pot.isArray">isArray</a></li>
-                        <li><a href="#function.Pot.isDate">isDate</a></li>
-                        <li><a href="#function.Pot.isRegExp">isRegExp</a></li>
-                        <li><a href="#function.Pot.isObject">isObject</a></li>
-                        <li><a href="#function.Pot.isError">isError</a></li>
-                        <li><a href="#function.Pot.typeOf">typeOf</a></li>
-                        <li><a href="#function.Pot.isStopIter">isStopIter</a></li>
-                        <li><a href="#function.Pot.isIterable">isIterable</a></li>
-                        <li><a href="#function.Pot.isArrayLike">isArrayLike</a></li>
-                        <li><a href="#function.Pot.isDeferred">isDeferred</a></li>
-                        <li><a href="#function.Pot.isIter">isIter</a></li>
-                        <li><a href="#function.Pot.isNumeric">isNumeric</a></li>
-                        <li><a href="#function.Pot.isInt">isInt</a></li>
-                        <li><a href="#function.Pot.isBuiltinMethod">isBuiltinMethod</a></li>
-                        <li><a href="#function.Pot.isWindow">isWindow</a></li>
-                        <li><a href="#function.Pot.isDocument">isDocument</a></li>
-                        <li><a href="#function.Pot.isElement">isElement</a></li>
-                        <li><a href="#function.Pot.isNodeList">isNodeList</a></li>
-                        <li><a href="#function.Pot.isNodeLike">isNodeLike</a></li>
-                        <li><a href="#function.Pot.range">range</a></li>
-                        <li><a href="#function.Pot.indexOf">indexOf</a></li>
-                        <li><a href="#function.Pot.lastIndexOf">lastIndexOf</a></li>
-                        <li><a href="#function.Pot.request">request</a></li>
-                        <li><a href="#function.Pot.jsonp">jsonp</a></li>
-                        <li><a href="#function.Pot.loadScript">loadScript</a></li>
-                        <li><a href="#function.Pot.serializeToJSON">serializeToJSON</a></li>
-                        <li><a href="#function.Pot.parseFromJSON">parseFromJSON</a></li>
-                        <li><a href="#function.Pot.serializeToQueryString">serializeToQueryString</a></li>
-                        <li><a href="#function.Pot.parseFromQueryString">parseFromQueryString</a></li>
-                        <li><a href="#function.Pot.urlEncode">urlEncode</a></li>
-                        <li><a href="#function.Pot.urlDecode">urlDecode</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <span class="toggle-trigger-pre"></span>
-                      <a href="#iteratorFunctions">イテレータ関数</a>
-                      <ul>
-                        <li><a href="#function.Pot.forEach">forEach</a></li>
-                        <li><a href="#function.Pot.repeat">repeat</a></li>
-                        <li><a href="#function.Pot.forEver">forEver</a></li>
-                        <li><a href="#function.Pot.iterate">iterate</a></li>
-                        <li><a href="#function.Pot.Iter">Iter</a></li>
-                        <li><a href="#function.Pot.toIter">toIter</a></li>
-                        <li><a href="#function.Pot.items">items</a></li>
-                        <li><a href="#function.Pot.zip">zip</a></li>
-                        <li><a href="#function.Pot.map">map</a></li>
-                        <li><a href="#function.Pot.filter">filter</a></li>
-                        <li><a href="#function.Pot.reduce">reduce</a></li>
-                        <li><a href="#function.Pot.every">every</a></li>
-                        <li><a href="#function.Pot.some">some</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <span class="toggle-trigger-pre"></span>
-                      <a href="#PotDeferredMethods">Pot.Deferred のメソッド</a>
-                      <ul>
-                        <li><a href="#function.Pot.Deferred">Deferred</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.then">then</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.rescue">rescue</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.ensure">ensure</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.begin">begin</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.raise">raise</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.end">end</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.wait">wait</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.till">till</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.cancel">cancel</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.canceller">canceller</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.speed">speed</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.async">async</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.args">args</a></li>
-                        <li><a href="#function.Pot.Deferred.prototype.data">data</a></li>
-                      </ul>
-                    </li>
-                    <li>
-                      <span class="toggle-trigger-pre"></span>
-                      <a href="#PotDeferredFunctions">Pot.Deferred の関数</a>
-                      <ul>
-                        <li><a href="#function.Pot.Deferred.succeed">succeed</a></li>
-                        <li><a href="#function.Pot.Deferred.failure">failure</a></li>
-                        <li><a href="#function.Pot.Deferred.wait">wait</a></li>
-                        <li><a href="#function.Pot.Deferred.till">till</a></li>
-                        <li><a href="#function.Pot.Deferred.begin">begin</a></li>
-                        <li><a href="#function.Pot.Deferred.flush">flush</a></li>
-                        <li><a href="#function.Pot.Deferred.maybeDeferred">maybeDeferred</a></li>
-                        <li><a href="#function.Pot.Deferred.callLater">callLater</a></li>
-                        <li><a href="#function.Pot.Deferred.callLazy">callLazy</a></li>
-                        <li><a href="#function.Pot.Deferred.isFired">isFired</a></li>
-                        <li><a href="#function.Pot.Deferred.lastResult">lastResult</a></li>
-                        <li><a href="#function.Pot.Deferred.lastError">lastError</a></li>
-                        <li><a href="#function.Pot.Deferred.register">register</a></li>
-                        <li><a href="#function.Pot.Deferred.unregister">unregister</a></li>
-                        <li><a href="#function.Pot.Deferred.deferrize">deferrize</a></li>
-                        <li><a href="#function.Pot.Deferred.parallel">parallel</a></li>
-                        <li><a href="#function.Pot.Deferred.chain">chain</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
+      <div class="frame">
+        <div class="header-logo">
+         <a href="http://polygonplanet.github.com/Pot.js/index.html"
+            title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ"><img src="http://api.polygonpla.net/img/logo/potlite.js.mini.png"></a>
         </div>
-        <div style="width: 100%; text-align: center"><hr></div>
+        <h1 id="top">Pot.js + PotLite.js</h1>
+        <p>
+         JavaScript utility library for asynchronous processing with Deferred.
+        </p>
+      </div>
+    </div>
+    <div class="layout-2-column-left-menu clearfix">
+      <div class="content">
+       <div class="frame">
         <h2 id="overview">概要</h2>
         <p>
          非ブロックでの非同期処理を直列的に書けるようにし、
@@ -285,7 +179,7 @@ $(function() {
          <br>
          MochiKit ライクな Deferred オブジェクトにより
          <br>
-         様々なイテレート (forEach, filter, map, repeat, some など) を可能とします。
+         様々なイテレート (forEach, filter, map, reduce, zip, repeat, some など) を可能とします。
         </p>
         <h2 id="download">ダウンロード</h2>
         <div>
@@ -295,10 +189,10 @@ $(function() {
            </div>
            <ul>
              <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"
-                    title="最新のzip"><strong>zip</strong></a>
+                    title="最新の zip"><strong>zip</strong></a>
              </li>
              <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"
-                    title="最新のtar.gz"><strong>tar</strong></a>
+                    title="最新の tar.gz"><strong>tar.gz</strong></a>
              </li>
            </ul>
          </div>
@@ -346,9 +240,15 @@ $(function() {
          <p>
           例:
          </p>
-         <pre>&lt;script type="text/javascript" src="potlite.min.js"&gt;&lt;/script&gt;</pre>
-         読み込み後の例:
-         <pre>&lt;script type="text/javascript"&gt;
+         <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;potlite.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- または下記で説明する API サーバが利用できます --&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js&quot;&gt;&lt;/script&gt;
+</pre>
+         <p>
+          読み込み後の例:
+         </p>
+         <pre>&lt;script type=&quot;text/javascript&quot;&gt;
 // 任意に globalize で短い記述にできる (下記参照)
 Pot.globalize();
 
@@ -394,6 +294,46 @@ Pot.Deferred.begin(function() {
     // do something...
 });
 //...</pre>
+         <p>
+          PotLite.js をバージョンを限定して Web から直接読み込みたい場合、
+          上の GitHub リンクでは常に最新になってしまうため
+          実装の差異による不具合が発生するかもしれません。
+          <br>
+          そのため、ホスティング用に API サーバを用意しました。
+         </p>
+         <div>
+          <p>PotLite.js Version 1.23 を使う場合:</p>
+          <ul>
+           <li>v1.23 : http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js</li>
+          </ul>
+         </div>
+         <p>
+          これは、1.23 の部分をリリース済みのバージョンに合わせて変更できます。
+          <br>
+          レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
+          あわせて API サーバに置くようにしています。
+         <p>
+         <p>
+          例えば Greasemonkey で 1.23 を使いたい場合、
+         </p>
+         <pre>// ==UserScript==
+// ...
+// @require  http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js
+// ...
+// ==/UserScript==</pre>
+         <p>
+          と記述できます。
+         </p>
+         <p>
+          この例では 1.23 としていますが、このマニュアルは常に更新しているわけではないので
+          最新とは限りません。
+          <br>
+          より安定したバージョンを選び使ってください。
+         </p>
+         <p>
+          Greasemonkey に限らず script タグからでもなんでも自由にご利用ください。
+         </p>
+         <p><hr></p>
          <p>
           jQuery プラグインとして。
          </p>
@@ -478,10 +418,8 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
           ロゴを作成してくれた
           <a href="http://r-m-t.jp/" title="R M T　|　同人音楽サークル">yinyang302mg</a> さん、
           そして Pot.js / PotLite.js を作る切欠となった
-          <a href="http://cho45.stfuawsc.com/jsdeferred/" title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
-          ,
-          <a href="http://www.mochimedia.com/" title="Mochi Media, Inc.">MochiKit (Mochi Media, Inc.)</a>
-          ,
+          <a href="http://cho45.stfuawsc.com/jsdeferred/" title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>,
+          <a href="http://www.mochimedia.com/" title="Mochi Media, Inc.">MochiKit (Mochi Media, Inc.)</a>,
           <a href="https://github.com/to/tombloo/wiki" title="Tombloo - Home - GitHub">Tombloo</a>
           developers に感謝いたします。
          </p>
@@ -3662,6 +3600,309 @@ parallel([
 // と出力される</pre>
              </dd>
             </dl>
+            <p><br></p>
+            <h4 id="PotSignalFunctions">Pot.Signal の関数</h4>
+            <div>
+              <p>
+               以下は、Pot.Signal の関数です。
+              </p>
+              <p>
+               Pot.Signal は、任意のハンドラを登録し
+               シグナルを送信して実行に移すことが可能です。
+               <br>
+               言い方を変えると、自らイベントを作成し、任意のタイミングで呼び出せるようなものです。
+              </p>
+              <p>
+               Pot.Signal には大まかに以下の関数があります。
+              </p>
+              <div>
+               <ul>
+                <li>attach : シグナル (イベント) を登録</li>
+                <li>detach : シグナル (イベント) を解除</li>
+                <li>signal : シグナル (イベント) を実行</li>
+               </ul>
+              </div>
+              <p>
+               そして、attachBefore() は attach() で登録したシグナルの前に実行されるコールバックを登録します。
+               <br>
+               attachAfter() は、同じく attach() ハンドラの後に実行されるコールバック関数を登録できます。
+              </p>
+              <p>
+               これらの関数、とくに Before, After を使うことで、
+               アスペクト指向 (AOP) なプログラミングが可能となります。
+               <br>
+               Pot.Signal は Node.js などのサーバでの利用も可能ですが、
+               Web ブラウザ上、HTML5 での Web Storage (localStorage や sessionStorage) を使う時などに便利です。
+              </p>
+              <p>
+               また、attach 系の関数 (attach*) の後に .once を付けると、一度だけ実行されます。
+              </p>
+              <pre>// 一度クリックしたら解除される
+attach.once('#hoge', 'click', function() {
+    //...
+});</pre>
+              <p>
+               Pot.Signal 自体は コンストラクタではなくオブジェクトです。
+               <br>
+               各関数は、Pot オブジェクトから参照できるため
+               Pot.attach() のように呼び出せます。
+               <br>
+               明示的に Pot.Signal.attach() と呼び出しても同じです。
+               <br>
+               Pot.globalize() が適応されている場合は、
+               各関数、例えば Pot.attach() が 単に attach() とコールできます。
+              </p>
+            </div>
+            <dl>
+             <dt>
+              <dfn id="function.Pot.Signal.attach"><em>Pot.Signal.</em>attach</dfn>(object, signalName, callback[, useCapture])
+             </dt>
+             <dd>
+              スロットにシグナルを登録します。
+              <br>
+              Pot.Signal が保持しているハンドラリストに任意のオブジェクトとコールバック関数を登録します。
+              <br>
+              引数 object が DOM エレメントだった場合、addEventListener と同じように働きます。
+              <br>
+              戻り値は、Pot.Signal.Handler のインスタンスです。
+              <pre>// イベントを登録
+//  第一引数に文字列を渡すと document.getElementById を使用します
+//  '#foo' のシャープ記号 '#' は、単に無視されます
+//  この例では明示的に ID を示すため付けています
+//  また、jQuery オブジェクトを渡すことも可能です
+var handler = attach('#foo', 'click', function(ev) {
+    // ...
+});
+
+// イベント解除
+detach(handler);</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.attachBefore"><em>Pot.Signal.</em>attachBefore</dfn>(object, signalName, callback[, useCapture])
+             </dt>
+             <dd>
+              スロットに存在するハンドラが呼ばれる前に実行されるシグナルを登録します。
+              <br>
+              attach() (Pot.Signal.attach()) で登録したものと同じシグナル signalName で登録した場合、
+              attach() のハンドラが呼ばれる前に実行されます。
+              <br>
+              同じシグナルが存在しない場合 signal() によって実行しても何も起きません。
+              <br>
+              DOM エレメントに対して attach() した場合も同様です。
+              <br>
+              戻り値は、Pot.Signal.Handler のインスタンスです。
+              <pre>// 保存ボタンを押した時のイベントを設定
+attach('#saveData', 'click', function() {
+    // 保存する関数
+    saveData(document.getElementById('inputText').value);
+    // ユーザーに保存を伝える関数
+    showSaveData('Saved!');
+});
+
+// これにフォーカス移動するよう後付けする
+attachAfter('#saveData', 'click', function() {
+    document.getElementById('inputText').focus();
+});
+
+// その前にログを取るよう設定する
+attachBefore('#saveData', 'click', function() {
+    MyLogger.log('Save inputText');
+});</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.attachAfter"><em>Pot.Signal.</em>attachAfter</dfn>(object, signalName, callback[, useCapture])
+             </dt>
+             <dd>
+              スロットに存在するハンドラが呼ばれた後に実行されるシグナルを登録します。
+              <br>
+              attach() (Pot.Signal.attach()) で登録したものと同じシグナル signalName で登録した場合、
+              attach() のハンドラが呼ばれた後に実行されます。
+              <br>
+              同じシグナルが存在しない場合 signal() によって実行しても何も起きません。
+              <br>
+              DOM エレメントに対して attach() した場合も同様です。
+              <br>
+              戻り値は、Pot.Signal.Handler のインスタンスです。
+              <pre>// 保存ボタンを押した時のイベントを設定
+attach('#saveData', 'click', function() {
+    // 保存する関数
+    saveData(document.getElementById('inputText').value);
+    // ユーザーに保存を伝える関数
+    showSaveData('Saved!');
+});
+
+// これにフォーカス移動するよう後付けする
+attachAfter('#saveData', 'click', function() {
+    document.getElementById('inputText').focus();
+});
+
+// その前にログを取るよう設定する
+attachBefore('#saveData', 'click', function() {
+    MyLogger.log('Save inputText');
+});</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.attachPropBefore"><em>Pot.Signal.</em>attachPropBefore</dfn>(object, propName, callback)
+             </dt>
+             <dd>
+              object が持つ関数 propName が呼ばれる前に実行されるシグナル callback を登録します。
+              <br>
+              attachBefore() と違い、attach() の必要はありません。
+              <br>
+              登録すると、signal() (Pot.Signal.signal()) を呼ばなくても
+              object[propName] が呼ばれた時に自動的に実行されます。
+              <br>
+              attachPropBefore は、DOM オブジェクトに対しての動作は保証されません。
+              <br>
+              戻り値は、Pot.Signal.Handler のインスタンスです。
+              <pre>// 例えば何らかのアプリケーションを実行する時に、ログをとりたくなった場合
+var MyApp = {
+    execute : function() {
+        // 何らかの処理を開始する
+        myAppDoit();
+    }
+};
+
+attach('#execute', 'click', function() {
+    // アプリケーションを実行
+    MyApp.execute();
+});
+
+// 実行する前にログを取る
+attachPropBefore(MyApp, 'execute', function() {
+    MyLogger.log('Begin execute');
+});
+
+// 実行した後のログを取る
+attachPropAfter(MyApp, 'execute', function() {
+    MyLogger.log('End execute');
+});</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.attachPropAfter"><em>Pot.Signal.</em>attachPropAfter</dfn>(object, propName, callback)
+             </dt>
+             <dd>
+              object が持つ関数 propName が呼ばれた後に実行されるシグナル callback を登録します。
+              <br>
+              attachAfter() と違い、attach() の必要はありません。
+              <br>
+              登録すると、signal() (Pot.Signal.signal()) を呼ばなくても
+              object[propName] が呼ばれた時に自動的に実行されます。
+              <br>
+              attachPropAfter は、DOM オブジェクトに対しての動作は保証されません。
+              <br>
+              戻り値は、Pot.Signal.Handler のインスタンスです。
+              <pre>// 例えば何らかのアプリケーションを実行する時に、ログをとりたくなった場合
+var MyApp = {
+    execute : function() {
+        // 何らかの処理を開始する
+        myAppDoit();
+    }
+};
+
+attach('#execute', 'click', function() {
+    // アプリケーションを実行
+    MyApp.execute();
+});
+
+// 実行する前にログを取る
+attachPropBefore(MyApp, 'execute', function() {
+    MyLogger.log('Begin execute');
+});
+
+// 実行した後のログを取る
+attachPropAfter(MyApp, 'execute', function() {
+    MyLogger.log('End execute');
+});</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.detach"><em>Pot.Signal.</em>detach</dfn>(object[, signalName[, callback[, useCapture]]])
+             </dt>
+             <dd>
+              attach*() (Pot.Signal.attach*()) によって登録したシグナルを 1 つ解除します。
+              <br>
+              attachBefore, attachAfter, attachPropBefore, attachPropAfter で登録したものも同様に解除可能です。
+              <br>
+              引数に object だけを渡した場合、関連するシグナルが 1 つ解除されます。
+              引数 signalName, callback を渡すと明確に解除できます。
+              <br>
+              また、attach() などの戻り値のハンドラを object として渡して解除もできます。
+              <br>
+              登録と解除の関係は、setTimeout と clearTimeout の関係と同様に扱えます。
+              <br>
+              DOM エレメントに対しては、 removeEventListener と同様に扱うことができます。
+              <br>
+              解除成功時に true、失敗時に false が返ります。
+              <pre>// イベントを登録
+var handler = attach('#foo', 'click', function(ev) {
+    // ...
+});
+
+// イベント解除
+detach(handler);</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.detachAll"><em>Pot.Signal.</em>detachAll</dfn>([object[, ...signals]])
+             </dt>
+             <dd>
+              attach*() (Pot.Signal.attach*()) によって登録したシグナルをすべて解除します。
+              <br>
+              attachBefore, attachAfter, attachPropBefore, attachPropAfter で登録したものも同様に解除可能です。
+              <br>
+              引数に object だけを渡した場合、関連するシグナルがすべて解除されます。
+              <br>
+              引数 signals を渡すと一致するシグナルがすべて解除できます。
+              <br>
+              引数を省略すると存在するすべてのシグナルが解除されます。
+              <br>
+              シグナル名となる signals は文字列または配列で複数指定できます。
+              <pre>// すべてのイベントを解除する例
+var foo = document.getElementById('foo');
+attach(foo, 'click',     function(ev) {/*...*/});
+attach(foo, 'mouseover', function(ev) {/*...*/});
+attach(foo, 'mouseout',  function(ev) {/*...*/});
+// foo のイベントをすべて解除
+detachAll(foo);</pre>
+              <pre>// 異なるすべてのシグナルを解除する例
+attach(window,        'load',      function(ev) {/*...*/});
+attach(document.body, 'mousemove', function(ev) {/*...*/});
+attach('#foo',        'click',     function(ev) {/*...*/});
+// すべて解除
+detachAll();</pre>
+             </dd>
+             <dt>
+              <dfn id="function.Pot.Signal.signal"><em>Pot.Signal.</em>signal</dfn>(object, signalName[, ...args])
+             </dt>
+             <dd>
+              attach() (Pot.Signal.attach()) によって登録したシグナルを実行します。
+              <br>
+              引数 object と signalName に一致するシグナルがすべて実行されます。
+              <br>
+              実行される関数には第三引数～以降に任意の引数が渡せます。
+              <pre>var MyObj = {};
+
+// 独自のシグナルを登録
+var handler = attach(MyObj, 'clear-data', function() {
+    // プロパティの初期化など
+    MyObj.data = null;
+    MyObj.time = null;
+});
+
+attach(window, 'load', function() {
+    // 初期化するシグナルを送信
+    signal(MyObj, 'clear-data');
+
+    // リセットボタンを押した時にもクリアするよう設定
+    attach('#reset', 'click', function() {
+        signal(MyObj, 'clear-data');
+    });
+
+    // 既存の処理など
+    myLoadProcess();
+    //...
+});</pre>
+             </dd>
+            </dl>
            </div>
            <div>
             <h3 id="otherPropertiesAndMethods">その他のプロパティ</h3>
@@ -3687,6 +3928,166 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
            </div>
          </div>
         </div>
+       </div>
+      </div>
+      <div class="leftside" id="index">
+        <!--h2 id="index">目次</h2-->
+        <ul class="compact-left">
+          <li><a href="#overview">概要</a></li>
+          <li><a href="#download">ダウンロード</a></li>
+          <li><a href="#install">インストール</a></li>
+          <li><a href="#compatibility">動作環境</a></li>
+          <li><a href="#TestRun">動作テスト</a></li>
+          <li><a href="#license">ライセンス</a></li>
+          <li><a href="#contact">連絡先</a></li>
+          <li><a href="#thanks">謝辞</a></li>
+          <li><a href="#forJSDoc">自動生成されたドキュメント</a></li>
+          <li><a href="#introduction">導入</a></li>
+          <li>
+            <a href="#reference">リファレンス</a>
+            <ul class="compact">
+              <li><a href="#callbackChain">チェイン</a></li>
+              <li><a href="#exception">例外処理</a></li>
+              <li><a href="#Destructuring-Assignment">分割代入</a></li>
+              <li><a href="#controlSpeed">速度の操作</a></li>
+              <li><a href="#fireChain">チェインを実行</a></li>
+              <li><a href="#replaceToDeferred">関数を Deferred 化</a></li>
+              <li><a href="#iterator">イテレータ</a></li>
+              <li><a href="#replaceLoop">ループ処理を置き換える</a></li>
+              <li><a href="#StopIteration">イテレートを止める</a></li>
+              <li>
+                <a href="#referenceFunctions">関数リファレンス</a>
+                <ul class="compact toggle-menu-list">
+                  <li>
+                    <span class="toggle-trigger-pre"></span>
+                    <a href="#PotObjectFunctions">Pot オブジェクトの関数</a>
+                    <ul class="compact">
+                      <li><a href="#function.Pot.update">update</a></li>
+                      <li><a href="#function.Pot.stringify">stringify</a></li>
+                      <li><a href="#function.Pot.arrayize">arrayize</a></li>
+                      <li><a href="#function.Pot.rescape">rescape</a></li>
+                      <li><a href="#function.Pot.trim">trim</a></li>
+                      <li><a href="#function.Pot.now">now</a></li>
+                      <li><a href="#function.Pot.debug">debug</a></li>
+                      <li><a href="#function.Pot.isBoolean">isBoolean</a></li>
+                      <li><a href="#function.Pot.isNumber">isNumber</a></li>
+                      <li><a href="#function.Pot.isString">isString</a></li>
+                      <li><a href="#function.Pot.isFunction">isFunction</a></li>
+                      <li><a href="#function.Pot.isArray">isArray</a></li>
+                      <li><a href="#function.Pot.isDate">isDate</a></li>
+                      <li><a href="#function.Pot.isRegExp">isRegExp</a></li>
+                      <li><a href="#function.Pot.isObject">isObject</a></li>
+                      <li><a href="#function.Pot.isError">isError</a></li>
+                      <li><a href="#function.Pot.typeOf">typeOf</a></li>
+                      <li><a href="#function.Pot.isStopIter">isStopIter</a></li>
+                      <li><a href="#function.Pot.isIterable">isIterable</a></li>
+                      <li><a href="#function.Pot.isArrayLike">isArrayLike</a></li>
+                      <li><a href="#function.Pot.isDeferred">isDeferred</a></li>
+                      <li><a href="#function.Pot.isIter">isIter</a></li>
+                      <li><a href="#function.Pot.isNumeric">isNumeric</a></li>
+                      <li><a href="#function.Pot.isInt">isInt</a></li>
+                      <li><a href="#function.Pot.isBuiltinMethod">isBuiltinMethod</a></li>
+                      <li><a href="#function.Pot.isWindow">isWindow</a></li>
+                      <li><a href="#function.Pot.isDocument">isDocument</a></li>
+                      <li><a href="#function.Pot.isElement">isElement</a></li>
+                      <li><a href="#function.Pot.isNodeList">isNodeList</a></li>
+                      <li><a href="#function.Pot.isNodeLike">isNodeLike</a></li>
+                      <li><a href="#function.Pot.range">range</a></li>
+                      <li><a href="#function.Pot.indexOf">indexOf</a></li>
+                      <li><a href="#function.Pot.lastIndexOf">lastIndexOf</a></li>
+                      <li><a href="#function.Pot.request">request</a></li>
+                      <li><a href="#function.Pot.jsonp">jsonp</a></li>
+                      <li><a href="#function.Pot.loadScript">loadScript</a></li>
+                      <li><a href="#function.Pot.serializeToJSON">serializeToJSON</a></li>
+                      <li><a href="#function.Pot.parseFromJSON">parseFromJSON</a></li>
+                      <li><a href="#function.Pot.serializeToQueryString">serializeToQueryString</a></li>
+                      <li><a href="#function.Pot.parseFromQueryString">parseFromQueryString</a></li>
+                      <li><a href="#function.Pot.urlEncode">urlEncode</a></li>
+                      <li><a href="#function.Pot.urlDecode">urlDecode</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="toggle-trigger-pre"></span>
+                    <a href="#iteratorFunctions">イテレータ関数</a>
+                    <ul class="compact">
+                      <li><a href="#function.Pot.forEach">forEach</a></li>
+                      <li><a href="#function.Pot.repeat">repeat</a></li>
+                      <li><a href="#function.Pot.forEver">forEver</a></li>
+                      <li><a href="#function.Pot.iterate">iterate</a></li>
+                      <li><a href="#function.Pot.Iter">Iter</a></li>
+                      <li><a href="#function.Pot.toIter">toIter</a></li>
+                      <li><a href="#function.Pot.items">items</a></li>
+                      <li><a href="#function.Pot.zip">zip</a></li>
+                      <li><a href="#function.Pot.map">map</a></li>
+                      <li><a href="#function.Pot.filter">filter</a></li>
+                      <li><a href="#function.Pot.reduce">reduce</a></li>
+                      <li><a href="#function.Pot.every">every</a></li>
+                      <li><a href="#function.Pot.some">some</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="toggle-trigger-pre"></span>
+                    <a href="#PotDeferredMethods">Pot.Deferred のメソッド</a>
+                    <ul class="compact">
+                      <li><a href="#function.Pot.Deferred">Deferred</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.then">then</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.rescue">rescue</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.ensure">ensure</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.begin">begin</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.raise">raise</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.end">end</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.wait">wait</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.till">till</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.cancel">cancel</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.canceller">canceller</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.speed">speed</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.async">async</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.args">args</a></li>
+                      <li><a href="#function.Pot.Deferred.prototype.data">data</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="toggle-trigger-pre"></span>
+                    <a href="#PotDeferredFunctions">Pot.Deferred の関数</a>
+                    <ul>
+                      <li><a href="#function.Pot.Deferred.succeed">succeed</a></li>
+                      <li><a href="#function.Pot.Deferred.failure">failure</a></li>
+                      <li><a href="#function.Pot.Deferred.wait">wait</a></li>
+                      <li><a href="#function.Pot.Deferred.till">till</a></li>
+                      <li><a href="#function.Pot.Deferred.begin">begin</a></li>
+                      <li><a href="#function.Pot.Deferred.flush">flush</a></li>
+                      <li><a href="#function.Pot.Deferred.maybeDeferred">maybeDeferred</a></li>
+                      <li><a href="#function.Pot.Deferred.callLater">callLater</a></li>
+                      <li><a href="#function.Pot.Deferred.callLazy">callLazy</a></li>
+                      <li><a href="#function.Pot.Deferred.isFired">isFired</a></li>
+                      <li><a href="#function.Pot.Deferred.lastResult">lastResult</a></li>
+                      <li><a href="#function.Pot.Deferred.lastError">lastError</a></li>
+                      <li><a href="#function.Pot.Deferred.register">register</a></li>
+                      <li><a href="#function.Pot.Deferred.unregister">unregister</a></li>
+                      <li><a href="#function.Pot.Deferred.deferrize">deferrize</a></li>
+                      <li><a href="#function.Pot.Deferred.parallel">parallel</a></li>
+                      <li><a href="#function.Pot.Deferred.chain">chain</a></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <span class="toggle-trigger-pre"></span>
+                    <a href="#PotSignalFunctions">Pot.Signal の関数</a>
+                    <ul>
+                      <li><a href="#function.Pot.Signal.attach">attach</a></li>
+                      <li><a href="#function.Pot.Signal.attachBefore">attachBefore</a></li>
+                      <li><a href="#function.Pot.Signal.attachAfter">attachAfter</a></li>
+                      <li><a href="#function.Pot.Signal.attachPropBefore">attachPropBefore</a></li>
+                      <li><a href="#function.Pot.Signal.attachPropAfter">attachPropAfter</a></li>
+                      <li><a href="#function.Pot.Signal.detach">detach</a></li>
+                      <li><a href="#function.Pot.Signal.detachAll">detachAll</a></li>
+                      <li><a href="#function.Pot.Signal.signal">signal</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="footer">
@@ -3698,7 +4099,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-11-23
+         Last modified: 2011-12-08
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
