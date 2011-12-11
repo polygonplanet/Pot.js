@@ -1,21 +1,21 @@
 /*!
- * Pot.js - JavaScript utility library (lite)
+ * PotLite.js - JavaScript utility library
  *
  * Pot.js implements practical tendency as a substitution utility library.
  * That includes asynchronous methods as "Deferred"
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.23, 2011-12-06
+ * Version 1.24, 2011-12-11
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  */
 /**
- * Project Pot.js
+ * Project PotLite.js
  *
  * @description
  *  <p>
- *  Pot.js implements practical tendency as a substitution utility library.
+ *  PotLite.js implements practical tendency as a substitution utility library.
  *  That includes asynchronous methods as "Deferred"
  *   for solution to heavy process.
  *  That is fully ECMAScript compliant.
@@ -29,10 +29,10 @@
  *  </p>
  *
  *
- * @fileoverview   Pot.js utility library (lite)
+ * @fileoverview   PotLite.js utility library
  * @author         polygon planet
- * @version        1.23
- * @date           2011-12-06
+ * @version        1.24
+ * @date           2011-12-11
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -52,7 +52,7 @@
  */
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 /**
- * @namespace Pot.js
+ * @namespace PotLite.js
  */
 (function(globals, undefined) {
 
@@ -65,7 +65,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.23', TYPE : 'lite'},
+var Pot = {VERSION : '1.24', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -364,11 +364,14 @@ update(Pot, {
      * @ignore
      */
     getMagicNumber : update(function() {
-      var me = arguments.callee;
-      return me.INITIAL_NUMBER + (me.count++);
+      var me = arguments.callee, n = me.n + (me.c++);
+      if (!isFinite(n) || isNaN(n)) {
+        me.c = me.n = n = 0;
+      }
+      return n;
     }, {
-      count : 0,
-      INITIAL_NUMBER : Number('0xC26BEB642C0A') || (2147483647 ^ 2047)
+      c : 0,
+      n : +'0xC26BEB642C0A'
     }),
     /**
      * Get the export object.
@@ -1596,7 +1599,7 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, id, scope, func, doc, script, head, text;
+    var me = arguments.callee, id, scope, func, doc, script, head;
     if (code && me.patterns.valid.test(code)) {
       if (Pot.System.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
@@ -1880,6 +1883,7 @@ Pot.update({
    *
    *
    * @example
+   *   // See source code directly.
    *   // Using E4X Syntax for test.
    *   var func = function() {
    *     // return 'hoge';
@@ -3027,6 +3031,23 @@ Pot.update({
    * @static
    */
   invoke : invoke,
+  /**
+   * Get the current time as milliseconds.
+   *
+   *
+   * @example
+   *   var time = now(); // equals (new Date()).getTime();
+   *   debug(time); // 1323446177282
+   *
+   *
+   * @return    Return the current time as milliseconds.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  now : now,
   /**
    * Output to the console using log function for debug.
    *
@@ -6048,6 +6069,7 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'flush', function(opts, callback) {
 }, Pot.Deferred.speeds);
 
 })();
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Define iteration methods. (internal)
 
@@ -7057,7 +7079,8 @@ update(Pot.tmp, {
    * @ignore
    */
   createLightIterateConstructor : function(creator) {
-    var methods, construct, name,
+    var
+    name,
     /**@ignore*/
     create = function(speed) {
       var interval;
@@ -7067,9 +7090,9 @@ update(Pot.tmp, {
         interval = Pot.Internal.LightIterator.speeds[speed];
       }
       return creator(interval);
-    };
+    },
+    methods = {},
     construct = create();
-    methods = {};
     for (name in Pot.Internal.LightIterator.speeds) {
       methods[name] = create(name);
     }
@@ -10233,6 +10256,7 @@ Pot.update({
 delete Pot.tmp.createIterators;
 delete Pot.tmp.createProtoIterators;
 delete Pot.tmp.createSyncIterator;
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Serializer.
 
@@ -10934,8 +10958,8 @@ update(Pot.URI, {
 
 // Update Pot object.
 Pot.update({
-  urlEncode : Pot.URI.urlEncode,
-  urlDecode : Pot.URI.urlDecode
+  urlEncode          : Pot.URI.urlEncode,
+  urlDecode          : Pot.URI.urlDecode
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -12160,6 +12184,7 @@ Pot.update({
 });
 
 })();
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
 Pot.update({
@@ -14054,6 +14079,7 @@ Pot.update({
 });
 
 })();
+
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Debug.
 Pot.update({
@@ -14267,106 +14293,106 @@ update(Pot.Internal, {
    * @internal
    */
   PotExportProps : {
-    Pot                    : Pot,
-    update                 : update,
-    isBoolean              : Pot.isBoolean,
-    isNumber               : Pot.isNumber,
-    isString               : Pot.isString,
-    isFunction             : Pot.isFunction,
-    isArray                : Pot.isArray,
-    isDate                 : Pot.isDate,
-    isRegExp               : Pot.isRegExp,
-    isObject               : Pot.isObject,
-    isError                : Pot.isError,
-    typeOf                 : Pot.typeOf,
-    typeLikeOf             : Pot.typeLikeOf,
-    StopIteration          : Pot.StopIteration,
-    isStopIter             : Pot.isStopIter,
-    isIterable             : Pot.isIterable,
-    isArrayLike            : Pot.isArrayLike,
-    isDeferred             : Pot.isDeferred,
-    isIter                 : Pot.isIter,
-    isPercentEncoded       : Pot.isPercentEncoded,
-    isNumeric              : Pot.isNumeric,
-    isInt                  : Pot.isInt,
-    isNativeCode           : Pot.isNativeCode,
-    isBuiltinMethod        : Pot.isBuiltinMethod,
-    isWindow               : Pot.isWindow,
-    isDocument             : Pot.isDocument,
-    isElement              : Pot.isElement,
-    isNodeLike             : Pot.isNodeLike,
-    isNodeList             : Pot.isNodeList,
-    Deferred               : Pot.Deferred,
-    succeed                : Pot.Deferred.succeed,
-    failure                : Pot.Deferred.failure,
-    wait                   : Pot.Deferred.wait,
-    callLater              : Pot.Deferred.callLater,
-    callLazy               : Pot.Deferred.callLazy,
-    maybeDeferred          : Pot.Deferred.maybeDeferred,
-    isFired                : Pot.Deferred.isFired,
-    lastResult             : Pot.Deferred.lastResult,
-    lastError              : Pot.Deferred.lastError,
-    register               : Pot.Deferred.register,
-    unregister             : Pot.Deferred.unregister,
-    deferrize              : Pot.Deferred.deferrize,
-    begin                  : Pot.Deferred.begin,
-    flush                  : Pot.Deferred.flush,
-    till                   : Pot.Deferred.till,
-    parallel               : Pot.Deferred.parallel,
-    chain                  : Pot.Deferred.chain,
-    forEach                : Pot.forEach,
-    repeat                 : Pot.repeat,
-    forEver                : Pot.forEver,
-    iterate                : Pot.iterate,
-    items                  : Pot.items,
-    zip                    : Pot.zip,
-    Iter                   : Pot.Iter,
-    toIter                 : Pot.Iter.toIter,
-    map                    : Pot.map,
-    filter                 : Pot.filter,
-    reduce                 : Pot.reduce,
-    every                  : Pot.every,
-    some                   : Pot.some,
-    range                  : Pot.range,
-    indexOf                : Pot.indexOf,
-    lastIndexOf            : Pot.lastIndexOf,
-    globalEval             : Pot.globalEval,
-    localEval              : Pot.localEval,
-    hasReturn              : Pot.hasReturn,
-    override               : Pot.override,
-    currentWindow          : Pot.currentWindow,
-    currentDocument        : Pot.currentDocument,
-    currentURI             : Pot.currentURI,
-    serializeToJSON        : Pot.Serializer.serializeToJSON,
-    parseFromJSON          : Pot.Serializer.parseFromJSON,
-    serializeToQueryString : Pot.Serializer.serializeToQueryString,
-    parseFromQueryString   : Pot.Serializer.parseFromQueryString,
-    urlEncode              : Pot.URI.urlEncode,
-    urlDecode              : Pot.URI.urlDecode,
-    request                : Pot.Net.request,
-    jsonp                  : Pot.Net.requestByJSONP,
-    loadScript             : Pot.Net.loadScript,
-    evalInSandbox          : Pot.XPCOM.evalInSandbox,
-    throughout             : Pot.XPCOM.throughout,
-    getMostRecentWindow    : Pot.XPCOM.getMostRecentWindow,
-    getChromeWindow        : Pot.XPCOM.getChromeWindow,
-    attach                 : Pot.Signal.attach,
-    attachBefore           : Pot.Signal.attachBefore,
-    attachAfter            : Pot.Signal.attachAfter,
-    attachPropBefore       : Pot.Signal.attachPropBefore,
-    attachPropAfter        : Pot.Signal.attachPropAfter,
-    detach                 : Pot.Signal.detach,
-    detachAll              : Pot.Signal.detachAll,
-    signal                 : Pot.Signal.signal,
-    rescape                : rescape,
-    arrayize               : arrayize,
-    invoke                 : invoke,
-    stringify              : stringify,
-    trim                   : trim,
-    now                    : now,
-    hashCode               : Pot.Crypt.hashCode,
-    globalize              : Pot.globalize,
-    debug                  : Pot.Debug.debug
+    Pot                     : Pot,
+    update                  : update,
+    isBoolean               : Pot.isBoolean,
+    isNumber                : Pot.isNumber,
+    isString                : Pot.isString,
+    isFunction              : Pot.isFunction,
+    isArray                 : Pot.isArray,
+    isDate                  : Pot.isDate,
+    isRegExp                : Pot.isRegExp,
+    isObject                : Pot.isObject,
+    isError                 : Pot.isError,
+    typeOf                  : Pot.typeOf,
+    typeLikeOf              : Pot.typeLikeOf,
+    StopIteration           : Pot.StopIteration,
+    isStopIter              : Pot.isStopIter,
+    isIterable              : Pot.isIterable,
+    isArrayLike             : Pot.isArrayLike,
+    isDeferred              : Pot.isDeferred,
+    isIter                  : Pot.isIter,
+    isPercentEncoded        : Pot.isPercentEncoded,
+    isNumeric               : Pot.isNumeric,
+    isInt                   : Pot.isInt,
+    isNativeCode            : Pot.isNativeCode,
+    isBuiltinMethod         : Pot.isBuiltinMethod,
+    isWindow                : Pot.isWindow,
+    isDocument              : Pot.isDocument,
+    isElement               : Pot.isElement,
+    isNodeLike              : Pot.isNodeLike,
+    isNodeList              : Pot.isNodeList,
+    Deferred                : Pot.Deferred,
+    succeed                 : Pot.Deferred.succeed,
+    failure                 : Pot.Deferred.failure,
+    wait                    : Pot.Deferred.wait,
+    callLater               : Pot.Deferred.callLater,
+    callLazy                : Pot.Deferred.callLazy,
+    maybeDeferred           : Pot.Deferred.maybeDeferred,
+    isFired                 : Pot.Deferred.isFired,
+    lastResult              : Pot.Deferred.lastResult,
+    lastError               : Pot.Deferred.lastError,
+    register                : Pot.Deferred.register,
+    unregister              : Pot.Deferred.unregister,
+    deferrize               : Pot.Deferred.deferrize,
+    begin                   : Pot.Deferred.begin,
+    flush                   : Pot.Deferred.flush,
+    till                    : Pot.Deferred.till,
+    parallel                : Pot.Deferred.parallel,
+    chain                   : Pot.Deferred.chain,
+    forEach                 : Pot.forEach,
+    repeat                  : Pot.repeat,
+    forEver                 : Pot.forEver,
+    iterate                 : Pot.iterate,
+    items                   : Pot.items,
+    zip                     : Pot.zip,
+    Iter                    : Pot.Iter,
+    toIter                  : Pot.Iter.toIter,
+    map                     : Pot.map,
+    filter                  : Pot.filter,
+    reduce                  : Pot.reduce,
+    every                   : Pot.every,
+    some                    : Pot.some,
+    range                   : Pot.range,
+    indexOf                 : Pot.indexOf,
+    lastIndexOf             : Pot.lastIndexOf,
+    globalEval              : Pot.globalEval,
+    localEval               : Pot.localEval,
+    hasReturn               : Pot.hasReturn,
+    override                : Pot.override,
+    currentWindow           : Pot.currentWindow,
+    currentDocument         : Pot.currentDocument,
+    currentURI              : Pot.currentURI,
+    serializeToJSON         : Pot.Serializer.serializeToJSON,
+    parseFromJSON           : Pot.Serializer.parseFromJSON,
+    serializeToQueryString  : Pot.Serializer.serializeToQueryString,
+    parseFromQueryString    : Pot.Serializer.parseFromQueryString,
+    urlEncode               : Pot.URI.urlEncode,
+    urlDecode               : Pot.URI.urlDecode,
+    request                 : Pot.Net.request,
+    jsonp                   : Pot.Net.requestByJSONP,
+    loadScript              : Pot.Net.loadScript,
+    hashCode                : Pot.Crypt.hashCode,
+    evalInSandbox           : Pot.XPCOM.evalInSandbox,
+    throughout              : Pot.XPCOM.throughout,
+    getMostRecentWindow     : Pot.XPCOM.getMostRecentWindow,
+    getChromeWindow         : Pot.XPCOM.getChromeWindow,
+    attach                  : Pot.Signal.attach,
+    attachBefore            : Pot.Signal.attachBefore,
+    attachAfter             : Pot.Signal.attachAfter,
+    attachPropBefore        : Pot.Signal.attachPropBefore,
+    attachPropAfter         : Pot.Signal.attachPropAfter,
+    detach                  : Pot.Signal.detach,
+    detachAll               : Pot.Signal.detachAll,
+    signal                  : Pot.Signal.signal,
+    rescape                 : rescape,
+    arrayize                : arrayize,
+    invoke                  : invoke,
+    stringify               : stringify,
+    trim                    : trim,
+    now                     : now,
+    globalize               : Pot.globalize,
+    debug                   : Pot.Debug.debug
   }
 });
 
