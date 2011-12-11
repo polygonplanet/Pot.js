@@ -1,0 +1,21 @@
+{
+  "fileName": "potlite.js",
+  "debug": false,
+  "version": "1.24",
+  "files": [
+    "Core.js",
+    "Deferred.js",
+    "Iterator.js",
+    "Serializer.js",
+    "URI.js",
+    "Crypt.js",
+    "Net.js",
+    "XPCOM.js",
+    "Signal.js",
+    "Debug.js",
+    "Export.js",
+    "Plugin.js",
+    "Done.js"
+  ],
+  "enclosure": "Enclosure.js"
+}
