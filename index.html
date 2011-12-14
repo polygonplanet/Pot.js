@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ</title>
-<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico">
+<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico?2">
 <meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for asynchronous processing with Deferred.">
 <meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
 <meta name="description" lang="ja" content="Pot.js/PotLite.jsは,非ブロックでの非同期処理を直列的に書けるようにし,UIやCPUへの負担を軽減するループ処理を中心にDeferredと共に実装されたJavaScriptライブラリ.">
@@ -29,7 +29,7 @@ dfn em {
   color: #666;
 }
 
-td.header, td.header * {
+td.row-head, td.row-head * {
   font-weight: bold;
 }
 
@@ -162,7 +162,7 @@ $(function() {
       <div class="frame">
         <div class="header-logo">
          <a href="http://polygonplanet.github.com/Pot.js/index.html"
-            title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ"><img src="http://api.polygonpla.net/img/logo/potlite.js.mini.png"></a>
+            title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理ライブラリ"><img src="http://api.polygonpla.net/img/logo/potlite.js.mini.png?2"></a>
         </div>
         <h1 id="top">Pot.js + PotLite.js</h1>
         <p>
@@ -245,7 +245,7 @@ $(function() {
          <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;potlite.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;!-- または下記で説明する API サーバが利用できます --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js&quot;&gt;&lt;/script&gt;
 </pre>
          <p>
           読み込み後の例:
@@ -304,34 +304,34 @@ Pot.Deferred.begin(function() {
           そのため、ホスティング用に API サーバを用意しました。
          </p>
          <div>
-          <p>PotLite.js Version 1.23 を使う場合:</p>
+          <p>PotLite.js Version 1.24 を使う場合:</p>
           <ul>
            <li>
-            v1.23 :
-             <a href="http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js"
-                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js</a>
+            v1.24 :
+             <a href="http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js"
+                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js</a>
            </li>
           </ul>
          </div>
          <p>
-          これは、1.23 の部分をリリース済みのバージョンに合わせて変更できます。
+          これは、1.24 の部分をリリース済みのバージョンに合わせて変更できます。
           <br>
           レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
           あわせて API サーバに置くようにしています。
          <p>
          <p>
-          例えば Greasemonkey で 1.23 を使いたい場合、
+          例えば Greasemonkey で 1.24 を使いたい場合、
          </p>
          <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/potlite/1.23/potlite.min.js
+// @require  http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js
 // ...
 // ==/UserScript==</pre>
          <p>
           と記述できます。
          </p>
          <p>
-          この例では 1.23 としていますが、このマニュアルは常に更新しているわけではないので
+          この例では 1.24 としていますが、このマニュアルは常に更新しているわけではないので
           最新とは限りません。
           <br>
           より安定したバージョンを選び使ってください。
@@ -555,23 +555,23 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
              <div>
                <table class="grid" id="DeferredLibraryMap">
                  <tr>
-                   <td class="header marker" style="width: 19%;">
+                   <td class="row-head marker">
                      <a href="http://polygonplanet.github.com/Pot.js/index.html"
                         title="Pot.js + PotLite.js - ドキュメントリファレンス">Pot.Deferred</a>
                    </td>
-                   <td class="header" style="width: 19%;">
+                   <td class="row-head">
                      <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred"
                         title="MochiKit.Async - manage asynchronous tasks">MochiKit.Async.Deferred</a>
                    </td>
-                   <td class="header" style="width: 19%;">
+                   <td class="row-head">
                      <a href="http://cho45.stfuawsc.com/jsdeferred/"
                         title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
                    </td>
-                   <td class="header" style="width: 19%;">
+                   <td class="row-head">
                      <a href="http://api.jquery.com/category/deferred-object/"
                         title="Deferred Object -- jQuery API">jQuery.Deferred</a>
                    </td>
-                   <td class="header" style="width: 19%;">
+                   <td class="row-head">
                      <a href="http://docs.dojocampus.org/dojo/Deferred"
                         title="dojo/Deferred - DojoCampus - Docs">dojo.Deferred</a>
                    </td>
@@ -936,8 +936,8 @@ d.then(function() {
             <div>
              <table class="grid" id="controlSpeedMap">
               <tr>
-               <td class="marker header" style="width: 49%">値 / メソッド名</td>
-               <td class="marker header" style="width: 49%">速度</td>
+               <td class="marker row-head">値 / メソッド名</td>
+               <td class="marker row-head">速度</td>
               </tr>
               <tr>
                <td>limp</td>
@@ -4105,7 +4105,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-12-08
+         Last modified: 2011-12-15
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
