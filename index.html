@@ -116,41 +116,75 @@ body .toggle-trigger {
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
 <![endif]-->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
 <script type="text/javascript" src="http://api.polygonpla.net/js/jquery/jquery.floatingmenu.min.js"></script>
 <script type="text/javascript">
 $(function() {
 
-  $('.toggle-trigger-pre')
-    .removeClass('toggle-trigger-pre')
-    .addClass('toggle-trigger')
-    .addClass('toggle-shown')
-    .click(function() {
-      var block = $(this).next().next('ul');
-      if ($(this).hasClass('toggle-shown')) {
-        $(this).removeClass('toggle-shown').text('+');
-        block.hide();
-      } else {
-        $(this).addClass('toggle-shown').text('-');
-        block.show();
-      }
-    })
-    .click()
-    .parent('li')
-      .css({
-        listStyleType : 'none'
-      });
-  
-  if (Math.max(800, $(window).width()) != 800) {
-    setTimeout(function() {
-      $('ul.compact-left').floatingMenu({
-        container : '.layout-liquid-container',
-        footer    : '.layout-liquid-container .footer',
-        triggers  : {
-          'click' : '.toggle-trigger'
+function initScrollTo(expr, callback) {
+  $(expr).each(function() {
+    var that = $(this),
+        to = $('#' +
+          String(that.attr('href')).split(/#/).pop()
+          .replace(/([:#.-])/g, '\\$1')
+        );
+    that.click(function(ev) {
+      $.scrollTo(to, 800, {
+        onAfter : function() {
+          if (callback) {
+            callback();
+          }
         }
       });
-    }, 200);
-  }
+      try {
+        ev.preventDefault();
+        ev.stopPropagation();
+      } catch (e) {}
+      return false;
+    }).attr({
+      href : 'javascript:void(0);'
+    });
+  });
+}
+
+$('.toggle-trigger-pre')
+  .removeClass('toggle-trigger-pre')
+  .addClass('toggle-trigger')
+  .addClass('toggle-shown')
+  .click(function() {
+    var block = $(this).next().next('ul');
+    if ($(this).hasClass('toggle-shown')) {
+      $(this).removeClass('toggle-shown').text('+');
+      block.hide();
+    } else {
+      $(this).addClass('toggle-shown').text('-');
+      block.show();
+    }
+  })
+  .click()
+  .parent('li')
+    .css({
+      listStyleType : 'none'
+    });
+
+if (Math.max(800, $(window).width()) != 800) {
+  setTimeout(function() {
+    $('ul.compact-left').floatingMenu({
+      container : '.layout-liquid-container',
+      footer    : '.layout-liquid-container .footer',
+      triggers  : {
+        'click' : '.toggle-trigger'
+      },
+      callback  : function(that) {
+        initScrollTo('#index a[href*="#"]', function() {
+          that.setPos(-1);
+        });
+      }
+    });
+  }, 200);
+}
+
+initScrollTo('.layout-liquid-container .footer a[href*="#"]');
 
 });
 </script>
