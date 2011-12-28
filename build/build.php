@@ -3,6 +3,20 @@
 // Pot.js / PotLite.js
 // Simple script compiler
 //
+// Usage:
+//   Run Apache server.
+//   Access http://localhost/{this-directory}/build.php?debug=true&type=lite
+//   Parameters:
+//     - debug:
+//         "true" or "false"
+//         Output PHP comiled code if "debug" is "true".
+//     - type:
+//         "lite" or "full"
+//         Build "PotLite.js" if "type" is "lite".
+//         Build "Pot.js" if "type" is "full".
+//    - version:
+//         Optional.
+//
 
 pot_build();
 

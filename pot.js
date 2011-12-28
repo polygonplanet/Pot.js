@@ -6,9 +6,10 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.07, 2011-12-11
+ * Version 1.08, 2011-12-28
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
+ * http://polygonplanet.github.com/Pot.js/index.html
  */
 /**
  * Project Pot.js
@@ -31,8 +32,9 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.07
- * @date           2011-12-11
+ * @version        1.08
+ * @date           2011-12-28
+ * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.07', TYPE : 'full'},
+var Pot = {VERSION : '1.08', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -92,17 +94,17 @@ LOWER_ALPHAS = 'abcdefghijklmnopqrstuvwxyz',
 DIGITS       = '0123456789',
 
 // Regular expression patterns.
-RE_JS_ESCAPED      = /\\[ux][0-9a-fA-F]+/,
+RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
 RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
-RE_HTML_ESCAPED    = /&(?:[a-z]\w{0,24}|#(?:x[0-9a-f]{1,8}|[0-9]{1,10}));/i,
 RE_ARRAYLIKE       = /List|Collection/i,
-RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,
 RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,
 RE_LTRIM           = /^[\s\u00A0\u3000]+/g,
 RE_RTRIM           = /[\s\u00A0\u3000]+$/g,
 RE_STRIP           = /[\s\u00A0\u3000]+/g,
-RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
-RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
+RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,
+RE_JS_ESCAPED      = /^(?:[\w!#$()*+,.:;=?@[\]^`|~-]|\\[ux][0-9a-f]+)*$/i,
+RE_HTML_ESCAPED    =
+  /^(?:[^<>"'&]|&(?:[a-z]\w{0,24}|#(?:x[0-9a-f]{1,8}|[0-9]{1,10}));)*$/i,
 
 // Mozilla XPCOM Components.
 Ci, Cc, Cr, Cu;
@@ -1192,6 +1194,7 @@ Pot.update({
           empty = (!o || !o.length);
           break;
       case 'function':
+          /**@ignore*/
           f = (function() {});
           empty = true;
           for (p in o) {
@@ -1304,11 +1307,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isJSEscaped('abc'));                          // false
-   *   debug(isJSEscaped('1234567890'));                   // false
+   *   debug(isJSEscaped('abc'));                          // true
+   *   debug(isJSEscaped('abc\\hoge".'));                  // false
    *   debug(isJSEscaped('\\u007b\\x20hoge\\x20\\u007d')); // true
-   *   debug(isJSEscaped(null));                           // false
-   *   debug(isJSEscaped((void 0)));                       // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1327,11 +1328,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isPercentEncoded('abc'));              // false
-   *   debug(isPercentEncoded('1234567890'));       // false
+   *   debug(isPercentEncoded('abc'));              // true
+   *   debug(isPercentEncoded('abc["hoge"]'));      // false
    *   debug(isPercentEncoded('%7B%20hoge%20%7D')); // true
-   *   debug(isPercentEncoded(null));               // false
-   *   debug(isPercentEncoded((void 0)));           // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1350,11 +1349,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isHTMLEscaped('abc'));                     // false
-   *   debug(isHTMLEscaped('1234567890'));              // false
+   *   debug(isHTMLEscaped('abc'));                     // true
+   *   debug(isHTMLEscaped('1 < 2'));                   // false
    *   debug(isHTMLEscaped('&quot;(&gt;_&lt;)&quot;')); // true
-   *   debug(isHTMLEscaped(null));                      // false
-   *   debug(isHTMLEscaped((void 0)));                  // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1677,7 +1674,8 @@ Pot.update({
       'i'
     );
     return function(x) {
-      return (Pot.isNodeLike(x) || Pot.isWindow(x) || Pot.isDocument(x)) ||
+      return (Pot.isNodeLike(x) || Pot.isNodeList(x)  ||
+              Pot.isWindow(x)   || Pot.isDocument(x)) ||
         x != null && typeof x === 'object' && (
         // Event
         ((x.preventDefault || 'returnValue' in x) &&
@@ -1927,7 +1925,7 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, id, scope, func, doc, script, head, text;
+    var me = arguments.callee, id, scope, func, doc, script, head;
     if (code && me.patterns.valid.test(code)) {
       if (Pot.System.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
@@ -5908,7 +5906,7 @@ update(Pot.Deferred, {
    * @static
    */
   deferrize : function(object, method) {
-    var args = arguments, func, context, err, rep;
+    var args = arguments, func, context, err;
     try {
       switch (args.length) {
         case 0:
@@ -6557,6 +6555,27 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'flush', function(opts, callback) {
     }
   });
 }, Pot.Deferred.speeds);
+
+// Update Pot object.
+Pot.update({
+  succeed       : Pot.Deferred.succeed,
+  failure       : Pot.Deferred.failure,
+  wait          : Pot.Deferred.wait,
+  callLater     : Pot.Deferred.callLater,
+  callLazy      : Pot.Deferred.callLazy,
+  maybeDeferred : Pot.Deferred.maybeDeferred,
+  isFired       : Pot.Deferred.isFired,
+  lastResult    : Pot.Deferred.lastResult,
+  lastError     : Pot.Deferred.lastError,
+  register      : Pot.Deferred.register,
+  unregister    : Pot.Deferred.unregister,
+  deferrize     : Pot.Deferred.deferrize,
+  begin         : Pot.Deferred.begin,
+  flush         : Pot.Deferred.flush,
+  till          : Pot.Deferred.till,
+  parallel      : Pot.Deferred.parallel,
+  chain         : Pot.Deferred.chain
+});
 
 })();
 
@@ -11711,7 +11730,7 @@ update(Pot.URI, {
               (cur.location && cur.location.href) || ''
       }
     }
-    cur = stringify(cur || Pot.currentURI());
+    cur = stringify(cur);
     path = trim(trim(uri && (uri.href || uri.path) || uri) || cur);
     if (!path) {
       result = cur;
@@ -15473,7 +15492,7 @@ function attachPropByJoinPoint(object, propName, callback, advice, once) {
         attached : true
       };
       Pot.override(object, key, function(inherits, args) {
-        var uniq = buildSerial(Pot),
+        var uniq = {},
             d = newDeferred(),
             orgResult = uniq;
         d.data(errorKey, []);
@@ -16074,7 +16093,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   toObject : function() {
-    var o = {}, raw = this._rawData, key, val;
+    var o = {}, raw = this._rawData, key;
     for (k in raw) {
       if (k && k.charAt(0) === PREFIX) {
         key = k.substring(1);
@@ -16778,7 +16797,7 @@ update(Pot.Collection, {
           });
           len = array.length;
           for (i = 0; i < len; i++) {
-            for (j = 0; j < len; j++) {
+            for (j = i + 1; j < len; j++) {
               try {
                 if (cmp(array[i][1], array[j][1])) {
                   dups[j] = i;
@@ -16975,7 +16994,7 @@ update(Pot.Struct, {
    * @public
    */
   clone : function(x) {
-    var result, p, f, c, k, System = Pot.System;
+    var result, f, c, k, System = Pot.System;
     if (x == null) {
       return x;
     }
@@ -17522,8 +17541,8 @@ update(Pot.Struct, {
    * @public
    */
   pairs : function(/*key, value[, ...args]*/) {
-    var result = {}, args = arrayize(arguments), len = args.length,
-        i = 0, j, n, p, pair, key, val,
+    var result = {}, args = arrayize(arguments),
+        len = args.length, i = 0,
         isArray = Pot.isArray,
         isObject = Pot.isObject;
     do {
@@ -17921,7 +17940,7 @@ update(Pot.Struct, {
    * @public
    */
   remove : function(object, subject, loose) {
-    var result, i, len, done = false;
+    var result, i, len, index, done = false;
     result = object;
     if (object != null) {
       switch (Pot.typeLikeOf(object)) {
@@ -17930,24 +17949,24 @@ update(Pot.Struct, {
             break;
         case 'array':
             if (!loose && Pot.System.isBuiltinArrayIndexOf) {
-              result = Pot.Struct.removeAt(
-                object,
-                indexOf.call(object, subject)
-              );
-            } else {
-              result = [];
-              len = object.length;
-              for (i = 0; i < len; i++) {
-                try {
-                  if (!done &&
-                      (!loose && object[i] === subject) ||
-                      (loose  && object[i] ==  subject)) {
-                    done = true;
-                  } else {
-                    result[result.length] = object[i];
-                  }
-                } catch (e) {}
+              index = indexOf.call(object, subject);
+              if (~index) {
+                result = Pot.Struct.removeAt(object, index);
               }
+              break;
+            }
+            result = [];
+            len = object.length;
+            for (i = 0; i < len; i++) {
+              try {
+                if (!done &&
+                    ((!loose && object[i] === subject) ||
+                     (loose  && object[i] ==  subject))) {
+                  done = true;
+                } else {
+                  result[result.length] = object[i];
+                }
+              } catch (e) {}
             }
             break;
         case 'object':
@@ -17955,8 +17974,8 @@ update(Pot.Struct, {
             for (i in object) {
               try {
                 if (!done &&
-                    (!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
+                    ((!loose && object[i] === subject) ||
+                     (loose  && object[i] ==  subject))) {
                   done = true;
                 } else {
                   result[i] = object[i];
@@ -18006,7 +18025,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAll : function(object, subject, loose) {
-    var result, i, len, done = false;
+    var result, i, len;
     result = object;
     if (object != null) {
       switch (Pot.typeLikeOf(object)) {
@@ -18240,13 +18259,15 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty;
+    var result = false, cmp, empty, keys, p, v, i, len, k;
     /**@ignore*/
     cmp = Pot.isFunction(func) ? func : (function(a, b) { return a === b; });
     if (object == null) {
       if (cmp(object, subject)) {
         result = true;
       }
+    } else if (object === subject) {
+      result = true;
     } else {
       switch (Pot.typeLikeOf(object)) {
         case 'array':
@@ -18256,7 +18277,7 @@ update(Pot.Struct, {
               } else {
                 result = false;
                 each(object, function(v, i) {
-                  if (!cmp(v, subject[i])) {
+                  if (!(i in subject) || !cmp(v, subject[i])) {
                     result = false;
                     throw Pot.StopIteration;
                   } else {
@@ -18268,22 +18289,34 @@ update(Pot.Struct, {
             break;
         case 'object':
             if (subject && Pot.isObject(subject)) {
-              if ((Pot.isDOMLike(object)  || !Pot.isPlainObject(object)) &&
-                  (Pot.isDOMLike(subject) || !Pot.isPlainObject(subject))) {
+              if (Pot.isEmpty(object) && Pot.isEmpty(subject)) {
+                result = true;
+              } else if (
+                  (Pot.isDOMLike(object)  || !Pot.isPlainObject(object)) &&
+                  (Pot.isDOMLike(subject) || !Pot.isPlainObject(subject))
+              ) {
                 result = (object === subject);
               } else {
-                if (Pot.isEmpty(object) && Pot.isEmpty(subject)) {
-                  result = true;
-                } else {
-                  result = false;
-                  each(object, function(v, k) {
-                    if (!cmp(v, subject[k])) {
+                keys = [];
+                for (p in subject) {
+                  keys[keys.length] = p;
+                }
+                len = keys.length;
+                i = 0;
+                result = true;
+                for (p in object) {
+                  if (!(i in keys) || keys[i] !== p) {
+                    result = false;
+                    break;
+                  }
+                  try {
+                    v = object[p];
+                    if (!cmp(v, subject[p])) {
                       result = false;
-                      throw Pot.StopIteration;
-                    } else {
-                      result = true;
+                      break;
                     }
-                  });
+                  } catch (e) {}
+                  i++;
                 }
               }
             }
@@ -18297,13 +18330,19 @@ update(Pot.Struct, {
             break;
         case 'number':
             if (Pot.isNumber(subject)) {
-              if (Pot.isInt(subject)) {
-                if (cmp(object, subject)) {
-                  result = true;
-                }
+              if (isNaN(object) && isNaN(subject)) {
+                result = true;
+              } else if (!isFinite(object) && !isFinite(subject)) {
+                result = true;
               } else {
-                if (Math.abs(object - subject) <= 0.000001) {
-                  result = true;
+                if (Pot.isInt(subject)) {
+                  if (cmp(object, subject)) {
+                    result = true;
+                  }
+                } else {
+                  if (Math.abs(object - subject) <= 0.000001) {
+                    result = true;
+                  }
                 }
               }
             }
@@ -18314,7 +18353,7 @@ update(Pot.Struct, {
                   object.constructor === subject.constructor) {
                 /**@ignore*/
                 empty = function(a) {
-                  for (var p in a) {
+                  for (k in a) {
                     return false;
                   }
                   return true;
@@ -18590,11 +18629,14 @@ update(Pot.Struct, {
     } else if (Pot.isNumber(o) && Pot.isNumeric(o)) {
       sign = ((o - 0) < 0) ? '-' : '';
       points = Math.abs(o).toString().split('.');
-      result = sign + Struct.shuffle(points.shift());
+      result = Struct.shuffle(points.shift());
       if (points.length) {
         result += '.' + Struct.shuffle(points.pop());
       }
       result = result - 0;
+      if (sign) {
+        result = -result;
+      }
     } else {
       result = o;
     }
@@ -18646,7 +18688,9 @@ update(Pot.Struct, {
             defaults = '';
             break;
         case 'object':
-            defaults = {};
+            defaults = value;
+            value = count;
+            count = 0;
             break;
         case 'number':
             defaults = 0;
@@ -19328,7 +19372,7 @@ update(Pot.DateTime, {
        * @private
        * @ignore
        */
-      padding : function pad(n, size, ch) {
+      padding : function(n, size, ch) {
         var s = String(n), len = (size || 2) - 0, c = String(ch || 0);
         while (s.length < len) {
           s = c + s;
@@ -20488,7 +20532,7 @@ update(Pot.Sanitizer, {
     }
     result = stringify(text);
     if (result) {
-      if (Pot.isHTMLEscaped(s)) {
+      if (Pot.isHTMLEscaped(result)) {
         result = result.replace(me.RE, me.decode).replace(/&amp;/g, '&');
       }
     }
@@ -21218,7 +21262,7 @@ update(Pot.Archive, {
      * @public
      */
     encode : function(s) {
-      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x, y;
+      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x;
       A = ALPHAMERIC_BASE63TBL.split('');
       for (; i < 1024; i++) {
         t += t;
@@ -21779,7 +21823,7 @@ update(Pot.MimeType, {
    * @public
    */
   getExtByMimeType : function(mimeType) {
-    var result = '', ext, lext, mime, mimes,
+    var result = '', ext, mime, mimes,
         mtype, ltype, part, i, len,
         maps = Pot.MimeType.MimeTypeMaps,
         type = trim(mimeType).toLowerCase();
@@ -23062,7 +23106,7 @@ update(Pot.Text, {
     insertAdjust : function(string, brTag) {
       var results = [], Text = Pot.Text, me = Text.br,
           value = stringify(string),
-          lines, patterns, codes = [], mark = '', reset;
+          lines, codes = [], mark = '', reset;
       if (value) {
         do {
           mark += 'Pot' + now();
@@ -23784,8 +23828,8 @@ update(DOM, {
                (isWindow(o.contentWindow) && o.contentWindow) ||
                (isWindow(o.defaultView) && o.defaultView) ||
                (isWindow(o.parentWindow) && o.parentWindow) ||
-               (isWindow(o.top) && o.top) ||
-               (isWindow(o.content) && o.content);
+               (isWindow(o.content) && o.content) ||
+               (isWindow(o.top) && o.top);
       } catch (e) {}
     }
     return function(x) {
@@ -24329,7 +24373,7 @@ update(DOM, {
     }
     /**@ignore*/
     function byAttr(o, name, op, value, doc, multi) {
-      var result = [], attr, elems, node, selector, tagName, dir, raw,
+      var result = [], attr, elems, node, selector, dir, raw,
           elem, i, len, has, aval;
       if (!name) {
         return multi ? [] : null;
@@ -24973,7 +25017,6 @@ update(DOM, {
    * @public
    */
   setValue : function(elem, value) {
-    var val;
     if (Pot.isElement(elem)) {
       elem.value = stringify(value, false);
     }
@@ -25061,7 +25104,7 @@ update(DOM, {
    * @public
    */
   setOuterHTML : function(elem, value) {
-    var doc, range, done, html;
+    var doc, range, done;
     if (Pot.isElement(elem)) {
       value = stringify(value);
       if ('outerHTML' in elem) {

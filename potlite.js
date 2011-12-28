@@ -6,9 +6,10 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.24, 2011-12-11
+ * Version 1.25, 2011-12-28
  * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
+ * http://polygonplanet.github.com/Pot.js/index.html
  */
 /**
  * Project PotLite.js
@@ -31,8 +32,9 @@
  *
  * @fileoverview   PotLite.js utility library
  * @author         polygon planet
- * @version        1.24
- * @date           2011-12-11
+ * @version        1.25
+ * @date           2011-12-28
+ * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
@@ -65,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.24', TYPE : 'lite'},
+var Pot = {VERSION : '1.25', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -75,10 +77,10 @@ toString = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 
 // Regular expression patterns.
-RE_ARRAYLIKE       = /List|Collection/i,
-RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,
 RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
 RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
+RE_ARRAYLIKE       = /List|Collection/i,
+RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,
 
 // Mozilla XPCOM Components.
 Ci, Cc, Cr, Cu;
@@ -1077,11 +1079,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isPercentEncoded('abc'));              // false
-   *   debug(isPercentEncoded('1234567890'));       // false
+   *   debug(isPercentEncoded('abc'));              // true
+   *   debug(isPercentEncoded('abc["hoge"]'));      // false
    *   debug(isPercentEncoded('%7B%20hoge%20%7D')); // true
-   *   debug(isPercentEncoded(null));               // false
-   *   debug(isPercentEncoded((void 0)));           // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -6067,6 +6067,27 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'flush', function(opts, callback) {
     }
   });
 }, Pot.Deferred.speeds);
+
+// Update Pot object.
+Pot.update({
+  succeed       : Pot.Deferred.succeed,
+  failure       : Pot.Deferred.failure,
+  wait          : Pot.Deferred.wait,
+  callLater     : Pot.Deferred.callLater,
+  callLazy      : Pot.Deferred.callLazy,
+  maybeDeferred : Pot.Deferred.maybeDeferred,
+  isFired       : Pot.Deferred.isFired,
+  lastResult    : Pot.Deferred.lastResult,
+  lastError     : Pot.Deferred.lastError,
+  register      : Pot.Deferred.register,
+  unregister    : Pot.Deferred.unregister,
+  deferrize     : Pot.Deferred.deferrize,
+  begin         : Pot.Deferred.begin,
+  flush         : Pot.Deferred.flush,
+  till          : Pot.Deferred.till,
+  parallel      : Pot.Deferred.parallel,
+  chain         : Pot.Deferred.chain
+});
 
 })();
 
@@ -13841,7 +13862,7 @@ function attachPropByJoinPoint(object, propName, callback, advice, once) {
         attached : true
       };
       Pot.override(object, key, function(inherits, args) {
-        var uniq = buildSerial(Pot),
+        var uniq = {},
             d = newDeferred(),
             orgResult = uniq;
         d.data(errorKey, []);
