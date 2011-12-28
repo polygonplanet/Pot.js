@@ -318,7 +318,7 @@ update(Pot.Collection, {
           });
           len = array.length;
           for (i = 0; i < len; i++) {
-            for (j = 0; j < len; j++) {
+            for (j = i + 1; j < len; j++) {
               try {
                 if (cmp(array[i][1], array[j][1])) {
                   dups[j] = i;
