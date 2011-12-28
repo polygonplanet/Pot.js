@@ -441,7 +441,7 @@ update(Pot.URI, {
               (cur.location && cur.location.href) || ''
       }
     }
-    cur = stringify(cur || Pot.currentURI());
+    cur = stringify(cur);
     path = trim(trim(uri && (uri.href || uri.path) || uri) || cur);
     if (!path) {
       result = cur;
