@@ -360,7 +360,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   toObject : function() {
-    var o = {}, raw = this._rawData, key, val;
+    var o = {}, raw = this._rawData, key;
     for (k in raw) {
       if (k && k.charAt(0) === PREFIX) {
         key = k.substring(1);

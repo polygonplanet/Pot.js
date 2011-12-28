@@ -97,7 +97,7 @@ update(Pot.Archive, {
      * @public
      */
     encode : function(s) {
-      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x, y;
+      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x;
       A = ALPHAMERIC_BASE63TBL.split('');
       for (; i < 1024; i++) {
         t += t;

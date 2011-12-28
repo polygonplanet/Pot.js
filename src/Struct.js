@@ -64,7 +64,7 @@ update(Pot.Struct, {
    * @public
    */
   clone : function(x) {
-    var result, p, f, c, k, System = Pot.System;
+    var result, f, c, k, System = Pot.System;
     if (x == null) {
       return x;
     }
@@ -611,8 +611,8 @@ update(Pot.Struct, {
    * @public
    */
   pairs : function(/*key, value[, ...args]*/) {
-    var result = {}, args = arrayize(arguments), len = args.length,
-        i = 0, j, n, p, pair, key, val,
+    var result = {}, args = arrayize(arguments),
+        len = args.length, i = 0,
         isArray = Pot.isArray,
         isObject = Pot.isObject;
     do {
@@ -1010,7 +1010,7 @@ update(Pot.Struct, {
    * @public
    */
   remove : function(object, subject, loose) {
-    var result, i, len, done = false;
+    var result, i, len, index, done = false;
     result = object;
     if (object != null) {
       switch (Pot.typeLikeOf(object)) {
@@ -1019,24 +1019,24 @@ update(Pot.Struct, {
             break;
         case 'array':
             if (!loose && Pot.System.isBuiltinArrayIndexOf) {
-              result = Pot.Struct.removeAt(
-                object,
-                indexOf.call(object, subject)
-              );
-            } else {
-              result = [];
-              len = object.length;
-              for (i = 0; i < len; i++) {
-                try {
-                  if (!done &&
-                      (!loose && object[i] === subject) ||
-                      (loose  && object[i] ==  subject)) {
-                    done = true;
-                  } else {
-                    result[result.length] = object[i];
-                  }
-                } catch (e) {}
+              index = indexOf.call(object, subject);
+              if (~index) {
+                result = Pot.Struct.removeAt(object, index);
               }
+              break;
+            }
+            result = [];
+            len = object.length;
+            for (i = 0; i < len; i++) {
+              try {
+                if (!done &&
+                    ((!loose && object[i] === subject) ||
+                     (loose  && object[i] ==  subject))) {
+                  done = true;
+                } else {
+                  result[result.length] = object[i];
+                }
+              } catch (e) {}
             }
             break;
         case 'object':
@@ -1044,8 +1044,8 @@ update(Pot.Struct, {
             for (i in object) {
               try {
                 if (!done &&
-                    (!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
+                    ((!loose && object[i] === subject) ||
+                     (loose  && object[i] ==  subject))) {
                   done = true;
                 } else {
                   result[i] = object[i];
@@ -1095,7 +1095,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAll : function(object, subject, loose) {
-    var result, i, len, done = false;
+    var result, i, len;
     result = object;
     if (object != null) {
       switch (Pot.typeLikeOf(object)) {
@@ -1329,13 +1329,15 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty;
+    var result = false, cmp, empty, keys, p, v, i, len, k;
     /**@ignore*/
     cmp = Pot.isFunction(func) ? func : (function(a, b) { return a === b; });
     if (object == null) {
       if (cmp(object, subject)) {
         result = true;
       }
+    } else if (object === subject) {
+      result = true;
     } else {
       switch (Pot.typeLikeOf(object)) {
         case 'array':
@@ -1345,7 +1347,7 @@ update(Pot.Struct, {
               } else {
                 result = false;
                 each(object, function(v, i) {
-                  if (!cmp(v, subject[i])) {
+                  if (!(i in subject) || !cmp(v, subject[i])) {
                     result = false;
                     throw Pot.StopIteration;
                   } else {
@@ -1357,22 +1359,34 @@ update(Pot.Struct, {
             break;
         case 'object':
             if (subject && Pot.isObject(subject)) {
-              if ((Pot.isDOMLike(object)  || !Pot.isPlainObject(object)) &&
-                  (Pot.isDOMLike(subject) || !Pot.isPlainObject(subject))) {
+              if (Pot.isEmpty(object) && Pot.isEmpty(subject)) {
+                result = true;
+              } else if (
+                  (Pot.isDOMLike(object)  || !Pot.isPlainObject(object)) &&
+                  (Pot.isDOMLike(subject) || !Pot.isPlainObject(subject))
+              ) {
                 result = (object === subject);
               } else {
-                if (Pot.isEmpty(object) && Pot.isEmpty(subject)) {
-                  result = true;
-                } else {
-                  result = false;
-                  each(object, function(v, k) {
-                    if (!cmp(v, subject[k])) {
+                keys = [];
+                for (p in subject) {
+                  keys[keys.length] = p;
+                }
+                len = keys.length;
+                i = 0;
+                result = true;
+                for (p in object) {
+                  if (!(i in keys) || keys[i] !== p) {
+                    result = false;
+                    break;
+                  }
+                  try {
+                    v = object[p];
+                    if (!cmp(v, subject[p])) {
                       result = false;
-                      throw Pot.StopIteration;
-                    } else {
-                      result = true;
+                      break;
                     }
-                  });
+                  } catch (e) {}
+                  i++;
                 }
               }
             }
@@ -1386,13 +1400,19 @@ update(Pot.Struct, {
             break;
         case 'number':
             if (Pot.isNumber(subject)) {
-              if (Pot.isInt(subject)) {
-                if (cmp(object, subject)) {
-                  result = true;
-                }
+              if (isNaN(object) && isNaN(subject)) {
+                result = true;
+              } else if (!isFinite(object) && !isFinite(subject)) {
+                result = true;
               } else {
-                if (Math.abs(object - subject) <= 0.000001) {
-                  result = true;
+                if (Pot.isInt(subject)) {
+                  if (cmp(object, subject)) {
+                    result = true;
+                  }
+                } else {
+                  if (Math.abs(object - subject) <= 0.000001) {
+                    result = true;
+                  }
                 }
               }
             }
@@ -1403,7 +1423,7 @@ update(Pot.Struct, {
                   object.constructor === subject.constructor) {
                 /**@ignore*/
                 empty = function(a) {
-                  for (var p in a) {
+                  for (k in a) {
                     return false;
                   }
                   return true;
@@ -1679,11 +1699,14 @@ update(Pot.Struct, {
     } else if (Pot.isNumber(o) && Pot.isNumeric(o)) {
       sign = ((o - 0) < 0) ? '-' : '';
       points = Math.abs(o).toString().split('.');
-      result = sign + Struct.shuffle(points.shift());
+      result = Struct.shuffle(points.shift());
       if (points.length) {
         result += '.' + Struct.shuffle(points.pop());
       }
       result = result - 0;
+      if (sign) {
+        result = -result;
+      }
     } else {
       result = o;
     }
@@ -1735,7 +1758,9 @@ update(Pot.Struct, {
             defaults = '';
             break;
         case 'object':
-            defaults = {};
+            defaults = value;
+            value = count;
+            count = 0;
             break;
         case 'number':
             defaults = 0;

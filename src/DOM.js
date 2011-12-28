@@ -141,8 +141,8 @@ update(DOM, {
                (isWindow(o.contentWindow) && o.contentWindow) ||
                (isWindow(o.defaultView) && o.defaultView) ||
                (isWindow(o.parentWindow) && o.parentWindow) ||
-               (isWindow(o.top) && o.top) ||
-               (isWindow(o.content) && o.content);
+               (isWindow(o.content) && o.content) ||
+               (isWindow(o.top) && o.top);
       } catch (e) {}
     }
     return function(x) {
@@ -686,7 +686,7 @@ update(DOM, {
     }
     /**@ignore*/
     function byAttr(o, name, op, value, doc, multi) {
-      var result = [], attr, elems, node, selector, tagName, dir, raw,
+      var result = [], attr, elems, node, selector, dir, raw,
           elem, i, len, has, aval;
       if (!name) {
         return multi ? [] : null;
@@ -1330,7 +1330,6 @@ update(DOM, {
    * @public
    */
   setValue : function(elem, value) {
-    var val;
     if (Pot.isElement(elem)) {
       elem.value = stringify(value, false);
     }
@@ -1418,7 +1417,7 @@ update(DOM, {
    * @public
    */
   setOuterHTML : function(elem, value) {
-    var doc, range, done, html;
+    var doc, range, done;
     if (Pot.isElement(elem)) {
       value = stringify(value);
       if ('outerHTML' in elem) {

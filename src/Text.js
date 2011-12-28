@@ -1070,7 +1070,7 @@ update(Pot.Text, {
     insertAdjust : function(string, brTag) {
       var results = [], Text = Pot.Text, me = Text.br,
           value = stringify(string),
-          lines, patterns, codes = [], mark = '', reset;
+          lines, codes = [], mark = '', reset;
       if (value) {
         do {
           mark += 'Pot' + now();

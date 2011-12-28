@@ -306,7 +306,7 @@ update(Pot.DateTime, {
        * @private
        * @ignore
        */
-      padding : function pad(n, size, ch) {
+      padding : function(n, size, ch) {
         var s = String(n), len = (size || 2) - 0, c = String(ch || 0);
         while (s.length < len) {
           s = c + s;

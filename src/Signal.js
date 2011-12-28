@@ -1512,7 +1512,7 @@ function attachPropByJoinPoint(object, propName, callback, advice, once) {
         attached : true
       };
       Pot.override(object, key, function(inherits, args) {
-        var uniq = buildSerial(Pot),
+        var uniq = {},
             d = newDeferred(),
             orgResult = uniq;
         d.data(errorKey, []);

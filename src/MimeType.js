@@ -41,7 +41,7 @@ update(Pot.MimeType, {
    * @public
    */
   getExtByMimeType : function(mimeType) {
-    var result = '', ext, lext, mime, mimes,
+    var result = '', ext, mime, mimes,
         mtype, ltype, part, i, len,
         maps = Pot.MimeType.MimeTypeMaps,
         type = trim(mimeType).toLowerCase();
