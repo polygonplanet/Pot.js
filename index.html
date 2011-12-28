@@ -154,10 +154,10 @@ $('.toggle-trigger-pre')
   .click(function() {
     var block = $(this).next().next('ul');
     if ($(this).hasClass('toggle-shown')) {
-      $(this).removeClass('toggle-shown').text('+');
+      $(this).removeClass('toggle-shown').text('+').attr({title: 'open'});
       block.hide();
     } else {
-      $(this).addClass('toggle-shown').text('-');
+      $(this).addClass('toggle-shown').text('-').attr({title: 'close'});
       block.show();
     }
   })
@@ -237,8 +237,11 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
             <h4>Pot.js</h4>
            </div>
            <ul>
-             <li>
-              (調整中)
+             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
+                    title="Development (Uncompressed Code)"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
+             </li>
+             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js"
+                    title="Production (Minified)"><strong>pot.min.js</strong> - Production (Minified)</a>
              </li>
            </ul>
          </div>
@@ -279,7 +282,7 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
          <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;potlite.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;!-- または下記で説明する API サーバが利用できます --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js&quot;&gt;&lt;/script&gt;
 </pre>
          <p>
           読み込み後の例:
@@ -338,34 +341,34 @@ Pot.Deferred.begin(function() {
           そのため、ホスティング用に API サーバを用意しました。
          </p>
          <div>
-          <p>PotLite.js Version 1.24 を使う場合:</p>
+          <p>PotLite.js Version 1.25 を使う場合:</p>
           <ul>
            <li>
-            v1.24 :
-             <a href="http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js"
-                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js</a>
+            v1.25 :
+             <a href="http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js"
+                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js</a>
            </li>
           </ul>
          </div>
          <p>
-          これは、1.24 の部分をリリース済みのバージョンに合わせて変更できます。
+          これは、1.25 の部分をリリース済みのバージョンに合わせて変更できます。
           <br>
           レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
           あわせて API サーバに置くようにしています。
          <p>
          <p>
-          例えば Greasemonkey で 1.24 を使いたい場合、
+          例えば Greasemonkey で 1.25 を使いたい場合、
          </p>
          <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/potlite/1.24/potlite.min.js
+// @require  http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js
 // ...
 // ==/UserScript==</pre>
          <p>
           と記述できます。
          </p>
          <p>
-          この例では 1.24 としていますが、このマニュアルは常に更新しているわけではないので
+          この例では 1.25 としていますが、このマニュアルは常に更新しているわけではないので
           最新とは限りません。
           <br>
           より安定したバージョンを選び使ってください。
@@ -427,6 +430,9 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
          </p>
          <ul>
           <li>
+           <a href="pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
+          </li>
+          <li>
            <a href="potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
           </li>
          </ul>
@@ -467,6 +473,9 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
         <h2 id="forJSDoc">自動生成されたドキュメント</h2>
         <div>
          <ul>
+          <li><a href="jsdoc/index.html"
+                 title="Pot.js - JsDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
+          </li>
           <li><a href="jsdoc/potlite/index.html"
                  title="PotLite.js - JsDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
           </li>
@@ -488,10 +497,19 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
         <div>
          <div>
            <p>
-            現在、PotLite.js という lite バージョンのみ扱っています。
-           </p>
-           <p>
-            このドキュメントは、PotLite.js について扱います。
+            現在、このドキュメントは
+            Pot.js および PotLite.js のライブラリ内「非同期処理」について扱っています。
+            <br>
+            PotLite.js は、Pot.js 内の 非同期処理のみを抜き取ったライト版のライブラリです。
+            Pot.js はそれらを含め汎用的な関数などを扱う統合的なライブラリです。
+            <br>
+            非同期用として、Deferred のみ必要なときなどは PotLite.js をご利用ください。
+            <br>
+            リファレンスに不足している
+            ライブラリ内の他の関数やオブジェクトメソッドについては随時追加していきます。
+            <br>
+            足りない情報についてはソースコードや
+            <a href="#forJSDoc" title="自動生成されたドキュメント">JSDoc ドキュメント</a> を参照ください。
            </p>
            <p>
             Pot.js および PotLite.js は、
@@ -3971,7 +3989,6 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
        </div>
       </div>
       <div class="leftside" id="index">
-        <!--h2 id="index">目次</h2-->
         <ul class="compact-left">
           <li><a href="#overview">概要</a></li>
           <li><a href="#download">ダウンロード</a></li>
@@ -4139,7 +4156,7 @@ debug( Pot.OS.iphone ); // iPhone なら true (全て小文字)</pre>
       <div style="width: 100%; text-align: center;">
         <div><hr></div>
         <p>
-         Last modified: 2011-12-15
+         Last modified: 2011-12-28
          Written by <a href="#contact">polygon planet</a>
         </p>
       </div>
