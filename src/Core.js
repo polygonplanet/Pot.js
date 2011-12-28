@@ -33,18 +33,18 @@ UPPER_ALPHAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
 LOWER_ALPHAS = 'abcdefghijklmnopqrstuvwxyz',
 DIGITS       = '0123456789',
 /*{#endif}*/
-// Regular expression patterns.{#if Pot}
-RE_JS_ESCAPED      = /\\[ux][0-9a-fA-F]+/,
+// Regular expression patterns.
+RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
 RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
-RE_HTML_ESCAPED    = /&(?:[a-z]\w{0,24}|#(?:x[0-9a-f]{1,8}|[0-9]{1,10}));/i,/*{#endif}*/
-RE_ARRAYLIKE       = /List|Collection/i,/*{#if Pot}*/
-RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,/*{#endif}*/
+RE_ARRAYLIKE       = /List|Collection/i,
 RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,/*{#if Pot}*/
 RE_LTRIM           = /^[\s\u00A0\u3000]+/g,
 RE_RTRIM           = /[\s\u00A0\u3000]+$/g,
-RE_STRIP           = /[\s\u00A0\u3000]+/g,/*{#endif}*/
-RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
-RE_PERCENT_ENCODED = /^(?:[a-zA-Z0-9_~.-]|%[0-9a-fA-F]{2})*$/,
+RE_STRIP           = /[\s\u00A0\u3000]+/g,
+RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,
+RE_JS_ESCAPED      = /^(?:[\w!#$()*+,.:;=?@[\]^`|~-]|\\[ux][0-9a-f]+)*$/i,
+RE_HTML_ESCAPED    =
+  /^(?:[^<>"'&]|&(?:[a-z]\w{0,24}|#(?:x[0-9a-f]{1,8}|[0-9]{1,10}));)*$/i,/*{#endif}*/
 
 // Mozilla XPCOM Components.
 Ci, Cc, Cr, Cu;
@@ -1134,6 +1134,7 @@ Pot.update({
           empty = (!o || !o.length);
           break;
       case 'function':
+          /**@ignore*/
           f = (function() {});
           empty = true;
           for (p in o) {
@@ -1246,11 +1247,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isJSEscaped('abc'));                          // false
-   *   debug(isJSEscaped('1234567890'));                   // false
+   *   debug(isJSEscaped('abc'));                          // true
+   *   debug(isJSEscaped('abc\\hoge".'));                  // false
    *   debug(isJSEscaped('\\u007b\\x20hoge\\x20\\u007d')); // true
-   *   debug(isJSEscaped(null));                           // false
-   *   debug(isJSEscaped((void 0)));                       // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1269,11 +1268,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isPercentEncoded('abc'));              // false
-   *   debug(isPercentEncoded('1234567890'));       // false
+   *   debug(isPercentEncoded('abc'));              // true
+   *   debug(isPercentEncoded('abc["hoge"]'));      // false
    *   debug(isPercentEncoded('%7B%20hoge%20%7D')); // true
-   *   debug(isPercentEncoded(null));               // false
-   *   debug(isPercentEncoded((void 0)));           // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1292,11 +1289,9 @@ Pot.update({
    *
    *
    * @example
-   *   debug(isHTMLEscaped('abc'));                     // false
-   *   debug(isHTMLEscaped('1234567890'));              // false
+   *   debug(isHTMLEscaped('abc'));                     // true
+   *   debug(isHTMLEscaped('1 < 2'));                   // false
    *   debug(isHTMLEscaped('&quot;(&gt;_&lt;)&quot;')); // true
-   *   debug(isHTMLEscaped(null));                      // false
-   *   debug(isHTMLEscaped((void 0)));                  // false
    *
    *
    * @param  {String|*}   s   The target string to test.
@@ -1619,7 +1614,8 @@ Pot.update({
       'i'
     );
     return function(x) {
-      return (Pot.isNodeLike(x) || Pot.isWindow(x) || Pot.isDocument(x)) ||
+      return (Pot.isNodeLike(x) || Pot.isNodeList(x)  ||
+              Pot.isWindow(x)   || Pot.isDocument(x)) ||
         x != null && typeof x === 'object' && (
         // Event
         ((x.preventDefault || 'returnValue' in x) &&
