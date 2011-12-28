@@ -2875,4 +2875,25 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'flush', function(opts, callback) {
   });
 }, Pot.Deferred.speeds);
 
+// Update Pot object.
+Pot.update({
+  succeed       : Pot.Deferred.succeed,
+  failure       : Pot.Deferred.failure,
+  wait          : Pot.Deferred.wait,
+  callLater     : Pot.Deferred.callLater,
+  callLazy      : Pot.Deferred.callLazy,
+  maybeDeferred : Pot.Deferred.maybeDeferred,
+  isFired       : Pot.Deferred.isFired,
+  lastResult    : Pot.Deferred.lastResult,
+  lastError     : Pot.Deferred.lastError,
+  register      : Pot.Deferred.register,
+  unregister    : Pot.Deferred.unregister,
+  deferrize     : Pot.Deferred.deferrize,
+  begin         : Pot.Deferred.begin,
+  flush         : Pot.Deferred.flush,
+  till          : Pot.Deferred.till,
+  parallel      : Pot.Deferred.parallel,
+  chain         : Pot.Deferred.chain
+});
+
 })();
