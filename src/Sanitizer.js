@@ -190,7 +190,7 @@ update(Pot.Sanitizer, {
     }
     result = stringify(text);
     if (result) {
-      if (Pot.isHTMLEscaped(s)) {
+      if (Pot.isHTMLEscaped(result)) {
         result = result.replace(me.RE, me.decode).replace(/&amp;/g, '&');
       }
     }
