@@ -153,7 +153,7 @@ update(Pot.Signal, {
    *     onLoadUnknown : function(data, name, size) {
    *       $('<textarea/>').val(data).appendTo('body');
    *     },
-   *     onLoadEnd : function() {
+   *     onLoadEnd : function(files) {
    *       this.upload(
    *         'http://www.example.com/',
    *         'dropfiles'
@@ -988,7 +988,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   initEvents : function() {
-    var that = this, isShow = false, target = this.target, html,
+    var that = this, target = this.target, html,
         cache = this.handleCache, op = this.options, ps = Pot.Signal;
     cache[cache.length] = ps.attach(target, 'drop', function(ev) {
       var files, reader, i = 0;
@@ -1005,24 +1005,25 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
             that.loadedFiles.push(evt.target.result);
             if (i <= 0) {
               if (op.onLoadEnd) {
-                op.onLoadEnd.call(that);
+                op.onLoadEnd.call(that, arrayize(that.loadedFiles));
               }
             }
           }
         };
         each(files, function(file) {
-          var name, size;
+          var name, size, type;
           if (file) {
             i++;
+            type = file.type;
             size = file.size;
             name = file.name;
             reader.readAsDataURL(file);
-            if (that.isImageFile(file.type)) {
-              that.loadAsImage(file, name, size);
-            } else if (that.isTextFile(file.type)) {
-              that.loadAsText(file, name, size);
+            if (that.isImageFile(type)) {
+              that.loadAsImage(file, name, size, type);
+            } else if (that.isTextFile(type)) {
+              that.loadAsText(file, name, size, type);
             } else {
-              that.loadAsUnknown(file, name, size);
+              that.loadAsUnknown(file, name, size, type);
             }
           }
         });
@@ -1141,7 +1142,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    *     onLoadUnknown : function(data, name, size) {
    *       $('<textarea/>').val(data).appendTo('body');
    *     },
-   *     onLoadEnd : function() {
+   *     onLoadEnd : function(files) {
    *       this.upload(
    *         'http://www.example.com/',
    *         'dropfiles'
@@ -1208,11 +1209,15 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsImage : function(file, name, size) {
+  loadAsImage : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadImage;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsDataURL(file);
@@ -1225,7 +1230,11 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
     var reader = new FileReader(), callback = this.options.onLoadText;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsText(file, this.encoding);
@@ -1238,7 +1247,11 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
     var reader = new FileReader(), callback = this.options.onLoadUnknown;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsDataURL(file);

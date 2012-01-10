@@ -388,7 +388,7 @@ update(Pot.Serializer, {
    * @public
    */
   serializeToQueryString : function(params) {
-    var queries = [], encode;
+    var queries = [], encode, objectLike;
     if (!params || params == false) {
       return '';
     }
@@ -398,11 +398,16 @@ update(Pot.Serializer, {
     if (Pot.isString(params)) {
       return stringify(params);
     }
-    if (Pot.isObject(params) || Pot.isArrayLike(params)) {
+    objectLike = Pot.isObject(params);
+    if (objectLike || Pot.isArrayLike(params)) {
       encode = Pot.URI.urlEncode;
       each(params, function(v, k) {
-        var item, key, val, sep, ok = true;
-        item = Pot.isArray(v) ? v : [k, v];
+        var item, key, val, sep, count = 0, ok = true;
+        if (objectLike) {
+          item = [k, v];
+        } else {
+          item = v;
+        }
         try {
           key = stringify(item[0], false);
           val = item[1];
@@ -410,13 +415,24 @@ update(Pot.Serializer, {
           ok = false;
         }
         if (ok && (key || val)) {
-          sep = key ? '=' : '';
-          if (Pot.isArray(val)) {
+          if (!objectLike) {
+            each(params, function(items) {
+              if (items) {
+                try {
+                  if (stringify(items[0], false) === key) {
+                    count++;
+                  }
+                } catch (e) {}
+              }
+            });
+          }
+          if (count > 1 || Pot.isArray(val)) {
+            sep = '=';
             key = stringify(key, true) + '[]';
           } else {
-            val = [val];
+            sep = key ? '=' : '';
           }
-          each(val, function(t) {
+          each(arrayize(val), function(t) {
             queries[queries.length] = encode(key) + sep +
                                       encode(stringify(t, true));
           });
@@ -466,7 +482,7 @@ update(Pot.Serializer, {
    *
    *
    * @example
-   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge';
+   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge=';
    *   debug(parseFromQueryString(query, true));
    *   // @results {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
    *
@@ -529,7 +545,7 @@ update(Pot.Serializer, {
                   arrayize(val)
                 );
               } else {
-                result[key] = [val];
+                result[k] = [val];
               }
             } else {
               result[result.length] = [k, val];

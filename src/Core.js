@@ -449,7 +449,63 @@ Pot.update({
    * @static
    * @const
    */
-  DIR_DELIMITER : Pot.OS.win ? '\\' : '/'
+  DIR_DELIMITER : Pot.OS.win ? '\\' : '/',
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XML_NS_URI : XML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  HTML_NS_URI : HTML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XHTML_NS_URI : XHTML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XLINK_NS_URI : XLINK_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XSL_NS_URI : XSL_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  SVG_NS_URI : SVG_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XUL_NS_URI : XUL_NS_URI,
 });
 /*{#endif}*/
 // Definition of System.
