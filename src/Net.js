@@ -695,7 +695,8 @@ update(Pot.Net, {
           if (data) {
             this.headers['Content-Length'] = Buffer.byteLength(data);
             if (!this.headers['Content-Type']) {
-              this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+              this.headers['Content-Type'] =
+                'application/x-www-form-urlencoded';
             }
           }
         }

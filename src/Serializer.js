@@ -373,6 +373,12 @@ update(Pot.Serializer, {
    *   // @results 'a=value1&b=value2'
    *
    *
+   * @example
+   *   var query = {foo: 'bar', baz: ['qux', 'quux'], corge: ''};
+   *   debug(serializeToQueryString(query));
+   *   // @results 'foo=bar&baz[]=qux&baz[]=quux&corge='
+   *
+   *
    * @param  {Object|Array|*}  params    The target object.
    * @return {String}                    The query-string of builded result.
    *
@@ -399,13 +405,21 @@ update(Pot.Serializer, {
         item = Pot.isArray(v) ? v : [k, v];
         try {
           key = stringify(item[0], false);
-          val = stringify(item[1], false);
+          val = item[1];
         } catch (e) {
           ok = false;
         }
         if (ok && (key || val)) {
           sep = key ? '=' : '';
-          queries[queries.length] = encode(key) + sep + encode(val);
+          if (Pot.isArray(val)) {
+            key = stringify(key, true) + '[]';
+          } else {
+            val = [val];
+          }
+          each(val, function(t) {
+            queries[queries.length] = encode(key) + sep +
+                                      encode(stringify(t, true));
+          });
         }
       });
     }
@@ -451,6 +465,12 @@ update(Pot.Serializer, {
    *   // @results {'@A': '16^2&2', '@B': '(2+3>=1)'}
    *
    *
+   * @example
+   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge';
+   *   debug(parseFromQueryString(query, true));
+   *   // @results {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
+   *
+   *
    * @param  {String}   queryString   The query-string to parse.
    * @param  {Boolean}  (toObject)    Whether to return as
    *                                    an key-value object.
@@ -483,7 +503,7 @@ update(Pot.Serializer, {
         query = query.substring(1);
       }
       each(query.split(re), function(q) {
-        var key, val, pair;
+        var key, val, pair, k;
         pair = q.split('=');
         switch (pair.length) {
           case 0:
@@ -499,10 +519,27 @@ update(Pot.Serializer, {
         if (key || val) {
           key = stringify(decode(key));
           val = stringify(decode(val));
-          if (toObject) {
-            result[key] = val;
+          if (key.slice(-2) === '[]') {
+            k = key.slice(0, -2);
+            if (toObject) {
+              if (hasOwnProperty.call(result, k)) {
+                result[k] = concat.call(
+                  [],
+                  arrayize(result[k]),
+                  arrayize(val)
+                );
+              } else {
+                result[key] = [val];
+              }
+            } else {
+              result[result.length] = [k, val];
+            }
           } else {
-            result[result.length] = [key, val];
+            if (toObject) {
+              result[key] = val;
+            } else {
+              result[result.length] = [key, val];
+            }
           }
         }
       });

@@ -281,7 +281,9 @@ update(Pot.Internal, {
     attachPropAfter         : Pot.Signal.attachPropAfter,
     detach                  : Pot.Signal.detach,
     detachAll               : Pot.Signal.detachAll,
-    signal                  : Pot.Signal.signal,/*{#if Pot}*/
+    signal                  : Pot.Signal.signal,
+    cancelEvent             : Pot.Signal.cancelEvent,
+    DropFile                : Pot.Signal.DropFile,/*{#if Pot}*/
     Hash                    : Pot.Hash,
     arrayize                : Pot.Collection.arrayize,
     merge                   : Pot.Collection.merge,
