@@ -1,7 +1,7 @@
 {
   "fileName": "potlite.js",
   "debug": false,
-  "version": "1.27",
+  "version": "1.28",
   "files": [
     "Core.js",
     "Deferred.js",

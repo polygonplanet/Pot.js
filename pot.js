@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.10, 2012-01-11
+ * Version 1.11, 2012-01-11
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -32,7 +32,7 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.10
+ * @version        1.11
  * @date           2012-01-11
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.10', TYPE : 'full'},
+var Pot = {VERSION : '1.11', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -15316,7 +15316,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsText : function(file, name, size) {
+  loadAsText : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadText;
     reader.onload = function(ev) {
       if (callback) {
@@ -15333,7 +15333,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsUnknown : function(file, name, size) {
+  loadAsUnknown : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadUnknown;
     reader.onload = function(ev) {
       if (callback) {

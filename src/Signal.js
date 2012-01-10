@@ -1226,7 +1226,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsText : function(file, name, size) {
+  loadAsText : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadText;
     reader.onload = function(ev) {
       if (callback) {
@@ -1243,7 +1243,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsUnknown : function(file, name, size) {
+  loadAsUnknown : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadUnknown;
     reader.onload = function(ev) {
       if (callback) {
