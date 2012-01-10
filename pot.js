@@ -6,8 +6,8 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.08, 2011-12-28
- * Copyright (c) 2011 polygon planet <polygon.planet@gmail.com>
+ * Version 1.09, 2012-01-11
+ * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
  */
@@ -32,10 +32,10 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.08
- * @date           2011-12-28
+ * @version        1.09
+ * @date           2012-01-11
  * @link           http://polygonplanet.github.com/Pot.js/index.html
- * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
+ * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
  * Based:
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.08', TYPE : 'full'},
+var Pot = {VERSION : '1.09', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -11141,6 +11141,12 @@ update(Pot.Serializer, {
    *   // @results 'a=value1&b=value2'
    *
    *
+   * @example
+   *   var query = {foo: 'bar', baz: ['qux', 'quux'], corge: ''};
+   *   debug(serializeToQueryString(query));
+   *   // @results 'foo=bar&baz[]=qux&baz[]=quux&corge='
+   *
+   *
    * @param  {Object|Array|*}  params    The target object.
    * @return {String}                    The query-string of builded result.
    *
@@ -11167,13 +11173,21 @@ update(Pot.Serializer, {
         item = Pot.isArray(v) ? v : [k, v];
         try {
           key = stringify(item[0], false);
-          val = stringify(item[1], false);
+          val = item[1];
         } catch (e) {
           ok = false;
         }
         if (ok && (key || val)) {
           sep = key ? '=' : '';
-          queries[queries.length] = encode(key) + sep + encode(val);
+          if (Pot.isArray(val)) {
+            key = stringify(key, true) + '[]';
+          } else {
+            val = [val];
+          }
+          each(val, function(t) {
+            queries[queries.length] = encode(key) + sep +
+                                      encode(stringify(t, true));
+          });
         }
       });
     }
@@ -11219,6 +11233,12 @@ update(Pot.Serializer, {
    *   // @results {'@A': '16^2&2', '@B': '(2+3>=1)'}
    *
    *
+   * @example
+   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge';
+   *   debug(parseFromQueryString(query, true));
+   *   // @results {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
+   *
+   *
    * @param  {String}   queryString   The query-string to parse.
    * @param  {Boolean}  (toObject)    Whether to return as
    *                                    an key-value object.
@@ -11251,7 +11271,7 @@ update(Pot.Serializer, {
         query = query.substring(1);
       }
       each(query.split(re), function(q) {
-        var key, val, pair;
+        var key, val, pair, k;
         pair = q.split('=');
         switch (pair.length) {
           case 0:
@@ -11267,10 +11287,27 @@ update(Pot.Serializer, {
         if (key || val) {
           key = stringify(decode(key));
           val = stringify(decode(val));
-          if (toObject) {
-            result[key] = val;
+          if (key.slice(-2) === '[]') {
+            k = key.slice(0, -2);
+            if (toObject) {
+              if (hasOwnProperty.call(result, k)) {
+                result[k] = concat.call(
+                  [],
+                  arrayize(result[k]),
+                  arrayize(val)
+                );
+              } else {
+                result[key] = [val];
+              }
+            } else {
+              result[result.length] = [k, val];
+            }
           } else {
-            result[result.length] = [key, val];
+            if (toObject) {
+              result[key] = val;
+            } else {
+              result[result.length] = [key, val];
+            }
           }
         }
       });
@@ -13375,7 +13412,8 @@ update(Pot.Net, {
           if (data) {
             this.headers['Content-Length'] = Buffer.byteLength(data);
             if (!this.headers['Content-Type']) {
-              this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+              this.headers['Content-Type'] =
+                'application/x-www-form-urlencoded';
             }
           }
         }
@@ -14054,23 +14092,21 @@ update(Pot.Signal, {
    * @ignore
    */
   Observer : function(object, ev) {
-    var that = this, evt;
-    if (!this.PotInternal.serial) {
-      this.PotInternal.serial = buildSerial(this);
+    var that = this, evt, pi = this.PotInternal;
+    if (!pi.serial) {
+      pi.serial = buildSerial(this);
     }
-    update(this.PotInternal, {
+    update(pi, {
       orgEvent : ev || (typeof window === 'object' && window.event) || {},
       object   : object
     });
-    evt = this.PotInternal.orgEvent;
+    evt = pi.orgEvent;
     if (!Pot.isObject(evt)) {
-      this.PotInternal.orgEvent = evt = {type : evt};
+      pi.orgEvent = evt = {type : evt};
     }
     each(evt, function(v, p) {
-      if (p) {
-        if (!(p in that)) {
-          that[p] = v;
-        }
+      if (!hasOwnProperty.call(that, p)) {
+        that[p] = v;
       }
     });
     try {
@@ -14094,7 +14130,94 @@ update(Pot.Signal, {
         }
       }
     } catch (ex) {}
+    this.originalEvent = evt;
   },
+  /**
+   * @lends Pot.Signal
+   */
+  /**
+   * Drop file constructor.
+   *
+   *
+   * @example
+   *   // This example using jQuery.
+   *   var panel = $('<div/>')
+   *     .css({
+   *       position   : 'fixed',
+   *       left       : '10%',
+   *       top        : '10%',
+   *       width      : '80%',
+   *       height     : '80%',
+   *       minHeight  : 200,
+   *       background : '#ccc',
+   *       border     : '2px solid #999',
+   *       zIndex     : 9999999
+   *     })
+   *     .hide()
+   *     .text('Drop here')
+   *     .appendTo('body');
+   *   var dropFile = new Pot.DropFile(panel, {
+   *     onShow : function() { panel.show() },
+   *     onHide : function() { panel.hide() },
+   *     onDrop : function(files) {
+   *       panel.text('dropped');
+   *     },
+   *     onLoadImage : function(data, name, size) {
+   *       $('<img/>').attr('src', data).appendTo('body');
+   *     },
+   *     onLoadText : function(data, name, size) {
+   *       $('<textarea/>').val(data).appendTo('body');
+   *     },
+   *     onLoadUnknown : function(data, name, size) {
+   *       $('<textarea/>').val(data).appendTo('body');
+   *     },
+   *     onLoadEnd : function() {
+   *       this.upload(
+   *         'http://www.example.com/',
+   *         'dropfiles'
+   *       ).then(function() {
+   *         alert('finish upload.');
+   *       });
+   *     }
+   *   });
+   *   alert("Let's try drag and drop any file from your desktop.");
+   *
+   *
+   * @param  {Element|String}  target    Target element or id.
+   * @param  {Object|String}  (options)  Options for drop file:
+   *                                     -------------------------------------
+   *                                     - onShow : {Function}
+   *                                         Should display a message that
+   *                                         is able to dropped.
+   *                                     - onHide : {Function}
+   *                                         Should hide a message that
+   *                                         is not able to dropped.
+   *                                     - onDrop : {Function}
+   *                                         Called when a file is dropped.
+   *                                     - onLoadImage : {Function}
+   *                                         Called when a file is
+   *                                           loaded as image.
+   *                                     - onLoadText : {Function}
+   *                                         Called when a file is
+   *                                           loaded as text.
+   *                                     - onLoadUnknown : {Function}
+   *                                         Called when a file is
+   *                                           loaded as unknown type.
+   *                                     - onLoadEnd : {Function}
+   *                                         Called when a file is loaded.
+   *                                         (i.e. enable to upload).
+   *                                     -------------------------------------
+   * @return {DropFile}                  Return an instance of Pot.DropFile.
+   * @name Pot.Signal.DropFile
+   * @constructor
+   * @public
+   */
+  DropFile : function(target, options) {
+    return Pot.Signal.DropFile.prototype.init(target, options);
+  },
+  /**
+   * @lends Pot.Signal
+   */
   /**
    * Check whether the argument object is an instance of Pot.Signal.Handler.
    *
@@ -14720,8 +14843,426 @@ update(Pot.Signal, {
       }
       return res;
     }).begin();
+  },
+  /**
+   * Cancel and stop event.
+   *
+   *
+   * @example
+   *   attach('#foo', 'click', function(ev) {
+   *     myProcess();
+   *     return cancelEvent(ev);
+   *   });
+   *
+   *
+   * @param  {Event}    ev  The event object.
+   * @return {Boolean}      Returns always false.
+   * @type   Function
+   * @function
+   * @public
+   * @static
+   */
+  cancelEvent : function(ev) {
+    /**@ignore*/
+    var f = function(v) {
+      try {
+        v.preventDefault();
+        v.stopPropagation();
+      } catch (e) {}
+    };
+    if (ev) {
+      f();
+      if (ev.originalEvent) {
+        f(ev.originalEvent);
+      }
+      if (ev.PotInternal && ev.PotInternal.orgEvent) {
+        f(ev.PotInternal.orgEvent);
+      }
+    }
+    return false;
   }
 });
+
+// Definition of prototype.
+Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
+  /**
+   * @lends Pot.Signal.DropFile.prototype
+   */
+  /**
+   * @private
+   * @ignore
+   * @internal
+   */
+  constructor : Pot.Signal.DropFile,
+  /**
+   * @private
+   * @ignore
+   */
+  id : Pot.Internal.getMagicNumber(),
+  /**
+   * @private
+   * @ignore
+   * @const
+   */
+  NAME : 'DropFile',
+  /**
+   * A unique strings.
+   *
+   * @type  String
+   * @const
+   * @ignore
+   */
+  serial : null,
+  /**
+   * toString.
+   *
+   * @return  Return formatted string of object.
+   * @type Function
+   * @function
+   * @static
+   * @ignore
+   */
+  toString : Pot.toString,
+  /**
+   * @ignore
+   * @private
+   */
+  defaultOptions : {
+    onShow        : null,
+    onHide        : null,
+    onDrop        : null,
+    onLoadImage   : null,
+    onLoadText    : null,
+    onLoadUnknown : null,
+    onLoadEnd     : null
+  },
+  /**
+   * Text encoding. (default = 'UTF-8')
+   *
+   * @type  String
+   */
+  encoding : 'UTF-8',
+  /**
+   * @ignore
+   * @private
+   */
+  loadedFiles : [],
+  /**
+   * @ignore
+   * @private
+   */
+  handleCache : [],
+  /**
+   * @ignore
+   * @private
+   */
+  target : [],
+  /**
+   * @ignore
+   * @private
+   */
+  options : {},
+  /**
+   * @ignore
+   * @private
+   */
+  isShow : false,
+  /**
+   * Initialize properties.
+   *
+   * @private
+   * @ignore
+   */
+  init : function(target, options) {
+    if (!this.serial) {
+      this.serial = buildSerial(this);
+    }
+    this.isShow = false;
+    this.target = getElement(target);
+    this.options = update({}, this.defaultOptions, options || {});
+    if (this.options.encoding) {
+      this.encoding = this.options.encoding;
+    }
+    if (this.target) {
+      this.initEvents();
+    }
+    return this;
+  },
+  /**
+   * Clear drop events.
+   *
+   * @public
+   */
+  clearDropEvents : function() {
+    each(this.handleCache, function(h) {
+      Pot.Signal.detach(h);
+    });
+    this.handleCache = [];
+  },
+  /**
+   * Initialize events.
+   *
+   * @private
+   * @ignore
+   */
+  initEvents : function() {
+    var that = this, isShow = false, target = this.target, html,
+        cache = this.handleCache, op = this.options, ps = Pot.Signal;
+    cache[cache.length] = ps.attach(target, 'drop', function(ev) {
+      var files, reader, i = 0;
+      that.isShow = false;
+      files = ev.dataTransfer && ev.dataTransfer.files;
+      if (files) {
+        if (op.onDrop) {
+          op.onDrop.call(that, files);
+        }
+        reader = new FileReader();
+        reader.onloadend = function(evt) {
+          i--;
+          if (evt && evt.target && evt.target.result != null) {
+            that.loadedFiles.push(evt.target.result);
+            if (i <= 0) {
+              if (op.onLoadEnd) {
+                op.onLoadEnd.call(that);
+              }
+            }
+          }
+        };
+        each(files, function(file) {
+          var name, size;
+          if (file) {
+            i++;
+            size = file.size;
+            name = file.name;
+            reader.readAsDataURL(file);
+            if (that.isImageFile(file.type)) {
+              that.loadAsImage(file, name, size);
+            } else if (that.isTextFile(file.type)) {
+              that.loadAsText(file, name, size);
+            } else {
+              that.loadAsUnknown(file, name, size);
+            }
+          }
+        });
+      }
+    });
+    cache[cache.length] = ps.attach(target, 'dragenter', function(ev) {
+      that.isShow = true;
+      ps.cancelEvent(ev);
+    });
+    cache[cache.length] = ps.attach(target, 'dragover', function(ev) {
+      that.isShow = true;
+      ps.cancelEvent(ev);
+    });
+    cache[cache.length] = ps.attach(target, 'dragleave', function(ev) {
+      that.isShow = false;
+    });
+    if (op.onHide) {
+      op.onHide.call(that);
+    }
+    html = Pot.currentDocument().documentElement;
+    cache[cache.length] = ps.attach(html, 'drop', function(ev) {
+      that.isShow = false;
+      if (op.onHide) {
+        op.onHide.call(that);
+      }
+      ps.cancelEvent(ev);
+    });
+    cache[cache.length] = ps.attach(html, 'dragleave', function(ev) {
+      Pot.Internal.setTimeout(function() {
+        if (that.isShow) {
+          that.isShow = false;
+        } else {
+          if (op.onHide) {
+            op.onHide.call(that);
+          }
+        }
+      }, 1000);
+    });
+    each(['dragenter', 'dragover'], function(type) {
+      cache[cache.length] = ps.attach(html, type, function(ev) {
+        var dt = ev && ev.dataTransfer, doShow, re;
+        if (dt) {
+          if (dt.files && dt.files.length) {
+            doShow = true;
+          } else if (dt.types) {
+            re = /Files/i;
+            if (re.test(dt.types)) {
+              doShow = true;
+            } else if (Pot.isArrayLike(dt.types)) {
+              each(dt.types, function(t) {
+                if (re.test(t)) {
+                  doShow = true;
+                  throw Pot.StopIteration;
+                }
+              });
+            }
+          }
+        }
+        if (doShow) {
+          that.isShow = true;
+          if (op.onShow) {
+            op.onShow.call(that);
+          }
+        }
+        ps.cancelEvent(ev);
+      });
+    });
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  isImageFile : function(type) {
+    return /image/i.test(type);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  isTextFile : function(type) {
+    return !/image|audio|video|zip|compress/i.test(type);
+  },
+  /**
+   * Upload the dropped files with specified options.
+   *
+   *
+   * @example
+   *   // This example using jQuery.
+   *   var panel = $('<div/>')
+   *     .css({
+   *       position   : 'fixed',
+   *       left       : '10%',
+   *       top        : '10%',
+   *       width      : '80%',
+   *       height     : '80%',
+   *       minHeight  : 200,
+   *       background : '#ccc',
+   *       border     : '2px solid #999',
+   *       zIndex     : 9999999
+   *     })
+   *     .hide()
+   *     .text('Drop here')
+   *     .appendTo('body');
+   *   var dropFile = new Pot.DropFile(panel, {
+   *     onShow : function() { panel.show() },
+   *     onHide : function() { panel.hide() },
+   *     onDrop : function(files) {
+   *       panel.text('dropped');
+   *     },
+   *     onLoadImage : function(data, name, size) {
+   *       $('<img/>').attr('src', data).appendTo('body');
+   *     },
+   *     onLoadText : function(data, name, size) {
+   *       $('<textarea/>').val(data).appendTo('body');
+   *     },
+   *     onLoadUnknown : function(data, name, size) {
+   *       $('<textarea/>').val(data).appendTo('body');
+   *     },
+   *     onLoadEnd : function() {
+   *       this.upload(
+   *         'http://www.example.com/',
+   *         'dropfiles'
+   *       ).then(function() {
+   *         alert('finish upload.');
+   *       });
+   *     }
+   *   });
+   *   alert("Let's try drag and drop any file from your desktop.");
+   *
+   *
+   * @param  {String}             url      Target url to upload.
+   * @param  {Object|String|*}  (options)  Upload options.
+   *                                       Available parameters:
+   *                                       -----------------------------------
+   *                                       - key : {String}
+   *                                           The file data key name in
+   *                                             query string if specify.
+   *                                           (default = 'file').
+   *                                       - sendContent : {Object|Array}
+   *                                           Other parameters if you need.
+   *                                       -----------------------------------
+   * @return {Deferred}                    Return the Pot.Deferred instance.
+   * @type Function
+   * @function
+   * @public
+   */
+  upload : function(url, options) {
+    var d, uri, files = this.loadedFiles,
+        opts = {}, re, data, key = 'file';
+    if (files && files.length) {
+      if (Pot.isString(options)) {
+        key = options;
+      } else if (Pot.isObject(options)) {
+        re = /key|file|name/i;
+        each(options, function(v, k) {
+          if (Pot.isString(v) && re.test(k)) {
+            key = v;
+            throw Pot.StopIteration;
+          }
+        });
+        opts = update({}, options);
+      }
+      uri = stringify(url);
+      re = /([^@:;#?&=\/\\]+)=[?]/;
+      if (re.test(uri)) {
+        key = uri.match(re)[1];
+        uri = uri.replace(key, '');
+      }
+      data = opts.sendContent || opts.queryString || {};
+      if (Pot.isArray(data)) {
+        data[data.length] = [key, files.splice(0)];
+      } else {
+        data[key] = files.splice(0);
+      }
+      opts.sendContent = data;
+      opts.queryString = null;
+      opts.method = opts.method || 'POST';
+      d = Pot.Net.request(uri, opts);
+    }
+    return Pot.Deferred.maybeDeferred(d);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  loadAsImage : function(file, name, size) {
+    var reader = new FileReader(), callback = this.options.onLoadImage;
+    reader.onload = function(ev) {
+      if (callback) {
+        callback.call(this, ev && ev.target && ev.target.result, name, size);
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  loadAsText : function(file, name, size) {
+    var reader = new FileReader(), callback = this.options.onLoadText;
+    reader.onload = function(ev) {
+      if (callback) {
+        callback.call(this, ev && ev.target && ev.target.result, name, size);
+      }
+    };
+    reader.readAsText(file, this.encoding);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  loadAsUnknown : function(file, name, size) {
+    var reader = new FileReader(), callback = this.options.onLoadUnknown;
+    reader.onload = function(ev) {
+      if (callback) {
+        callback.call(this, ev && ev.target && ev.target.result, name, size);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+});
+Pot.Signal.DropFile.prototype.init.prototype = Pot.Signal.DropFile.prototype;
 
 // Definition of prototype.
 Pot.Signal.Handler.prototype = update(Pot.Signal.Handler.prototype, {
@@ -14844,6 +15385,18 @@ Pot.Signal.Observer.prototype = {
         }
       }
     } catch (e) {}
+    if (this.originalEvent) {
+      try {
+        ev = this.originalEvent;
+        if (ev) {
+          if (ev.preventDefault) {
+            ev.preventDefault();
+          } else {
+            ev.returnValue = false;
+          }
+        }
+      } catch (e) {}
+    }
   },
   /**
    * stopPropagation.
@@ -14863,6 +15416,17 @@ Pot.Signal.Observer.prototype = {
         ev.cancelBubble = true;
       }
     } catch (e) {}
+    if (this.originalEvent) {
+      try {
+        ev = this.originalEvent;
+        if (ev) {
+          if (ev.stopPropagation) {
+            ev.stopPropagation();
+          }
+          ev.cancelBubble = true;
+        }
+      } catch (e) {}
+    }
   }
 };
 
@@ -15726,10 +16290,12 @@ Pot.update({
   attachPropAfter  : Pot.Signal.attachPropAfter,
   detach           : Pot.Signal.detach,
   detachAll        : Pot.Signal.detachAll,
-  signal           : Pot.Signal.signal
+  signal           : Pot.Signal.signal,
+  cancelEvent      : Pot.Signal.cancelEvent,
+  DropFile         : Pot.Signal.DropFile
 });
 
-})();
+}());
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Hash.
@@ -19850,7 +20416,7 @@ update(Pot.Complex, {
        * @public
        */
       alnum : update(function(length, valid) {
-        var result = '', len, max
+        var result = '', len, max, c;
         len = Pot.isNumeric(length) ? length - 0 : 1;
         if (len > 0) {
           c = [];
@@ -27422,6 +27988,8 @@ update(Pot.Internal, {
     detach                  : Pot.Signal.detach,
     detachAll               : Pot.Signal.detachAll,
     signal                  : Pot.Signal.signal,
+    cancelEvent             : Pot.Signal.cancelEvent,
+    DropFile                : Pot.Signal.DropFile,
     Hash                    : Pot.Hash,
     arrayize                : Pot.Collection.arrayize,
     merge                   : Pot.Collection.merge,
