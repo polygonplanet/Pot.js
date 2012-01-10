@@ -9,7 +9,7 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.02
+ * @version        1.03
  * @date           2012-01-11
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -1008,7 +1008,7 @@ $(function() {
     }, {
       title  : 'Pot.parseFromQueryString() for Array with Items',
       code   : function() {
-        var queryString = 'foo=bar&baz%5B%5D=qux&baz%5B%5D=quux&corge';
+        var queryString = 'foo=bar&baz%5B%5D=qux&baz%5B%5D=quux&corge=';
         return parseFromQueryString(queryString);
       },
       expect : [['foo', 'bar'], ['baz', 'qux'], ['baz', 'quux'], ['corge', '']]
