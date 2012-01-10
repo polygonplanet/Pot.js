@@ -253,7 +253,7 @@ update(Pot.Complex, {
        * @public
        */
       alnum : update(function(length, valid) {
-        var result = '', len, max
+        var result = '', len, max, c;
         len = Pot.isNumeric(length) ? length - 0 : 1;
         if (len > 0) {
           c = [];
