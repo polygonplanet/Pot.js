@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js (PotLite.js) Drag and Drop File Example - JavaScript Library</title>
+<script>
+// IE SUCKS
+if (window.ActiveXObject) {
+    window.onerror = function(msg, uri, line) {
+        alert([
+            'Error!',
+            'message: ' + msg,
+            'URI: ' + uri,
+            'line: ' + line
+        ].join('\n'));
+    };
+}
+</script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="potlite.min.js"></script>
+<script>
+$(function () {
+
+// This example using jQuery.
+var panel = $('<div/>')
+  .css({
+    position   : 'fixed',
+    left       : '10%',
+    top        : '10%',
+    width      : '80%',
+    height     : '80%',
+    minHeight  : 200,
+    background : '#ccc',
+    border     : '2px solid #999',
+    zIndex     : 9999999
+  })
+  .hide()
+  .text('Drop here')
+  .appendTo('body');
+var dropFile = new Pot.DropFile(panel, {
+  onShow : function() { panel.show() },
+  onHide : function() { panel.hide() },
+  onDrop : function(files) {
+    panel.text('dropped');
+  },
+  onLoadImage : function(data, name, size) {
+    $('<div/>')
+      .text('name: ' + name + ', size: ' + size)
+      .appendTo('body');
+    $('<img/>')
+      .attr({src : data})
+      .css({maxWidth : 500, maxHeight : 500})
+      .appendTo('body');
+  },
+  onLoadText : function(data, name, size) {
+    $('<div/>')
+      .text('name: ' + name + ', size: ' + size)
+      .appendTo('body');
+    $('<textarea/>')
+      .val(data)
+      .css({width : '90%', height : 300})
+      .appendTo('body');
+  },
+  onLoadText : function(data, name, size) {
+    $('<div/>')
+      .text('name: ' + name + ', size: ' + size)
+      .appendTo('body');
+    $('<textarea/>')
+      .val(data)
+      .css({width : '90%', height : 300})
+      .appendTo('body');
+  },
+  onLoadEnd : function() {
+    if (void 'use server') {
+      this.upload(
+        'http://www.example.com/',
+        'dropfiles'
+      ).then(function(res) {
+        alert('finish upload.\nresponse:\n\n' + res.responseText);
+      });
+    }
+  }
+});
+alert("Let's try drag and drop any file from your desktop.");
+
+});
+</script>
+</head>
+<body>
+ <header>
+  <h1>Pot.js - Drag and Drop File Example</h1>
+ </header>
+ <article>
+  <h2>Demo</h2>
+  <p>Let's try drag and drop any file from your desktop.</p>
+  <div id="status"></div>
+  <p>
+   <a href="http://polygonplanet.github.com/Pot.js/index.html"><strong>Pot.js + PotLite.js - ドキュメントリファレンス</strong></a>
+  </p>
+ </article>
+ <footer>
+  <p>2012 &copy; polygon planet</p>
+ </footer>
+</body>
+</html>
