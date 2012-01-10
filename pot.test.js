@@ -9,9 +9,9 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.00
- * @date           2011-12-28
- * @copyright      Copyright (c) 2011 polygon planet <polygon.planet*gmail.com>
+ * @version        1.01
+ * @date           2012-01-10
+ * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
 var Assert = {
@@ -978,12 +978,40 @@ $(function() {
       },
       expect : 'foo=1&bar=bar2&baz='
     }, {
+      title  : 'Pot.serializeToQueryString() for Array',
+      code   : function() {
+        var obj = {foo: 'bar', baz: ['qux', 'quux'], corge: ''};
+        return serializeToQueryString(obj);
+      },
+      expect : 'foo=bar&baz%5B%5D=qux&baz%5B%5D=quux&corge='
+    }, {
       title  : 'Pot.parseFromQueryString()',
       code   : function() {
         var queryString = 'foo=1&bar=bar2&baz=%7B3%7D';
         return parseFromQueryString(queryString, true);
       },
       expect : {foo: '1', bar: 'bar2', baz: '{3}'}
+    }, {
+      title  : 'Pot.parseFromQueryString() for Array',
+      code   : function() {
+        var queryString = 'foo=bar&baz[]=qux&baz[]=quux&corge';
+        return parseFromQueryString(queryString, true);
+      },
+      expect : {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
+    }, {
+      title  : 'Pot.parseFromQueryString() for Array Strict',
+      code   : function() {
+        var queryString = 'foo=bar&baz%5B%5D=qux&baz%5B%5D=quux&corge';
+        return parseFromQueryString(queryString, true);
+      },
+      expect : {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
+    }, {
+      title  : 'Pot.parseFromQueryString() for Array with Items',
+      code   : function() {
+        var queryString = 'foo=bar&baz%5B%5D=qux&baz%5B%5D=quux&corge';
+        return parseFromQueryString(queryString);
+      },
+      expect : [['foo', 'bar'], ['baz', 'qux'], ['baz', 'quux'], ['corge', '']]
     }, {
       title  : 'Pot.urlEncode()',
       code   : function() {
