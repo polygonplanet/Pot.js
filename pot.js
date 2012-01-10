@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.09, 2012-01-11
+ * Version 1.10, 2012-01-11
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -32,7 +32,7 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.09
+ * @version        1.10
  * @date           2012-01-11
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.09', TYPE : 'full'},
+var Pot = {VERSION : '1.10', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -509,7 +509,63 @@ Pot.update({
    * @static
    * @const
    */
-  DIR_DELIMITER : Pot.OS.win ? '\\' : '/'
+  DIR_DELIMITER : Pot.OS.win ? '\\' : '/',
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XML_NS_URI : XML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  HTML_NS_URI : HTML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XHTML_NS_URI : XHTML_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XLINK_NS_URI : XLINK_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XSL_NS_URI : XSL_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  SVG_NS_URI : SVG_NS_URI,
+  /**
+   * XML/HTML namespace URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  XUL_NS_URI : XUL_NS_URI,
 });
 
 // Definition of System.
@@ -11156,7 +11212,7 @@ update(Pot.Serializer, {
    * @public
    */
   serializeToQueryString : function(params) {
-    var queries = [], encode;
+    var queries = [], encode, objectLike;
     if (!params || params == false) {
       return '';
     }
@@ -11166,11 +11222,16 @@ update(Pot.Serializer, {
     if (Pot.isString(params)) {
       return stringify(params);
     }
-    if (Pot.isObject(params) || Pot.isArrayLike(params)) {
+    objectLike = Pot.isObject(params);
+    if (objectLike || Pot.isArrayLike(params)) {
       encode = Pot.URI.urlEncode;
       each(params, function(v, k) {
-        var item, key, val, sep, ok = true;
-        item = Pot.isArray(v) ? v : [k, v];
+        var item, key, val, sep, count = 0, ok = true;
+        if (objectLike) {
+          item = [k, v];
+        } else {
+          item = v;
+        }
         try {
           key = stringify(item[0], false);
           val = item[1];
@@ -11178,13 +11239,24 @@ update(Pot.Serializer, {
           ok = false;
         }
         if (ok && (key || val)) {
-          sep = key ? '=' : '';
-          if (Pot.isArray(val)) {
+          if (!objectLike) {
+            each(params, function(items) {
+              if (items) {
+                try {
+                  if (stringify(items[0], false) === key) {
+                    count++;
+                  }
+                } catch (e) {}
+              }
+            });
+          }
+          if (count > 1 || Pot.isArray(val)) {
+            sep = '=';
             key = stringify(key, true) + '[]';
           } else {
-            val = [val];
+            sep = key ? '=' : '';
           }
-          each(val, function(t) {
+          each(arrayize(val), function(t) {
             queries[queries.length] = encode(key) + sep +
                                       encode(stringify(t, true));
           });
@@ -11234,7 +11306,7 @@ update(Pot.Serializer, {
    *
    *
    * @example
-   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge';
+   *   var query = 'foo=bar&baz[]=qux&baz[]=quux&corge=';
    *   debug(parseFromQueryString(query, true));
    *   // @results {foo: 'bar', baz: ['qux', 'quux'], corge: ''}
    *
@@ -11297,7 +11369,7 @@ update(Pot.Serializer, {
                   arrayize(val)
                 );
               } else {
-                result[key] = [val];
+                result[k] = [val];
               }
             } else {
               result[result.length] = [k, val];
@@ -14171,7 +14243,7 @@ update(Pot.Signal, {
    *     onLoadUnknown : function(data, name, size) {
    *       $('<textarea/>').val(data).appendTo('body');
    *     },
-   *     onLoadEnd : function() {
+   *     onLoadEnd : function(files) {
    *       this.upload(
    *         'http://www.example.com/',
    *         'dropfiles'
@@ -15006,7 +15078,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   initEvents : function() {
-    var that = this, isShow = false, target = this.target, html,
+    var that = this, target = this.target, html,
         cache = this.handleCache, op = this.options, ps = Pot.Signal;
     cache[cache.length] = ps.attach(target, 'drop', function(ev) {
       var files, reader, i = 0;
@@ -15023,24 +15095,25 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
             that.loadedFiles.push(evt.target.result);
             if (i <= 0) {
               if (op.onLoadEnd) {
-                op.onLoadEnd.call(that);
+                op.onLoadEnd.call(that, arrayize(that.loadedFiles));
               }
             }
           }
         };
         each(files, function(file) {
-          var name, size;
+          var name, size, type;
           if (file) {
             i++;
+            type = file.type;
             size = file.size;
             name = file.name;
             reader.readAsDataURL(file);
-            if (that.isImageFile(file.type)) {
-              that.loadAsImage(file, name, size);
-            } else if (that.isTextFile(file.type)) {
-              that.loadAsText(file, name, size);
+            if (that.isImageFile(type)) {
+              that.loadAsImage(file, name, size, type);
+            } else if (that.isTextFile(type)) {
+              that.loadAsText(file, name, size, type);
             } else {
-              that.loadAsUnknown(file, name, size);
+              that.loadAsUnknown(file, name, size, type);
             }
           }
         });
@@ -15159,7 +15232,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    *     onLoadUnknown : function(data, name, size) {
    *       $('<textarea/>').val(data).appendTo('body');
    *     },
-   *     onLoadEnd : function() {
+   *     onLoadEnd : function(files) {
    *       this.upload(
    *         'http://www.example.com/',
    *         'dropfiles'
@@ -15226,11 +15299,15 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsImage : function(file, name, size) {
+  loadAsImage : function(file, name, size, type) {
     var reader = new FileReader(), callback = this.options.onLoadImage;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsDataURL(file);
@@ -15243,7 +15320,11 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
     var reader = new FileReader(), callback = this.options.onLoadText;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsText(file, this.encoding);
@@ -15256,7 +15337,11 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
     var reader = new FileReader(), callback = this.options.onLoadUnknown;
     reader.onload = function(ev) {
       if (callback) {
-        callback.call(this, ev && ev.target && ev.target.result, name, size);
+        callback.call(
+          this,
+          ev && ev.target && ev.target.result,
+          name, size, type
+        );
       }
     };
     reader.readAsDataURL(file);
