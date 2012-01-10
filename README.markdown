@@ -82,6 +82,7 @@ And, it also designed for operate in following environments.
 Test Run
 ========
 
+  * [Pot.js - Test Run][Pot.js_TestRun]
   * [PotLite.js - Test Run][PotLite.js_TestRun]
 
 
@@ -97,7 +98,7 @@ That is limited with asynchronous processing as lightweight version of Pot.js.
 
   * **[Pot.js/PotLite.js - Document and Reference (Japanese)][Documentation_JA]**  
   * JSDoc Document
-      * Pot.js (yet incomplete)
+      * [Pot.js - JsDoc Reference - Index][Pot_JSDoc]
       * [PotLite.js - JsDoc Reference - Index][PotLite_JSDoc]
 
 
@@ -219,11 +220,15 @@ Refer document if you want to need more example and usage.
 
 
 
+[Pot_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/index.html "Pot.js - JsDoc Reference - Index"
+
 [PotLite_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html "PotLite.js - JsDoc Reference - Index"
 
 [Documentation_JA]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js + PotLite.js - Document and Reference (Japanese)"
 
-[PotLite.js_TestRun]: http://polygonplanet.github.com/Pot.js/potlite.test.html "Pot.js + PotLite.js - Test Run - JavaScript Async Library"
+[Pot.js_TestRun]: http://polygonplanet.github.com/Pot.js/pot.test.html "Pot.js - Test Run - JavaScript Utility Library"
+
+[PotLite.js_TestRun]: http://polygonplanet.github.com/Pot.js/potlite.test.html "PotLite.js - Test Run - JavaScript Async Library"
 
 
 
