@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred.map</title>
+		<title>JsDoc Reference - Pot.Signal.DropFile</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -338,7 +338,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Function Namespace Pot.Deferred.map
+				Class Pot.Signal.DropFile
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -355,8 +355,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred.map.">
-				<caption>Function Namespace Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Signal.DropFile.">
+				<caption>Class Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -368,10 +368,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#constructor">Pot.Deferred.map</a></b>(object, callback, (context))
+								<b><a href="../symbols/Pot.Signal.DropFile.html#constructor">Pot.Signal.DropFile</a></b>(target, (options))
 							</div>
-							<div class="description">Creates a new object with the results of calling a
-  provided function on every element in object.</div>
+							<div class="description">Drop file constructor.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -382,7 +381,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred.map.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Signal.DropFile.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -396,69 +395,9 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#doze">doze</a></b>
+								<b><a href="../symbols/Pot.Signal.DropFile.html#encoding">encoding</a></b>
 								</div>
-								<div class="description">Iterates "map" loop with slower speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#fast">fast</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with fast speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#limp">limp</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with slowest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#ninja">ninja</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with fastest speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#normal">normal</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with default speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#rapid">rapid</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.map.html#slow">slow</a></b>
-								</div>
-								<div class="description">Iterates "map" loop with slow speed.</div>
+								<div class="description">Text encoding.</div>
 							</td>
 						</tr>
 					
@@ -471,6 +410,42 @@ ul.inheritsList
 
 <!-- ============================== methods summary ======================== -->
 			
+				
+				
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.Signal.DropFile.">
+					<caption>Method Summary</caption>
+					<thead>
+						<tr>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Signal.DropFile.html#clearDropEvents">clearDropEvents</a></b>()
+								</div>
+								<div class="description">Clear drop events.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/Pot.Signal.DropFile.html#upload">upload</a></b>(url, (options))
+								</div>
+								<div class="description">Upload the dropped files with specified options.</div>
+							</td>
+						</tr>
+					
+					</tbody>
+				</table>
+				
+				
+				
+			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -478,32 +453,61 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Function Namespace Detail
+					Class Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.Deferred.map</b>(object, callback, (context))
+						<b>Pot.Signal.DropFile</b>(target, (options))
 				</div>
 				
 				<div class="description">
-					Creates a new object with the results of calling a
-  provided function on every element in object.
-
-Iteration will use the results of the previous chain.
-
-This method like Array.prototype.map
+					Drop file constructor.
 					
 				</div>
 				
 				
 				
-				<pre class="code">  var words = ['foot', 'goose', 'moose'];
-  Pot.Deferred.map(words, function(word) {
-    return word.replace(/o/g, 'e');
-  }).then(function(result) {
-    debug(result);
+				<pre class="code">  // This example using jQuery.
+  var panel = $('<div/>')
+    .css({
+      position   : 'fixed',
+      left       : '10%',
+      top        : '10%',
+      width      : '80%',
+      height     : '80%',
+      minHeight  : 200,
+      background : '#ccc',
+      border     : '2px solid #999',
+      zIndex     : 9999999
+    })
+    .hide()
+    .text('Drop here')
+    .appendTo('body');
+  var dropFile = new Pot.DropFile(panel, {
+    onShow : function() { panel.show() },
+    onHide : function() { panel.hide() },
+    onDrop : function(files) {
+      panel.text('dropped');
+    },
+    onLoadImage : function(data, name, size) {
+      $('<img/>').attr('src', data).appendTo('body');
+    },
+    onLoadText : function(data, name, size) {
+      $('<textarea/>').val(data).appendTo('body');
+    },
+    onLoadUnknown : function(data, name, size) {
+      $('<textarea/>').val(data).appendTo('body');
+    },
+    onLoadEnd : function() {
+      this.upload(
+        'http://www.example.com/',
+        'dropfiles'
+      ).then(function() {
+        alert('finish upload.');
+      });
+    }
   });
-  // @results result = ['feet', 'geese', 'meese']</pre>
+  alert("Let's try drag and drop any file from your desktop.");</pre>
 				
 				
 				
@@ -513,23 +517,38 @@ This method like Array.prototype.map
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Array|Object|*}</span>  <b>object</b>
+								<span class="light fixedFont">{Element|String}</span>  <b>target</b>
 								
 							</dt>
-								<dd>A target object.</dd>
+								<dd>Target element or id.</dd>
 						
 							<dt>
-								<span class="light fixedFont">{Function}</span>  <b>callback</b>
+								<span class="light fixedFont">{Object|String}</span>  <b>(options)</b>
 								
 							</dt>
-								<dd>A callback function.</dd>
-						
-							<dt>
-								<span class="light fixedFont">{*}</span>  <b>(context)</b>
-								
-							</dt>
-								<dd>(Optional) Object to use
-                                     as `this` when executing callback.</dd>
+								<dd>Options for drop file:
+                                    -------------------------------------
+                                    - onShow : {Function}
+                                        Should display a message that
+                                        is able to dropped.
+                                    - onHide : {Function}
+                                        Should hide a message that
+                                        is not able to dropped.
+                                    - onDrop : {Function}
+                                        Called when a file is dropped.
+                                    - onLoadImage : {Function}
+                                        Called when a file is
+                                          loaded as image.
+                                    - onLoadText : {Function}
+                                        Called when a file is
+                                          loaded as text.
+                                    - onLoadUnknown : {Function}
+                                        Called when a file is
+                                          loaded as unknown type.
+                                    - onLoadEnd : {Function}
+                                        Called when a file is loaded.
+                                        (i.e. enable to upload).
+                                    -------------------------------------</dd>
 						
 						</dl>
 					
@@ -540,7 +559,7 @@ This method like Array.prototype.map
 						<dl class="detailList">
 						<dt class="heading">Returns:</dt>
 						
-								<dd><span class="light fixedFont">{*}</span> Return the result of each callbacks.</dd>
+								<dd><span class="light fixedFont">{DropFile}</span> Return an instance of Pot.DropFile.</dd>
 						
 						</dl>
 					
@@ -556,147 +575,15 @@ This method like Array.prototype.map
 					Field Detail
 				</div>
 				
-					<a name="doze"> </a>
+					<a name="encoding"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{Function}</span>
-					<b>doze</b>
+					<span class="light">{String}</span>
+					<b>encoding</b>
 					
 					</div>
 					<div class="description">
-						Iterates "map" loop with slower speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with fast speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with slowest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with fastest speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with default speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with faster speed.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Iterates "map" loop with slow speed.
+						Text encoding. (default = 'UTF-8')
 						
 						
 					</div>
@@ -714,6 +601,138 @@ This method like Array.prototype.map
 
 <!-- ============================== method details ========================= -->		
 			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name="clearDropEvents"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>clearDropEvents</b>()
+					
+					</div>
+					<div class="description">
+						Clear drop events.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="upload"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Function}</span>
+					<b>upload</b>(url, (options))
+					
+					</div>
+					<div class="description">
+						Upload the dropped files with specified options.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // This example using jQuery.
+  var panel = $('<div/>')
+    .css({
+      position   : 'fixed',
+      left       : '10%',
+      top        : '10%',
+      width      : '80%',
+      height     : '80%',
+      minHeight  : 200,
+      background : '#ccc',
+      border     : '2px solid #999',
+      zIndex     : 9999999
+    })
+    .hide()
+    .text('Drop here')
+    .appendTo('body');
+  var dropFile = new Pot.DropFile(panel, {
+    onShow : function() { panel.show() },
+    onHide : function() { panel.hide() },
+    onDrop : function(files) {
+      panel.text('dropped');
+    },
+    onLoadImage : function(data, name, size) {
+      $('<img/>').attr('src', data).appendTo('body');
+    },
+    onLoadText : function(data, name, size) {
+      $('<textarea/>').val(data).appendTo('body');
+    },
+    onLoadUnknown : function(data, name, size) {
+      $('<textarea/>').val(data).appendTo('body');
+    },
+    onLoadEnd : function() {
+      this.upload(
+        'http://www.example.com/',
+        'dropfiles'
+      ).then(function() {
+        alert('finish upload.');
+      });
+    }
+  });
+  alert("Let's try drag and drop any file from your desktop.");</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>url</b>
+									
+								</dt>
+								<dd>Target url to upload.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object|String|*}</span> <b>(options)</b>
+									
+								</dt>
+								<dd>Upload options.
+                                      Available parameters:
+                                      -----------------------------------
+                                      - key : {String}
+                                          The file data key name in
+                                            query string if specify.
+                                          (default = 'file').
+                                      - sendContent : {Object|Array}
+                                          Other parameters if you need.
+                                      -----------------------------------</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Deferred}</span> Return the Pot.Deferred instance.</dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
+			
 			
 <!-- ============================== event details ========================= -->		
 			
@@ -725,7 +744,7 @@ This method like Array.prototype.map
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Jan 11 2012 01:08:28 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Jan 11 2012 01:08:29 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
