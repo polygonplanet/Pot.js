@@ -779,8 +779,8 @@ update(DOM, {
     }
     /**@ignore*/
     function byPseudo(o, op, doc, multi) {
-      var result = [], elems, context, elem, i, len,
-          node, parent, count, ok, attr, type, name,
+      var result = [], elems, context, elem, i, len, node,
+          parent, count, ok, attr, type, name, checkSelect,
           pseudo = stringify(op, true).toLowerCase();
       if (!pseudo) {
         return multi ? [] : null;
@@ -869,7 +869,7 @@ update(DOM, {
                 throw false;
             case 'selected':
                 if (elem.parentNode) {
-                  elem.parentNode.selectedIndex;
+                  checkSelect = elem.parentNode.selectedIndex;
                 }
                 if (elem.selected) {
                   break;
