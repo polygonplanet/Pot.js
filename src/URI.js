@@ -372,6 +372,245 @@ update(Pot.URI, {
     }
   }),
   /**
+   * Build to the URI from a string or an object with query-string.
+   * Object key names can treat like "window.location" object keys.
+   * Query-string will encode by percent-encoding.
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/';
+   *   var params = {
+   *     foo : '{foo}',
+   *     bar : '{bar}'
+   *   };
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results 'http://www.example.com/?foo=%7Bfoo%7D&bar=%7Bbar%7D'
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/test?a=1';
+   *   var params = [
+   *     ['prototype',    '{foo}'],
+   *     ['__iterator__', '{bar}'],
+   *   ];
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results
+   *   // 'http://www.example.com/test?' +
+   *   //   'a=1&prototype=%7Bfoo%7D&__iterator__=%7Bbar%7D'
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/test?a=1';
+   *   var params = 'b=2&c=3';
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results 'http://www.example.com/test?a=1&b=2&c=3'
+   *
+   *
+   * @example
+   *   var parts = {
+   *     protocol : 'http:',
+   *     username : 'user',
+   *     password : 'pass',
+   *     hostname : 'www.example.com',
+   *     port     : 8000,
+   *     pathname : '/path/to/file.ext',
+   *     query    : {
+   *       arg1   : 'v1',
+   *       arg2   : 'v#2'
+   *     },
+   *     hash     : 'a'
+   *   };
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'http://user:pass@www.example.com:8000/path/to/file.ext' +
+   *   //   '?arg1=v1&arg2=v%232#a'
+   *
+   *
+   * @example
+   *   var uri = 'http://user:pass@host:8000/path/to/file.ext?' +
+   *               'arg=value#fragment';
+   *   var parts = parseURI(uri);
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'http://user:pass@host:8000/path/to/file.ext?arg=value#fragment'
+   *
+   *
+   * @example
+   *   var parts = {
+   *     protocol : 'file:',
+   *     pathname : 'C:\\path\\to\\file.ext',
+   *     query    : {
+   *       arg1   : 'value#1',
+   *       arg2   : 'value#2'
+   *     },
+   *     hash     : '#fragment'
+   *   };
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'file:///C:\\path\\to\\file.ext?' +
+   *   //   'arg1=value%231&arg2=value%232#fragment'
+   *
+   *
+   * @param  {String|Object}         url     Base URI string or
+   *                                           parts as Object.
+   * @param  {Object|Array|String}  (query)  (Optional) queryString.
+   * @return {String}                        Return a builded URI string.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  buildURI : (function() {
+    var
+    RE_SCHEME = /^[^:]+:\/{0,}/,
+    // URI list from RFC 1738: http://tools.ietf.org/html/rfc1738
+    RE_PROTOCOL = new RegExp(
+      '[st]?' +
+      '(?:' +
+        'http|ws|ftp|rsync|wais|telnet|nntp|' +
+        'gopher|prospero|ssh|svn|scp|ldap|git' +
+      ')' +
+      '(?:[+]ssh)?' +
+      's?',
+      'i'
+    );
+    return function(url/*[, query]*/) {
+      var uri, args = arguments, c, s, index,
+          queryString = args[1],
+          encode = Pot.URI.urlEncode,
+          serialize = Pot.Serializer.serializeToQueryString,
+          protocol, userinfo, host, pathname, search, hash;
+      if (Pot.isObject(url)) {
+        protocol = stringify(url.protocol);
+        if (!protocol) {
+          protocol = stringify(url.scheme);
+          if (!protocol) {
+            protocol = 'http:';
+          }
+        }
+        c = protocol.slice(-1);
+        if (c !== ':' && c !== '/') {
+          protocol += ':';
+        }
+        userinfo = stringify(url.userinfo);
+        if (!userinfo && url.username != null && url.password != null) {
+          userinfo = [encode(url.username), encode(url.password)].join(':');
+          if (userinfo === ':') {
+            userinfo = '';
+          }
+        }
+        if (userinfo && userinfo.slice(-1) !== '@') {
+          userinfo += '@';
+        }
+        host = stringify(url.host);
+        if (!host) {
+          if (url.hostname != null) {
+            host = stringify(url.hostname);
+          }
+          if (Pot.isNumeric(url.port)) {
+            host += ':' + (+url.port);
+          }
+        }
+        pathname = stringify(url.pathname);
+        if (!pathname) {
+          if (url.dirname != null && url.filename != null) {
+            pathname = stringify(url.dirname) + stringify(url.filename);
+          }
+        }
+        c = pathname.charAt(0);
+        if (c !== '/' && c !== '\\') {
+          pathname = '/' + pathname;
+        }
+        if (Pot.isObject(url.search) || Pot.isArrayLike(url.search)) {
+          search = stringify(serialize(url.search));
+        } else {
+          search = stringify(url.search);
+        }
+        if (!search) {
+          if (url.query != null) {
+            if (Pot.isObject(url.query) || Pot.isArrayLike(url.query)) {
+              search = stringify(serialize(url.query));
+            } else {
+              search = stringify(url.query);
+            }
+          } else if (queryString != null) {
+            if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+              search = stringify(serialize(queryString));
+            } else {
+              search = stringify(queryString);
+            }
+          }
+        }
+        while (search.charAt(0) === '?') {
+          search = search.substring(1);
+        }
+        if (search) {
+          search = '?' + search;
+        }
+        hash = stringify(url.hash);
+        if (!hash) {
+          hash = stringify(url.fragment);
+        }
+        while (hash.charAt(0) === '#') {
+          hash = hash.substring(1);
+        }
+        if (hash) {
+          hash = '#' + hash;
+        }
+        uri = protocol + userinfo + host + pathname;
+        c = (~uri.indexOf('?')) ? '&' : '?';
+        while (search.charAt(0) === c) {
+          search = search.substring(1);
+        }
+        if (search) {
+          uri += c + search;
+        }
+        uri += hash;
+      } else {
+        uri = stringify(url);
+        query = '';
+        if (queryString != null) {
+          if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+            query = stringify(serialize(queryString));
+          } else {
+            query = stringify(queryString);
+          }
+        }
+        c = (~uri.indexOf('?')) ? '&' : '?';
+        while (query.charAt(0) === c) {
+          query = query.substring(1);
+        }
+        if (query) {
+          uri += c + query;
+        }
+      }
+      index = uri.indexOf(':');
+      if (!~index) {
+        protocol = 'http';
+      } else {
+        protocol = uri.substr(0, index).toLowerCase();
+      }
+      s = '';
+      if (protocol === 'file') {
+        s = '///';
+      } else if (RE_PROTOCOL.test(protocol)) {
+        s = '//';
+      }
+      protocol += ':' + s;
+      if (uri.indexOf(s) !== 0) {
+        uri = uri.replace(RE_SCHEME, protocol);
+      }
+      return uri;
+    };
+  }()),
+  /**
    * Resolves the incomplete URI.
    * Then, fix the invalid symbols for ".." and "./" etc hierarchies.
    *
@@ -753,6 +992,7 @@ Pot.update({
   urlEncode          : Pot.URI.urlEncode,
   urlDecode          : Pot.URI.urlDecode/*{#if Pot}*/,
   parseURI           : Pot.URI.parseURI,
+  buildURI           : Pot.URI.buildURI,
   resolveRelativeURI : Pot.URI.resolveRelativeURI,
   getExt             : Pot.URI.getExt,
   toDataURI          : Pot.URI.toDataURI/*{#endif}*/
