@@ -85,6 +85,364 @@ update(Pot.Text, {
    */
   stringify : stringify,
   /**
+   * This class will be replace a particular string to temporary string,
+   *  and execute the conventional process,
+   *  and after back replace to the original string,
+   *  these heavy step so just to make easier by this function.
+   *
+   *
+   * @example
+   *   // This sample code is process to leaving only the 'pre' tags,
+   *   //  and replace all other HTML tags are escaped.
+   *   var myProcess = function(string) {
+   *     return string.replace(/&/g, '&amp;').
+   *                   replace(/</g, '&lt;').
+   *                   replace(/>/g, '&gt;');
+   *   };
+   *   var string =
+   *     '<pre>\n' +
+   *       '<b>var</b> foo = 1;\n' +
+   *     '</pre>\n' +
+   *     '<div>hoge</div>\n' +
+   *     '<div>fuga</div>\n' +
+   *     '<p onclick="alert(1)">piyo</p>\n' +
+   *     '<pre>\n' +
+   *       '<b>foo</b>\n' +
+   *       'bar\n' +
+   *       '<i>baz</i>\n' +
+   *     '</pre>';
+   *   var pattern = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi;
+   *   // The string or Array that must not appear in the saved string.
+   *   var reserve = ['<', '>'];
+   *   var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+   *   // Save and replace string for your replace process.
+   *   var result = rs.save();
+   *   // Execute your replace process.
+   *   result = myProcess(result);
+   *   // Load and replace from saved string.
+   *   result = rs.load(result);
+   *   debug(result);
+   *   // @results
+   *   //   <pre>
+   *   //     <b>var</b> foo = 1;
+   *   //   </pre>
+   *   //   &lt;div&gt;hoge&lt;/div&gt;
+   *   //   &lt;div&gt;fuga&lt;/div&gt;
+   *   //   &lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;
+   *   //   <pre>
+   *   //     <b>foo</b>
+   *   //     bar
+   *   //     <i>baz</i>
+   *   //   </pre>
+   *
+   *
+   * @param  {String}               string   The target string.
+   * @param  {String|RegExp|Array}  pattern  The pattern(s) to save string.
+   * @param  {String|Array}        (reserve) The reserve keyword(s) for
+   *                                         your replace process.
+   * @return {Pot.ReplaceSaver}              Returns an instance of
+   *                                           Pot.ReplaceSaver.
+   * @name Pot.Text.ReplaceSaver
+   * @constructor
+   * @public
+   */
+  ReplaceSaver : (function() {
+    /**@ignore*/
+    var Saver = function(string, pattern, reserve) {
+      return new Saver.prototype.init(string, pattern, reserve);
+    };
+    Saver.prototype = update(Saver.prototype, {
+      /**
+       * @lends Pot.Text.ReplaceSaver
+       */
+      /**
+       * @ignore
+       */
+      constructor : Saver,
+      /**
+       * @const
+       * @private
+       * @ignore
+       */
+      id : Pot.Internal.getMagicNumber(),
+      /**
+       * @const
+       * @private
+       */
+      serial : null,
+      /**
+       * @private
+       * @readonly
+       * @const
+       * @ignore
+       */
+      NAME : 'ReplaceSaver',
+      /**
+       * toString.
+       *
+       * @return  Return formatted string of object.
+       * @type Function
+       * @function
+       * @static
+       * @public
+       */
+      toString : Pot.toString,
+      /**
+       * @ignore
+       * @private
+       */
+      saving : [],
+      /**
+       * @ignore
+       * @private
+       */
+      strings : [],
+      /**
+       * @ignore
+       * @private
+       */
+      patterns : [],
+      /**
+       * @ignore
+       * @private
+       */
+      reserves : [],
+      /**
+       * Initialize.
+       *
+       * @ignore
+       * @private
+       */
+      init : function(string, pattern, reserve) {
+        if (!this.serial) {
+          this.serial = buildSerial(this);
+        }
+        this.setString(string);
+        this.setPattern(pattern);
+        this.setReserve(reserve);
+        return this;
+      },
+      /**
+       * Set the string.
+       *
+       * @param  {String}            string  The target string.
+       * @return {Pot.ReplaceSaver}          Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setString : function(string) {
+        if (Pot.isScalar(string)) {
+          this.strings[this.strings.length] = stringify(string);
+        }
+      },
+      /**
+       * Set the reserve keyword(s).
+       *
+       * @param  {String|Array}     reserve  The reserve keyword(s).
+       * @return {Pot.ReplaceSaver}          Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setReserve : function(reserve) {
+        var rvs = this.reserves;
+        each(arrayize(reserve), function(resv) {
+          if (Pot.isScalar(resv)) {
+            rvs[rvs.length] = stringify(resv);
+          }
+        });
+      },
+      /**
+       * Generate the unique string.
+       *
+       * @return {String} The unique string.
+       * @type  Function
+       * @function
+       * @ignore
+       * @private
+       */
+      generateUniqString : function() {
+        var s = this.strings.join(''),
+            re = new RegExp('[' +
+              rescape(this.reserves.join('')) +
+            ']', 'g'),
+            sc = String.fromCharCode,
+            uniq, n = 0;
+        do {
+          uniq = sc(
+            n, n, Math.random() * 0xFFFF >>> 0, n, n
+          );
+          uniq += uniq + uniq + sc(n, n);
+          if (~s.indexOf(uniq)) {
+            uniq += (+new Date) + uniq;
+          }
+          uniq = uniq.replace(re, '');
+          if (++n >= 0xFFFE) {
+            n = 0;
+          }
+        } while (~s.indexOf(uniq));
+        return uniq;
+      },
+      /**
+       * Set the pattern(s).
+       *
+       * @param  {String|RegExp|Array} pattern The pattern(s).
+       * @return {Pot.ReplaceSaver}            Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setPattern : function(pattern) {
+        var pt = this.patterns;
+        each(arrayize(pattern), function(p) {
+          var item = arrayize(p), search, index, v, i;
+          try {
+            v = item[0];
+            i = item[1];
+            if (Pot.isScalar(v)) {
+              search = stringify(v);
+            } else if (Pot.isRegExp(v)) {
+              search = v;
+            }
+            if (search != null) {
+              if (!i) {
+                index = 0;
+              } else if (Pot.isNumeric(i)) {
+                index = Math.floor(i - 0) || 0;
+              } else if (Pot.isFunction(i)) {
+                index = i;
+              } else {
+                index = 0;
+              }
+              pt[pt.length] = [search, index];
+            }
+          } catch (e) {}
+        });
+      },
+      /**
+       * Save the string by specified pattern(s).
+       *
+       *
+       * @example
+       *   // This sample code is process to leaving only the 'pre' tags,
+       *   //  and replace all other HTML tags are escaped.
+       *   var myProcess = function(string) {
+       *     return string.replace(/&/g, '&amp;').
+       *                   replace(/</g, '&lt;').
+       *                   replace(/>/g, '&gt;');
+       *   };
+       *   var string =
+       *     '<pre>\n' +
+       *       '<b>var</b> foo = 1;\n' +
+       *     '</pre>\n' +
+       *     '<div>hoge</div>\n' +
+       *     '<div>fuga</div>\n' +
+       *     '<p onclick="alert(1)">piyo</p>\n' +
+       *     '<pre>\n' +
+       *       '<b>foo</b>\n' +
+       *       'bar\n' +
+       *       '<i>baz</i>\n' +
+       *     '</pre>';
+       *   var pattern = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi;
+       *   // The string or Array that must not appear in the saved string.
+       *   var reserve = ['<', '>'];
+       *   var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+       *   // Save and replace string for your replace process.
+       *   var result = rs.save();
+       *   // Execute your replace process.
+       *   result = myProcess(result);
+       *   // Load and replace from saved string.
+       *   result = rs.load(result);
+       *   debug(result);
+       *   // @results
+       *   //   <pre>
+       *   //     <b>var</b> foo = 1;
+       *   //   </pre>
+       *   //   &lt;div&gt;hoge&lt;/div&gt;
+       *   //   &lt;div&gt;fuga&lt;/div&gt;
+       *   //   &lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;
+       *   //   <pre>
+       *   //     <b>foo</b>
+       *   //     bar
+       *   //     <i>baz</i>
+       *   //   </pre>
+       *
+       *
+       * @return {String} Returns a string that is replaced by
+       *                  specified pattern(s).
+       * @type  Function
+       * @function
+       * @public
+       */
+      save : function() {
+        var result = '', that = this, args = arguments,
+            saving = this.saving, patterns = this.patterns,
+            pattern, search, index, uniq, s, i, len;
+        if (args.length) {
+          this.init.apply(this, args);
+        }
+        s = stringify(this.strings.pop());
+        if (s) {
+          len = patterns.length;
+          for (i = 0; i < len; i++) {
+            pattern = patterns[i];
+            search  = pattern[0];
+            index   = pattern[1];
+            if (search == null) {
+              continue;
+            }
+            s = s.replace(search, function() {
+              var matches = arrayize(arguments), idx;
+              if (Pot.isFunction(index)) {
+                idx = index(matches) || 0;
+              } else {
+                idx = (index - 0) || 0;
+              }
+              uniq = that.generateUniqString();
+              saving[saving.length] = [matches[idx], uniq];
+              return uniq;
+            });
+          }
+          result = s;
+        }
+        return result;
+      },
+      /**
+       * Load the original string from saved string.
+       *
+       * @see Pot.Text.ReplaceSaver.save
+       *
+       * @param  {String}   result  The saved string.
+       * @return {String}           Returns the original string.
+       * @type  Function
+       * @function
+       * @public
+       */
+      load : function(result) {
+        var r = stringify(result), saving = this.saving,
+            i, sv, match, uniq;
+        for (i = saving.length - 1; i >= 0; --i) {
+          sv = saving[i];
+          try {
+            match = sv[0];
+            uniq = sv[1];
+            if (match == null || uniq == null) {
+              throw match;
+            }
+          } catch (e) {
+            continue;
+          }
+          r = r.split(uniq).join(match);
+        }
+        saving.splice(0);
+        return r;
+      }
+    });
+    Saver.prototype.init.prototype = Saver.prototype;
+    return Saver;
+  }()),
+  /**
    * Shortcut of String.fromCharCode().
    * This function fixed an error on 'stack overflow' (or RangeError).
    * e.g. String.fromCharCode.apply(null, new Array(100000000));
@@ -1040,28 +1398,31 @@ update(Pot.Text, {
      * @ignore
      */
     patterns : {
-      inline : new RegExp(['^(?:<|)(', ')(?:[^>]*>|)$'].join([
-        '(?:a|b|i|q|s|u|abbr|acronym|applet|big|cite',
-          '|code|dfn|em|font|iframe|kbd|label|object',
-          '|samp|small|span|strike|strong|sub|sup|tt',
-          '|var|bdo|button|del|ruby|img|input|select',
-          '|embed|ins|keygen|textarea|map|canvas|svg',
-          '|audio|command|mark|math|meter|time|video',
-          '|datalist|progress|output|\\w+:\\w+',
-        ')\\b'
-      ].join('')), 'i'),
+      inline : new RegExp(['^(?:<|)(', ')(?:[^>]*>|)$'].join(
+          '(?:a|b|i|q|s|u|abbr|acronym|applet|big|cite' +
+            '|code|dfn|em|font|iframe|kbd|label|object' +
+            '|samp|small|span|strike|strong|sub|sup|tt' +
+            '|var|bdo|button|del|ruby|img|input|select' +
+            '|embed|ins|keygen|textarea|map|canvas|svg' +
+            '|audio|command|mark|math|meter|time|video' +
+            '|datalist|progress|output|\\w+:\\w+' +
+          ')\\b'
+        ),
+        'i'
+      ),
       xml  : /<\s*\w+[^>]*\/>/,
       nl   : /\r\n|\r|\n/,
       nlg  : /(\r\n|\r|\n)/g,
       rt   : /[\s\u00A0\u3000]+$/,
       top  : /^[\s\u00A0\u3000]*<\s*(\/|)\s*(\w+(?::\w+|))\b[^>]*(\/|)>/,
       end  : /<\s*(\/|)\s*(\w+(?::\w+|))\b[^>]*(\/|)>[\s\u00A0\u3000]*$/,
-      code : new RegExp([
-        '(<(pre|style|script)\\b[^>]*>[\\s\\S]*?</\\2\\s*>',
-        '|<!--[\\s\\S]*?-->',
-        '|<!\\[CDATA\\[[\\s\\S]*?\\]\\]>',
-        ')'
-      ].join(''), 'gi')
+      code : new RegExp(
+        '(<(pre|style|script)\\b[^>]*>[\\s\\S]*?</\\2\\s*>' +
+        '|<!--[\\s\\S]*?-->' +
+        '|<!\\[CDATA\\[[\\s\\S]*?\\]\\]>' +
+        ')',
+        'gi'
+      )
     },
     /**
      * @private
@@ -1615,6 +1976,7 @@ update(Pot.Text, {
 // Update Pot object.
 Pot.update({
   stringify      : Pot.Text.stringify,
+  ReplaceSaver   : Pot.Text.ReplaceSaver,
   chr            : Pot.Text.chr,
   ord            : Pot.Text.ord,
   trim           : Pot.Text.trim,
