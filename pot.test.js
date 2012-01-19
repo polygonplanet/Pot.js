@@ -9,8 +9,8 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.03
- * @date           2012-01-11
+ * @version        1.05
+ * @date           2012-01-19
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -566,6 +566,44 @@ $(function() {
       },
       expect : true
     }, {
+      title  : 'Pot.isScalar()',
+      code   : function() {
+        return [
+          isScalar(null)),
+          isScalar((void 0))),
+          isScalar('')),
+          isScalar('abc')),
+          isScalar(0)),
+          isScalar(123)),
+          isScalar(false)),
+          isScalar(true)),
+          isScalar(new Boolean(true))),
+          isScalar([])),
+          isScalar([1, 2, 3])),
+          isScalar(/hoge/)),
+          isScalar(new Error())),
+          isScalar({})),
+          isScalar({a: 1, b: 2}))
+        ];
+      },
+      expect : [
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }, {
       title  : 'Pot.isArrayLike()',
       code   : function() {
         return (function() {
@@ -887,6 +925,12 @@ $(function() {
       },
       expect : ['fugafugahoge', '{{Modified:fugafuga}}hoge']
     }, {
+      title  : 'Pot.getErrorMessage()',
+      code   : function() {
+        return getErrorMessage(new Error('ErrorMessage'));
+      },
+      expect : 'ErrorMessage'
+    }, {
       title  : 'Pot.range()',
       code   : function() {
         return [
@@ -1049,6 +1093,52 @@ $(function() {
         hash      : '#fragment',
         fragment  : 'fragment'
       }
+    }, {
+      title  : 'Pot.buildURI()',
+      code   : function() {
+        return [
+          buildURI('http://www.example.com/', {
+            foo : '{foo}',
+            bar : '{bar}'
+          }),
+          buildURI('http://www.example.com/test?a=1', [
+            ['prototype',    '{foo}'],
+            ['__iterator__', '{bar}'],
+          ]),
+          buildURI('http://www.example.com/test?a=1', 'b=2&c=3'),
+          buildURI({
+            protocol : 'http:',
+            username : 'user',
+            password : 'pass',
+            hostname : 'www.example.com',
+            port     : 8000,
+            pathname : '/path/to/file.ext',
+            query    : {
+              arg1   : 'v1',
+              arg2   : 'v#2'
+            },
+            hash     : 'a'
+          }),
+          buildURI(parseURI('http://user:pass@host:8000/path/to/file.ext?arg=value#fragment')),
+          buildURI({
+            protocol : 'file:',
+            pathname : 'C:\\path\\to\\file.ext',
+            query    : {
+              arg1   : 'value#1',
+              arg2   : 'value#2'
+            },
+            hash     : '#fragment'
+          })
+        ];
+      },
+      expect : [
+        'http://www.example.com/?foo=%7Bfoo%7D&bar=%7Bbar%7D',
+        'http://www.example.com/test?a=1&prototype=%7Bfoo%7D&__iterator__=%7Bbar%7D',
+        'http://www.example.com/test?a=1&b=2&c=3',
+        'http://user:pass@www.example.com:8000/path/to/file.ext?arg1=v1&arg2=v%232#a',
+        'http://user:pass@host:8000/path/to/file.ext?arg=value#fragment',
+        'file:///C:\\path\\to\\file.ext?arg1=value%231&arg2=value%232#fragment'
+      ]
     }, {
       title  : 'Pot.resolveRelativeURI()',
       code   : function() {
@@ -3681,6 +3771,16 @@ $(function() {
       },
       expect : [true, true]
     }, {
+      title  : 'Pot.rand.caseOf()',
+      code   : function() {
+        var r, s = 'd41d8cd98f00b204e9800998ecf8427e';
+        do {
+          r = rand.caseOf(s);
+        } while (s === r);
+        return s !== r && s.length === r.length;
+      },
+      expect : true
+    }, {
       title  : 'Pot.limit()',
       code   : function() {
         return [
@@ -3980,6 +4080,44 @@ $(function() {
         return getMimeTypeByExt('js');
       },
       expect : 'application/javascript'
+    }, {
+      title  : 'new Pot.ReplaceSaver()',
+      code   : function() {
+        var myProcess = function(string) {
+          return string.replace(/&/g, '&amp;').
+                        replace(/</g, '&lt;').
+                        replace(/>/g, '&gt;');
+        };
+        var string =
+          '<pre>' +
+            '<b>var</b> foo = 1;' +
+          '</pre>' +
+          '<div>hoge</div>' +
+          '<div>fuga</div>' +
+          '<p onclick="alert(1)">piyo</p>' +
+          '<pre>' +
+            '<b>foo</b>' +
+            'bar' +
+            '<i>baz</i>' +
+          '</pre>';
+        var pattern = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi;
+        var reserve = ['<', '>'];
+        var rs = new ReplaceSaver(string, pattern, reserve);
+        var result = rs.save();
+        result = myProcess(result);
+        return rs.load(result);
+      },
+      expect : '<pre>' +
+        '<b>var</b> foo = 1;' +
+      '</pre>' +
+      '&lt;div&gt;hoge&lt;/div&gt;' +
+      '&lt;div&gt;fuga&lt;/div&gt;' +
+      '&lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;' +
+      '<pre>' +
+        '<b>foo</b>' +
+        'bar' +
+        '<i>baz</i>' +
+      '</pre>'
     }, {
       title  : 'Pot.chr()',
       code   : function() {

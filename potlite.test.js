@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.15
- * @date           2012-01-11
+ * @version        1.16
+ * @date           2012-01-19
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -515,6 +515,44 @@ $(function() {
       },
       expect : true
     }, {
+      title  : 'Pot.isScalar()',
+      code   : function() {
+        return [
+          isScalar(null)),
+          isScalar((void 0))),
+          isScalar('')),
+          isScalar('abc')),
+          isScalar(0)),
+          isScalar(123)),
+          isScalar(false)),
+          isScalar(true)),
+          isScalar(new Boolean(true))),
+          isScalar([])),
+          isScalar([1, 2, 3])),
+          isScalar(/hoge/)),
+          isScalar(new Error())),
+          isScalar({})),
+          isScalar({a: 1, b: 2}))
+        ];
+      },
+      expect : [
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }, {
       title  : 'Pot.isArrayLike()',
       code   : function() {
         return (function() {
@@ -606,6 +644,111 @@ $(function() {
         ];
       },
       expect : [false, true]
+    }, {
+      title  : 'Pot.currentWindow()',
+      code   : function() {
+        return (window === Pot.currentWindow());
+      },
+      expect : true
+    }, {
+      title  : 'Pot.currentDocument()',
+      code   : function() {
+        return (document === Pot.currentDocument());
+      },
+      expect : true
+    }, {
+      title  : 'Pot.currentURI()',
+      code   : function() {
+        return (document.URL == Pot.currentURI());
+      },
+      expect : true
+    }, {
+      title  : 'Pot.globalEval()',
+      code   : function() {
+        globalEval(
+          'var Pot__globalEval__testvar = 2;' +
+          'Pot.tmp.__globalEval__testvar = 2;'
+        );
+        var result = (window.Pot__globalEval__testvar === 2 &&
+                      Pot.tmp.__globalEval__testvar  === 2);
+        try {
+          delete Pot.tmp.__globalEval__testvar;
+          delete window.Pot__globalEval__testvar;
+        } catch (e) {}
+        return result;
+      },
+      expect : true
+    }, {
+      title  : 'Pot.localEval()',
+      code   : function() {
+        localEval(
+          'var Pot__localEval__testvar = 2;' +
+          'Pot.tmp.__localEval__testvar = 2;'
+        );
+        var result = (window.Pot__localEval__testvar !== 2 &&
+                      Pot.tmp.__localEval__testvar  === 2);
+        try {
+          delete Pot.tmp.__localEval__testvar;
+          delete window.Pot__localEval__testvar;
+        } catch (e) {}
+        return result;
+      },
+      expect : true
+    }, {
+      title  : 'Pot.hasReturn()',
+      code   : function() {
+        return [
+          hasReturn(function() {
+            return 'hoge';
+          }),
+          hasReturn(function() {
+            var hoge = 1;
+          }),
+          hasReturn(function return_test(return1, return$2) {
+            /* dummy comment: return 'hoge'; */
+            var $return = 'return(1)' ? (function(a) {
+              if (a) {
+                return true;
+              }
+              return false;
+            })(/return true/) : "return false";
+          }),
+          hasReturn(function() {
+            if (1) {
+              return (function() {
+                return 'hoge';
+              })();
+            }
+          })
+        ];
+      },
+      expect : [true, false, false, true]
+    }, {
+      title  : 'Pot.override()',
+      code   : function() {
+        var results = [];
+        var Hoge = {
+          addHoge : function(value) {
+            return value + 'hoge';
+          }
+        };
+        results.push(Hoge.addHoge('fugafuga'));
+        override(Hoge, 'addHoge', function(inherits, args) {
+          var value = args[0];
+          var modify = '{{Modified:' + value + '}}';
+          args[0] = '';
+          return modify + inherits(args);
+        });
+        results.push(Hoge.addHoge('fugafuga'));
+        return results;
+      },
+      expect : ['fugafugahoge', '{{Modified:fugafuga}}hoge']
+    }, {
+      title  : 'Pot.getErrorMessage()',
+      code   : function() {
+        return getErrorMessage(new Error('ErrorMessage'));
+      },
+      expect : 'ErrorMessage'
     }, {
       title  : 'Pot.range()',
       code   : function() {
