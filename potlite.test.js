@@ -9,7 +9,7 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.16
+ * @version        1.17
  * @date           2012-01-19
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -518,21 +518,21 @@ $(function() {
       title  : 'Pot.isScalar()',
       code   : function() {
         return [
-          isScalar(null)),
-          isScalar((void 0))),
-          isScalar('')),
-          isScalar('abc')),
-          isScalar(0)),
-          isScalar(123)),
-          isScalar(false)),
-          isScalar(true)),
-          isScalar(new Boolean(true))),
-          isScalar([])),
-          isScalar([1, 2, 3])),
-          isScalar(/hoge/)),
-          isScalar(new Error())),
-          isScalar({})),
-          isScalar({a: 1, b: 2}))
+          isScalar(null),
+          isScalar((void 0)),
+          isScalar(''),
+          isScalar('abc'),
+          isScalar(0),
+          isScalar(123),
+          isScalar(false),
+          isScalar(true),
+          isScalar(new Boolean(true)),
+          isScalar([]),
+          isScalar([1, 2, 3]),
+          isScalar(/hoge/),
+          isScalar(new Error()),
+          isScalar({}),
+          isScalar({a: 1, b: 2})
         ];
       },
       expect : [
