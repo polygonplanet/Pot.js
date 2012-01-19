@@ -365,7 +365,52 @@ update(Pot.Complex, {
         upper : function(/*[addSharp]*/) {
           return Pot.Complex.rand.color.apply(null, arguments).toUpperCase();
         }
-      })
+      }),
+      /**
+       * @lends Pot.Complex.rand
+       */
+      /**
+       * Returns a string that converted by random case-sensitive of
+       *   the alphabet in a given string.
+       *
+       *
+       * @example
+       *   var s = 'd41d8cd98f00b204e9800998ecf8427e';
+       *   debug(rand.caseOf(s));
+       *   // @results
+       *   // e.g. 'D41D8Cd98F00b204E9800998Ecf8427e'
+       *
+       *
+       * @param  {String}  string  Target string.
+       * @return {String}          The result string.
+       *
+       * @name Pot.Complex.rand.caseOf
+       * @class
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       */
+      caseOf : function(string) {
+        var result = '', s, i, len, c;
+        s = stringify(string);
+        if (s) {
+          len = s.length;
+          for (i = 0; i < len; i++) {
+            c = s.charAt(i);
+            if ((c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z')) {
+              if (Math.random() * 10 >>> 0 < 5) {
+                c = c.toLowerCase();
+              } else {
+                c = c.toUpperCase();
+              }
+            }
+            result += c;
+          }
+        }
+        return result;
+      }
     };
   })()),
   /**
