@@ -177,7 +177,14 @@ update(Pot.Internal, {
     Pot                     : Pot,
     update                  : update,/*{#if Pot}*/
     PATH_DELIMITER          : Pot.PATH_DELIMITER,
-    DIR_DELIMITER           : Pot.DIR_DELIMITER,/*{#endif}*/
+    DIR_DELIMITER           : Pot.DIR_DELIMITER,
+    XML_NS_URI              : Pot.XML_NS_URI,
+    HTML_NS_URI             : Pot.HTML_NS_URI,
+    XHTML_NS_URI            : Pot.XHTML_NS_URI,
+    XLINK_NS_URI            : Pot.XLINK_NS_URI,
+    XSL_NS_URI              : Pot.XSL_NS_URI,
+    SVG_NS_URI              : Pot.SVG_NS_URI,
+    XUL_NS_URI              : Pot.XUL_NS_URI,/*{#endif}*/
     isBoolean               : Pot.isBoolean,
     isNumber                : Pot.isNumber,
     isString                : Pot.isString,
@@ -192,6 +199,7 @@ update(Pot.Internal, {
     StopIteration           : Pot.StopIteration,
     isStopIter              : Pot.isStopIter,
     isIterable              : Pot.isIterable,
+    isScalar                : Pot.isScalar,
     isArrayLike             : Pot.isArrayLike,/*{#if Pot}*/
     isPlainObject           : Pot.isPlainObject,
     isEmpty                 : Pot.isEmpty,/*{#endif}*/
@@ -249,6 +257,7 @@ update(Pot.Internal, {
     localEval               : Pot.localEval,
     hasReturn               : Pot.hasReturn,
     override                : Pot.override,
+    getErrorMessage         : Pot.getErrorMessage,
     currentWindow           : Pot.currentWindow,
     currentDocument         : Pot.currentDocument,
     currentURI              : Pot.currentURI,
@@ -259,6 +268,7 @@ update(Pot.Internal, {
     urlEncode               : Pot.URI.urlEncode,
     urlDecode               : Pot.URI.urlDecode,/*{#if Pot}*/
     parseURI                : Pot.URI.parseURI,
+    buildURI                : Pot.URI.buildURI,
     resolveRelativeURI      : Pot.URI.resolveRelativeURI,
     getExt                  : Pot.URI.getExt,
     toDataURI               : Pot.URI.toDataURI,/*{#endif}*/
@@ -347,6 +357,7 @@ update(Pot.Internal, {
     getExtByMimeType        : Pot.MimeType.getExtByMimeType,
     getMimeTypeByExt        : Pot.MimeType.getMimeTypeByExt,
     stringify               : Pot.Text.stringify,
+    ReplaceSaver            : Pot.Text.ReplaceSaver,
     chr                     : Pot.Text.chr,
     ord                     : Pot.Text.ord,
     trim                    : Pot.Text.trim,
