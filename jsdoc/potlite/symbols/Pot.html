@@ -551,6 +551,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.getErrorMessage">getErrorMessage</a></b>(error, (defaults))
+								</div>
+								<div class="description">Get the error message from Error object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.globalEval">globalEval</a></b>(code)
 								</div>
 								<div class="description">Evaluates a script in a global context.</div>
@@ -709,6 +718,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isPercentEncoded">isPercentEncoded</a></b>(s)
 								</div>
 								<div class="description">Check whether the value is percent encoded.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isScalar">isScalar</a></b>(x)
+								</div>
+								<div class="description">Return whether the argument is scalar type.</div>
 							</td>
 						</tr>
 					
@@ -1158,7 +1176,7 @@ ul.inheritsList
 					
 					
 					<pre class="code">  Pot.forEach([1, 2, 3, 4, 5], function(v) {
-    if (v > 2) {
+    if (v &gt; 2) {
       throw Pot.StopIteration;
     }
     debug(v);
@@ -1238,7 +1256,7 @@ ul.inheritsList
   debug(arrayize(new Object('foo')));  // [Object {'foo'}]
   debug(arrayize(Object));             // [Object]
   debug(arrayize(document.getElementsByTagName('div')));
-  // @results  [<div/>, <div/>, <div/> ...]
+  // @results  [&lt;div/&gt;, &lt;div/&gt;, &lt;div/&gt; ...]
   (function(a, b, c) {
     debug(arrayize(arguments));
     // @results  [1, 2, 3]
@@ -1460,6 +1478,61 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name=".getErrorMessage"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>getErrorMessage</b>(error, (defaults))
+					
+					</div>
+					<div class="description">
+						Get the error message from Error object.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var error = new Error('MyError!');
+  debug(getErrorMessage(error));
+  // @results 'MyError!'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Error|*}</span> <b>error</b>
+									
+								</dt>
+								<dd>Error object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String|*}</span> <b>(defaults)</b>
+									
+								</dt>
+								<dd>Optional message.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Return the error message, or 'error'.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".globalEval"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1655,24 +1728,24 @@ ul.inheritsList
   // Using E4X Syntax for test.
   var func = function() {
     // return 'hoge';
-    var e1 = <>return</>;
-    var e2 = <><![CDATA[
+    var e1 = &lt;&gt;return&lt;/&gt;;
+    var e2 = &lt;&gt;&lt;![CDATA[
       return 1;
-    ]]></>;
-    var e3 = <> <div data={(function() {
+    ]]&gt;&lt;/&gt;;
+    var e3 = &lt;&gt; &lt;div data={(function() {
       return 'hoge';
-    })()}>
+    })()}&gt;
       return 1;
-    </div></>;
-    var e4 = <><!--</>-->return 1;</>;
-    var re = /<><!--[\/]--><\/>/gim;
-    var e5 = <root><hoge fuga={(function() {
+    &lt;/div&gt;&lt;/&gt;;
+    var e4 = &lt;&gt;&lt;!--&lt;/&gt;--&gt;return 1;&lt;/&gt;;
+    var re = /&lt;&gt;&lt;!--[\/]--&gt;&lt;\/&gt;/gim;
+    var e5 = &lt;root&gt;&lt;hoge fuga={(function() {
       return 1;
-    })()} piyo="<root>">
-    <root>return</root>return;<!--</root>"<root>"-->return;
-    <!--return-->
-    </hoge></root>;
-    var root = "</root>";
+    })()} piyo="&lt;root&gt;"&gt;
+    &lt;root&gt;return&lt;/root&gt;return;&lt;!--&lt;/root&gt;"&lt;root&gt;"--&gt;return;
+    &lt;!--return--&gt;
+    &lt;/hoge&gt;&lt;/root&gt;;
+    var root = "&lt;/root&gt;";
     var r = 'return(1)' ? (function(a) {
       if (a) {
         return true;
@@ -2253,7 +2326,7 @@ That is for cases where JavaScript sucks
 					<pre class="code">  var iter = new Pot.Iter();
   var i = 0;
   iter.next = function() {
-    if (i > 5) {
+    if (i &gt; 5) {
       throw StopIteration;
     }
     return i++;
@@ -2263,7 +2336,7 @@ That is for cases where JavaScript sucks
   debug( isIterable(func) ); // @results  false</pre>
 					
 					<pre class="code">  var iter = (function() {
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i &lt; 10; i++) {
       yield;
       debug(i);
     }
@@ -2582,6 +2655,69 @@ That is for cases where JavaScript sucks
 
 					<hr />
 				
+					<a name=".isScalar"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isScalar</b>(x)
+					
+					</div>
+					<div class="description">
+						Return whether the argument is scalar type.
+This function treats as scalar type for
+  String or Number and Boolean types.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug(isScalar(null));              // false
+  debug(isScalar((void 0)));          // false
+  debug(isScalar(''));                // true
+  debug(isScalar('abc'));             // true
+  debug(isScalar(0));                 // true
+  debug(isScalar(123));               // true
+  debug(isScalar(false));             // true
+  debug(isScalar(true));              // true
+  debug(isScalar(new Boolean(true))); // true
+  debug(isScalar([]));                // false
+  debug(isScalar([1, 2, 3]));         // false
+  debug(isScalar(/hoge/));            // false
+  debug(isScalar(new Error()));       // false
+  debug(isScalar({}));                // false
+  debug(isScalar({a: 1, b: 2}));      // false</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>A target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> ture or false (scalar type or not).</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".isStopIter"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2598,8 +2734,8 @@ That is for cases where JavaScript sucks
 					
 					
 					<pre class="code">  try {
-    for (var i = 0; i < 10; i++) {
-      if (i > 5) {
+    for (var i = 0; i &lt; 10; i++) {
+      if (i &gt; 5) {
         throw Pot.StopIteration;
       }
       debug(i);
@@ -3526,7 +3662,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Jan 11 2012 03:37:30 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jan 19 2012 12:15:10 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - Pot.Deferred.flush</title>
+		<title>JsDoc Reference - Pot.Text.ReplaceSaver</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -342,7 +342,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Function Namespace Pot.Deferred.flush
+				Class Pot.Text.ReplaceSaver
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -359,8 +359,8 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Deferred.flush.">
-				<caption>Function Namespace Summary</caption>
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class Pot.Text.ReplaceSaver.">
+				<caption>Class Summary</caption>
 				<thead>
 					<tr>
 						<th scope="col">Constructor Attributes</th>
@@ -372,9 +372,12 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#constructor">Pot.Deferred.flush</a></b>(callback)
+								<b><a href="../symbols/Pot.Text.ReplaceSaver.html#constructor">Pot.Text.ReplaceSaver</a></b>(string, pattern, (reserve))
 							</div>
-							<div class="description">Call the function with asynchronous.</div>
+							<div class="description">This class will be replace a particular string to temporary string,
+ and execute the conventional process,
+ and after back replace to the original string,
+ these heavy step so just to make easier by this function.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -383,85 +386,72 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class Pot.Deferred.flush.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class Pot.Text.ReplaceSaver.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#doze">doze</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.load">load</a></b>(result)
 								</div>
-								<div class="description">Return new Deferred with slower speed.</div>
+								<div class="description">Load the original string from saved string.</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#fast">fast</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.save">save</a></b>()
 								</div>
-								<div class="description">Return new Deferred with fast speed.</div>
+								<div class="description">Save the string by specified pattern(s).</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#limp">limp</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.setPattern">setPattern</a></b>(pattern)
 								</div>
-								<div class="description">Return new Deferred with slowest speed.</div>
+								<div class="description">Set the pattern(s).</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#ninja">ninja</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.setReserve">setReserve</a></b>(reserve)
 								</div>
-								<div class="description">Return new Deferred with fastest speed.</div>
+								<div class="description">Set the reserve keyword(s).</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#normal">normal</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.setString">setString</a></b>(string)
 								</div>
-								<div class="description">Return new Deferred with normal speed.</div>
+								<div class="description">Set the string.</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#rapid">rapid</a></b>
+								<div class="fixedFont">Pot.Text.ReplaceSaver.<b><a href="../symbols/Pot.Text.ReplaceSaver.html#.toString">toString</a></b>()
 								</div>
-								<div class="description">Return new Deferred with faster speed.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/Pot.Deferred.flush.html#slow">slow</a></b>
-								</div>
-								<div class="description">Return new Deferred with slow speed.</div>
+								<div class="description">toString.</div>
 							</td>
 						</tr>
 					
@@ -471,9 +461,6 @@ ul.inheritsList
 				
 				
 			
-
-<!-- ============================== methods summary ======================== -->
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -481,36 +468,65 @@ ul.inheritsList
 			
 			<div class="details"><a name="constructor"> </a>
 				<div class="sectionTitle">
-					Function Namespace Detail
+					Class Detail
 				</div>
 				
 				<div class="fixedFont">
-						<b>Pot.Deferred.flush</b>(callback)
+						<b>Pot.Text.ReplaceSaver</b>(string, pattern, (reserve))
 				</div>
 				
 				<div class="description">
-					Call the function with asynchronous.
+					This class will be replace a particular string to temporary string,
+ and execute the conventional process,
+ and after back replace to the original string,
+ these heavy step so just to make easier by this function.
 					
 				</div>
 				
 				
 				
-				<pre class="code">  var value = null;
-  // Call the function with asynchronous.
-  Pot.Deferred.flush(function() {
-    debug('Begin Deferred.flush');
-    value = 1;
-  }).wait(1).then(function() {
-    debug('End Deferred.flush');
-    value = 2;
-  });
-  // Without having to call the ".begin()", has already executed.
-  debug(value);
-  // @results  value = null
-  Pot.Deferred.callLater(2.5, function() {
-    debug(value);
-    // @results  value = 2
-  });</pre>
+				<pre class="code">  // This sample code is process to leaving only the 'pre' tags,
+  //  and replace all other HTML tags are escaped.
+  var myProcess = function(string) {
+    return string.replace(/&amp;/g, '&amp;amp;').
+                  replace(/&lt;/g, '&amp;lt;').
+                  replace(/&gt;/g, '&amp;gt;');
+  };
+  var string =
+    '&lt;pre&gt;\n' +
+      '&lt;b&gt;var&lt;/b&gt; foo = 1;\n' +
+    '&lt;/pre&gt;\n' +
+    '&lt;div&gt;hoge&lt;/div&gt;\n' +
+    '&lt;div&gt;fuga&lt;/div&gt;\n' +
+    '&lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;\n' +
+    '&lt;pre&gt;\n' +
+      '&lt;b&gt;foo&lt;/b&gt;\n' +
+      'bar\n' +
+      '&lt;i&gt;baz&lt;/i&gt;\n' +
+    '&lt;/pre&gt;';
+  var pattern = /&lt;pre\b[^&gt;]*&gt;([\s\S]*?)&lt;\/pre&gt;/gi;
+  // The string or Array that must not appear in the saved string.
+  var reserve = ['&lt;', '&gt;'];
+  var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+  // Save and replace string for your replace process.
+  var result = rs.save();
+  // Execute your replace process.
+  result = myProcess(result);
+  // Load and replace from saved string.
+  result = rs.load(result);
+  debug(result);
+  // @results
+  //   &lt;pre&gt;
+  //     &lt;b&gt;var&lt;/b&gt; foo = 1;
+  //   &lt;/pre&gt;
+  //   &amp;lt;div&amp;gt;hoge&amp;lt;/div&amp;gt;
+  //   &amp;lt;div&amp;gt;fuga&amp;lt;/div&amp;gt;
+  //   &amp;lt;p onclick="alert(1)"&amp;gt;piyo&amp;lt;/p&amp;gt;
+  //   &lt;pre&gt;
+  //     &lt;b&gt;foo&lt;/b&gt;
+  //     bar
+  //     &lt;i&gt;baz&lt;/i&gt;
+  //   &lt;/pre&gt;</pre>
 				
 				
 				
@@ -520,16 +536,23 @@ ul.inheritsList
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{Function|*}</span>  <b>callback</b>
+								<span class="light fixedFont">{String}</span>  <b>string</b>
 								
 							</dt>
-								<dd>A function to call.</dd>
+								<dd>The target string.</dd>
 						
 							<dt>
-								<span class="light fixedFont">{...}</span>  <b>(...)</b>
+								<span class="light fixedFont">{String|RegExp|Array}</span>  <b>pattern</b>
 								
 							</dt>
-								<dd>Arguments passed to callback.</dd>
+								<dd>The pattern(s) to save string.</dd>
+						
+							<dt>
+								<span class="light fixedFont">{String|Array}</span>  <b>(reserve)</b>
+								
+							</dt>
+								<dd>The reserve keyword(s) for
+                                        your replace process.</dd>
 						
 						</dl>
 					
@@ -540,7 +563,8 @@ ul.inheritsList
 						<dl class="detailList">
 						<dt class="heading">Returns:</dt>
 						
-								<dd><span class="light fixedFont">{Deferred}</span> Return a new Deferred.</dd>
+								<dd><span class="light fixedFont">{Pot.ReplaceSaver}</span> Returns an instance of
+                                          Pot.ReplaceSaver.</dd>
 						
 						</dl>
 					
@@ -552,167 +576,302 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
-				<div class="sectionTitle">
-					Field Detail
-				</div>
-				
-					<a name="doze"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>doze</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slower speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="fast"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>fast</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with fast speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="limp"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>limp</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slowest speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="ninja"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>ninja</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with fastest speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="normal"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>normal</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with normal speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="rapid"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>rapid</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with faster speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="slow"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Function}</span>
-					<b>slow</b>
-					
-					</div>
-					<div class="description">
-						Return new Deferred with slow speed. (static)
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					
-				
-			
 
 <!-- ============================== method details ========================= -->		
+			
+				<div class="sectionTitle">
+					Method Detail
+				</div>
+				
+					<a name=".load"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>load</b>(result)
+					
+					</div>
+					<div class="description">
+						Load the original string from saved string.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>result</b>
+									
+								</dt>
+								<dd>The saved string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Returns the original string.</dd>
+							
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd><a href="../symbols/Pot.Text.ReplaceSaver.html#.save">Pot.Text.ReplaceSaver.save</a></dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name=".save"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>save</b>()
+					
+					</div>
+					<div class="description">
+						Save the string by specified pattern(s).
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  // This sample code is process to leaving only the 'pre' tags,
+  //  and replace all other HTML tags are escaped.
+  var myProcess = function(string) {
+    return string.replace(/&amp;/g, '&amp;amp;').
+                  replace(/&lt;/g, '&amp;lt;').
+                  replace(/&gt;/g, '&amp;gt;');
+  };
+  var string =
+    '&lt;pre&gt;\n' +
+      '&lt;b&gt;var&lt;/b&gt; foo = 1;\n' +
+    '&lt;/pre&gt;\n' +
+    '&lt;div&gt;hoge&lt;/div&gt;\n' +
+    '&lt;div&gt;fuga&lt;/div&gt;\n' +
+    '&lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;\n' +
+    '&lt;pre&gt;\n' +
+      '&lt;b&gt;foo&lt;/b&gt;\n' +
+      'bar\n' +
+      '&lt;i&gt;baz&lt;/i&gt;\n' +
+    '&lt;/pre&gt;';
+  var pattern = /&lt;pre\b[^&gt;]*&gt;([\s\S]*?)&lt;\/pre&gt;/gi;
+  // The string or Array that must not appear in the saved string.
+  var reserve = ['&lt;', '&gt;'];
+  var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+  // Save and replace string for your replace process.
+  var result = rs.save();
+  // Execute your replace process.
+  result = myProcess(result);
+  // Load and replace from saved string.
+  result = rs.load(result);
+  debug(result);
+  // @results
+  //   &lt;pre&gt;
+  //     &lt;b&gt;var&lt;/b&gt; foo = 1;
+  //   &lt;/pre&gt;
+  //   &amp;lt;div&amp;gt;hoge&amp;lt;/div&amp;gt;
+  //   &amp;lt;div&amp;gt;fuga&amp;lt;/div&amp;gt;
+  //   &amp;lt;p onclick="alert(1)"&amp;gt;piyo&amp;lt;/p&amp;gt;
+  //   &lt;pre&gt;
+  //     &lt;b&gt;foo&lt;/b&gt;
+  //     bar
+  //     &lt;i&gt;baz&lt;/i&gt;
+  //   &lt;/pre&gt;</pre>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Returns a string that is replaced by
+                 specified pattern(s).</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".setPattern"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>setPattern</b>(pattern)
+					
+					</div>
+					<div class="description">
+						Set the pattern(s).
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|RegExp|Array}</span> <b>pattern</b>
+									
+								</dt>
+								<dd>The pattern(s).</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Pot.ReplaceSaver}</span> Return this.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".setReserve"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>setReserve</b>(reserve)
+					
+					</div>
+					<div class="description">
+						Set the reserve keyword(s).
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Array}</span> <b>reserve</b>
+									
+								</dt>
+								<dd>The reserve keyword(s).</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Pot.ReplaceSaver}</span> Return this.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".setString"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>setString</b>(string)
+					
+					</div>
+					<div class="description">
+						Set the string.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>string</b>
+									
+								</dt>
+								<dd>The target string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Pot.ReplaceSaver}</span> Return this.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".toString"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Text.ReplaceSaver.</span><b>toString</b>()
+					
+					</div>
+					<div class="description">
+						toString.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd>Return formatted string of object.</dd>
+							
+							</dl>
+						
+						
+						
+
+					
+				
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -725,7 +884,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jan 19 2012 12:11:59 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jan 19 2012 12:12:00 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
