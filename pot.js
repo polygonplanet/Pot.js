@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.11, 2012-01-11
+ * Version 1.12, 2012-01-19
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -32,8 +32,8 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.11
- * @date           2012-01-11
+ * @version        1.12
+ * @date           2012-01-19
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.11', TYPE : 'full'},
+var Pot = {VERSION : '1.12', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -565,7 +565,7 @@ Pot.update({
    * @static
    * @const
    */
-  XUL_NS_URI : XUL_NS_URI,
+  XUL_NS_URI : XUL_NS_URI
 });
 
 // Definition of System.
@@ -1102,6 +1102,41 @@ Pot.update({
   isIterable : function(x) {
     return !!(x && Pot.isFunction(x.next) &&
          (~x.next.toString().indexOf(SI) || Pot.isNativeCode(x.next)));
+  },
+  /**
+   * Return whether the argument is scalar type.
+   * This function treats as scalar type for
+   *   String or Number and Boolean types.
+   *
+   *
+   * @example
+   *   debug(isScalar(null));              // false
+   *   debug(isScalar((void 0)));          // false
+   *   debug(isScalar(''));                // true
+   *   debug(isScalar('abc'));             // true
+   *   debug(isScalar(0));                 // true
+   *   debug(isScalar(123));               // true
+   *   debug(isScalar(false));             // true
+   *   debug(isScalar(true));              // true
+   *   debug(isScalar(new Boolean(true))); // true
+   *   debug(isScalar([]));                // false
+   *   debug(isScalar([1, 2, 3]));         // false
+   *   debug(isScalar(/hoge/));            // false
+   *   debug(isScalar(new Error()));       // false
+   *   debug(isScalar({}));                // false
+   *   debug(isScalar({a: 1, b: 2}));      // false
+   *
+   *
+   * @param   {*}         x     A target object.
+   * @return  {Boolean}         ture or false (scalar type or not).
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isScalar : function(x) {
+    return x != null &&
+      (Pot.isString(x) || Pot.isNumber(x) || Pot.isBoolean(x));
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -2673,6 +2708,32 @@ Pot.update({
       });
     }
     return object;
+  },
+  /**
+   * Get the error message from Error object.
+   *
+   *
+   * @example
+   *   var error = new Error('MyError!');
+   *   debug(getErrorMessage(error));
+   *   // @results 'MyError!'
+   *
+   *
+   * @param  {Error|*}    error      Error object.
+   * @param  {String|*}  (defaults)  Optional message.
+   * @return {String}                Return the error message, or 'error'.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  getErrorMessage : function(error, defaults) {
+    var msg;
+    if (Pot.isError(error)) {
+      msg = String(error.message  || error.description ||
+                  (error.toString && error.toString()) || error);
+    }
+    return stringify(msg) || stringify(defaults) || 'error';
   }
 });
 
@@ -11770,6 +11831,245 @@ update(Pot.URI, {
     }
   }),
   /**
+   * Build to the URI from a string or an object with query-string.
+   * Object key names can treat like "window.location" object keys.
+   * Query-string will encode by percent-encoding.
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/';
+   *   var params = {
+   *     foo : '{foo}',
+   *     bar : '{bar}'
+   *   };
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results 'http://www.example.com/?foo=%7Bfoo%7D&bar=%7Bbar%7D'
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/test?a=1';
+   *   var params = [
+   *     ['prototype',    '{foo}'],
+   *     ['__iterator__', '{bar}'],
+   *   ];
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results
+   *   // 'http://www.example.com/test?' +
+   *   //   'a=1&prototype=%7Bfoo%7D&__iterator__=%7Bbar%7D'
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/test?a=1';
+   *   var params = 'b=2&c=3';
+   *   var result = Pot.buildURI(url, params);
+   *   debug(result);
+   *   // @results 'http://www.example.com/test?a=1&b=2&c=3'
+   *
+   *
+   * @example
+   *   var parts = {
+   *     protocol : 'http:',
+   *     username : 'user',
+   *     password : 'pass',
+   *     hostname : 'www.example.com',
+   *     port     : 8000,
+   *     pathname : '/path/to/file.ext',
+   *     query    : {
+   *       arg1   : 'v1',
+   *       arg2   : 'v#2'
+   *     },
+   *     hash     : 'a'
+   *   };
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'http://user:pass@www.example.com:8000/path/to/file.ext' +
+   *   //   '?arg1=v1&arg2=v%232#a'
+   *
+   *
+   * @example
+   *   var uri = 'http://user:pass@host:8000/path/to/file.ext?' +
+   *               'arg=value#fragment';
+   *   var parts = parseURI(uri);
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'http://user:pass@host:8000/path/to/file.ext?arg=value#fragment'
+   *
+   *
+   * @example
+   *   var parts = {
+   *     protocol : 'file:',
+   *     pathname : 'C:\\path\\to\\file.ext',
+   *     query    : {
+   *       arg1   : 'value#1',
+   *       arg2   : 'value#2'
+   *     },
+   *     hash     : '#fragment'
+   *   };
+   *   var result = Pot.buildURI(parts);
+   *   debug(result);
+   *   // @results
+   *   // 'file:///C:\\path\\to\\file.ext?' +
+   *   //   'arg1=value%231&arg2=value%232#fragment'
+   *
+   *
+   * @param  {String|Object}         url     Base URI string or
+   *                                           parts as Object.
+   * @param  {Object|Array|String}  (query)  (Optional) queryString.
+   * @return {String}                        Return a builded URI string.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  buildURI : (function() {
+    var
+    RE_SCHEME = /^[^:]+:\/{0,}/,
+    // URI list from RFC 1738: http://tools.ietf.org/html/rfc1738
+    RE_PROTOCOL = new RegExp(
+      '[st]?' +
+      '(?:' +
+        'http|ws|ftp|rsync|wais|telnet|nntp|' +
+        'gopher|prospero|ssh|svn|scp|ldap|git' +
+      ')' +
+      '(?:[+]ssh)?' +
+      's?',
+      'i'
+    );
+    return function(url/*[, query]*/) {
+      var uri, args = arguments, c, s, index,
+          queryString = args[1],
+          encode = Pot.URI.urlEncode,
+          serialize = Pot.Serializer.serializeToQueryString,
+          protocol, userinfo, host, pathname, search, hash;
+      if (Pot.isObject(url)) {
+        protocol = stringify(url.protocol);
+        if (!protocol) {
+          protocol = stringify(url.scheme);
+          if (!protocol) {
+            protocol = 'http:';
+          }
+        }
+        c = protocol.slice(-1);
+        if (c !== ':' && c !== '/') {
+          protocol += ':';
+        }
+        userinfo = stringify(url.userinfo);
+        if (!userinfo && url.username != null && url.password != null) {
+          userinfo = [encode(url.username), encode(url.password)].join(':');
+          if (userinfo === ':') {
+            userinfo = '';
+          }
+        }
+        if (userinfo && userinfo.slice(-1) !== '@') {
+          userinfo += '@';
+        }
+        host = stringify(url.host);
+        if (!host) {
+          if (url.hostname != null) {
+            host = stringify(url.hostname);
+          }
+          if (Pot.isNumeric(url.port)) {
+            host += ':' + (+url.port);
+          }
+        }
+        pathname = stringify(url.pathname);
+        if (!pathname) {
+          if (url.dirname != null && url.filename != null) {
+            pathname = stringify(url.dirname) + stringify(url.filename);
+          }
+        }
+        c = pathname.charAt(0);
+        if (c !== '/' && c !== '\\') {
+          pathname = '/' + pathname;
+        }
+        if (Pot.isObject(url.search) || Pot.isArrayLike(url.search)) {
+          search = stringify(serialize(url.search));
+        } else {
+          search = stringify(url.search);
+        }
+        if (!search) {
+          if (url.query != null) {
+            if (Pot.isObject(url.query) || Pot.isArrayLike(url.query)) {
+              search = stringify(serialize(url.query));
+            } else {
+              search = stringify(url.query);
+            }
+          } else if (queryString != null) {
+            if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+              search = stringify(serialize(queryString));
+            } else {
+              search = stringify(queryString);
+            }
+          }
+        }
+        while (search.charAt(0) === '?') {
+          search = search.substring(1);
+        }
+        if (search) {
+          search = '?' + search;
+        }
+        hash = stringify(url.hash);
+        if (!hash) {
+          hash = stringify(url.fragment);
+        }
+        while (hash.charAt(0) === '#') {
+          hash = hash.substring(1);
+        }
+        if (hash) {
+          hash = '#' + hash;
+        }
+        uri = protocol + userinfo + host + pathname;
+        c = (~uri.indexOf('?')) ? '&' : '?';
+        while (search.charAt(0) === c) {
+          search = search.substring(1);
+        }
+        if (search) {
+          uri += c + search;
+        }
+        uri += hash;
+      } else {
+        uri = stringify(url);
+        query = '';
+        if (queryString != null) {
+          if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+            query = stringify(serialize(queryString));
+          } else {
+            query = stringify(queryString);
+          }
+        }
+        c = (~uri.indexOf('?')) ? '&' : '?';
+        while (query.charAt(0) === c) {
+          query = query.substring(1);
+        }
+        if (query) {
+          uri += c + query;
+        }
+      }
+      index = uri.indexOf(':');
+      if (!~index) {
+        protocol = 'http';
+      } else {
+        protocol = uri.substr(0, index).toLowerCase();
+      }
+      s = '';
+      if (protocol === 'file') {
+        s = '///';
+      } else if (RE_PROTOCOL.test(protocol)) {
+        s = '//';
+      }
+      protocol += ':' + s;
+      if (uri.indexOf(s) !== 0) {
+        uri = uri.replace(RE_SCHEME, protocol);
+      }
+      return uri;
+    };
+  }()),
+  /**
    * Resolves the incomplete URI.
    * Then, fix the invalid symbols for ".." and "./" etc hierarchies.
    *
@@ -12151,6 +12451,7 @@ Pot.update({
   urlEncode          : Pot.URI.urlEncode,
   urlDecode          : Pot.URI.urlDecode,
   parseURI           : Pot.URI.parseURI,
+  buildURI           : Pot.URI.buildURI,
   resolveRelativeURI : Pot.URI.resolveRelativeURI,
   getExt             : Pot.URI.getExt,
   toDataURI          : Pot.URI.toDataURI
@@ -20613,7 +20914,52 @@ update(Pot.Complex, {
         upper : function(/*[addSharp]*/) {
           return Pot.Complex.rand.color.apply(null, arguments).toUpperCase();
         }
-      })
+      }),
+      /**
+       * @lends Pot.Complex.rand
+       */
+      /**
+       * Returns a string that converted by random case-sensitive of
+       *   the alphabet in a given string.
+       *
+       *
+       * @example
+       *   var s = 'd41d8cd98f00b204e9800998ecf8427e';
+       *   debug(rand.caseOf(s));
+       *   // @results
+       *   // e.g. 'D41D8Cd98F00b204E9800998Ecf8427e'
+       *
+       *
+       * @param  {String}  string  Target string.
+       * @return {String}          The result string.
+       *
+       * @name Pot.Complex.rand.caseOf
+       * @class
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       */
+      caseOf : function(string) {
+        var result = '', s, i, len, c;
+        s = stringify(string);
+        if (s) {
+          len = s.length;
+          for (i = 0; i < len; i++) {
+            c = s.charAt(i);
+            if ((c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z')) {
+              if (Math.random() * 10 >>> 0 < 5) {
+                c = c.toLowerCase();
+              } else {
+                c = c.toUpperCase();
+              }
+            }
+            result += c;
+          }
+        }
+        return result;
+      }
     };
   })()),
   /**
@@ -22772,6 +23118,364 @@ update(Pot.Text, {
    */
   stringify : stringify,
   /**
+   * This class will be replace a particular string to temporary string,
+   *  and execute the conventional process,
+   *  and after back replace to the original string,
+   *  these heavy step so just to make easier by this function.
+   *
+   *
+   * @example
+   *   // This sample code is process to leaving only the 'pre' tags,
+   *   //  and replace all other HTML tags are escaped.
+   *   var myProcess = function(string) {
+   *     return string.replace(/&/g, '&amp;').
+   *                   replace(/</g, '&lt;').
+   *                   replace(/>/g, '&gt;');
+   *   };
+   *   var string =
+   *     '<pre>\n' +
+   *       '<b>var</b> foo = 1;\n' +
+   *     '</pre>\n' +
+   *     '<div>hoge</div>\n' +
+   *     '<div>fuga</div>\n' +
+   *     '<p onclick="alert(1)">piyo</p>\n' +
+   *     '<pre>\n' +
+   *       '<b>foo</b>\n' +
+   *       'bar\n' +
+   *       '<i>baz</i>\n' +
+   *     '</pre>';
+   *   var pattern = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi;
+   *   // The string or Array that must not appear in the saved string.
+   *   var reserve = ['<', '>'];
+   *   var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+   *   // Save and replace string for your replace process.
+   *   var result = rs.save();
+   *   // Execute your replace process.
+   *   result = myProcess(result);
+   *   // Load and replace from saved string.
+   *   result = rs.load(result);
+   *   debug(result);
+   *   // @results
+   *   //   <pre>
+   *   //     <b>var</b> foo = 1;
+   *   //   </pre>
+   *   //   &lt;div&gt;hoge&lt;/div&gt;
+   *   //   &lt;div&gt;fuga&lt;/div&gt;
+   *   //   &lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;
+   *   //   <pre>
+   *   //     <b>foo</b>
+   *   //     bar
+   *   //     <i>baz</i>
+   *   //   </pre>
+   *
+   *
+   * @param  {String}               string   The target string.
+   * @param  {String|RegExp|Array}  pattern  The pattern(s) to save string.
+   * @param  {String|Array}        (reserve) The reserve keyword(s) for
+   *                                         your replace process.
+   * @return {Pot.ReplaceSaver}              Returns an instance of
+   *                                           Pot.ReplaceSaver.
+   * @name Pot.Text.ReplaceSaver
+   * @constructor
+   * @public
+   */
+  ReplaceSaver : (function() {
+    /**@ignore*/
+    var Saver = function(string, pattern, reserve) {
+      return new Saver.prototype.init(string, pattern, reserve);
+    };
+    Saver.prototype = update(Saver.prototype, {
+      /**
+       * @lends Pot.Text.ReplaceSaver
+       */
+      /**
+       * @ignore
+       */
+      constructor : Saver,
+      /**
+       * @const
+       * @private
+       * @ignore
+       */
+      id : Pot.Internal.getMagicNumber(),
+      /**
+       * @const
+       * @private
+       */
+      serial : null,
+      /**
+       * @private
+       * @readonly
+       * @const
+       * @ignore
+       */
+      NAME : 'ReplaceSaver',
+      /**
+       * toString.
+       *
+       * @return  Return formatted string of object.
+       * @type Function
+       * @function
+       * @static
+       * @public
+       */
+      toString : Pot.toString,
+      /**
+       * @ignore
+       * @private
+       */
+      saving : [],
+      /**
+       * @ignore
+       * @private
+       */
+      strings : [],
+      /**
+       * @ignore
+       * @private
+       */
+      patterns : [],
+      /**
+       * @ignore
+       * @private
+       */
+      reserves : [],
+      /**
+       * Initialize.
+       *
+       * @ignore
+       * @private
+       */
+      init : function(string, pattern, reserve) {
+        if (!this.serial) {
+          this.serial = buildSerial(this);
+        }
+        this.setString(string);
+        this.setPattern(pattern);
+        this.setReserve(reserve);
+        return this;
+      },
+      /**
+       * Set the string.
+       *
+       * @param  {String}            string  The target string.
+       * @return {Pot.ReplaceSaver}          Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setString : function(string) {
+        if (Pot.isScalar(string)) {
+          this.strings[this.strings.length] = stringify(string);
+        }
+      },
+      /**
+       * Set the reserve keyword(s).
+       *
+       * @param  {String|Array}     reserve  The reserve keyword(s).
+       * @return {Pot.ReplaceSaver}          Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setReserve : function(reserve) {
+        var rvs = this.reserves;
+        each(arrayize(reserve), function(resv) {
+          if (Pot.isScalar(resv)) {
+            rvs[rvs.length] = stringify(resv);
+          }
+        });
+      },
+      /**
+       * Generate the unique string.
+       *
+       * @return {String} The unique string.
+       * @type  Function
+       * @function
+       * @ignore
+       * @private
+       */
+      generateUniqString : function() {
+        var s = this.strings.join(''),
+            re = new RegExp('[' +
+              rescape(this.reserves.join('')) +
+            ']', 'g'),
+            sc = String.fromCharCode,
+            uniq, n = 0;
+        do {
+          uniq = sc(
+            n, n, Math.random() * 0xFFFF >>> 0, n, n
+          );
+          uniq += uniq + uniq + sc(n, n);
+          if (~s.indexOf(uniq)) {
+            uniq += (+new Date) + uniq;
+          }
+          uniq = uniq.replace(re, '');
+          if (++n >= 0xFFFE) {
+            n = 0;
+          }
+        } while (~s.indexOf(uniq));
+        return uniq;
+      },
+      /**
+       * Set the pattern(s).
+       *
+       * @param  {String|RegExp|Array} pattern The pattern(s).
+       * @return {Pot.ReplaceSaver}            Return this.
+       * @type  Function
+       * @function
+       * @public
+       */
+      setPattern : function(pattern) {
+        var pt = this.patterns;
+        each(arrayize(pattern), function(p) {
+          var item = arrayize(p), search, index, v, i;
+          try {
+            v = item[0];
+            i = item[1];
+            if (Pot.isScalar(v)) {
+              search = stringify(v);
+            } else if (Pot.isRegExp(v)) {
+              search = v;
+            }
+            if (search != null) {
+              if (!i) {
+                index = 0;
+              } else if (Pot.isNumeric(i)) {
+                index = Math.floor(i - 0) || 0;
+              } else if (Pot.isFunction(i)) {
+                index = i;
+              } else {
+                index = 0;
+              }
+              pt[pt.length] = [search, index];
+            }
+          } catch (e) {}
+        });
+      },
+      /**
+       * Save the string by specified pattern(s).
+       *
+       *
+       * @example
+       *   // This sample code is process to leaving only the 'pre' tags,
+       *   //  and replace all other HTML tags are escaped.
+       *   var myProcess = function(string) {
+       *     return string.replace(/&/g, '&amp;').
+       *                   replace(/</g, '&lt;').
+       *                   replace(/>/g, '&gt;');
+       *   };
+       *   var string =
+       *     '<pre>\n' +
+       *       '<b>var</b> foo = 1;\n' +
+       *     '</pre>\n' +
+       *     '<div>hoge</div>\n' +
+       *     '<div>fuga</div>\n' +
+       *     '<p onclick="alert(1)">piyo</p>\n' +
+       *     '<pre>\n' +
+       *       '<b>foo</b>\n' +
+       *       'bar\n' +
+       *       '<i>baz</i>\n' +
+       *     '</pre>';
+       *   var pattern = /<pre\b[^>]*>([\s\S]*?)<\/pre>/gi;
+       *   // The string or Array that must not appear in the saved string.
+       *   var reserve = ['<', '>'];
+       *   var rs = new Pot.Text.ReplaceSaver(string, pattern, reserve);
+       *   // Save and replace string for your replace process.
+       *   var result = rs.save();
+       *   // Execute your replace process.
+       *   result = myProcess(result);
+       *   // Load and replace from saved string.
+       *   result = rs.load(result);
+       *   debug(result);
+       *   // @results
+       *   //   <pre>
+       *   //     <b>var</b> foo = 1;
+       *   //   </pre>
+       *   //   &lt;div&gt;hoge&lt;/div&gt;
+       *   //   &lt;div&gt;fuga&lt;/div&gt;
+       *   //   &lt;p onclick="alert(1)"&gt;piyo&lt;/p&gt;
+       *   //   <pre>
+       *   //     <b>foo</b>
+       *   //     bar
+       *   //     <i>baz</i>
+       *   //   </pre>
+       *
+       *
+       * @return {String} Returns a string that is replaced by
+       *                  specified pattern(s).
+       * @type  Function
+       * @function
+       * @public
+       */
+      save : function() {
+        var result = '', that = this, args = arguments,
+            saving = this.saving, patterns = this.patterns,
+            pattern, search, index, uniq, s, i, len;
+        if (args.length) {
+          this.init.apply(this, args);
+        }
+        s = stringify(this.strings.pop());
+        if (s) {
+          len = patterns.length;
+          for (i = 0; i < len; i++) {
+            pattern = patterns[i];
+            search  = pattern[0];
+            index   = pattern[1];
+            if (search == null) {
+              continue;
+            }
+            s = s.replace(search, function() {
+              var matches = arrayize(arguments), idx;
+              if (Pot.isFunction(index)) {
+                idx = index(matches) || 0;
+              } else {
+                idx = (index - 0) || 0;
+              }
+              uniq = that.generateUniqString();
+              saving[saving.length] = [matches[idx], uniq];
+              return uniq;
+            });
+          }
+          result = s;
+        }
+        return result;
+      },
+      /**
+       * Load the original string from saved string.
+       *
+       * @see Pot.Text.ReplaceSaver.save
+       *
+       * @param  {String}   result  The saved string.
+       * @return {String}           Returns the original string.
+       * @type  Function
+       * @function
+       * @public
+       */
+      load : function(result) {
+        var r = stringify(result), saving = this.saving,
+            i, sv, match, uniq;
+        for (i = saving.length - 1; i >= 0; --i) {
+          sv = saving[i];
+          try {
+            match = sv[0];
+            uniq = sv[1];
+            if (match == null || uniq == null) {
+              throw match;
+            }
+          } catch (e) {
+            continue;
+          }
+          r = r.split(uniq).join(match);
+        }
+        saving.splice(0);
+        return r;
+      }
+    });
+    Saver.prototype.init.prototype = Saver.prototype;
+    return Saver;
+  }()),
+  /**
    * Shortcut of String.fromCharCode().
    * This function fixed an error on 'stack overflow' (or RangeError).
    * e.g. String.fromCharCode.apply(null, new Array(100000000));
@@ -23727,28 +24431,31 @@ update(Pot.Text, {
      * @ignore
      */
     patterns : {
-      inline : new RegExp(['^(?:<|)(', ')(?:[^>]*>|)$'].join([
-        '(?:a|b|i|q|s|u|abbr|acronym|applet|big|cite',
-          '|code|dfn|em|font|iframe|kbd|label|object',
-          '|samp|small|span|strike|strong|sub|sup|tt',
-          '|var|bdo|button|del|ruby|img|input|select',
-          '|embed|ins|keygen|textarea|map|canvas|svg',
-          '|audio|command|mark|math|meter|time|video',
-          '|datalist|progress|output|\\w+:\\w+',
-        ')\\b'
-      ].join('')), 'i'),
+      inline : new RegExp(['^(?:<|)(', ')(?:[^>]*>|)$'].join(
+          '(?:a|b|i|q|s|u|abbr|acronym|applet|big|cite' +
+            '|code|dfn|em|font|iframe|kbd|label|object' +
+            '|samp|small|span|strike|strong|sub|sup|tt' +
+            '|var|bdo|button|del|ruby|img|input|select' +
+            '|embed|ins|keygen|textarea|map|canvas|svg' +
+            '|audio|command|mark|math|meter|time|video' +
+            '|datalist|progress|output|\\w+:\\w+' +
+          ')\\b'
+        ),
+        'i'
+      ),
       xml  : /<\s*\w+[^>]*\/>/,
       nl   : /\r\n|\r|\n/,
       nlg  : /(\r\n|\r|\n)/g,
       rt   : /[\s\u00A0\u3000]+$/,
       top  : /^[\s\u00A0\u3000]*<\s*(\/|)\s*(\w+(?::\w+|))\b[^>]*(\/|)>/,
       end  : /<\s*(\/|)\s*(\w+(?::\w+|))\b[^>]*(\/|)>[\s\u00A0\u3000]*$/,
-      code : new RegExp([
-        '(<(pre|style|script)\\b[^>]*>[\\s\\S]*?</\\2\\s*>',
-        '|<!--[\\s\\S]*?-->',
-        '|<!\\[CDATA\\[[\\s\\S]*?\\]\\]>',
-        ')'
-      ].join(''), 'gi')
+      code : new RegExp(
+        '(<(pre|style|script)\\b[^>]*>[\\s\\S]*?</\\2\\s*>' +
+        '|<!--[\\s\\S]*?-->' +
+        '|<!\\[CDATA\\[[\\s\\S]*?\\]\\]>' +
+        ')',
+        'gi'
+      )
     },
     /**
      * @private
@@ -24302,6 +25009,7 @@ update(Pot.Text, {
 // Update Pot object.
 Pot.update({
   stringify      : Pot.Text.stringify,
+  ReplaceSaver   : Pot.Text.ReplaceSaver,
   chr            : Pot.Text.chr,
   ord            : Pot.Text.ord,
   trim           : Pot.Text.trim,
@@ -25117,8 +25825,8 @@ update(DOM, {
     }
     /**@ignore*/
     function byPseudo(o, op, doc, multi) {
-      var result = [], elems, context, elem, i, len,
-          node, parent, count, ok, attr, type, name,
+      var result = [], elems, context, elem, i, len, node,
+          parent, count, ok, attr, type, name, checkSelect,
           pseudo = stringify(op, true).toLowerCase();
       if (!pseudo) {
         return multi ? [] : null;
@@ -25207,7 +25915,7 @@ update(DOM, {
                 throw false;
             case 'selected':
                 if (elem.parentNode) {
-                  elem.parentNode.selectedIndex;
+                  checkSelect = elem.parentNode.selectedIndex;
                 }
                 if (elem.selected) {
                   break;
@@ -27969,6 +28677,13 @@ update(Pot.Internal, {
     update                  : update,
     PATH_DELIMITER          : Pot.PATH_DELIMITER,
     DIR_DELIMITER           : Pot.DIR_DELIMITER,
+    XML_NS_URI              : Pot.XML_NS_URI,
+    HTML_NS_URI             : Pot.HTML_NS_URI,
+    XHTML_NS_URI            : Pot.XHTML_NS_URI,
+    XLINK_NS_URI            : Pot.XLINK_NS_URI,
+    XSL_NS_URI              : Pot.XSL_NS_URI,
+    SVG_NS_URI              : Pot.SVG_NS_URI,
+    XUL_NS_URI              : Pot.XUL_NS_URI,
     isBoolean               : Pot.isBoolean,
     isNumber                : Pot.isNumber,
     isString                : Pot.isString,
@@ -27983,6 +28698,7 @@ update(Pot.Internal, {
     StopIteration           : Pot.StopIteration,
     isStopIter              : Pot.isStopIter,
     isIterable              : Pot.isIterable,
+    isScalar                : Pot.isScalar,
     isArrayLike             : Pot.isArrayLike,
     isPlainObject           : Pot.isPlainObject,
     isEmpty                 : Pot.isEmpty,
@@ -28040,6 +28756,7 @@ update(Pot.Internal, {
     localEval               : Pot.localEval,
     hasReturn               : Pot.hasReturn,
     override                : Pot.override,
+    getErrorMessage         : Pot.getErrorMessage,
     currentWindow           : Pot.currentWindow,
     currentDocument         : Pot.currentDocument,
     currentURI              : Pot.currentURI,
@@ -28050,6 +28767,7 @@ update(Pot.Internal, {
     urlEncode               : Pot.URI.urlEncode,
     urlDecode               : Pot.URI.urlDecode,
     parseURI                : Pot.URI.parseURI,
+    buildURI                : Pot.URI.buildURI,
     resolveRelativeURI      : Pot.URI.resolveRelativeURI,
     getExt                  : Pot.URI.getExt,
     toDataURI               : Pot.URI.toDataURI,
@@ -28138,6 +28856,7 @@ update(Pot.Internal, {
     getExtByMimeType        : Pot.MimeType.getExtByMimeType,
     getMimeTypeByExt        : Pot.MimeType.getMimeTypeByExt,
     stringify               : Pot.Text.stringify,
+    ReplaceSaver            : Pot.Text.ReplaceSaver,
     chr                     : Pot.Text.chr,
     ord                     : Pot.Text.ord,
     trim                    : Pot.Text.trim,

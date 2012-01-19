@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.28, 2012-01-11
+ * Version 1.29, 2012-01-19
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -32,8 +32,8 @@
  *
  * @fileoverview   PotLite.js utility library
  * @author         polygon planet
- * @version        1.28
- * @date           2012-01-11
+ * @version        1.29
+ * @date           2012-01-19
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.28', TYPE : 'lite'},
+var Pot = {VERSION : '1.29', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -976,6 +976,41 @@ Pot.update({
   isIterable : function(x) {
     return !!(x && Pot.isFunction(x.next) &&
          (~x.next.toString().indexOf(SI) || Pot.isNativeCode(x.next)));
+  },
+  /**
+   * Return whether the argument is scalar type.
+   * This function treats as scalar type for
+   *   String or Number and Boolean types.
+   *
+   *
+   * @example
+   *   debug(isScalar(null));              // false
+   *   debug(isScalar((void 0)));          // false
+   *   debug(isScalar(''));                // true
+   *   debug(isScalar('abc'));             // true
+   *   debug(isScalar(0));                 // true
+   *   debug(isScalar(123));               // true
+   *   debug(isScalar(false));             // true
+   *   debug(isScalar(true));              // true
+   *   debug(isScalar(new Boolean(true))); // true
+   *   debug(isScalar([]));                // false
+   *   debug(isScalar([1, 2, 3]));         // false
+   *   debug(isScalar(/hoge/));            // false
+   *   debug(isScalar(new Error()));       // false
+   *   debug(isScalar({}));                // false
+   *   debug(isScalar({a: 1, b: 2}));      // false
+   *
+   *
+   * @param   {*}         x     A target object.
+   * @return  {Boolean}         ture or false (scalar type or not).
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isScalar : function(x) {
+    return x != null &&
+      (Pot.isString(x) || Pot.isNumber(x) || Pot.isBoolean(x));
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -2291,6 +2326,32 @@ Pot.update({
       });
     }
     return object;
+  },
+  /**
+   * Get the error message from Error object.
+   *
+   *
+   * @example
+   *   var error = new Error('MyError!');
+   *   debug(getErrorMessage(error));
+   *   // @results 'MyError!'
+   *
+   *
+   * @param  {Error|*}    error      Error object.
+   * @param  {String|*}  (defaults)  Optional message.
+   * @return {String}                Return the error message, or 'error'.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  getErrorMessage : function(error, defaults) {
+    var msg;
+    if (Pot.isError(error)) {
+      msg = String(error.message  || error.description ||
+                  (error.toString && error.toString()) || error);
+    }
+    return stringify(msg) || stringify(defaults) || 'error';
   }
 });
 
@@ -14925,6 +14986,7 @@ update(Pot.Internal, {
     StopIteration           : Pot.StopIteration,
     isStopIter              : Pot.isStopIter,
     isIterable              : Pot.isIterable,
+    isScalar                : Pot.isScalar,
     isArrayLike             : Pot.isArrayLike,
     isDeferred              : Pot.isDeferred,
     isIter                  : Pot.isIter,
@@ -14976,6 +15038,7 @@ update(Pot.Internal, {
     localEval               : Pot.localEval,
     hasReturn               : Pot.hasReturn,
     override                : Pot.override,
+    getErrorMessage         : Pot.getErrorMessage,
     currentWindow           : Pot.currentWindow,
     currentDocument         : Pot.currentDocument,
     currentURI              : Pot.currentURI,
