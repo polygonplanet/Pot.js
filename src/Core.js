@@ -505,7 +505,7 @@ Pot.update({
    * @static
    * @const
    */
-  XUL_NS_URI : XUL_NS_URI,
+  XUL_NS_URI : XUL_NS_URI
 });
 /*{#endif}*/
 // Definition of System.
@@ -1042,6 +1042,41 @@ Pot.update({
   isIterable : function(x) {
     return !!(x && Pot.isFunction(x.next) &&
          (~x.next.toString().indexOf(SI) || Pot.isNativeCode(x.next)));
+  },
+  /**
+   * Return whether the argument is scalar type.
+   * This function treats as scalar type for
+   *   String or Number and Boolean types.
+   *
+   *
+   * @example
+   *   debug(isScalar(null));              // false
+   *   debug(isScalar((void 0)));          // false
+   *   debug(isScalar(''));                // true
+   *   debug(isScalar('abc'));             // true
+   *   debug(isScalar(0));                 // true
+   *   debug(isScalar(123));               // true
+   *   debug(isScalar(false));             // true
+   *   debug(isScalar(true));              // true
+   *   debug(isScalar(new Boolean(true))); // true
+   *   debug(isScalar([]));                // false
+   *   debug(isScalar([1, 2, 3]));         // false
+   *   debug(isScalar(/hoge/));            // false
+   *   debug(isScalar(new Error()));       // false
+   *   debug(isScalar({}));                // false
+   *   debug(isScalar({a: 1, b: 2}));      // false
+   *
+   *
+   * @param   {*}         x     A target object.
+   * @return  {Boolean}         ture or false (scalar type or not).
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isScalar : function(x) {
+    return x != null &&
+      (Pot.isString(x) || Pot.isNumber(x) || Pot.isBoolean(x));
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -2613,6 +2648,32 @@ Pot.update({
       });
     }
     return object;
+  },
+  /**
+   * Get the error message from Error object.
+   *
+   *
+   * @example
+   *   var error = new Error('MyError!');
+   *   debug(getErrorMessage(error));
+   *   // @results 'MyError!'
+   *
+   *
+   * @param  {Error|*}    error      Error object.
+   * @param  {String|*}  (defaults)  Optional message.
+   * @return {String}                Return the error message, or 'error'.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  getErrorMessage : function(error, defaults) {
+    var msg;
+    if (Pot.isError(error)) {
+      msg = String(error.message  || error.description ||
+                  (error.toString && error.toString()) || error);
+    }
+    return stringify(msg) || stringify(defaults) || 'error';
   }
 });
 
