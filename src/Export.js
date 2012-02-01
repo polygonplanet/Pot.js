@@ -376,6 +376,7 @@ update(Pot.Internal, {
     camelize                : Pot.Text.camelize,
     hyphenize               : Pot.Text.hyphenize,
     underscore              : Pot.Text.underscore,
+    extract                 : Pot.Text.extract,
     inc                     : Pot.Text.inc,
     dec                     : Pot.Text.dec,
     br                      : Pot.Text.br,

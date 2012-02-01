@@ -1034,6 +1034,66 @@ update(Pot.Text, {
     return stringify(s).replace(/([A-Z]+)/g, '_$1').toLowerCase();
   },
   /**
+   * Extract a substring from string .
+   *
+   *
+   * @example
+   *   var result = extract('foo:bar', /:(\w+)$/);
+   *   debug(result);
+   *   // @results 'bar'
+   *
+   *
+   * @example
+   *   var result = extract('foo:bar', /^:(\w+)/);
+   *   debug(result);
+   *   // @results ''
+   *
+   *
+   * @example
+   *   var result = extract('foo.html', /(foo|bar)\.([^.]+)$/, 2);
+   *   debug(result);
+   *   // @results 'html'
+   *
+   *
+   * @example
+   *   var result = extract('foobar', 'foo');
+   *   debug(result);
+   *   // @results 'foo'
+   *
+   *
+   * @example
+   *   var result = extract('foobar', 'fo+');
+   *   debug(result);
+   *   // @results ''
+   *
+   *
+   * @param  {String|*}       string    A target string.
+   * @param  {RegExp|String}  pattern   A pattern for extract substring.
+   * @param  {Number}         (index)   (Optional) Index number of
+   *                                      captured group.
+   * @return {String}                   Return extracted substring.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  extract : function(string, pattern, index) {
+    var r = '', s = stringify(string), re, idx, m;
+    if (s && pattern) {
+      if (Pot.isRegExp(pattern)) {
+        re = pattern;
+      } else {
+        re = new RegExp(Pot.rescape(pattern));
+      }
+      idx = (index != null && Pot.isNumeric(index)) ? index : 1;
+      m = s.match(re);
+      if (m) {
+        r = r + m[(m[idx] == null) ? 0 : idx];
+      }
+    }
+    return r;
+  },
+  /**
    * Increment the argument value.
    * This incrementation like Perl and PHP etc that
    *   uses alphabets [a-z] + [A-Z] and digits [0-9]
@@ -1995,6 +2055,7 @@ Pot.update({
   camelize       : Pot.Text.camelize,
   hyphenize      : Pot.Text.hyphenize,
   underscore     : Pot.Text.underscore,
+  extract        : Pot.Text.extract,
   inc            : Pot.Text.inc,
   dec            : Pot.Text.dec,
   br             : Pot.Text.br,
