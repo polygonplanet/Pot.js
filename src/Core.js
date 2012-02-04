@@ -27,6 +27,7 @@ XLINK_NS_URI = 'http://www.w3.org/1999/xlink',
 XSL_NS_URI   = 'http://www.w3.org/1999/XSL/Transform',
 SVG_NS_URI   = 'http://www.w3.org/2000/svg',
 XUL_NS_URI   = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+JS_VOID_URI  = 'javascript:void(0)',
 
 // Constant strings.
 UPPER_ALPHAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -505,7 +506,15 @@ Pot.update({
    * @static
    * @const
    */
-  XUL_NS_URI : XUL_NS_URI
+  XUL_NS_URI : XUL_NS_URI,
+  /**
+   * JavaScript void URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  JS_VOID_URI : JS_VOID_URI
 });
 /*{#endif}*/
 // Definition of System.
@@ -1454,7 +1463,7 @@ Pot.update({
    *
    *
    * @param  {Number}   n  The number to test.
-   * @return {boolean}     Whether `n` is an integer.
+   * @return {Boolean}     Whether `n` is an integer.
    * @type Function
    * @function
    * @static
@@ -2891,7 +2900,7 @@ function numeric(value, defaults) {
  * @ignore
  */
 function now() {
-  return (new Date()).getTime();
+  return +new Date;
 }
 
 /**
@@ -3582,10 +3591,10 @@ Pot.update({
    *
    * @example
    *   var time = now(); // equals (new Date()).getTime();
-   *   debug(time); // 1323446177282
+   *   debug(time); // e.g. 1323446177282
    *
    *
-   * @return    Return the current time as milliseconds.
+   * @return {Number} Return the current time as milliseconds.
    *
    * @type  Function
    * @function
