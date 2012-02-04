@@ -673,7 +673,9 @@ update(Pot.Struct, {
         case 'object':
         case 'function':
             for (p in o) {
-              c++;
+              if (hasOwnProperty.call(o, p)) {
+                c++;
+              }
             }
             break;
         case 'number':
@@ -1042,15 +1044,17 @@ update(Pot.Struct, {
         case 'object':
             result = {};
             for (i in object) {
-              try {
-                if (!done &&
-                    ((!loose && object[i] === subject) ||
-                     (loose  && object[i] ==  subject))) {
-                  done = true;
-                } else {
-                  result[i] = object[i];
-                }
-              } catch (e) {}
+              if (hasOwnProperty.call(object, i)) {
+                try {
+                  if (!done &&
+                      ((!loose && object[i] === subject) ||
+                       (loose  && object[i] ==  subject))) {
+                    done = true;
+                  } else {
+                    result[i] = object[i];
+                  }
+                } catch (e) {}
+              }
             }
             break;
         case 'number':
@@ -1129,13 +1133,15 @@ update(Pot.Struct, {
         case 'object':
             result = {};
             for (i in object) {
-              try {
-                if ((!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
-                  continue;
-                }
-                result[i] = object[i];
-              } catch (e) {}
+              if (hasOwnProperty.call(object, i)) {
+                try {
+                  if ((!loose && object[i] === subject) ||
+                      (loose  && object[i] ==  subject)) {
+                    continue;
+                  }
+                  result[i] = object[i];
+                } catch (e) {}
+              }
             }
             break;
         case 'number':
@@ -1212,12 +1218,14 @@ update(Pot.Struct, {
             result = {};
             n = 0;
             for (i in object) {
-              if (n < idx || n > idx + len) {
-                try {
-                  result[i] = object[i];
-                } catch (e) {}
+              if (hasOwnProperty.call(object, i)) {
+                if (n < idx || n > idx + len) {
+                  try {
+                    result[i] = object[i];
+                  } catch (e) {}
+                }
+                n++;
               }
-              n++;
             }
             break;
         case 'number':
@@ -1369,24 +1377,28 @@ update(Pot.Struct, {
               } else {
                 keys = [];
                 for (p in subject) {
-                  keys[keys.length] = p;
+                  if (hasOwnProperty.call(subject, p)) {
+                    keys[keys.length] = p;
+                  }
                 }
                 len = keys.length;
                 i = 0;
                 result = true;
                 for (p in object) {
-                  if (!(i in keys) || keys[i] !== p) {
-                    result = false;
-                    break;
-                  }
-                  try {
-                    v = object[p];
-                    if (!cmp(v, subject[p])) {
+                  if (hasOwnProperty.call(object, p)) {
+                    if (!(i in keys) || keys[i] !== p) {
                       result = false;
                       break;
                     }
-                  } catch (e) {}
-                  i++;
+                    try {
+                      v = object[p];
+                      if (!cmp(v, subject[p])) {
+                        result = false;
+                        break;
+                      }
+                    } catch (e) {}
+                    i++;
+                  }
                 }
               }
             }
@@ -1606,12 +1618,14 @@ update(Pot.Struct, {
    * @public
    */
   flip : function(o) {
-    var result;
+    var result, sc;
     switch (Pot.typeLikeOf(o)) {
       case 'object':
           result = {};
           each(o, function(v, k) {
-            result[stringify(v, true)] = k;
+            if (hasOwnProperty.call(o, k)) {
+              result[stringify(v, true)] = k;
+            }
           });
           break;
       case 'array':
@@ -1624,8 +1638,9 @@ update(Pot.Struct, {
           break;
       case 'string':
           result = '';
+          sc = String.fromCharCode;
           each(o.split(''), function(c) {
-            result += String.fromCharCode(
+            result += sc(
               c.charCodeAt(0) ^ 0xFFFF
             );
           });

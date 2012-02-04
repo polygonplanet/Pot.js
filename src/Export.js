@@ -184,7 +184,8 @@ update(Pot.Internal, {
     XLINK_NS_URI            : Pot.XLINK_NS_URI,
     XSL_NS_URI              : Pot.XSL_NS_URI,
     SVG_NS_URI              : Pot.SVG_NS_URI,
-    XUL_NS_URI              : Pot.XUL_NS_URI,/*{#endif}*/
+    XUL_NS_URI              : Pot.XUL_NS_URI,
+    JS_VOID_URI             : Pot.JS_VOID_URI,/*{#endif}*/
     isBoolean               : Pot.isBoolean,
     isNumber                : Pot.isNumber,
     isString                : Pot.isString,
