@@ -61,6 +61,9 @@ update(Pot.Net, {
    *                                 - headers     : {Object}    null
    *                                 - mimeType    : {String}    null
    *                                 - cache       : {Boolean}   true
+   *                                 - binary      : {Boolean}   false
+   *                                 - cookie      : {Boolean}   false
+   *                                 - crossDomain : {Boolean}   false
    *                                 </pre>
    * @return {Deferred}            Return the instance of Pot.Deferred.
    * @type Function
@@ -177,6 +180,9 @@ update(Pot.Net, {
      *                                 - headers     : {Object}    null
      *                                 - mimeType    : {String}    null
      *                                 - cache       : {Boolean}   true
+     *                                 - binary      : {Boolean}   false
+     *                                 - cookie      : {Boolean}   false
+     *                                 - crossDomain : {Boolean}   false
      *                                 </pre>
      * @return {Deferred}            Return the instance of Pot.Deferred.
      * @type Function
@@ -188,7 +194,11 @@ update(Pot.Net, {
       /**@ignore*/
       var Request = function(url, options) {
         return new Request.prototype.doit(url, options);
-      };
+      },
+      PATTERNS = {
+        URI : /^([^:]+)(?::+\/{0,}((?:[^@]+@|)[^\/\\?&#:;]*)(?::(\d+)|)|)/
+      },
+      CURRENT_URIS = PATTERNS.URI.exec(Pot.currentURI().toLowerCase()) || [];
       Request.prototype = update(Request.prototype, {
         /**
          * @ignore
@@ -257,17 +267,22 @@ update(Pot.Net, {
          * @ignore
          */
         setOptions : function(options) {
-          var defaults, opts;
-          defaults = {
+          var opts, parts, defaults = {
             method      : 'GET',
             sendContent : null,
             queryString : null,
             callback    : null,
             username    : null,
             password    : null,
-            headers     : null,
             mimeType    : null,
-            cache       : true
+            binary      : false,
+            cache       : true,
+            cookie      : false,
+            crossDomain : null,
+            headers     : {
+              'Accept'           : ['*/'] + ['*'], //XXX: Check MimeType.
+              'X-Requested-With' : 'XMLHttpRequest'
+            }
           };
           if (Pot.isObject(options)) {
             opts = update({}, options);
@@ -294,6 +309,17 @@ update(Pot.Net, {
                this.options.method === 'HEAD')) {
             this.url = addNoCache(this.url);
           }
+          if (this.options.crossDomain == null) {
+            parts = PATTERNS.URI.exec(Pot.currentURI().toLowerCase());
+            this.options.crossDomain = !!(parts &&
+              (parts[1] !== CURRENT_URIS[1] ||
+               parts[2] !== CURRENT_URIS[2] ||
+               parts[3] !== CURRENT_URIS[3])
+            );
+          }
+          if (this.options.binary && !this.options.mimeType) {
+            this.options.mimeType = 'text/plain; charset=x-user-defined';
+          }
         },
         /**
          * @private
@@ -319,13 +345,18 @@ update(Pot.Net, {
         setHeaders : function() {
           var that = this, contentType;
           try {
+            if (this.options.cookie) {
+              try {
+                // https://developer.mozilla.org/en/HTTP_access_control
+                this.xhr.withCredentials = 'true';
+              } catch (e) {}
+            }
             try {
               if (this.xhr.overrideMimeType &&
                   this.options.mimeType != null) {
                 this.xhr.overrideMimeType(this.options.mimeType);
               }
             } catch (e) {}
-            this.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             if (this.options.contentType != null) {
               contentType = this.options.contentType;
             }
@@ -368,11 +399,11 @@ update(Pot.Net, {
               // 1223 is apparently a bug in IE
               if ((status >= 200 && status < 300) ||
                   status === 304 || status === 1223) {
+                that.assignResponseText();
                 if (Pot.isFunction(that.options.callback)) {
                   Pot.Deferred.flush(function() {
                     that.options.callback.call(
-                      that.xhr,
-                      that.xhr.responseText, that.xhr
+                      that.xhr, that.xhr.responseText, that.xhr
                     );
                   }).ensure(function(res) {
                     that.deferred.begin(that.xhr);
@@ -388,6 +419,30 @@ update(Pot.Net, {
               }
             }
           };
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        assignResponseText : function() {
+          var i, len, bytes, chars, sc, c, s;
+          if (this.options.binary) {
+            bytes = [];
+            chars = [];
+            s = this.xhr.responseText || '';
+            len = s.length;
+            sc = String.fromCharCode;
+            for (i = 0; i < len; i++) {
+              c = s.charCodeAt(i) & 0xFF;
+              bytes[i] = c;
+              chars[i] = sc(c);
+            }
+            try {
+              this.xhr.originalText  = s;
+              this.xhr.responseBytes = bytes;
+              this.xhr.responseText  = chars.join('');
+            } catch (e) {}
+          }
         },
         /**
          * @private
@@ -628,12 +683,12 @@ update(Pot.Net, {
        * @ignore
        */
       defaultHeaders : {
-        'Accept'     : '*/*',
+        'Accept'     : ['*/'] + ['*'],
         'User-Agent' : [
-          'Pot.js/', Pot.VERSION,
-          ' ', Pot.TYPE,
-          ' ', '(Node.js; *)'
-        ].join('')
+          'Pot.js/' + Pot.VERSION,
+          Pot.TYPE,
+          '(Node.js; *)'
+        ].join(' ')
       },
       /**
        * @private
@@ -788,7 +843,7 @@ update(Pot.Net, {
       });
       return (new SimpleRequestByNode(opts)).deferred;
     };
-  })(),
+  }()),
   /**
    * Send request by JSONP.
    *
@@ -953,7 +1008,40 @@ update(Pot.Net, {
       }
       return d;
     };
-  })(),
+  }()),
+  /**
+   * Get the JSON data by HTTP GET request.
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/hoge.json';
+   *   getJSON(url).then(function(data) {
+   *     debug(data.results[0].text);
+   *   });
+   *
+   *
+   * @param  {String}     url      The request URL.
+   * @param  {Object}   (options)  Request options. (@see Pot.Net.request)
+   * @return {Deferred}            Return the instance of Pot.Deferred.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  getJSON : (function() {
+    var fixJson = /^[^{]*|[^}]*$/g;
+    return function(url, options) {
+      return Pot.Net.request(url, update({
+        mimeType : 'text/javascript',
+        headers  : {
+          'Content-Type' : 'text/javascript'
+        }
+      }, options || {})).then(function(res) {
+        var data = trim(res && res.responseText).replace(fixJson, '');
+        return Pot.Serializer.parseFromJSON(data);
+      });
+    };
+  }()),
   /**
    * Non-blocking script loader.
    *
@@ -1059,7 +1147,7 @@ update(Pot.Net, {
       }
       return d;
     };
-  })()
+  }())
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -1152,7 +1240,8 @@ function insertId(url, id, defaults) {
 Pot.update({
   request    : Pot.Net.request,
   jsonp      : Pot.Net.requestByJSONP,
+  getJSON    : Pot.Net.getJSON,
   loadScript : Pot.Net.loadScript
 });
 
-})();
+}());
