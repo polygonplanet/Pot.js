@@ -499,7 +499,10 @@ setTimeout(function() {
               backItem = tree.get(curHash);
               if (backItem && backItem.page) {
                 processing = false;
+                initHighlightProcess = false;
                 loadPage(backItem.page, curHash);
+                addHighlightClass(backItem);
+                initHighlightProcess = true;
                 return;
               }
             }
