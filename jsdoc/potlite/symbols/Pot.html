@@ -355,6 +355,46 @@ ul.inheritsList
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
+								Pot.<b><a href="../symbols/Pot.html#.Cc">Cc</a></b>
+								</div>
+								<div class="description">A shortcut of "Components.classes".</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								Pot.<b><a href="../symbols/Pot.html#.Ci">Ci</a></b>
+								</div>
+								<div class="description">A shortcut of "Components.interfaces".</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								Pot.<b><a href="../symbols/Pot.html#.Cr">Cr</a></b>
+								</div>
+								<div class="description">A shortcut of "Components.results".</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								Pot.<b><a href="../symbols/Pot.html#.Cu">Cu</a></b>
+								</div>
+								<div class="description">A shortcut of "Components.utils".</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
 								Pot.<b><a href="../symbols/Pot.html#.Global">Global</a></b>
 								</div>
 								<div class="description">Global object.</div>
@@ -751,6 +791,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.keys">keys</a></b>(o)
+								</div>
+								<div class="description">Collect the object key names like ES5's Object.keys().</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.lastIndexOf">lastIndexOf</a></b>(object, subject, (from))
 								</div>
 								<div class="description">Returns the last index at which a
@@ -911,6 +960,94 @@ ul.inheritsList
 				<div class="sectionTitle">
 					Field Detail
 				</div>
+				
+					<a name=".Cc"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>Cc</b>
+					
+					</div>
+					<div class="description">
+						A shortcut of "Components.classes".
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".Ci"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>Ci</b>
+					
+					</div>
+					<div class="description">
+						A shortcut of "Components.interfaces".
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".Cr"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>Cr</b>
+					
+					</div>
+					<div class="description">
+						A shortcut of "Components.results".
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".Cu"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Object}</span>
+					<span class="light">Pot.</span><b>Cu</b>
+					
+					</div>
+					<div class="description">
+						A shortcut of "Components.utils".
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
 				
 					<a name=".Global"> </a>
 					<div class="fixedFont">&lt;static&gt; 
@@ -2248,7 +2385,7 @@ That is for cases where JavaScript sucks
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{boolean}</span> Whether `n` is an integer.</dd>
+								<dd><span class="light fixedFont">{Boolean}</span> Whether `n` is an integer.</dd>
 							
 							</dl>
 						
@@ -2834,6 +2971,65 @@ This function treats as scalar type for
 
 					<hr />
 				
+					<a name=".keys"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>keys</b>(o)
+					
+					</div>
+					<div class="description">
+						Collect the object key names like ES5's Object.keys().
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var obj = {foo: 1, bar: 2, baz: 3};
+  debug(keys(obj));
+  // @results ['foo', 'bar', 'baz']
+  var array = [10, 20, 30, 40, 50];
+  debug(keys(array));
+  // @results [0, 1, 2, 3, 4]
+  delete array[2];
+  debug(keys(array));
+  // @results [0, 1, 3, 4]
+
+
+{@link https://developer.mozilla.org/en/JavaScript/
+               Reference/Global_Objects/Object/keys }</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|Function|*}</span> <b>o</b>
+									
+								</dt>
+								<dd>The target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Array}</span> The collected key names as an array.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".lastIndexOf"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -3017,7 +3213,7 @@ This method like Array.prototype.lastIndexOf
 					
 					
 					<pre class="code">  var time = now(); // equals (new Date()).getTime();
-  debug(time); // 1323446177282</pre>
+  debug(time); // e.g. 1323446177282</pre>
 					
 					
 					
@@ -3029,7 +3225,7 @@ This method like Array.prototype.lastIndexOf
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd>Return the current time as milliseconds.</dd>
+								<dd><span class="light fixedFont">{Number}</span> Return the current time as milliseconds.</dd>
 							
 							</dl>
 						
@@ -3662,7 +3858,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jan 19 2012 12:15:10 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Feb 06 2012 22:12:37 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
