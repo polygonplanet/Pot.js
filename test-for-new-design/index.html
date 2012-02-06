@@ -630,6 +630,12 @@ body > .layout-liquid-container {
   border-width: 1px 0 0 0;
 }
 
+.layout-liquid-container #cse-search-result-container {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
 .leftside-wrapper {
   border-color: #666677;
   border-style: solid;
@@ -877,6 +883,176 @@ td.marker, td.marker * {
 }
 
 </style>
+<!--Google Custom Search-->
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script type="text/javascript">
+setTimeout(function() {
+  var done;
+  if (typeof Pot === 'undefined') {
+    return setTimeout(arguments.callee, 13);
+  }
+  if (done) {
+    return;
+  }
+  done = true;
+
+  google.load('search', '1', {language: Pot.LANG, style : google.loader.themes.MINIMALIST});
+  google.setOnLoadCallback(function() {
+    var customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y'),
+        drawOptions         = new google.search.DrawOptions();
+
+    //customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    customSearchControl.setResultSetSize(google.search.Search.LARGE_RESULTSET);
+    customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
+    drawOptions.setAutoComplete(true);
+    drawOptions.setSearchFormRoot('cse-search-form');
+    customSearchControl.draw('cse-search-result-container', drawOptions);
+  }, true);
+}, 20);
+</script>
+<style type="text/css">
+.gsc-control-cse {
+  font-family: verdana, sans-serif;
+  border-color: #666677;
+  background-color: #f8f8ff;
+}
+input.gsc-input {
+  border-color: #6368ac;
+}
+input.gsc-search-button {
+  border-color: #6368ac;
+  background-color: #ccccff;
+}
+.gsc-tabHeader.gsc-tabhInactive {
+  border-color: #6368ac;
+  background-color: #f8f8ff;
+}
+.gsc-tabHeader.gsc-tabhActive {
+  border-color: #6368ac;
+  background-color: #e2e5ff;
+}
+.gsc-tabsArea {
+  border-color: #6368ac;
+}
+.gsc-webResult.gsc-result,
+.gsc-results .gsc-imageResult {
+  border-color: #f8f8ff;
+  background-color: #f8f8ff;
+}
+.gsc-webResult.gsc-result:hover,
+.gsc-webResult.gsc-result.gsc-promotion:hover,
+.gsc-imageResult:hover {
+  border-color: #f8f8ff;
+  background-color: #f8f8ff;
+}
+.gs-webResult.gs-result a.gs-title:link,
+.gs-webResult.gs-result a.gs-title:link b,
+.gs-imageResult a.gs-title:link,
+.gs-imageResult a.gs-title:link b {
+  color: #3d42cf;
+}
+.gs-webResult.gs-result a.gs-title:visited,
+.gs-webResult.gs-result a.gs-title:visited b,
+.gs-imageResult a.gs-title:visited,
+.gs-imageResult a.gs-title:visited b {
+  color: #514cae;
+}
+.gs-webResult.gs-result a.gs-title:hover,
+.gs-webResult.gs-result a.gs-title:hover b,
+.gs-imageResult a.gs-title:hover,
+.gs-imageResult a.gs-title:hover b {
+  color: #267cff;
+}
+.gs-webResult.gs-result a.gs-title:active,
+.gs-webResult.gs-result a.gs-title:active b,
+.gs-imageResult a.gs-title:active,
+.gs-imageResult a.gs-title:active b {
+  color: #3d42cf;
+}
+.gsc-cursor-page {
+  color: #3d42cf;
+}
+a.gsc-trailing-more-results:link {
+  color: #3d42cf;
+}
+.gs-webResult .gs-snippet,
+.gs-imageResult .gs-snippet,
+.gs-fileFormatType {
+  color: #333366;
+}
+.gs-webResult div.gs-visibleUrl,
+.gs-imageResult div.gs-visibleUrl {
+  color: #3d42cf;
+}
+.gs-webResult div.gs-visibleUrl-short {
+  color: #3d42cf;
+}
+.gs-webResult div.gs-visibleUrl-short {
+  display: none;
+}
+.gs-webResult div.gs-visibleUrl-long {
+  display: block;
+}
+.gs-promotion div.gs-visibleUrl-short {
+  display: none;
+}
+.gs-promotion div.gs-visibleUrl-long {
+  display: block;
+}
+.gsc-cursor-box {
+  border-color: #f8f8ff;
+}
+.gsc-results .gsc-cursor-box .gsc-cursor-page {
+  border-color: #6368ac;
+  background-color: #f8f8ff;
+  color: #3d42cf;
+}
+.gsc-results .gsc-cursor-box .gsc-cursor-current-page {
+  border-color: #6368ac;
+  background-color: #e2e5ff;
+  color: #514cae;
+}
+.gsc-webResult.gsc-result.gsc-promotion {
+  border-color: #f8f8ff;
+  background-color: #f8f8ff;
+}
+.gsc-completion-title {
+  color: #3d42cf;
+}
+.gsc-completion-snippet {
+  color: #333366;
+}
+.gs-promotion a.gs-title:link,
+.gs-promotion a.gs-title:link *,
+.gs-promotion .gs-snippet a:link {
+  color: #3d42cf;
+}
+.gs-promotion a.gs-title:visited,
+.gs-promotion a.gs-title:visited *,
+.gs-promotion .gs-snippet a:visited {
+  color: #514cae;
+}
+.gs-promotion a.gs-title:hover,
+.gs-promotion a.gs-title:hover *,
+.gs-promotion .gs-snippet a:hover {
+  color: #267cff;
+}
+.gs-promotion a.gs-title:active,
+.gs-promotion a.gs-title:active *,
+.gs-promotion .gs-snippet a:active {
+  color: #3d42cf;
+}
+.gs-promotion .gs-snippet,
+.gs-promotion .gs-title .gs-promotion-title-right,
+.gs-promotion .gs-title .gs-promotion-title-right *  {
+  color: #333333;
+}
+.gs-promotion .gs-visibleUrl,
+.gs-promotion .gs-visibleUrl-short {
+  color: #3d42cf;
+}
+</style>
+<!--/Google Custom Search-->
 </head>
 <body>
   <div class="layout-liquid-container">
@@ -910,8 +1086,11 @@ td.marker, td.marker * {
             </div>
           </div>
           <div class="header-search">
+            <div id="cse-search-form"></div>
+            <!--
             <input type="text" class="header-search-input" placeholder="Search" value="まだ動かないのです">
             <button type="button" class="header-search-submit hoge" title="Search">Search</button>
+            -->
           </div>
           <div class="header-lang-container"></div>
         </div>
@@ -923,6 +1102,7 @@ td.marker, td.marker * {
         </div>
       </div>
     </div>
+    <div id="cse-search-result-container"></div>
     <div class="layout-2-column-left-menu clearfix">
       <div class="content">
         <div class="content-broader">
