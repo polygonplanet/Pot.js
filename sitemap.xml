@@ -1,0 +1,1404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<!--  created with free sitemap generation system www.sitemapxml.jp  --> 
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/test-for-new-design/</loc>
+  <priority>1.0</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/index.html</loc>
+  <priority>0.8</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/index.html</loc>
+  <priority>0.7</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html</loc>
+  <priority>0.7</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/files.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/GLOBAL.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/files.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/GLOBAL.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.html</loc>
+  <priority>0.6</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Archive.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Archive.AlphamericString.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Base64.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Browser.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Collection.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.rand.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.rand.alnum.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.rand.alpha.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.rand.caseOf.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Complex.rand.color.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Crypt.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.DateTime.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.DateTime.format.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Debug.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23forEach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23forEver.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23items.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23iterate.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23repeat.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred%23zip.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.begin.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.flush.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Deferred.some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.DOM.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.forEach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.forEver.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Format.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Hash.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.items.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Iter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.iterate.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.MimeType.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Net.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Net.XHR.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.OS.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.repeat.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Sanitizer.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Serializer.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.attach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.attachAfter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.attachBefore.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.attachPropAfter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.attachPropBefore.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Signal.DropFile.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Struct.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Style.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.System.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Text.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.Text.ReplaceSaver.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.URI.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.UTF8.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.XPCOM.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/Pot.zip.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Browser.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Crypt.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Debug.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23forEach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23forEver.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23items.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23iterate.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23repeat.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred%23zip.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.begin.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.flush.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Deferred.some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.every.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.filter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.forEach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.forEver.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.items.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Iter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.iterate.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.map.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Net.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Net.XHR.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.OS.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.reduce.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.repeat.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Serializer.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.attach.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.attachAfter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.attachBefore.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.attachPropAfter.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.attachPropBefore.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.Signal.DropFile.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.some.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.System.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.URI.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.XPCOM.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/Pot.zip.html</loc>
+  <priority>0.5</priority>
+  <lastmod>2012-02-07T00:38:21+09:00</lastmod>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/index.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/files.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/GLOBAL.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Archive.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Archive.AlphamericString.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Base64.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Browser.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Collection.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.rand.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.rand.alnum.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.rand.alpha.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.rand.caseOf.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Complex.rand.color.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Crypt.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.DateTime.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.DateTime.format.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Debug.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23forEach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23forEver.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23items.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23iterate.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23repeat.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred%23zip.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.begin.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.flush.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Deferred.some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.DOM.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.forEach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.forEver.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Format.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Hash.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.items.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Iter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.iterate.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.MimeType.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Net.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Net.XHR.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.OS.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.repeat.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Sanitizer.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Serializer.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.attach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.attachAfter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.attachBefore.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.attachPropAfter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.attachPropBefore.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Signal.DropFile.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Struct.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Style.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.System.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Text.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.Text.ReplaceSaver.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.URI.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.UTF8.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.XPCOM.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/symbols/symbols/Pot.zip.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/index.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/files.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/GLOBAL.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Browser.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Crypt.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Debug.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23forEach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23forEver.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23items.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23iterate.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23repeat.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred%23zip.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.begin.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.flush.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Deferred.some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.every.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.filter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.forEach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.forEver.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.items.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Iter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.iterate.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.map.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Net.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Net.XHR.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.OS.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.reduce.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.repeat.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Serializer.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.attach.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.attachAfter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.attachBefore.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.attachPropAfter.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.attachPropBefore.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.Signal.DropFile.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.some.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.System.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.URI.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.XPCOM.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+<url>
+  <loc>http://polygonplanet.github.com/Pot.js/jsdoc/potlite/symbols/symbols/Pot.zip.html</loc>
+  <priority>0.5</priority>
+  <changefreq>never</changefreq>
+</url>
+
+</urlset>
