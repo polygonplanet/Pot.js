@@ -20,7 +20,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" async="async" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 <script type="text/javascript" async="async" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
-<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.12/pot.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.13/pot.min.js"></script>
 <script type="text/javascript" async="async" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
 <script type="text/javascript">
 setTimeout(function() {
@@ -30,10 +30,11 @@ setTimeout(function() {
   var MENU_URI = 'menu.json';
 
   var done, lang, tree, changed, isMouseInMenu,
-      currentPage, currentId, initHash, initPage;
+      currentPage, currentId, initHash, initPage, scrolling;
 
   var scrollToHash = function(page, hash) {
     var d = new Pot.Deferred();
+    scrolling = true;
     try {
       if (hash && hash != page) {
         try {
@@ -59,6 +60,12 @@ setTimeout(function() {
     } catch (e) {
       d.raise(e);
     }
+    d.ensure(function(err) {
+      scrolling = false;
+      if (Pot.isError(err)) {
+        throw err;
+      }
+    });
     return d;
   };
 
@@ -99,6 +106,14 @@ setTimeout(function() {
           });
 
           if (Pot.isError(err)) {
+
+            //TODO: Remove if completed.
+            $('<div/>')
+              .append(
+                $('<h2/>').text('ページが取得できません')
+              )
+              .appendTo(target.empty());
+
             throw err;
           }
 
@@ -317,6 +332,7 @@ setTimeout(function() {
 
           if (!firstPage) {
             firstPage = fileName;
+            firstHash = id;
           }
           if (!initPage) {
             initPage = fileName;
@@ -437,24 +453,32 @@ setTimeout(function() {
               forInViewClass = 'potjs-manual-item-for-in-view',
               accordion = $('.menu-accordion-container'),
               leftSide  = $('.leftside-wrapper'),
-              prevItem, processing;
+              prevItem, processing, initHighlightProcess;
 
           var addHighlightClass = function(menuItem) {
-            if (menuItem && menuItem.item && menuItem.item !== prevItem) {
+            var delay = 0;
+
+            if (menuItem && menuItem.item &&
+                (menuItem.item !== prevItem || !initHighlightProcess)) {
               prevItem && prevItem.removeClass(highlightClass);
               menuItem.item.addClass(highlightClass);
-              if (currentPage !== menuItem.page && menuItem.index != null &&
+              if ((!initHighlightProcess || currentPage !== menuItem.page) &&
+                  menuItem.index != null &&
                   accordion.accordion('option', 'active') !== menuItem.index
               ) {
                 accordion.accordion('activate', menuItem.index);
+                delay = initHighlightProcess ? 1 : 0.5;
               }
 
-              if (!isMouseInMenu) {
-                leftSide.scrollTo(menuItem.item, 20, {
-                  axis    : 'y',
-                  offset  : -Math.floor(leftSide.height() / 2 - menuItem.item.height() / 2)
-                });
-              }
+              Pot.callLater(delay, function() {
+                if (!isMouseInMenu || !initHighlightProcess) {
+                  leftSide.scrollTo(menuItem.item, 20, {
+                    axis    : 'y',
+                    offset  : -Math.floor(leftSide.height() / 2 - menuItem.item.height() / 2)
+                  });
+                }
+              });
+
               prevItem = menuItem.item;
             }
           };
@@ -465,7 +489,7 @@ setTimeout(function() {
                 curHash = Pot.stringify(location.hash).substring(1),
                 backPage, backId, backItem;
 
-            if (processing) {
+            if (processing || scrolling) {
               return;
             }
 
@@ -478,6 +502,13 @@ setTimeout(function() {
                 loadPage(backItem.page, curHash);
                 return;
               }
+            }
+
+            if (!initHighlightProcess && item && item.item && !$('.' + highlightClass).length) {
+              addHighlightClass(item);
+              initHighlightProcess = true;
+              processing = false;
+              return;
             }
 
             if (item && item.item && Pot.startsWith(itemId, 'reference.')) {
@@ -509,10 +540,6 @@ setTimeout(function() {
                   throw err;
                 }
               });
-            }
-
-            if (item && item.item && !$('.' + highlightClass).length) {
-              addHighlightClass(item);
             }
           };
         }()));
@@ -908,7 +935,7 @@ td.marker, td.marker * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-02-06
+          Last modified: 2012-02-07
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>

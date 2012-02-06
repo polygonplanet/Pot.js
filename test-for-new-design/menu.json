@@ -12,7 +12,8 @@
         "manualsub.overview.contact":{"ja":"連絡先","en":"Contact"},
         "manualsub.overview.thanks":{"ja":"謝辞","en":"Thanks"},
         "manualsub.overview.forJSDoc":{"ja":"JSDoc ドキュメント","en":"JSDoc Document"},
-        "manualsub.overview.introduction":{"ja":"導入","en":"Introduction"}
+        "manualsub.overview.introduction":{"ja":"導入","en":"Introduction"},
+        "manualsub.overview.Blog.Archives":{"ja":"関連記事","en":"Blog Archives"}
       }
     },
     "manual.Deferred.Reference":{
