@@ -98,17 +98,13 @@ update(Pot.Struct, {
             // Some environments cannot clone object by function prototype.
             //XXX: frozen object
             result = {};
-            for (k in x) {
-              if (hasOwnProperty.call(x, k)) {
-                try {
-                  result[k] = x[k];
-                } catch (e) {}
-              }
-            }
+            each(x, function(v, k) {
+              result[k] = v;
+            });
           }
           break;
       case 'error':
-          result = new Error(x.message || x.description || x);
+          result = new Error(Pot.getErrorMessage(x));
           update(result, x);
           break;
       case 'date':
@@ -250,28 +246,7 @@ update(Pot.Struct, {
    * @static
    * @public
    */
-  keys : function(o) {
-    var r = [], objectLike;
-    if (o) {
-      objectLike = Pot.isObject(o);
-      if (objectLike && Pot.System.isBuiltinObjectKeys) {
-        try {
-          r = Object.keys(o);
-          return r;
-        } catch (e) {}
-      }
-      if (objectLike || Pot.isArrayLike(o)) {
-        each(o, function(v, k) {
-          try {
-            if (hasOwnProperty.call(o, k)) {
-              r[r.length] = k;
-            }
-          } catch (e) {}
-        });
-      }
-    }
-    return r;
-  },
+  keys : Pot.keys,
   /**
    * Collect the object values.
    *
@@ -299,12 +274,8 @@ update(Pot.Struct, {
     var r = [];
     if (o) {
       if (Pot.isObject(o) || Pot.isArrayLike(o)) {
-        each(o, function(v, k) {
-          try {
-            if (hasOwnProperty.call(o, k)) {
-              r[r.length] = v;
-            }
-          } catch (e) {}
+        each(o, function(v) {
+          r[r.length] = v;
         });
       }
     }
@@ -409,13 +380,9 @@ update(Pot.Struct, {
                 } while (i < len);
               }
             } else if (isObject(item)) {
-              for (key in item) {
-                try {
-                  k = stringify(key, true);
-                  v = item[key];
-                  pairs[pairs.length] = [k, v];
-                } catch (ex) {}
-              }
+              each(item, function(val, p) {
+                pairs[pairs.length] = [p, val];
+              });
             }
             each(pairs, function(pair) {
               var rv, p;
@@ -469,11 +436,9 @@ update(Pot.Struct, {
                         if (isArray(rv)) {
                           result[rv[0]] = rv[1];
                         } else if (isObject(rv)) {
-                          for (p in rv) {
-                            try {
-                              result[p] = rv[p];
-                            } catch (err) {}
-                          }
+                          each(rv, function(val, prop) {
+                            result[prop] = val;
+                          });
                         } else {
                           result[pair[0]] = rv;
                         }
@@ -672,11 +637,9 @@ update(Pot.Struct, {
             break;
         case 'object':
         case 'function':
-            for (p in o) {
-              if (hasOwnProperty.call(o, p)) {
-                c++;
-              }
-            }
+            each(o, function() {
+              c++;
+            });
             break;
         case 'number':
             c = Math.abs(Math.round(o));
@@ -876,19 +839,13 @@ update(Pot.Struct, {
             }
             break;
         case 'object':
-            for (p in o) {
-              if (hasOwnProperty.call(o, p)) {
-                try {
-                  if (keyOnly) {
-                    r = p;
-                  } else {
-                    r = o[p];
-                  }
-                } catch (e) {
-                  continue;
-                }
+            each(o, function(v, k) {
+              if (keyOnly) {
+                r = k;
+              } else {
+                r = v;
               }
-            }
+            });
             break;
         default:
             break;
@@ -1033,7 +990,7 @@ update(Pot.Struct, {
               try {
                 if (!done &&
                     ((!loose && object[i] === subject) ||
-                     (loose  && object[i] ==  subject))) {
+                      (loose && object[i] ==  subject))) {
                   done = true;
                 } else {
                   result[result.length] = object[i];
@@ -1043,19 +1000,15 @@ update(Pot.Struct, {
             break;
         case 'object':
             result = {};
-            for (i in object) {
-              if (hasOwnProperty.call(object, i)) {
-                try {
-                  if (!done &&
-                      ((!loose && object[i] === subject) ||
-                       (loose  && object[i] ==  subject))) {
-                    done = true;
-                  } else {
-                    result[i] = object[i];
-                  }
-                } catch (e) {}
+            each(object, function(v, p) {
+              if (!done &&
+                  ((!loose && v === subject) ||
+                    (loose && v ==  subject))) {
+                done = true;
+              } else {
+                result[p] = v;
               }
-            }
+            });
             break;
         case 'number':
             result = object.toString().replace(subject, '') - 0;
@@ -1123,7 +1076,7 @@ update(Pot.Struct, {
             for (i = 0; i < len; i++) {
               try {
                 if ((!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
+                     (loose && object[i] ==  subject)) {
                   continue;
                 }
                 result[result.length] = object[i];
@@ -1132,17 +1085,13 @@ update(Pot.Struct, {
             break;
         case 'object':
             result = {};
-            for (i in object) {
-              if (hasOwnProperty.call(object, i)) {
-                try {
-                  if ((!loose && object[i] === subject) ||
-                      (loose  && object[i] ==  subject)) {
-                    continue;
-                  }
-                  result[i] = object[i];
-                } catch (e) {}
+            each(object, function(v, p) {
+              if ((!loose && v === subject) ||
+                   (loose && v ==  subject)) {
+                return;
               }
-            }
+              result[p] = v;
+            });
             break;
         case 'number':
             result = object.toString().split(subject).join('') - 0;
@@ -1187,7 +1136,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAt : function(object, index, length) {
-    var result, me = arguments.callee, i, idx, len, n;
+    var result, me = arguments.callee, i, idx, len, n, minus;
     result = object;
     if (object != null) {
       idx = index - 0;
@@ -1217,16 +1166,12 @@ update(Pot.Struct, {
         case 'object':
             result = {};
             n = 0;
-            for (i in object) {
-              if (hasOwnProperty.call(object, i)) {
-                if (n < idx || n > idx + len) {
-                  try {
-                    result[i] = object[i];
-                  } catch (e) {}
-                }
-                n++;
+            each(object, function(v, p) {
+              if (n < idx || n > idx + len) {
+                result[p] = v;
               }
-            }
+              n++;
+            });
             break;
         case 'number':
             minus = (object < 0);
@@ -1375,31 +1320,23 @@ update(Pot.Struct, {
               ) {
                 result = (object === subject);
               } else {
-                keys = [];
-                for (p in subject) {
-                  if (hasOwnProperty.call(subject, p)) {
-                    keys[keys.length] = p;
-                  }
-                }
+                keys = Pot.keys(subject);
                 len = keys.length;
                 i = 0;
                 result = true;
-                for (p in object) {
-                  if (hasOwnProperty.call(object, p)) {
-                    if (!(i in keys) || keys[i] !== p) {
-                      result = false;
-                      break;
-                    }
-                    try {
-                      v = object[p];
-                      if (!cmp(v, subject[p])) {
-                        result = false;
-                        break;
-                      }
-                    } catch (e) {}
-                    i++;
+                each(object, function(value, p) {
+                  if (!(i in keys) || keys[i] !== p) {
+                    result = false;
+                    throw Pot.StopIteration;
                   }
-                }
+                  try {
+                    if (!cmp(value, subject[p])) {
+                      result = false;
+                      throw Pot.StopIteration;
+                    }
+                  } catch (e) {}
+                  i++;
+                });
               }
             }
             break;
@@ -1623,9 +1560,7 @@ update(Pot.Struct, {
       case 'object':
           result = {};
           each(o, function(v, k) {
-            if (hasOwnProperty.call(o, k)) {
-              result[stringify(v, true)] = k;
-            }
+            result[stringify(v, true)] = k;
           });
           break;
       case 'array':
@@ -1916,14 +1851,9 @@ update(Pot.Struct, {
       if (s === nop) {
         s = defs.separator;
       }
-      for (p in o) {
-        try {
-          v = o[p];
-        } catch (e) {
-          continue;
-        }
-        ins[ins.length] = p + d + stringify(v);
-      }
+      each(o, function(val, prop) {
+        ins[ins.length] = prop + d + stringify(val);
+      });
       result = ins.join(s);
       if (t) {
         result += isString(t) ? t : s;

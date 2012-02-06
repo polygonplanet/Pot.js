@@ -603,14 +603,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     //XXX: Should use "yield" for duplicate loops.
     if (Pot.isFunction(callback)) {
       copy = [];
-      for (p in object) {
-        try {
-          v = object[p];
-        } catch (e) {
-          continue;
-        }
-        copy[copy.length] = [v, p];
-      }
+      each(object, function(value, prop) {
+        copy[copy.length] = [value, prop];
+      });
     }
     if (!copy || !copy.length) {
       return this.noop();
@@ -710,16 +705,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     var that = this, copy, i = 0, value, prop, isPair;
     if (Pot.isObject(object)) {
       copy = [];
-      for (prop in object) {
-        if (hasOwnProperty.call(object, prop)) {
-          try {
-            value = object[prop];
-          } catch (e) {
-            continue;
-          }
-          copy[copy.length] = [prop, value];
-        }
-      }
+      each(object, function(ov, op) {
+        copy[copy.length] = [op, ov];
+      });
       isPair = true;
     } else if (Pot.isArrayLike(object)) {
       copy = arrayize(object);
@@ -1882,14 +1870,9 @@ update(Pot.Iter, {
     objectLike = x && !arrayLike && Pot.isObject(x);
     if (objectLike) {
       o = [];
-      for (p in x) {
-        try {
-          v = x[p];
-        } catch (e) {
-          continue;
-        }
-        o[o.length] = [v, p];
-      }
+      each(x, function(xv, xp) {
+        o[o.length] = [xv, xp];
+      });
     } else {
       o = arrayize(x);
     }
@@ -1943,7 +1926,7 @@ update(Pot.Iter, {
           }
         };
       }
-    })();
+    }());
     return iter;
   },
   /**
@@ -2172,7 +2155,7 @@ update(Pot.Iter, {
           });
         }
         return first;
-      })();
+      }());
     } else {
       value = initial;
     }
@@ -2499,21 +2482,16 @@ update(Pot.Iter, {
       }
     } else if (objectLike) {
       passed = false;
-      for (key in object) {
-        try {
-          if (!passed && argn >= 3 && from !== key) {
-            continue;
-          } else {
-            passed = true;
-          }
-          val = object[key];
-          if (val === subject) {
-            result = key;
-          }
-        } catch (e) {
-          continue;
+      each(object, function(ov, op) {
+        if (!passed && argn >= 3 && from !== key) {
+          return;
+        } else {
+          passed = true;
         }
-      }
+        if (ov === subject) {
+          result = op;
+        }
+      });
     } else if (object != null) {
       try {
         val = (object.toString && object.toString()) || String(object);
@@ -2620,21 +2598,16 @@ update(Pot.Iter, {
     } else if (objectLike) {
       pairs = [];
       passed = false;
-      for (key in object) {
-        try {
-          val = object[key];
-        } catch (e) {
-          continue;
+      each(object, function(ov, op) {
+        pairs[pairs.length] = [op, ov];
+        if (ov === subject) {
+          result = op;
         }
-        pairs[pairs.length] = [key, val];
-        if (val === subject) {
-          result = key;
-        }
-        if (key === from) {
+        if (op === from) {
           passed = true;
-          break;
+          throw Pot.StopIteration;
         }
-      }
+      });
       if (passed) {
         result = -1;
         len = pairs.length;

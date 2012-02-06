@@ -275,6 +275,7 @@ update(Pot.Internal, {
     toDataURI               : Pot.URI.toDataURI,/*{#endif}*/
     request                 : Pot.Net.request,
     jsonp                   : Pot.Net.requestByJSONP,
+    getJSON                 : Pot.Net.getJSON,
     loadScript              : Pot.Net.loadScript,
     hashCode                : Pot.Crypt.hashCode,/*{#if Pot}*/
     md5                     : Pot.Crypt.md5,

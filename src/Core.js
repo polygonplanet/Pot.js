@@ -926,6 +926,42 @@ Pot.update({
    * @lends Pot
    */
   /**
+   * A shortcut of "Components.classes".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cc : Cc,
+  /**
+   * A shortcut of "Components.interfaces".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Ci : Ci,
+  /**
+   * A shortcut of "Components.results".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cr : Cr,
+  /**
+   * A shortcut of "Components.utils".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cu : Cu,
+  /**
    * Emulate StopIteration.
    *
    *
@@ -1749,7 +1785,7 @@ if (typeof StopIteration === 'undefined') {
 
 // Definition of current Document and URI.
 (function() {
-  var win, doc, uri, wp, dp;
+  var win, doc, uri, wp, dp, a;
   wp = 'window contentWindow defaultView parentWindow content top'.split(' ');
   dp = 'ownerDocument document'.split(' ');
   /**@ignore*/
@@ -1831,7 +1867,13 @@ if (typeof StopIteration === 'undefined') {
     if (!uri && win) {
       try {
         uri = win.location && win.location.href || win.location;
-      } catch (e) {}
+      } catch (e) {
+        try {
+          a = doc.createElement('a');
+          a.href = '';
+          uri = a.href;
+        } catch (ex) {}
+      }
     }
   }
   update(Pot.System, {
@@ -1947,6 +1989,84 @@ Pot.update({
   /**
    * @lends Pot
    */
+  /**
+   * Collect the object key names like ES5's Object.keys().
+   *
+   *
+   * @example
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   debug(keys(obj));
+   *   // @results ['foo', 'bar', 'baz']
+   *   var array = [10, 20, 30, 40, 50];
+   *   debug(keys(array));
+   *   // @results [0, 1, 2, 3, 4]
+   *   delete array[2];
+   *   debug(keys(array));
+   *   // @results [0, 1, 3, 4]
+   *
+   *
+   * {@link https://developer.mozilla.org/en/JavaScript/
+   *                Reference/Global_Objects/Object/keys }
+   *
+   * @param  {Object|Function|*}  o  The target object.
+   * @return {Array}                 The collected key names as an array.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  keys : (function() {
+    var hasDontEnumBug = !({toString : null})
+                            .propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+    return function(object) {
+      var results = [], type = typeof object, len, p, i;
+      if (type !== 'object' && type !== 'function' || object === null) {
+        return results;
+      }
+      if (Pot.isArrayLike(object)) {
+        len = object.length;
+        for (i = 0; i < len; i++) {
+          if (i in object) {
+            results[results.length] = i;
+          }
+        }
+      } else {
+        if (Pot.System.isBuiltinObjectKeys) {
+          try {
+            results = Object.keys(object);
+            return results;
+          } catch (e) {}
+        }
+        for (p in object) {
+          try {
+            if (hasOwnProperty.call(object, p)) {
+              results[results.length] = p;
+            }
+          } catch (ex) {}
+        }
+        if (hasDontEnumBug) {
+          for (i = 0; i < dontEnumsLength; i++) {
+            try {
+              if (hasOwnProperty.call(object, dontEnums[i])) {
+                results[results.length] = dontEnums[i];
+              }
+            } catch (er) {}
+          }
+        }
+      }
+      return results;
+    };
+  }()),
   /**
    * Evaluates a script in a global context.
    *
@@ -2693,7 +2813,7 @@ Pot.update({
  * @ignore
  */
 function update() {
-  var args = arguments, len = args.length, i = 1, o, p, x;
+  var args = arguments, len = args.length, i = 1, j, o, p, x, keys, n;
   if (len === i) {
     o = this || {};
     i--;
@@ -2704,10 +2824,23 @@ function update() {
     do {
       x = args[i];
       if (x) {
-        for (p in x) {
-          try {
-            o[p] = x[p];
-          } catch (e) {}
+        if (Pot.keys) {
+          keys = Pot.keys(x);
+          n = keys.length;
+          for (j = 0; j < n; j++) {
+            p = keys[j];
+            try {
+              o[p] = x[p];
+            } catch (e) {}
+          }
+        } else {
+          for (p in x) {
+            try {
+              if (hasOwnProperty.call(x, p)) {
+                o[p] = x[p];
+              }
+            } catch (e) {}
+          }
         }
       }
     } while (++i < len);
@@ -3630,7 +3763,7 @@ Pot.update({
  * @internal
  */
 function each(object, callback, context) {
-  var i, len, val, err;
+  var i, len, val, err, p, keys;
   if (object) {
     len = object.length;
     try {
@@ -3646,13 +3779,16 @@ function each(object, callback, context) {
           }
         }
       } else {
-        for (i in object) {
+        keys = Pot.keys(object);
+        len = keys.length;
+        for (i = 0; i < len; i++) {
+          p = keys[i];
           try {
-            val = object[i];
+            val = object[p];
           } catch (e) {
             continue;
           }
-          callback.call(context, val, i, object);
+          callback.call(context, val, p, object);
         }
       }
     } catch (ex) {
