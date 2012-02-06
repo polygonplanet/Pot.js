@@ -482,7 +482,7 @@ update(Pot.URI, {
       'i'
     );
     return function(url/*[, query]*/) {
-      var uri, args = arguments, c, s, index,
+      var uri, args = arguments, c, s, index, query,
           queryString = args[1],
           encode = Pot.URI.urlEncode,
           serialize = Pot.Serializer.serializeToQueryString,
