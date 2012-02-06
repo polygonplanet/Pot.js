@@ -510,6 +510,10 @@ setTimeout(function() {
                 }
               });
             }
+
+            if (item && item.item && !$('.' + highlightClass).length) {
+              addHighlightClass(item);
+            }
           };
         }()));
 
