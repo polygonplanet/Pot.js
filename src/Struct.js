@@ -628,7 +628,7 @@ update(Pot.Struct, {
    * @public
    */
   count : function(o) {
-    var c = 0, p;
+    var c = 0;
     if (o != null) {
       switch (Pot.typeLikeOf(o)) {
         case 'array':
@@ -1136,7 +1136,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAt : function(object, index, length) {
-    var result, me = arguments.callee, i, idx, len, n, minus;
+    var result, me = arguments.callee, idx, len, n, minus;
     result = object;
     if (object != null) {
       idx = index - 0;
@@ -1282,7 +1282,7 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty, keys, p, i, len, k;
+    var result = false, cmp, empty, keys, i, len, k;
     /**@ignore*/
     cmp = Pot.isFunction(func) ? func : (function(a, b) { return a === b; });
     if (object == null) {
