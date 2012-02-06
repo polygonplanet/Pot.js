@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isBuiltinMethod"><em>Pot.</em>isBuiltinMethod</dfn>
+    (<em>{Function|*}</em> method)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 method がビルトイン関数かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 method がビルトイン関数かどうか調べます。
+ <br>
+ 例えば encodeURI を渡すと true を返します。
+</p>
+<p>
+ method がビルトイン関数なら true を返し、それ以外は false を返します。
+</p>
+<pre>debug(isBuiltinMethod((function() {})));          // false
+debug(isBuiltinMethod(Array.prototype.slice));    // true
+debug(isBuiltinMethod(encodeURIComponent));       // true
+debug(isBuiltinMethod(document.getElementById));  // true (on Web Browser)</pre>
+    </div>
+  </dd>
+</dl>

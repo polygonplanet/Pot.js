@@ -1,0 +1,44 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isScalar"><em>Pot.</em>isScalar</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x がスカラー型かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x がスカラー型かどうか調べます。
+ <br>
+ スカラー型 (あるいはプリミティブ) は、String, Number, Boolean が含まれます。
+ <br>
+ Array や Object は含まれません。
+ <br>
+ この関数では、null と undefined も除外されます。
+</p>
+<p>
+ x がスカラー型なら true を返し、それ以外は false を返します。
+</p>
+<pre>debug(isScalar(null));              // false
+debug(isScalar((void 0)));          // false
+debug(isScalar(''));                // true
+debug(isScalar('abc'));             // true
+debug(isScalar(0));                 // true
+debug(isScalar(123));               // true
+debug(isScalar(false));             // true
+debug(isScalar(true));              // true
+debug(isScalar(new Boolean(true))); // true
+debug(isScalar([]));                // false
+debug(isScalar([1, 2, 3]));         // false
+debug(isScalar(/hoge/));            // false
+debug(isScalar(new Error()));       // false
+debug(isScalar({}));                // false
+debug(isScalar({a: 1, b: 2}));      // false</pre>
+    </div>
+  </dd>
+</dl>

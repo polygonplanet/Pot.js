@@ -1,0 +1,28 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isDeferred"><em>Pot.</em>isDeferred</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が Pot.Deferred のインスタンスかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が Pot.Deferred のインスタンスかどうか調べます。
+</p>
+<p>
+ x が <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスなら true を返し、それ以外は false を返します。
+</p>
+<pre>var o = {hoge: 1};
+var d = new Pot.Deferred();
+
+debug( isDeferred(o) ); // false
+debug( isDeferred(d) ); // true</pre>
+    </div>
+  </dd>
+</dl>

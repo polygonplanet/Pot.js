@@ -1,0 +1,365 @@
+<h2 id="manualsub.overview.overview" class="potjs-manual-item-for-in-view">Overview</h2>
+<div class="potjs-manual-item-for-in-view">
+  <p>
+   Pot.js is a JavaScript library that can be performed without causing stress to the UI and
+    the CPU load by using easy loop iteration functions.
+  </p>
+  <p>
+   With respect to load, you can implement a particular application without requiring the programmer to be aware of.
+  </p>
+  <p>
+   Pot.js is built around the asynchronous processing and iterator with Deferred.
+   <br>
+   Pot.Deferred is a Deferred object like MochiKit (or JSDeferred like).
+   <br>
+   That makes it possible to various iterations (forEach, filter, map, reduce, zip, repeat, some etc.).
+  </p>
+  <p>
+   Moreover, Pot.js is an utility library that handles string processes with various algorithms,
+   <br>
+   and it has the Signal object that can write like aspect-oriented (AOP),
+   <br>
+   and it has the Event object for DOM listener,
+   <br>
+   and treats it the File API for HTML5. etc.
+  </p>
+  <p>
+   And, Pot.js never pollute the prototype of the global objects.
+   <br>
+   We only define the 'Pot' object in the global scope basically.
+   <br>
+   You can use Pot.js with other available libraries without fear of conflict.
+  </p>
+  <p>
+   Pot.js is a cross-browser library that works on a Web browser,
+   Node.js, userscript (Greasemonkey, Scriptish) XUL, or (Firefox Add-ons) etc.
+  </p>
+  <p>
+   PotLite.js is a light version that extracts only the part of
+   asynchronous processing (Deferred etc.) has been implemented in Pot.js.
+  </p>
+</div>
+<h2 id="manualsub.overview.download" class="potjs-manual-item-for-in-view">Download</h2>
+<div class="potjs-manual-item-for-in-view">
+ <div style="margin: 8px;">
+   <div>
+    <h4>Latest and Stable</h4>
+   </div>
+   <ul>
+     <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"
+            title="Pot.js + PotLite.js - Latest and Stable (zip)"><strong>zip</strong></a>
+     </li>
+     <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"
+            title="Pot.js + PotLite.js - Latest and Stable (tar.gz)"><strong>tar.gz</strong></a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>Pot.js</h4>
+   </div>
+   <ul>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js"
+            title="Production (Minified)"><strong>pot.min.js</strong> - Production (Minified)</a>
+     </li>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
+            title="Development (Uncompressed Code)"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>PotLite.js (lite)</h4>
+   </div>
+   <ul>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js"
+            title="Production (Minified)"><strong>potlite.min.js</strong> - Production (Minified)</a>
+     </li>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.js"
+            title="Development (Uncompressed Code)"><strong>potlite.js</strong> - Development (Uncompressed Code)</a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>Repository</h4>
+   </div>
+   <pre>$ git clone git://github.com/polygonplanet/Pot.js</pre>
+   <div style="margin: 8px;">
+     <p>
+      GitHub : <a href="http://github.com/polygonplanet/Pot.js"
+                  title="polygonplanet/Pot.js - GitHub">polygonplanet/Pot.js</a>
+     </p>
+   </div>
+ </div>
+</div>
+<h2 id="manualsub.overview.install" class="potjs-manual-item-for-in-view">Install</h2>
+<div class="potjs-manual-item-for-in-view">
+ <p>
+  Will work with common ways.
+ </p>
+ <p>
+  Example:
+ </p>
+ <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;pot.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;!--
+  Or you can use the API hosting server for the Pot.js available.
+  That referenced followings.
+--&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.12/pot.min.js&quot;&gt;&lt;/script&gt;
+</pre>
+ <p>
+  Example for after loading of PotLite.js:
+ </p>
+ <pre>&lt;script type=&quot;text/javascript&quot;&gt;
+// You can use short method name in any by
+//   Pot.globalize method. (see below).
+Pot.globalize();
+
+begin(function() {
+    return request('./hoge.json', {
+        mimeType : 'text/javascript'
+    }).then(function(res) {
+        return parseFromJSON(res.responseText);
+    });
+}).then(function(res) {
+    return Deferred.forEach(res.items, function(value, key) {
+        // ...
+    });
+});
+// ...
+&lt;/script&gt;</pre>
+ <p>
+  For Node.js:
+ </p>
+ <pre>// Example to define Pot object on Node.js.
+var Pot = require('./pot.min.js');
+Pot.debug(Pot.VERSION);
+
+Pot.Deferred.begin(function() {
+    Pot.debug('Hello Deferred!');
+}).then(function() {...})
+// ...</pre>
+ <p>
+  Example of Greasemonkey (userscript).
+ </p>
+ <pre>// ==UserScript==
+// ...
+// @require  https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js
+// ...
+// ==/UserScript==
+
+Pot.Deferred.begin(function() {
+    return Pot.request('http://www.example.com/data.json').then(function(res) {
+        return Pot.parseFromJSON(res.responseText);
+    });
+}).then(function(res) {
+    Pot.debug(res);
+    // do something...
+});
+//...</pre>
+ <p>
+  Pot.js API hosting server is available if you import directly from the Web with a limited version of the Pot.js.
+  <br>
+  On GitHub link above defects may occur due to differences in implementation because it is always up to date.
+ </p>
+ <div>
+  <p>Example for use the Pot.js version 1.12:</p>
+  <ul>
+   <li>
+    v1.12 :
+     <a href="http://api.polygonpla.net/js/pot/1.12/pot.min.js"
+        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.12/pot.min.js</a>
+   </li>
+  </ul>
+ </div>
+ <p>
+  This can be changed to fit the part of the released version 1.12.
+  <br>
+  When tagged version (e.g. 1.xx), we will put a new package to the API server together with the repository.
+ </p>
+ <p>
+  For example, if you use 1.12 with Greasemonkey (userscript):
+ </p>
+ <pre>// ==UserScript==
+// ...
+// @require  http://api.polygonpla.net/js/pot/1.12/pot.min.js
+// ...
+// ==/UserScript==</pre>
+ <p>
+  Note: This example uses the version numbers of 1.12, it is not always up to date.
+  <br>
+  Please select the version with more stable.
+ </p>
+ <div>
+  <p>
+   Examples of using PotLite.js:
+  </p>
+  <ul>
+   <li>
+    PotLite.js v1.29 :
+     <a href="http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js"
+        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js</a>
+   </li>
+  </ul>
+  <p>
+   You can use the API hosting server by change the link URL for PotLite.js like Pot.js's URL.
+  </p>
+ </div>
+ <p>
+  You can check the latest version number on
+   <a href="https://github.com/polygonplanet/Pot.js/tags"
+      title="All Tags for polygonplanet's Pot.js - GitHub">GitHub repository (All tags)</a>
+ </p>
+ <p><hr></p>
+ <p>
+  As for jQuery plugin:
+ </p>
+ <pre>// Execute after loading with jQuery.
+Pot.deferrizejQueryAjax();
+
+// Ajax-based functions will return with Pot.Deferred object instance.
+$.getJSON('/hoge.json').then(function(data) {
+    alert(data.results[0].text);
+}).rescue(function(err) {
+    alert('Error! ' + err);
+}).ensure(function() {
+    return someNextProcess();
+});
+
+// Will added 'deferred' method for effects etc
+//  that convert to Deferred functions.
+$('div#hoge').deferred('hide', 'slow').then(function() {
+    // (...Do something after hide() method completed.)
+});</pre>
+ <p>
+  Pot.deferrizejQueryAjax() does not execute in library now.
+  So, if you use as plugin, must call first.
+ </p>
+</div>
+<h2 id="manualsub.overview.compatibility" class="potjs-manual-item-for-in-view">Compatibility</h2>
+<div class="potjs-manual-item-for-in-view">
+ <div>
+   <p>Pot.js / PotLite.js works with the following web browsers.</p>
+   <ul>
+     <li>Mozilla Firefox *</li>
+     <li>Internet Explorer 6+</li>
+     <li>Safari *</li>
+     <li>Opera *</li>
+     <li>Google Chrome *</li>
+   </ul>
+   <p>And, it also designed for operate in following environments.</p>
+   <ul>
+     <li>Greasemonkey (userscript)</li>
+     <li>Mozilla Firefox Add-On (on XUL)</li>
+     <li>Node.js</li>
+     <li>Other non-browser environment</li>
+   </ul>
+ </div>
+</div>
+<h2 id="manualsub.overview.TestRun" class="potjs-manual-item-for-in-view">Test Run</h2>
+<div class="potjs-manual-item-for-in-view">
+ <p>
+  You can verify by running the operation test in the following page.
+ </p>
+ <ul>
+  <li>
+   <a href="pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
+  </li>
+  <li>
+   <a href="potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
+  </li>
+ </ul>
+</div>
+<h2 id="manualsub.overview.license" class="potjs-manual-item-for-in-view">License</h2>
+<div class="potjs-manual-item-for-in-view">
+ <p>
+  Dual licensed under the MIT and GPL v2 licenses.
+ </p>
+ <p>
+  Copyright &copy; 2012 polygon planet
+ </p>
+</div>
+<h2 id="manualsub.overview.contact" class="potjs-manual-item-for-in-view">Contact</h2>
+<div class="potjs-manual-item-for-in-view">
+ <p>
+  <strong>Author</strong>: polygon planet
+ </p>
+ <p>
+  polygon.planet[at]gmail.com
+ </p>
+</div>
+<h2 id="manualsub.overview.thanks" class="potjs-manual-item-for-in-view">Thanks</h2>
+<div class="potjs-manual-item-for-in-view">
+ <p>
+  Logo design:
+  <br>
+  <a href="http://r-m-t.jp/" title="R M T　|　同人音楽サークル (Japanese)">yinyang302mg</a>
+ </p>
+ <p>
+  Thanks for which became chance to make Pot.js / PotLite.js library:
+  <br>
+  <a href="http://cho45.stfuawsc.com/jsdeferred/"
+     title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>,
+  <a href="http://www.mochimedia.com/"
+     title="Mochi Media, Inc.">MochiKit (Mochi Media, Inc.)</a>,
+  <a href="https://github.com/to/tombloo/wiki"
+     title="Tombloo - Home - GitHub">Tombloo</a>
+  developers.
+ </p>
+</div>
+<h2 id="manualsub.overview.forJSDoc" class="potjs-manual-item-for-in-view">JSDoc Document</h2>
+<div class="potjs-manual-item-for-in-view">
+ <ul>
+  <li><a href="jsdoc/index.html"
+         title="Pot.js - JsDoc Reference - Index">JSDoc Document (Pot.js)</a>
+  </li>
+  <li><a href="jsdoc/potlite/index.html"
+         title="PotLite.js - JsDoc Reference - Index">JSDoc Document (PotLite.js)</a>
+  </li>
+ </ul>
+ <p>
+  The auto-generated documentation from the Pot.js / PotLite.js source code by
+  <a href="http://code.google.com/intl/ja/closure/compiler/docs/js-for-compiler.html"
+     title="Annotating JavaScript for the Closure Compiler - Closure Compiler - Google Code">Closure Compiler</a>.
+ </p>
+ <p>
+  Refer more detailed implementation from the source code directly if needed.
+ </p>
+</div>
+<h2 id="manualsub.overview.introduction" class="potjs-manual-item-for-in-view">Introduction</h2>
+<div class="potjs-manual-item-for-in-view">
+ <div>
+   <p>
+    Pot.js / PotLite.js will define a &quot;Pot&quot; object in global scope 
+     for does non-conflict with other libraries.
+    <br>
+    If the environment is enabled the module (Node.js etc.),
+    Pot.js / PotLite.js will use &quot;exports&quot; for &quot;require&quot;.
+    That case will not define an &quot;Pot&quot; object in global scope.
+   </p>
+   <p>
+    If you want to use short method name:
+   </p>
+   <pre>Pot.globalize();</pre>
+   <p>
+    Execute this code in the first.
+    For example, you can be called only &quot;begin&quot;,
+    As method name of the &quot;Pot.Deferred.begin&quot;.
+   </p>
+   <p>
+    And, &quot;Pot.globalize&quot; can be useful when define any object into the global scope.
+   </p>
+   <pre>var obj = {
+    foo: function() { return 'foo' },
+    bar: function() { return 'bar' }
+};
+Pot.globalize(obj);
+
+alert(foo() + bar()); // 'foobar'</pre>
+   <p>
+    By providing such an argument on any object can be useful when you want to place any object in global scope.
+   </p>
+ </div>
+</div>

@@ -1,0 +1,31 @@
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.currentWindow"><em>Pot.</em>currentWindow</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      現在の window オブジェクトを取得します。
+    </p>
+    <div>
+      <p>
+ Pot.js もしくは PotLite.js 読み込み時の window オブジェクトを返します。
+ <br>
+ window が存在しない場合は 空のオブジェクト {} を返します。
+ <br>
+ 複数の window が存在する環境 (XUL など) で効果が現れます。
+ <br>
+ 返す値は、読み込み時以降 違う window オブジェクトになったりせず、変化することはありません。
+</p>
+<p>
+ 現在の window オブジェクトもしくは空のオブジェクト {} が返ります。
+</p>
+<pre>var win = currentWindow();
+win.alert('hoge'); // 'hoge'</pre>
+    </div>
+  </dd>
+</dl>

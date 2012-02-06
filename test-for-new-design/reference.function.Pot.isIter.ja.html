@@ -1,0 +1,28 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isIter"><em>Pot.</em>isIter</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が Pot.Iter のインスタンスかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が Pot.Iter のインスタンスかどうか調べます。
+</p>
+<p>
+ x が Pot.Iter のインスタンスなら true を返し、それ以外は false を返します。
+</p>
+<pre>var func = function() {};
+var iter = new Pot.Iter();
+
+debug( isIter(func) ); // false
+debug( isIter(iter) ); // true</pre>
+    </div>
+  </dd>
+</dl>

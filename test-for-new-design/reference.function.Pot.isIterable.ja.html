@@ -1,0 +1,48 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isIterable"><em>Pot.</em>isIterable</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x がイテレート可能なオブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x がイテレートできるかどうか調べます。
+ <br>
+ ここでいうイテレート可能とは、
+ <a href="#reference.function.Pot.iterate">Pot.iterate()</a> によるイテレートが可能かどうかです。
+ <br>
+ <a href="#reference.function.Pot.Iter">Pot.Iter</a> のインスタンスまたは yield 演算子によって生成したジェネレータが含まれます。
+</p>
+<p>
+ x がイテレート可能なら true を返し、それ以外は false を返します。
+</p>
+<pre>var iter = new Pot.Iter();
+var i = 0;
+iter.next = function() {
+    if (i &gt; 5) {
+        throw StopIteration;
+    }
+    return i++;
+};
+debug( isIterable(iter) ); // true</pre>
+
+<pre>var func = function() {};
+debug( isIterable(func) ); // false</pre>
+
+<pre>var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield;
+        debug(i);
+    }
+})();
+debug( isIterable(iter) ); // true</pre>
+    </div>
+  </dd>
+</dl>

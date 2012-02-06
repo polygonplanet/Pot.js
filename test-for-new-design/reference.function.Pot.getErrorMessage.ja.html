@@ -1,0 +1,31 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.getErrorMessage"><em>Pot.</em>getErrorMessage</dfn>
+    (<em>{Error|*}</em> error[, <em>{String|*}</em> defaults = 'error'])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      error オブジェクトからエラーメッセージを取得します。
+    </p>
+    <div>
+      <p>
+ エラー (error オブジェクト) の引数 error から、エラーメッセージを文字列で取得し返します。
+ <br>
+ エラーメッセージがなかったり、空文字 '' の時に、引数 defaults が渡されてると、
+ 代行メッセージとして defaults を返します。
+ <br>
+ この関数を使うことで、error オブジェクトのプロパティ message が、ある環境では description だったりする点を解消します。
+</p>
+<p>
+ error のエラーメッセージ、もしくは defaults が返ります。
+</p>
+<pre>var error = new Error('MyError!');
+debug(getErrorMessage(error)); // 'MyError!'</pre>
+
+    </div>
+  </dd>
+</dl>

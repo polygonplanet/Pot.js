@@ -1,0 +1,35 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isInt"><em>Pot.</em>isInt</dfn>
+    (<em>{Number|*}</em> n)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 n が整数かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 n が整数かどうか調べます。
+</p>
+<p>
+ n が整数なら true を返し、それ以外は false を返します。
+</p>
+<pre>debug(isInt(0));                       // true
+debug(isInt(-524560620));              // true
+debug(isInt(0.1205562));               // false
+debug(isInt(1.5));                     // false
+debug(isInt(12345));                   // true
+debug(isInt(Number.MAX_VALUE));        // true
+debug(isInt(Number.MAX_VALUE * 1000)); // false
+debug(isInt(null));                    // false
+debug(isInt((void 0)));                // false
+debug(isInt('hoge'));                  // false
+debug(isInt(''));                      // false
+debug(isInt([100]));                   // false</pre>
+    </div>
+  </dd>
+</dl>

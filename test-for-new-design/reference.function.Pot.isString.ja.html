@@ -1,0 +1,30 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isString"><em>Pot.</em>isString</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が文字列かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が文字列かどうか調べ、適正なら true を返します。
+ <br>
+ 文字列でない場合、false が返ります。
+</p>
+<p>
+ x が文字列なら true を返します。
+</p>
+<pre>debug(isString(''));                 // true
+debug(isString('123'));              // true
+debug(isString(new String('hoge'))); // true
+debug(isString(123));                // false</pre>
+
+    </div>
+  </dd>
+</dl>

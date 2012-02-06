@@ -1,0 +1,148 @@
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.override"><em>Pot.</em>override</dfn>
+    (<em>{Object}</em> object, <em>{String|RegExp|Array}</em> properties, <em>{Array|Function}</em> converters/overrider [, <em>{Array|Function}</em> converters/overrider])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      object の関数をオーバーライドします。
+    </p>
+    <div>
+      <p>
+ 引数 object が持つ関数 properties を、関数 overrider でオーバーライドします。
+ <br>
+ 引数 object は、オーバーライドしたい関数をもつ親オブジェクトを指定します。
+ <br>
+ 引数 properties は、オーバーライドする関数名を文字列または正規表現で指定、
+ または複数の関数を対象とし、配列で指定します。
+ <br>
+ 引数 overrider は、オーバーライドする関数を渡します。
+ <br>
+ 引数 converters が渡されると、対象の関数のコードを converters 通りに置換します。
+ <br>
+ overrider もしくは converters が必須です。
+ <br>
+ overrider と converters の両方を指定することも可能です。
+</p>
+<p>
+ properties が正規表現または配列の場合、複数の関数をオーバーライドします。
+</p>
+<p>
+ overrider に渡される引数は以下の 4 つです。
+</p>
+<pre>function (inherits, args, self, prop) {}
+
+  - inherits : <em class="var-type">{Function}</em>  オリジナルの関数。
+  - args     : <em class="var-type">{Arguments}</em> オリジナルの引数。
+  - self     : <em class="var-type">{Object}</em>    オリジナルの関数の 'this'。
+  - prop     : <em class="var-type">{String}</em>    対象の関数名。</pre>
+<p>
+ converters を指定する場合、置換パターンと結果文字列で構成された配列で渡します。
+ <br>
+ 例えば、<code>[/\breturn\b\s*([^;]+);/, 'throw $1;']</code> を指定すると
+ <br>
+ オーバーライドする関数は return する代わりに それを throw する動作になります。
+ <br>
+ 複数のパターンを指定する場合は、上のようなペアを複数持つ配列を渡します。
+ <br>
+ converters と overrider の両方が指定された場合、
+ converters によるコード置換が適応された後に overrider によりオーバーライドされます。
+</p>
+<p>
+ また、converters で置換する際には
+ コード内のコメントが除去されたり式が最適化されるかもしれません。
+ <br>
+ 実行環境により差が出てしまうので、実行結果が意図した結果かどうか、注意してください。
+</p>
+<p>
+ 関数がオーバーライドされた object が返ります。
+</p>
+
+<pre>// overrider のみ指定した例
+
+var Hoge = {
+  addHoge : function(value) {
+    return value + &#039;hoge&#039;;
+  }
+};
+
+debug(Hoge.addHoge(&#039;fugafuga&#039;)); // &#039;fugafugahoge&#039;
+
+override(Hoge, &#039;addHoge&#039;, function(inherits, args, self, prop) {
+
+  // オリジナルの関数の引数の 0 番目の値
+  var value = args[0];
+
+  // 引数を 以下のように変更
+  var modify = &#039;{{Modified:&#039; + value + &#039;}}&#039;;
+
+  // 元の引数を消す
+  args[0] = &#039;&#039;;
+
+  // 先頭に追加してオリジナルの関数を呼び出す
+  return modify + inherits(args);
+});
+
+var result = Hoge.addHoge(&#039;fugafuga&#039;);
+
+debug(result); // &#039;{{Modified:fugafuga}}hoge&#039;</pre>
+
+<pre>// converters を指定する例
+
+var Numbers = {
+  NAME   : &#039;Numbers&#039;,
+  logAdd : function(a, b) {
+    return this.NAME + &#039;:&#039; + (a + b);
+  }
+};
+
+debug(Numbers.logAdd(1, 2)); // &#039;Numbers:3&#039;
+
+override(Numbers, &#039;logAdd&#039;, [[
+  /\bthis\.NAME\b/, // this.NAME を &quot;Result&quot; に置換
+  &#039;&quot;Result&quot;&#039;
+], [
+  /([&quot;&#039;]):([&#039;&quot;])/,  // &#039;:&#039; を &#039; = &#039; に置換
+  &#039;$1 = $2&#039;
+], [
+  /\ba\s*[+]\s*b\b/, // + を * に置換し最後に * 100 を追加
+  &#039;(a * b * 100)&#039;
+]]);
+
+debug(Numbers.logAdd(1, 2)); // &#039;Result = 200&#039;</pre>
+
+<pre>// converters と overrider の両方を指定する例
+
+var Numbers = {
+  NAME   : &#039;Numbers&#039;,
+  logAdd : function(a, b) {
+    return this.NAME + &#039;:&#039; + (a + b);
+  }
+};
+
+debug(Numbers.logAdd(1, 2)); // &#039;Numbers:3&#039;
+
+override(Numbers, &#039;logAdd&#039;, [
+
+  // 「this.NAME + &#039;:&#039; +」 を 「&quot;(*l_l)/&quot;」 に置換
+
+  /this\.NAME\s*[+]\s*([()])?\s*[&quot;&#039;]:[&#039;&quot;]\s*[+]/,
+  &#039;&quot;(*l_l)/&quot;+$1&#039;
+], function(inherits, args, self, prop) {
+
+  // 引数 a と b を取得
+  var a = args[0], b = args[1];
+
+  // 引数 a と b に 100 足して渡す
+  return &#039;{{&#039; + inherits(a + 100, b + 100) + &#039;}}&#039;;
+});
+
+debug(Numbers.logAdd(1, 2)); // &#039;{{(*l_l)/203}}&#039;</pre>
+
+    </div>
+  </dd>
+</dl>

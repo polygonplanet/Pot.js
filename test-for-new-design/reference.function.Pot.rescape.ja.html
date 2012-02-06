@@ -1,0 +1,28 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.rescape"><em>Pot.</em>rescape</dfn>
+    (<em>{String}</em> s)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 s を正規表現パターンとみなしエスケープして返します。
+    </p>
+    <div>
+      <p>
+ 引数 s を正規表現パターンとして特殊文字をすべてエスケープして返します。
+ <br>
+ 特殊文字は <code>- . * + ? ^ $ { } ( ) | [ ] / \</code> です。
+</p>
+<p>
+ 正規表現パターンとしてエスケープされた文字列が返ります。
+</p>
+<pre>var pattern = '*[hoge]*';
+var regex = new RegExp('^(' + rescape(pattern) + ')$', 'g');
+debug(regex.toString()); // =&gt; /^(\*\[hoge\]\*)$/g</pre>
+    </div>
+  </dd>
+</dl>

@@ -1,0 +1,48 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.stringify"><em>Pot.</em>stringify</dfn>
+    (<em>{*}</em> x [, <em>{Boolean}</em> ignoreBoolean = false])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      任意の値 x を文字列として評価して返します。
+    </p>
+    <div>
+<p>
+      String, Number などのいわゆるスカラー型のみ限定して扱います。
+<br>
+Object や Function, null, undefined 等は空文字 '' が返ります。
+<br>
+Boolean は、false の場合、空文字 '' が返り、true は '1' になります。
+<br>
+引数 ignoreBoolean が 真 (true) として与えられると Boolean の true も 空文字 '' になります。
+<br>
+E4X (ECMAScript for XML) が使用できる環境では、XML オブジェクトも適応され toString() して返します。
+<br>
+Node.js などで利用可能な Buffer が与えられると、同じく toString() の結果が返ります。
+</p>
+<p>
+ かならず文字列としての値が返ります。
+</p>
+<pre>stringify({});                // ''
+stringify([]);                // ''
+stringify(0);                 // '0'
+stringify(-100.02);           // '-100.02'
+stringify(new Date());        // ''
+stringify(null);              // ''
+stringify((void 0));          // ''
+stringify(false);             // ''
+stringify(true);              // '1'
+stringify('');                // ''
+stringify('hoge');            // 'hoge'
+stringify(new String('hoge'); // 'hoge'
+stringify(new Boolean(false); // ''
+stringify(new Boolean(true);  // '1'
+stringify([100]);             // ''</pre>
+    </div>
+  </dd>
+</dl>

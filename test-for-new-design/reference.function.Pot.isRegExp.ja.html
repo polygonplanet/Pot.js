@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isRegExp"><em>Pot.</em>isRegExp</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が正規表現オブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が正規表現オブジェクトかどうか調べ、適正なら true を返します。
+ <br>
+ 正規表現オブジェクトでない場合、false が返ります。
+</p>
+<p>
+ x が正規表現オブジェクトなら true を返します。
+</p>
+<pre>debug(isRegExp(/fo+/));              // true
+debug(isRegExp(new RegExp('fo+$'))); // true
+debug(isRegExp('hoge'));             // false</pre>
+
+    </div>
+  </dd>
+</dl>

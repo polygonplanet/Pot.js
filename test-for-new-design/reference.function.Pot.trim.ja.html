@@ -1,0 +1,33 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.trim"><em>Pot.</em>trim</dfn>
+    (<em>{String}</em> s [, <em>{String}</em> chars [, <em>{Boolean}</em> ignoreCase = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 s の両端のホワイトスペースを除去して返します。
+    </p>
+    <div>
+      <p>
+ 引数 s の左側と右側のホワイトスペースを除去して返します。
+ <br>
+ ホワイトスペースは、全角スペース U+3000 を含む Unicode Whitespace キャラクタです。
+ <br>
+ 文字列 chars が指定されると、ホワイトスペースの代わりに chars を除去して返します。
+ <br>
+ その際に、引数 ignoreCase が 真 (true) として渡されると、大文字小文字を無視して除去します。
+ <br>
+ chars は、1 文字単位で扱われます。
+</p>
+<p>
+ 文字列の両端からホワイトスペースまたは文字列 chars が除去された文字列が返ります。
+</p>
+<pre>debug( trim(' hoge  ') );          // 'hoge'
+debug( trim('abbbcc cca ', 'ab') ); // 'cc cca '</pre>
+    </div>
+  </dd>
+</dl>

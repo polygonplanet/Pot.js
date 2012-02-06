@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isNodeList"><em>Pot.</em>isNodeList</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が DOM NodeList かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が DOM NodeList かどうか調べます。
+</p>
+<p>
+ x が NodeList なら true を返し、それ以外は false を返します。
+</p>
+<pre>// For Web Browser.
+var array = [{foo: 1}, {bar: 2}, {baz: 3}];
+var nodes = document.getElementsByTagName('div');
+
+debug(isNodeList(array)); // false
+debug(isNodeList(nodes)); // true</pre>
+    </div>
+  </dd>
+</dl>

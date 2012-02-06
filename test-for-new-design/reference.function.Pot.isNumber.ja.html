@@ -1,0 +1,31 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isNumber"><em>Pot.</em>isNumber</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が数値かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が数値かどうか調べ、適正なら true を返します。
+ <br>
+ 数値でない場合、false が返ります。
+</p>
+<p>
+ x が数値であれば true を返します。
+</p>
+<pre>debug(isNumber(0));               // true
+debug(isNumber(new Number(123))); // true
+debug(isNumber(NaN));             // true
+debug(isNumber(Infinity));        // true
+debug(isNumber('hoge'));          // false</pre>
+
+    </div>
+  </dd>
+</dl>

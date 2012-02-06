@@ -1,0 +1,30 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isArray"><em>Pot.</em>isArray</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が配列かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が配列かどうか調べ、適正なら true を返します。
+ <br>
+ 配列でない場合、false が返ります。
+</p>
+<p>
+ x が配列なら true を返します。
+</p>
+<pre>debug(isArray([]));            // true
+debug(isArray([1, 2, 3]));     // true
+debug(isArray(new Array(10))); // true
+debug(isArray('hoge'));        // false</pre>
+
+    </div>
+  </dd>
+</dl>

@@ -1,0 +1,62 @@
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.globalize"><em>Pot.</em>globalize</dfn>
+    ([<em>{Object}</em> target[, <em>{Boolean}</em> advised = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Pot.js ライブラリまたは target をグローバル化します。
+    </p>
+    <div>
+      <p>
+ Pot.js (or PotLite.js) ライブラリの関数やプロパティ・オブジェクトをグローバルスコープに参照付けします。
+ <br>
+ グローバル化することにより、
+ <br>
+ 例えば <a href="#reference.function.Pot.debug">Pot.debug()</a> が、たんに debug() と呼び出せるようになります。
+ <br>
+ このリファレンスのサンプルコードの多くは、便宜上 Pot.globalize が適応されたと仮定して表現しています。
+ <br>
+ 適応しない場合の親オブジェクトは、関数の定義から参照できます (ここでは {Array} Pot.globalize の 'Pot')。
+ <br>
+ 引数 target をオブジェクトで渡すと、Pot.js ライブラリの代わりに target が持つ関数/プロパティをグローバル化します。
+ <br>
+ その際に、引数 advised が 真 (true) として渡されると
+ <br>
+ 同じ名前がグローバルスコープに定義されていた場合、上書きしない動作になります。
+ <br>
+ 引数なしで Pot.js / PotLite.js ライブラリをグローバル化する場合は、常に上書きします。ご注意ください。
+</p>
+<p>
+ グローバルスコープへの上書きを避けた名前の配列が返ります。なかった場合、空の配列 [] が返ります。
+</p>
+<pre>// グローバル化して短い関数名を使用する例
+
+try {
+    debug( trim(' hoge ') ); // (Error: trim is undefined)
+} catch (e) {
+    Pot.debug( Pot.trim(' hoge ') ); // 'hoge'
+}
+
+Pot.globalize();
+
+debug( trim(' hoge ') ); // 'hoge'</pre>
+
+<pre>var obj = {
+    foo : function() { return 'foo!'; },
+    bar : function() { return 'bar!'; }
+};
+
+Pot.globalize(obj);
+
+// e.g.,
+debug(window.foo()); // 'foo!' (on Web Browser)
+debug(bar());        // 'bar!'</pre>
+
+    </div>
+  </dd>
+</dl>

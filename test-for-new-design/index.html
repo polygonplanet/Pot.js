@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library</title>
+<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico?2">
+<meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for string operations and asynchronous iterable processing with Deferred.">
+<meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
+<meta name="description" lang="ja" content="Pot.js/PotLite.jsは,非ブロックでの非同期処理を直列的に書けるようにし,UIやCPUへの負担を軽減するループ処理を中心にDeferredと共に実装されたJavaScriptライブラリ.">
+<meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="Pot.js Develop Blog - CPU Benchmark with jQuery" href="http://polygon-planet.blogspot.com/2011/11/javascript.html">
+<link rel="Pot.js Develop Blog - Deferred" href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css">
+<!--[if lt IE 7]>
+<script>var IE7_PNG_SUFFIX = '.png';</script>
+<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+<![endif]-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" async="async" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.12/pot.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
+<script type="text/javascript">
+setTimeout(function() {
+
+  var NULL_URI = 'javascript:void(0)';
+  var LOADING  = 'content-loading';
+  var MENU_URI = 'menu.json';
+
+  var done, lang, tree, changed, isMouseInMenu,
+      currentPage, currentId, initHash, initPage;
+
+  var scrollToHash = function(page, hash) {
+    var d = new Pot.Deferred();
+    try {
+      if (hash && hash != page) {
+        try {
+          $('.content-broader').scrollTo('#' + Pot.rescape(hash), 800, {
+            axis    : 'y',
+            onAfter : function() {
+              location.hash = hash;
+              d.begin();
+            }
+          });
+        } catch (ex) {
+          location.hash = hash;
+          d.begin();
+        }
+      } else if (page && currentPage != page) {
+        Pot.callLater(0.5, function() {
+          location.hash = page;
+          d.begin();
+        });
+      } else {
+        d.begin();
+      }
+    } catch (e) {
+      d.raise(e);
+    }
+    return d;
+  };
+
+  var loadPage = function(page, hash) {
+    var target = $('.content-wrapper');
+
+    if (currentPage == page) {
+      scrollToHash(page, hash);
+      currentId = hash;
+    } else {
+      target.empty().addClass(LOADING);
+
+      return Pot.Deferred.wait(0.2).then(function() {
+
+        return Pot.request(page, {
+          mimeType : 'text/html'
+        }).then(function(res) {
+
+          target.append(res.responseText).find('a[href^="#"]').each(function() {
+            var that = $(this), id = that.attr('href').substring(1);
+
+            if (tree.has(id)) {
+              that.attr({href : NULL_URI}).click(function() {
+                var menuItem = tree.get(id);
+                if (menuItem && menuItem.item) {
+                  menuItem.item.find('a').click();
+                }
+              });
+            }
+          });
+
+        }).ensure(function(err) {
+          target.removeClass(LOADING);
+
+          scrollToHash(page, hash).ensure(function() {
+            currentPage = page;
+            currentId = hash;
+          });
+
+          if (Pot.isError(err)) {
+            throw err;
+          }
+
+        });
+
+      });
+
+    }
+  };
+
+  var observe = function(callback) {
+    var args = arguments;
+    Pot.callLazy(function() {
+      callback();
+      Pot.callLater(0.375, function() {
+        args.callee.apply(args.callee, args);
+      });
+    });
+  };
+
+  var isElementInView = function(elem) {
+    var result = false,
+        de = document.documentElement,
+        body = document.body || de,
+        scrollLeft = Math.max(de.scrollLeft, body.scrollLeft),
+        scrollTop  = Math.max(de.scrollTop, body.scrollTop),
+        isOpera1050, rect, ua = Pot.Browser, left, top;
+
+    try {
+      if (window.opera.version() >= 10.50) {
+        isOpera1050 = true;
+      }
+    } catch (e) {}
+
+    try {
+      rect = elem.getClientRects()[0];
+      if (!rect) {
+        throw rect;
+      }
+    } catch (e) {
+      return false;
+    }
+    if ((ua.opera || isOpera1050) &&
+        (rect.left < 0 || rect.left > window.innerWidth ||
+         rect.top  < 0 || rect.top  > window.innerHeight)) {
+      return false;
+    }
+
+    left = (rect.left - 0) || 0;
+    top  = (rect.top  - 0) || 0;
+
+    if (ua.opera || ua.safari) {
+      left += scrollLeft;
+      top  += scrollTop;
+    } else if (ua.firefox) {
+      left += 1;
+      top  += 1;
+    }
+
+    try {
+      if (document.elementFromPoint(left, top) === elem) {
+        result = true;
+      }
+    } catch (e) {}
+
+    return result;
+  };
+
+  var showMenuScrollbar = function(menu) {
+    menu.css({
+      overflow  : 'auto',
+      overflowX : 'hidden',
+      overflowY : 'auto'
+    });
+  };
+
+  var hideMenuScrollbar = (function() {
+    var menuItemExpr = '.menu-accordion-container h3, .menu-accordion-container h3 a',
+        menuWidth, menuItems, initMenuScroll;
+
+    return function(menu) {
+      if (!initMenuScroll) {
+        menuItems = $(menuItemExpr);
+        menuWidth = menuItems.eq(0).width();
+        if (menuWidth) {
+          initMenuScroll = true;
+        }
+      }
+
+      menu.css({
+        overflow  : 'hidden',
+        overflowX : 'hidden',
+        overflowY : 'hidden'
+      });
+
+      // Google Chrome Bug?
+      if (menuWidth && menuItems) {
+        if (menuItems.eq(1).width() < menuWidth) {
+          menuItems.each(function() {
+            if (Pot.tagNameOf($(this).get(0)) === 'a') {
+              $(this).css({width : '99%'}).css({width : '100%'});
+            } else {
+              $(this).width(menuWidth);
+            }
+          });
+        }
+      }
+    };
+  }());
+
+  var adjustContainerLayout = (function() {
+    var menuExpr = '.leftside-wrapper',
+        contentExpr = '.content-broader',
+        initLayout;
+
+    return function() {
+      var height = $('body').height() - $('.header').outerHeight() - $('.footer').outerHeight();
+
+      if (!initLayout) {
+        $(menuExpr).hover(function() {
+          isMouseInMenu = true;
+          showMenuScrollbar($(this));
+        }, function() {
+          isMouseInMenu = false;
+        }).each(function() {
+          showMenuScrollbar($(this));
+        });
+        $(contentExpr).css({
+          overflow  : 'auto'
+        });
+        initLayout = true;
+      }
+
+      $(menuExpr).css({
+        height : height
+      });
+      $(contentExpr).css({
+        height : height
+      });
+
+      // IE SUCKS
+      if (Pot.System.hasActiveXObject) {
+        $(menuExpr).css({
+          overflow  : 'hidden',
+          overflowX : 'hidden',
+          overflowY : 'hidden',
+          position  : 'relative',
+          zoom      : 1
+        });
+        $(contentExpr).css({
+          overflow  : 'auto',
+          overflowX : 'hidden',
+          overflowY : 'auto',
+          position  : 'relative',
+          zoom      : 1
+        });
+      }
+
+    };
+  }());
+
+  var init = function() {
+
+    var getLang = function(ln, rev) {
+      var ja = 'ja', en = 'en';
+      if (rev) {
+        return (ln == ja) ? en : ja;
+      } else {
+        return (ln == en) ? en : ja;
+      }
+    };
+
+    Pot.deferrizejQueryAjax();
+
+    initHash = Pot.stringify(location.hash).substring(1);
+    if (~initHash.indexOf(':')) {
+      initHash = initHash.split(':');
+      lang = initHash.pop().toLowerCase();
+      initHash = initHash.join(':');
+    }
+    if (/ja|en/.test(lang)) {
+      lang = getLang(lang);
+    } else {
+      lang = getLang(Pot.LANG);
+    }
+
+    $('.header-desc-' + getLang(lang, true)).hide();
+    $('a[href="#"]').attr({href : Pot.parseURI(Pot.currentURI()).filename});
+
+    $('<a/>')
+      .attr({
+        href  : NULL_URI,
+        title : 'Language: ' + getLang(lang, true)
+      })
+      .click(function() {
+        var uri = Pot.currentURI().replace(/:+\w*$/g, '');
+        if (!~uri.indexOf('#')) {
+          uri += '#';
+        }
+        location.href = Pot.sprintf('%s:%s', uri, getLang(lang, true));
+        location.reload();
+      })
+      .text(getLang(lang, true))
+      .appendTo('.header-lang-container');
+
+    $.getJSON(MENU_URI).then(function(data) {
+      var id, subId, index = 0,
+          wrap = $('<div/>'),
+          subWrap, firstPage, firstHash;
+
+      tree = new Pot.Hash();
+
+      if (data && data.items) {
+        Pot.forEach(data.items, function(item, id) {
+          var menuitem, fileName = Pot.sprintf('%s.%s.html', id, lang);
+
+          if (!firstPage) {
+            firstPage = fileName;
+          }
+          if (!initPage) {
+            initPage = fileName;
+          }
+          if (initHash) {
+            if (initHash == id) {
+              firstPage = fileName;
+              firstHash = id;
+            } else if (initHash == fileName) {
+              firstPage = fileName;
+              firstHash = '';
+            }
+          }
+
+          menuitem = $('<h3/>')
+            .addClass('menu-accordion-item')
+            .append(
+              $('<a/>')
+                .attr({href : NULL_URI})
+                .text(item.title[lang])
+                .click(function() {
+                  Pot.Deferred.till(function() {
+                    return changed;
+                  }).then(function() {
+                    loadPage(fileName, id);
+                  });
+                })
+            );
+
+          if (tree.has(id)) {
+            throw 'error: ' + id;
+          }
+          tree.set(id, {
+            item  : menuitem,
+            page  : fileName,
+            index : index
+          });
+          menuitem.appendTo(wrap);
+          subWrap = $('<div/>');
+
+          Pot.forEach(item.items, function(subItem, subId) {
+            var subMenuitem, subFileName = fileName;
+
+            if (Pot.startsWith(subId, 'reference.')) {
+              subFileName = Pot.sprintf('%s.%s.html', subId, lang);
+            }
+            if (initHash) {
+              if (initHash == subId) {
+                firstPage = subFileName;
+                firstHash = subId;
+              } else if (initHash == subFileName) {
+                firstPage = subFileName;
+                firstHash = '';
+              }
+            }
+
+            subMenuitem = $('<h3/>')
+              .addClass('menu-accordion-subitem')
+              .append(
+                $('<a/>')
+                  .attr({href : NULL_URI})
+                  .text(subItem[lang])
+                  .click(function() {
+                    Pot.Deferred.till(function() {
+                      return changed;
+                    }).then(function() {
+                      loadPage(subFileName, subId);
+                    });
+                  })
+              );
+
+            if (tree.has(subId)) {
+              throw 'error: ' + subId;
+            }
+            tree.set(subId, {
+              item  : subMenuitem,
+              page  : subFileName,
+              index : index
+            });
+            subMenuitem.appendTo(subWrap);
+          });
+          subWrap.appendTo(wrap);
+
+          index++;
+        });
+        $('.menu-accordion-container').empty().append(wrap);
+      }
+      return [firstPage, firstHash, loadPage];
+
+    }).then(function(firstPage, firstHash, loadPage) {
+
+      $('.menu-accordion-container').accordion({
+        header      : '.menu-accordion-item',
+        collapsible : true,
+        autoHeight  : false,
+        active      : 0,
+        changestart : function(ev, ui) {
+          changed = false;
+        },
+        change      : function(ev, ui) {
+          changed = true;
+        }
+      }).removeClass(LOADING);
+      changed = true;
+
+      $(window).resize(function() {
+        adjustContainerLayout();
+      });
+      adjustContainerLayout();
+
+      Pot.callLazy(function() {
+        if (firstPage) {
+          loadPage(firstPage, firstHash);
+        }
+
+        observe((function() {
+          var highlightClass = 'menu-accordion-item-current',
+              forInViewClass = 'potjs-manual-item-for-in-view',
+              accordion = $('.menu-accordion-container'),
+              leftSide  = $('.leftside-wrapper'),
+              prevItem, processing;
+
+          var addHighlightClass = function(menuItem) {
+            if (menuItem && menuItem.item && menuItem.item !== prevItem) {
+              prevItem && prevItem.removeClass(highlightClass);
+              menuItem.item.addClass(highlightClass);
+              if (currentPage !== menuItem.page && menuItem.index != null &&
+                  accordion.accordion('option', 'active') !== menuItem.index
+              ) {
+                accordion.accordion('activate', menuItem.index);
+              }
+
+              if (!isMouseInMenu) {
+                leftSide.scrollTo(menuItem.item, 20, {
+                  axis    : 'y',
+                  offset  : -Math.floor(leftSide.height() / 2 - menuItem.item.height() / 2)
+                });
+              }
+              prevItem = menuItem.item;
+            }
+          };
+
+          return function() {
+            var item = tree.get(currentId),
+                itemId = currentId,
+                curHash = Pot.stringify(location.hash).substring(1),
+                backPage, backId, backItem;
+
+            if (processing) {
+              return;
+            }
+
+            processing = true;
+
+            if (curHash !== itemId) {
+              backItem = tree.get(curHash);
+              if (backItem && backItem.page) {
+                processing = false;
+                loadPage(backItem.page, curHash);
+                return;
+              }
+            }
+
+            if (item && item.item && Pot.startsWith(itemId, 'reference.')) {
+              addHighlightClass(item);
+              processing = false;
+            } else {
+              Pot.Deferred.forEach.ninja($('.' + forInViewClass), function(elem, i) {
+                var id;
+                if (itemId !== currentId) {
+                  processing = false;
+                  throw Pot.StopIteration;
+                }
+                if (isElementInView(elem)) {
+                  if (Pot.tagNameOf(elem) === 'div') {
+                    elem = $(elem).prev('.' + forInViewClass);
+                  }
+                  id = $(elem).attr('id');
+                  if (id) {
+                    if (i === 0) {
+                      id = 'manual.' + id.split('.').slice(1, -1).join('.');
+                    }
+                    addHighlightClass(tree.get(id));
+                    throw Pot.StopIteration;
+                  }
+                }
+              }).ensure(function(err) {
+                processing = false;
+                if (err && Pot.isError(err)) {
+                  throw err;
+                }
+              });
+            }
+          };
+        }()));
+
+      });
+    });
+  };
+
+  (function() {
+    if (typeof $   === 'undefined' ||
+        typeof Pot === 'undefined' || !$.scrollTo || !$.ui) {
+      setTimeout(arguments.callee, 20);
+    } else if (!done) {
+      done = true;
+      init();
+    }
+  }());
+
+}, 20);
+</script>
+<style type="text/css" media="all">
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #f8f8ff;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  overflow: hidden;
+}
+
+body .layout-liquid-container {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+}
+
+body > .layout-liquid-container {
+  height: auto;
+}
+
+.layout-liquid-container .header {
+  overflow: hidden;
+}
+
+.layout-liquid-container .layout-2-column-left-menu {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.layout-liquid-container .layout-2-column-left-menu .leftside {
+  width: 240px;
+  max-width: 240px;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  z-index: 6;
+}
+
+.layout-liquid-container .layout-2-column-left-menu .content {
+  width: 100%;
+  min-width: 100px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  margin-right: -240px;
+  position: relative;
+  z-index: 5;
+}
+
+.layout-liquid-container .header,
+.layout-liquid-container .footer {
+  overflow: hidden;
+}
+
+.layout-liquid-container .footer {
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+}
+
+.leftside-wrapper {
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+}
+
+.content-broader {
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 0 1px;
+  margin-right: 240px;
+}
+
+.content-wrapper {
+  padding: 1em;
+}
+
+.footer-wrapper {}
+
+.header-logo {
+  float: right;
+  width: 310px;
+  max-width: 310px;
+  height: 200px;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  z-index: 20;
+}
+
+.header-desc {
+  float: right;
+  width: 100%;
+  height: 200px;
+  margin-right: -310px;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  z-index: 10;
+}
+
+.header-logo-wrapper {
+  padding: 4px;
+}
+
+.header-desc-negative-wrapper {
+  margin-right: 310px;
+  padding: 4px;
+}
+
+.header-desc .header-title {
+  margin: 10px;
+}
+
+.header-desc-container {
+  height: 40px;
+}
+
+.header-desc .header-desc-container .header-desc-ja,
+.header-desc .header-desc-container .header-desc-en {
+  margin: 4px 6px;
+}
+
+.header-search {
+  margin: 16px 12px 4px 4px;
+  text-align: right;
+}
+
+.header-search .header-search-input {
+  width: 200px;
+}
+
+.header-lang-container {
+  margin: 16px 12px 4px 4px;
+  text-align: right;
+}
+
+.content-loading {
+  background: url(http://api.polygonpla.net/img/icon/loading-circle-cycle.gif?2) no-repeat scroll 45% 45% transparent;
+  height: 500px;
+}
+
+.potjs-reference-compatibility {
+  margin: 1em 5em;
+  color: #666699;
+}
+
+.potjs-reference-description {}
+
+
+dl dd {
+  margin-bottom: 1em;
+}
+
+dl var {
+  font-style: italic;
+  font-weight: normal;
+}
+
+dt em, .var-type {
+  color: #777;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 85%;
+}
+
+dfn em {
+  font-style: normal;
+  font-weight: normal;
+  color: #333355;
+  font-size: 100%;
+}
+
+td.header, td.header * {
+  font-weight: bold;
+}
+
+td.marker, td.marker * {
+  background: #e2e5ff;
+}
+
+
+/* ----- Accordion Menu ----- */
+.ui-helper-reset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  line-height: 1.4;
+  text-decoration: none;
+  font-size: 100%;
+  list-style: none;
+}
+
+/* states and images */
+.ui-icon {
+  width: 16px;
+  height: 16px;
+  background-image: url(http://api.polygonpla.net/img/icon/arrows.png?2);
+}
+
+.ui-state-default .ui-icon {
+  background-position: 0px 16px;
+}
+
+.ui-state-hover .ui-icon,
+.ui-state-focus .ui-icon {
+  background-position: 0px 32px;
+}
+
+.ui-state-active .ui-icon {
+  background-position: 0px 0px;
+}
+
+/* jQuery UI Accordion 1.8.11 */
+.ui-accordion {
+  width: 100%;
+}
+
+.ui-accordion .ui-accordion-header {
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 1px 0;
+  margin-top: -1px;
+  cursor: pointer;
+  position: relative;
+  zoom: 1;
+}
+
+.ui-accordion .ui-accordion-li-fix {
+  display: inline;
+}
+
+.ui-accordion .ui-accordion-header-active {
+  border-bottom: 0 !important;
+}
+
+.ui-accordion .ui-accordion-header a {
+  display: block;
+  padding: 0.5em 0.5em 0.5em 0.7em;
+}
+
+.ui-accordion-icons .ui-accordion-header a {
+  padding-left: 22px;
+  background: #e2e8ff;
+  text-decoration: none;
+}
+
+.ui-accordion .ui-accordion-header .ui-icon {
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  margin-top: -8px;
+}
+
+.ui-accordion .ui-accordion-content {
+  display: none;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  /*overflow: auto;*/
+  zoom: 1;
+}
+
+.ui-accordion .ui-accordion-content-active {
+  display: block;
+}
+
+/* Addition */
+.menu-accordion-container {
+  width: 100%;
+  border-color: #666677;
+  border-style: solid;
+  border-width: 0 1px 0 0;
+}
+
+.menu-accordion-subitem {
+  margin: -1px 0 0 0;
+  padding: 0;
+  outline: 0;
+  line-height: 1.4;
+  text-decoration: none;
+  font-size: 100%;
+  list-style: none;
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 1px 0;
+  cursor: pointer;
+  position: relative;
+  zoom: 1;
+}
+
+.menu-accordion-subitem a {
+  display: block;
+  outline: 0;
+  padding: 0.5em 0.5em 0.5em 0.7em;
+  background: #f0f2f8;
+  text-decoration: none;
+}
+
+.menu-accordion-container .menu-accordion-item-current a {
+  background: #c2f8d2;
+}
+
+</style>
+</head>
+<body>
+  <div class="layout-liquid-container">
+    <div class="header clearfix">
+      <div class="header-desc">
+        <div class="header-desc-negative-wrapper">
+          <h1 class="header-title">
+            <a href="#"
+               title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library">Pot.js + PotLite.js</a>
+          </h1>
+          <div class="header-desc-container">
+            <div class="header-desc-ja">
+             Pot.js は CPU に負荷をかけることなく JavaScript の実行を可能とするユーティリティライブラリです。
+             <div class="error">
+               このリファレンスはまだ作成途中です。
+               空白ページはミカンです。
+               足りない情報は
+               <a href="http://polygonplanet.github.com/Pot.js/index.html" 
+                  title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理+ユーティリティライブラリ">現行のリファレンス</a>
+               から参照ください。
+             </div>
+            </div>
+            <div class="header-desc-en">
+             Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.
+             <div class="error">
+               This reference translation is still going on...
+               Refer 
+               <a href="http://polygonplanet.github.com/Pot.js/index.html" 
+                  title="Pot.js + PotLite.js - Document and Reference - JavaScript Async+Utility Library">Current Reference(Japanese)</a>.
+             </div>
+            </div>
+          </div>
+          <div class="header-search">
+            <input type="text" class="header-search-input" placeholder="Search" value="まだ動かないのです">
+            <button type="button" class="header-search-submit hoge" title="Search">Search</button>
+          </div>
+          <div class="header-lang-container"></div>
+        </div>
+      </div>
+      <div class="header-logo">
+        <div class="header-logo-wrapper">
+          <a href="#"
+             title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library"><img src="http://api.polygonpla.net/img/logo/pot.js.mini.png?2"></a>
+        </div>
+      </div>
+    </div>
+    <div class="layout-2-column-left-menu clearfix">
+      <div class="content">
+        <div class="content-broader">
+          <div class="content-wrapper content-loading"></div>
+        </div>
+      </div>
+      <div class="leftside">
+        <div class="leftside-wrapper">
+          <div class="menu-accordion-container content-loading"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-wrapper">
+        <p>
+          Last modified: 2012-02-06
+          Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <noscript>
+    <style type="text/css" media="screen">
+    body .layout-liquid-container .layout-2-column-left-menu {
+      display: none;
+    }
+    body .layout-script-warn-container .layout-script-warn-wrapper {
+      border-color: #a05860;
+      -webkit-box-shadow: 1px 1px 5px #9999cc;
+      -moz-box-shadow: 1px 1px 5px #9999cc;
+      -o-box-shadow: 1px 1px 5px #9999cc;
+      box-shadow: 1px 1px 5px #9999cc;
+    }
+    body .layout-script-warn-container .layout-script-warn-wrapper,
+    body .layout-script-warn-container .layout-script-warn-wrapper .script-warning {
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+    }
+    body {
+      padding-top: 78px;
+    }
+    .header-search, .header-lang-container {
+      display: none;
+    }
+    </style>
+    <div class="layout-script-warn-container">
+      <div class="layout-script-warn-wrapper">
+        <div class="script-warning">
+         このページは JavaScript で動きます - This page require JavaScript.
+        </div>
+      </div>
+    </div>
+  </noscript>
+</body>
+</html>

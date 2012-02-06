@@ -1,0 +1,28 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isError"><em>Pot.</em>isError</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x がエラー (error オブジェクト) かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x がエラー (error オブジェクト) かどうか調べ、適正なら true を返します。
+ <br>
+ エラーでない場合、false が返ります。
+</p>
+<p>
+ x がエラーなら true を返します。
+</p>
+<pre>debug(isError(new Error('hoge!'))); // true
+debug(isError('fuga!'));            // false</pre>
+
+    </div>
+  </dd>
+</dl>

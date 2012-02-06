@@ -1,0 +1,63 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.typeLikeOf"><em>Pot.</em>typeLikeOf</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の型を調べ、その表現を文字列で取得します。
+    </p>
+    <div>
+      <p>
+ 引数 o の型の文字列表現を返します。
+ <br>
+ typeof 演算子を補完したようなものです。
+</p>
+<p>
+ <a href="#reference.function.Pot.typeOf">Pot.typeOf()</a> との違いは、arguments や NodeList も 'array' として返る点です。
+ <br>
+ それ以外は同じ動作をします。
+</p>
+<p>
+ 表現として返る値は以下のうちいずれかになります。
+</p>
+<pre>boolean, number, string, function, array,
+date, regexp, object, error, null, undefined</pre>
+<p>
+ o の型の文字列表現を全て小文字で返します。
+</p>
+<pre>(function(a, b, c) {
+    debug( Pot.typeOf(arguments) );     // 'object' (ECMA-262 3rd Edition)
+    debug( Pot.typeLikeOf(arguments) ); // 'array'
+})(1, 2, 3);</pre>
+
+<pre>debug(typeLikeOf(null));                     // 'null'
+debug(typeLikeOf(undefined));                // 'undefined'
+debug(typeLikeOf(false));                    // 'boolean'
+debug(typeLikeOf(true));                     // 'boolean'
+debug(typeLikeOf(new Boolean(true)));        // 'boolean'
+debug(typeLikeOf(0));                        // 'number'
+debug(typeLikeOf(-123.456));                 // 'number'
+debug(typeLikeOf(NaN));                      // 'number'
+debug(typeLikeOf(Infinity));                 // 'number'
+debug(typeLikeOf(new Number(100)));          // 'number'
+debug(typeLikeOf('abc'));                    // 'string'
+debug(typeLikeOf(new String('abc')));        // 'string'
+debug(typeLikeOf([1, 2, 3]));                // 'array'
+debug(typeLikeOf(new Array(10)));            // 'array'
+debug(typeLikeOf({a: 1, b: 2}));             // 'object'
+debug(typeLikeOf(new Object));               // 'object'
+debug(typeLikeOf(/[a-z]+/));                 // 'regexp'
+debug(typeLikeOf(new RegExp('[A-Z]*')));     // 'regexp'
+debug(typeLikeOf((function(){})));           // 'function'
+debug(typeLikeOf(new Function('return 1'))); // 'function'
+debug(typeLikeOf(new Date));                 // 'date'
+debug(typeLikeOf(new Error('hogeError')));   // 'error'</pre>
+
+    </div>
+  </dd>
+</dl>

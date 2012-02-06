@@ -1,0 +1,1106 @@
+<div>
+ <div>
+   <h2 id="manualsub.Deferred.Reference.Reference" class="potjs-manual-item-for-in-view">Deferred リファレンス</h2>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     このセクションでは、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> について解説します。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.callbackChain" class="potjs-manual-item-for-in-view">チェイン</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> は JavaScript の非同期処理を扱い、
+     また直列的に書けるよう作られています。
+    </p>
+    <pre>setTimeout(function() {
+    something1();
+    setTimeout(function() {
+        something2();
+        setTimeout(function() {
+            something3();
+        }, 0);
+    }, 0);
+}, 0);</pre>
+    <p>
+     このように深くなってしまうネストを、
+    </p>
+    <pre>begin(something1).then(something2).then(something3);</pre>
+    <p>
+     というふうに書けるようになります。
+    </p>
+    <p>
+     シンプルな非同期処理を Pot.Deferred を使い書いてみます。
+    </p>
+    <pre>begin(function() {
+    console.log('begin');
+    return wait(2);
+}).then(function() {
+    console.log('end');
+});</pre>
+    <p>
+     これは、<a href="#reference.function.Pot.Deferred.begin">begin</a> によって非同期で処理が始まり
+     コンソールに 'begin' と出力した後、2 秒待ってから 'end' と出力されます。
+    </p>
+    <p>
+     <a href="#reference.function.Pot.globalize">Pot.globalize()</a> の適応がされてない場合は、
+    </p>
+    <pre>Pot.Deferred.begin(function() {
+    console.log('begin');
+    return Pot.Deferred.wait(2);
+}).then(function() {
+    console.log('end');
+});</pre>
+    <p>
+     という記述になります。
+    </p>
+    <p>
+     (以降は便宜上 <a href="#reference.function.Pot.globalize">Pot.globalize()</a> がなされた記述で例を示します。)
+    </p>
+    <div>
+     <p>
+      他の Deferred ライブラリの経験がある場合、
+      関数名の違いに違和感を感じるかもしれないので以下に示します。
+      (いくつか解釈が違うものもあります。)
+     </p>
+     <div>
+       <table class="grid" id="manualsub.Deferred.Reference.DeferredLibraryMap">
+         <tr>
+           <td class="row-head marker">
+             <a href="http://polygonplanet.github.com/Pot.js/index.html"
+                title="Pot.js + PotLite.js - ドキュメントリファレンス">Pot.Deferred</a>
+           </td>
+           <td class="row-head">
+             <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred"
+                title="MochiKit.Async - manage asynchronous tasks">MochiKit.Async.Deferred</a>
+           </td>
+           <td class="row-head">
+             <a href="http://cho45.stfuawsc.com/jsdeferred/"
+                title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
+           </td>
+           <td class="row-head">
+             <a href="http://api.jquery.com/category/deferred-object/"
+                title="Deferred Object -- jQuery API">jQuery.Deferred</a>
+           </td>
+           <td class="row-head">
+             <a href="http://docs.dojocampus.org/dojo/Deferred"
+                title="dojo/Deferred - DojoCampus - Docs">dojo.Deferred</a>
+           </td>
+         </tr>
+         <tr>
+           <td class="marker">then</td>
+           <td>addCallback(s)</td>
+           <td>next</td>
+           <td>done / then</td>
+           <td>then / addCallback(s)</td>
+         </tr>
+         <tr>
+           <td class="marker">rescue</td>
+           <td>addErrback</td>
+           <td>error</td>
+           <td>fail</td>
+           <td>addErrback</td>
+         </tr>
+         <tr>
+           <td class="marker">ensure</td>
+           <td>addBoth</td>
+           <td>-</td>
+           <td>always</td>
+           <td>addBoth</td>
+         </tr>
+         <tr>
+           <td class="marker">begin</td>
+           <td>callback</td>
+           <td>call</td>
+           <td>resolve</td>
+           <td>resolve / callback</td>
+         </tr>
+         <tr>
+           <td class="marker">raise</td>
+           <td>errback</td>
+           <td>fail</td>
+           <td>reject</td>
+           <td>reject / errback</td>
+         </tr>
+         <tr>
+           <td class="marker">cancel</td>
+           <td>cancel</td>
+           <td>cancel</td>
+           <td>-</td>
+           <td>cancel</td>
+         </tr>
+       </table>
+     </div>
+    </div>
+    <p>
+     Pot.Deferred は MochiKit.Async.Deferred および JSDeferred とほぼ同じ動作をします。
+    </p>
+    <p>
+     <br>
+    </p>
+    <p>
+     以降の解説に関して、Deferred の基本的なものは
+     <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html"
+        title="JSDeferred 紹介">JSDeferred のドキュメント</a>
+     を参考にしています。
+     ゆえに、内容がそっくりになってしまっていますのでご了承ください。
+     なお、問題等ありましたら <a href="#manualsub.overview.contact">連絡先</a> までお願いします。
+     JSDeferred の解説はとてもわかりやすいので、Deferred に関して情報を得たい場合、
+     一度は閲覧することをお勧めします。
+    </p>
+    <p>
+     非同期処理は、setTimeout だけでなく
+     Ajax や onclick などのイベント時にも発生します。
+     <br>
+     例えば request という関数が、第一引数に URL を、
+     第二引数にコールバック関数をとるものとします。
+     <br>
+     これを Deferred なしで書くと、
+    </p>
+    <pre>request('/foo.json', function(fooData) {
+    request('/bar.json', function(barData) {
+        request('/baz.json', function(bazData) {
+            alert([fooData.result, barData.result, bazData.result]);
+        });
+    });
+});</pre>
+    <p>
+     リクエストが増えれば増えるほどネストが深くなってしまいます。
+    </p>
+    <p>
+     これを <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> を用いて書くと、
+    </p>
+    <pre>// request は第一引数に URL をとり Deferred が返る関数として
+var result = [];
+begin(function() {
+    return request('/foo.json').then(function(fooData) {
+        result.push(fooData.result);
+    });
+}).then(function() {
+    return request('/bar.json').then(function(barData) {
+        result.push(barData.result);
+    });
+}).then(function() {
+    return request('/baz.json').then(function(bazData) {
+        result.push(bazData.result);
+    });
+}).then(function() {
+    alert(result);
+});</pre>
+    <p>
+     他にも多様な書き方がありますが、処理が直列的になりました。
+    </p>
+    <p>
+     しかし、この例の場合
+     同じような処理を繰り返してしまっています。
+     <br>
+     未知数のリクエストに対応させると、
+    </p>
+    <pre>var urls = ['/foo.json', '/bar.json', '/baz.json'];
+var result = [];
+Deferred.forEach(urls, function(url) {
+    return request(url).then(function(data) {
+        result.push(data);
+    });
+}).then(function() {
+    alert(result);
+});</pre>
+    <p>
+     こんな感じに書くことができます。
+     <a href="#reference.function.Pot.repeat">Deferred.repeat</a> を使ってもいいと思います。
+    </p>
+    <p>
+     さらにコンパクトかつ、次の処理待ちという縛りをなくし
+     同時実行 (並列処理) として書くなら、
+    </p>
+    <pre>parallel([
+    request('/foo.json'),
+    request('/bar.json'),
+    request('/baz.json')
+]).then(function(result) {
+    alert(result);
+});</pre>
+    <p>
+     このように、<a href="#reference.function.Pot.Deferred.parallel">parallel (Pot.Deferred.parallel)</a> を使うこともできます。
+     parallel は、MochiKit でいう DeferredList と同等の処理を可能とします。
+     すべての処理が終わった後、次のコールバックが呼ばれます。
+     parallel は、オリジナルの JSDeferred.parallel をベースに実装されています。
+    </p>
+    <p><br></p>
+    <p>
+     各チェインのコールバック関数の結果は、
+     return した値が次のチェインの引数として渡されます。
+     <br>
+     コールバック関数から return されなかった場合、
+     結果値として無視されます。
+     <br>
+     その場合、前の結果値を引継ぎ次のコールバックに再び渡されます。
+     <br>
+     コールバック関数スコープ直下に return があるかないかで判断されます。
+    </p>
+    <pre>begin(function() {
+    return 'foo';
+}).then(function(res) {
+    alert(res); // 'foo'
+
+    // 値を返さずこのコールバックを抜ける
+
+}).then(function(res) {
+    // 前のチェインの結果が引き継がれる
+    alert(res); // 'foo'
+
+    // 値を返す
+    return 'bar';
+}).then(function(res) {
+    alert(res); // 'bar'
+});</pre>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.exception" class="potjs-manual-item-for-in-view">例外処理</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     非同期処理の中で発生した例外は、
+     何事もなかったかのように振舞われてしまいます。
+    </p>
+    <p>
+     Pot.Deferred では、これを <a href="#reference.function.Pot.Deferred.prototype.rescue">rescue</a> というメソッドにより捕捉が可能となっています。
+    </p>
+    <pre>begin(function() {
+    alert('begin');
+}).then(function() {
+    // 定義されていない関数を呼び例外が発生
+    undefinedFunc.call();
+}).rescue(function(err) {
+    // 例外をキャッチ
+    alert(err);
+}).then(function() {
+    // その後も処理を続けられる
+    alert('end');
+});</pre>
+    <p>
+     大まかに、このような流れで処理ができます。
+    </p>
+    <p>
+     <a href="#reference.function.Pot.Deferred.prototype.rescue">rescue</a> によるキャッチは、なにも必ず次のチェインでなくても捕捉できます。
+    </p>
+    <pre>begin(function() {
+    alert(1);
+    return 1 + 1;
+}).then(function(res) {
+    alert(res); // 2
+    return res + 1;
+}).then(function(res) {
+    alert(res); // 3
+
+    // エラーを発生させる
+    throw new Error('error');
+}).then(function(res) {
+    // エラーが発生したためこのコールバックは実行されない
+    alert(res);
+    return res + 1;
+}).rescue(function(err) {
+    // エラーをキャッチ
+    alert(err);
+    return 'end';
+}).then(function(res) {
+    alert(res); // 'end'
+});</pre>
+   <p>
+    この例では、 1, 2, 3, 'error', 'end' とアラートされます。
+   </p>
+   <p>
+    then の第一引数のコールバック関数は、成功時のみ実行され
+    エラーが発生した場合は無視されます。
+   </p>
+   <p><br></p>
+   <p>
+    実際のところ、チェインに必ず rescue を入れるような丁寧な実装は
+    そう多くはないと思います。
+    <br>
+    そのため、エラーが発生していても気づかず実装完了してしまうことがあるかもしれません。
+    <br>
+    Pot.Deferred は
+    そのような事例を防ぐため、
+    rescue などによりキャッチされずに終了してしまったチェインは
+    Pot.Deferred 側から再び throw するようになっています。
+    <br>
+    この再スロー機能により、例外を逃さず発見することが可能になっています。
+   </p>
+   <p><br></p>
+   <p>
+    例外時、成功時の両方
+    つまり何が起きても次のチェインを実行したい場合は、
+    <a href="#reference.function.Pot.Deferred.prototype.ensure">ensure</a> メソッドを使います。
+   </p>
+   <pre>begin(function() {
+    return 1;
+}).then(function(res) {
+    alert(res);
+    // ランダムに例外を発生させる
+    if (Math.random() * 10 &lt; 5) {
+        throw new Error('error');
+    } else {
+        return res + 1;
+    }
+}).ensure(function(res) {
+    if (isError(res)) {
+        alert('エラー: ' + res);
+    } else {
+        alert('成功: ' + res);
+    }
+    return 'end';
+}).then(function(res) {
+    alert(res); // 'end'
+});</pre>
+    <p>
+     このような、エラーなのか成功なのか不明な場合や
+     必ず実行したい場合に有用です。
+    </p>
+    <p>
+     isError (Pot.isError) は、
+     対象が Error オブジェクトかどうか判別します。
+     この例のような場合には特に有用です。
+    </p>
+    <p>
+     then, rescue, ensure それぞれの使用方法は同じです。
+     return した値が、次のコールバックの引数に使われます。
+    </p>
+    <p>
+     また、return した値が Pot.Deferred のインスタンスだった場合、
+     そのチェインの最終的な値が 次のコールバックの引数に渡されます。
+    </p>
+    <pre>begin(function() {
+    return begin(function() {
+        return 'ho';
+    }).then(function(res) {
+        var d = new Deferred();
+        return d.then(function() {
+            return res + 'ge';
+        }).begin();
+    });
+}).then(function(res) {
+    alert(res);
+});</pre>
+    <p>
+     この例では 'hoge' とアラートされます。
+    </p>
+    <p>
+     Pot.Deferred を返す場合はネストが可能です。
+     Pot.Deferred を返し、そのコールバックでも Pot.Deferred を返す、
+     といったことが可能です。
+     最終的な結果 (return された) 値が次のコールバックの引数として渡されます。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.Destructuring-Assignment" class="potjs-manual-item-for-in-view">分割代入</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     チェインのコールバック関数は、
+     引数の数を調節して結果値から分割代入 (Destructuring-Assignment) のようなことができます。
+    </p>
+    <pre>begin(function() {
+    // 配列で返す
+    return [1, 2, 3];
+}).then(function(a, b, c) { // 結果の配列のアイテム数と引数の数を合わせる
+
+    debug(a); // 1
+    debug(b); // 2
+    debug(c); // 3
+
+    return [c, b, a]; // 逆順にして返す
+
+}).then(function(a, b, c) {
+    // 上と逆順になる
+
+    debug(a); // 3
+    debug(b); // 2
+    debug(c); // 1
+
+    return [c, b, a];
+
+}).then(function(res) { // 通常通り引数一つで取得
+    // 引数一つの時は分割代入されない
+
+    debug(res); // [1, 2, 3]
+
+});</pre>
+    <p><br></p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.speedControl" class="potjs-manual-item-for-in-view">速度の操作</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     Pot.Deferred は、コールバックチェインの速度を変更することができます。
+    </p>
+    <pre>var d = new Deferred();
+// 速度を遅くする
+d.speed('slow');
+
+d.then(function() {
+    console.log(1);
+}).then(function() {
+    console.log(2);
+}).then(function() {
+    console.log(3);
+}).begin();</pre>
+    <p>
+     こうすることで、各コールバックはゆっくり実行されます。
+     <br>
+     この例では、console.log() が 1, 2, 3 とゆっくり表示されます。
+    </p>
+    <p>
+     速度の指定は、speed メソッドにより指定できます。
+     定義された値の文字列、または数値 (ms) で指定できます。
+     定義された文字列値は 下の表 を参照ください。
+    </p>
+    <div>
+     <table class="grid" id="manualsub.Deferred.Reference.controlSpeedMap">
+      <tr>
+       <td class="marker row-head">値 / メソッド名</td>
+       <td class="marker row-head">速度</td>
+      </tr>
+      <tr>
+       <td>limp</td>
+       <td>最も遅い</td>
+      </tr>
+      <tr>
+       <td>doze</td>
+       <td>遅い</td>
+      </tr>
+      <tr>
+       <td>slow</td>
+       <td>遅め</td>
+      </tr>
+      <tr>
+       <td>normal</td>
+       <td>通常</td>
+      </tr>
+      <tr>
+       <td>fast</td>
+       <td>速め</td>
+      </tr>
+      <tr>
+       <td>rapid</td>
+       <td>速い</td>
+      </tr>
+      <tr>
+       <td>ninja</td>
+       <td>最も速い</td>
+      </tr>
+     </table>
+    </div>
+    <p>
+     または、コンストラクタに引数のオプションとして渡すことができます。
+    </p>
+    <pre>var d = new Deferred({ speed : 'slow' });</pre>
+    <p>
+     コールバックチェインの途中で速度を変更することも可能です。
+    </p>
+    <pre>var d = new Deferred();
+d.then(function() {
+    console.log(1);
+}).speed('slow').then(function() {
+    console.log(2);
+    return 2 + 1;
+}).speed(5000).then(function(res) {
+    console.log(res); // 3
+}).begin();</pre>
+    <p>
+     上の例のように、コールバック関数を用いないメソッドは
+     結果の値を引き継ぎ、次のコールバックに渡します。
+     <br>
+     したがって、<a href="#reference.function.Pot.Deferred.prototype.speed">speed()</a> や <a href="#reference.function.Pot.Deferred.prototype.wait">wait()</a> などを使用しても
+     次のコールバックに渡す引数の値が失われることはありません。
+    </p>
+    <p>
+     何らかの重い処理を分割して処理する場合、speed の指定により負荷を軽減できます。
+    </p>
+    <pre>begin(function() {
+    return someHeavyProcess();
+}).speed('slow').then(function(res) {
+    return moreHeavyProcess(res);
+}).speed('doze').then(function(res) {
+    return mostHeavyProcess(res);
+}).speed('normal').then(function(res) {
+    alert(res);
+});</pre>
+    <p>
+     途中で wait を置くことも可能です。
+    </p>
+    <pre>begin(function() {
+    return someHeavyProcess();
+}).speed('slow').wait(1).then(function(res) {
+    return moreHeavyProcess(res);
+}).speed('doze').wait(2).then(function(res) {
+    return mostHeavyProcess(res);
+}).speed('normal').then(function(res) {
+    alert(res);
+});</pre>
+    <p>
+     wait は、秒数を引数に設定します。
+     ミリ秒ではないので注意してください。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.fireChain" class="potjs-manual-item-for-in-view">チェインを実行</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     今までの例の途中でもいくつか出ましたが、
+     <br>
+     <a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> メソッドによりチェインを開始することができます。
+    </p>
+    <p>
+     関数としての <a href="#reference.function.Pot.Deferred.begin">begin (Pot.Deferred.begin)</a> は、
+     Deferred のインスタンスを生成し、
+     チェインを開始するショートカットのようなものです。
+     別ものなので注意してください。
+    </p>
+    <pre>var d = new Deferred();
+d.then(function() {
+    alert('hoge');
+});</pre>
+    <p>
+     この例は、何も実行されません。
+     'hoge' とアラートもされません。
+     <br>
+     単に変数 d にコールバックを登録しただけです。
+    </p>
+    <p>
+     これを実行するには、
+    </p>
+    <pre>d.begin();</pre>
+    <p>
+     とすると、コールバックチェインが開始されます。
+    </p>
+    <p>
+     また、引数に値を設定することができます。
+    </p>
+    <pre>var d = new Deferred();
+d.then(function(value) {
+    alert(value);
+}).begin('hoge');</pre>
+    <p>
+     この例では、hoge とアラートされます。
+    </p>
+    <p>
+     次 (この場合は最初) のコールバックの引数の値として渡すことができます。
+    </p>
+    <p>
+     また、何らかの事態により <a href="#reference.function.Pot.Deferred.prototype.begin">.begin</a> を通常処理ではなくエラーと扱いたい場合は、
+    </p>
+    <pre>var d = new Deferred();
+d.then(function() {
+    // 成功時
+    successFunc();
+}).rescue(function() {
+    // エラー時
+    errorFunc();
+}).ensure(function() {
+    // 最終的な処理
+    finallyFunc();
+});
+
+// チェックが通れば成功とする場合
+if (check()) {
+    d.begin();
+} else {
+    d.raise();
+}</pre>
+    <p>
+     このような分岐が必要な場合、
+     <a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> のかわりに <a href="#reference.function.Pot.Deferred.prototype.raise">.raise()</a> を実行することで
+     エラー扱いでコールバックチェインを開始することができます。
+     <br>
+     エラーから始まるので、最初に <a href="#reference.function.Pot.Deferred.prototype.then">then</a> があった場合は そのコールバックは無視されます。
+    </p>
+    <p>
+     .raise() も同様に、引数に何らかの値を与え
+     次のエラーバック関数の引数として渡すことができます。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.replaceToDeferred" class="potjs-manual-item-for-in-view">関数を Deferred 化</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     既存の関数や、ユーザー定義の関数を Deferred 化、
+     つまり Pot.Deferred のインスタンスが返るよう置き換えたり
+     自分で作成する必要がでてくるかもしれません。
+    </p>
+    <p>
+     例として、XMLHttpRequest を使った非同期処理を書いてみます。
+    </p>
+    <pre>function request(url, options) {
+    var deferred = new Deferred();
+    var xhr = new XMLHttpRequest();
+    if (options.queryString) {
+        url += options.queryString;
+    }
+    xhr.open(options.method, url, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                deferred.begin(xhr);
+            } else {
+                deferred.raise(xhr);
+            }
+        }
+    };
+    deferred.canceller(function() {
+        xhr.abort();
+    });
+    xhr.send(options.sendContent || null);
+    return deferred;
+}</pre>
+    <p>
+     <a href="#reference.function.Pot.Net.request">request</a> 関数は、上のほうで例としてあげたものですが、
+     Pot.js および PotLite.js 内にも定義されています。
+     <br>
+     この例は、それを簡略化したものです。
+    </p>
+    <p>
+     Deferred を返すには、new Deferred としたものや、
+     <a href="#reference.function.Pot.Deferred.begin">Pot.Deferred.begin()</a> のような
+     あらかじめ定義されていて Deferred を返す関数を利用する必要があります。
+    </p>
+    <p>
+     接続が成功したら <a href="#reference.function.Pot.Deferred.prototype.begin">begin()</a> を、失敗したら <a href="#reference.function.Pot.Deferred.prototype.raise">raise()</a> をコールしています。
+     <br>
+     関数を定義する場合、エラー処理を明示してあげることで
+     より適切な処理になります。
+    </p>
+    <p>
+     また、<a href="#reference.function.Pot.Deferred.prototype.canceller">canceller()</a> によりキャンセル処理を追加しています。
+     <br>
+     Deferred のキャンセルは、
+    </p>
+    <pre>deferred.cancel();</pre>
+    <p>
+     とすることで任意にコールバックチェインの実行を中止
+     または中断できます。
+    </p>
+    <p>
+     Pot.Deferred では、キャンセル処理としてのコールバック関数を
+     スタッカブルに保持します。
+     <br>
+     なので、<a href="#reference.function.Pot.Deferred.prototype.canceller">canceller()</a> メソッドにより複数のコールバックが登録できます。
+    </p>
+    <p>
+     Pot.js および PotLite.js では、<a href="#reference.function.Pot.Net.request">request 関数</a> のほかに
+     <a href="#reference.function.Pot.Net.jsonp">jsonp 関数</a> も定義されています。
+     <br>
+    </p>
+    <p>
+     <a href="#reference.function.Pot.Net.jsonp">jsonp 関数</a> は、そのままの意味で JSONP によるデータ取得を行います。
+    </p>
+    <p>
+     使用方法、引数などは request, jsonp 共にほぼ同じで
+     返り値に XHR を設定された Deferred を返します。
+    </p>
+    <p><br></p>
+    <p>
+     他にも関数を Deferred 化するための方法があり、
+     <br>
+     <a href="#reference.function.Pot.Deferred.deferrize">deferrize (Pot.Deferred.deferrize)</a> という関数が Pot.Deferred オブジェクトに定義されています。
+    </p>
+    <pre>// setTimeout を Deferred 化する
+var timer = deferrize(window, 'setTimeout');
+
+// setTimeout と同じ引数
+timer(function() {
+    debug(1);
+}, 5000).then(function() {
+    debug(2);
+});</pre>
+    <p>
+     上の例は、setTimeout を Deferred 化し、それを実行します。
+    </p>
+    <p>
+     5 秒待ってから、
+     debug 関数によりコンソールに 1, 2 と出力されます。
+    <p>
+     <a href="#reference.function.Pot.Deferred.deferrize">deferrize</a> はコールバック関数を引数とする場合は、
+     その関数の処理が終わった後に Deferred を開始し、
+     関数を引数として扱わないものは
+     処理が全て終わったあとに Deferred を開始します。
+     途中でエラーが起きると raise() により開始されます。
+     <br>
+     したがって、処理自体を置き換えたい場合でなければ
+     大抵の関数は deferrize で Deferred 化できます。
+    </p>
+    <p>
+     もっと複雑な置き換えをする場合や、
+     自前で Deferred 関数を作成したりする場合、
+     new Deferred や Pot.Deferred オブジェクトの関数などを使用して
+     より細かな処理を独自に作成することができます。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.iterator" class="potjs-manual-item-for-in-view">イテレータ</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     Pot.js は、MochiKit ライクな実装の Deferred を中心に
+     非同期のループ、イテレートを重視して作られています。
+     <br>
+     (ここで言う MochiKit ライクとは、
+      コールバックチェインがひとつのインスタンスであるということです。)
+    </p>
+    <p>
+     また、JSDeferred の概要を強く尊重しています。
+    </p>
+    <p>
+     <a href="http://cho45.stfuawsc.com/jsdeferred/doc/intro.html"
+        title="JSDeferred 紹介">JSDeferred 紹介</a> より引用：
+    </p>
+    <blockquote>
+     <p>
+      JavaScript における「高速化」
+     </p>
+     <p>
+      JavaScript における「高速化」では、単純に処理速度の高速化というよりは、
+      ユーザ体験のストレスをいかになくすかがとても重要です。
+     </p>
+    </blockquote>
+    <p>
+     いくつにもネストした JavaScript のループ (for, for-in, while など) は、
+     <br>
+     特に Web ブラウザ上で実行される場合
+     処理が重たくなりがちです。
+    </p>
+    <p>
+     そこで、Pot.js は、非同期処理を直列的に書けるようにする Deferred を活用し、
+     <br>
+     forEach, map, reduce, filter, some, every, repeat, forEver 
+     などといったイテレート関数と結びつけ、
+     <br>
+     各ループ間の処理の重さを計算し、
+     自動的に CPU 負荷が軽減するよう調整しています。
+     <br>
+     そして、更なるストレス軽減を目標としています。
+    </p>
+    <p>
+     イテレートは、同期または非同期、Deferred チェイン上などで実行が可能です。
+    </p>
+    <p>
+     同期でのシンプルなオブジェクトのイテレートの場合、for-in では
+    </p>
+    <pre>for (var key in object) {...}</pre>
+    <p>
+     となりますが、Pot.js の forEach を使うと、
+    </p>
+    <pre>forEach(object, function(value, key) {...});</pre>
+    <p>
+     となります。
+     <br>
+     非同期でループする場合は、
+    </p>
+    <pre>Deferred.forEach(object, function(value, key) {...})</pre>
+    <p>
+     となり、Pot.Deferred のインスタンスを返します。
+     Pot.globalize() してない場合は <a href="#reference.function.Pot.forEach">Pot.Deferred.forEach</a> です。
+    </p>
+    <p>
+     Deferred チェイン上で実行する場合も同じ扱いですが、引数が異なります。
+    </p>
+    <pre>(new Deferred()).forEach(function(value, key) {...}).begin([1, 2, 3]);</pre>
+    <p>
+     各ループは、コールバック関数の処理の重さにより負荷がかからないよう
+     自動調節します。
+     <br>
+     この処理をすることで、例えば 10000 程の多くのアイテム数を持つ配列に対して
+     for でループした場合と
+     Deferred.forEach などのイテレータで実行した場合、
+     <br>
+     全体の処理の重さは大きな差が出ます。
+     <br>
+     また、それにより Web ブラウザによって発行される、
+     <br>
+     「処理が重くなっています、中断しますか？」
+     などのメッセージを回避することもできます。
+    </p>
+    <p>
+     Deferred に関連する イテレータのすべては、速度を調整することができます。
+     <br>
+     各ループをゆっくり実行したい場合は、
+    </p>
+    <pre>Deferred.forEach.slow(obj, function() {...});</pre>
+    <p>
+     逆に速くしたい場合は、
+    </p>
+    <pre>Deferred.forEach.fast(obj, function() {...});</pre>
+    <p>
+     などの指定が可能です。
+     <br>
+     他には 遅い順に limp, doze, slow, normal, fast, rapid, ninja が指定可能です。
+     速度の指定値については、<a href="#manualsub.Deferred.Reference.controlSpeedMap">上の速度の表</a> を参照ください。
+     <br>
+     その場に応じて使い分けができます。
+    </p>
+    <p>
+     時間のかかるループだけでなく、
+     <br>
+     瞬間的に負荷がかかり
+     Web ブラウザが頻発して一瞬だけ固まる、といった事例もあげられます。
+     <br>
+     そのような処理も、1 回で済まそうとしないで分割することで解消できます。
+    </p>
+    <p>
+     例えば DOM 要素を大量に扱って操作する場合、
+    </p>
+    <pre>// ものすごい巨大なページだったとします。
+var elems = document.getElementsByTagName('*');</pre>
+    <p>
+     従来通りループする場合、
+    </p>
+    <pre>var len = elems.length;
+for (var i = 0; i &lt; len; i++) {
+    var elem = elems[i];
+    someHeavyProcess(elem); // 何らかの重い処理
+}</pre>
+    <p>
+     この方法では休む間を与えられず、UI が固まっていても容赦なく処理が続行されてしまいます。
+    </p>
+    <p>
+     これを Pot.Deferred を使って書くと、
+    </p>
+    <pre>Deferred.repeat(elems.length, function(i) {
+    var elem = elems[i];
+    someHeavyProcess(elem); // 何らかの重い処理
+});</pre>
+    <p>
+     一見あまり変化なさそうですが、
+     1 ループごとに処理の負荷を計算して
+     ある程度重いと判断した場合は Web ブラウザに制御を返し、
+     UI を独占しないよう調節します。
+    </p>
+    <p>
+     または、<a href="#reference.function.Pot.forEach">forEach</a> を使うこともできます。
+    </p>
+    <pre>Deferred.forEach(elems, function(elem) {
+    someHeavyProcess(elem); // 何らかの重い処理
+});</pre>
+    <p>
+     someHeavyProcess() と 1 つの関数だけで表現しましたが、
+     <br>
+     これが、someHeavyProcess1, someHeavyProcess2, ... と
+     いくつかの関数で構成されている場合、
+    </p>
+    <pre>Deferred.forEach(elems, function(elem) {
+    return begin(function() {
+        someHeavyProcess1(elem);
+    }).wait(1).then(function() {
+        someHeavyProcess2(elem);
+    }).wait(1).then(function() {
+        someHeavyProcess3(elem);
+    });
+});</pre>
+    <p>
+     このように分割し、任意に <a hrf="#reference.function.Pot.Deferred.prototype.wait">wait</a> などを入れることが可能です。
+    </p>
+    <p>
+     なお、<a href="#reference.function.Pot.Deferred.begin">begin (Pot.Deferred.begin)</a> は、
+     Pot.Deferred オブジェクトのインスタンスを返すので
+     Deferred.forEach などの中で実行する場合、
+     return が必要です。
+     return しないと整合性がとれなくなってしまいます。
+    </p>
+    <p>
+     それでも重い場合、
+    </p>
+    <pre>Deferred.forEach.slow(elems, function(elem) {
+    someHeavyProcess(elem);
+});</pre>
+    <p>
+     ゆっくり実行することを明示し slow を指定して速度を調整できます。
+    </p>
+    <p>
+     slow の次に遅い doze にすると、必ず毎回のループごとに
+     Web ブラウザに制御を返します。
+     <br>
+     結果として処理時間は長くなりますが、
+     途中で固まったりカクカクするようなことが避けられます。
+    </p>
+    <p>
+     速度指定は 'メソッド.速度()' の形式で利用できます。
+     <br>
+     例えば、 'forEach.rapid(...)' のような指定です。
+     <br>
+     <a href="#reference.function.Pot.forEach">forEach</a>, <a href="#reference.function.Pot.repeat">repeat</a>, <a href="#reference.function.Pot.map">map</a>, <a href="#reference.function.Pot.filter">filter</a> など、すべてのイテレータで指定可能です。
+    </p>
+    <p>
+     定義された速度の値は、<a href="#manualsub.Deferred.Reference.controlSpeedMap">上の速度の表</a> を参照してください。
+    </p>
+    <p>
+     速度指定の表にある 「最も速い」 という表記は、
+     <br>
+     逆に言うと
+     最も負荷をかけやすいとも言えます。
+     <br>
+     とはいっても for-in などでループすることと比べたら
+     UI への配慮は少なからず存在するという差はあります。
+    </p>
+    <p>
+     大抵は自ら速度調整する必要はありませんが、
+     特殊な用途やデバッグ時など、必要になることもあります。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.replaceLoop" class="potjs-manual-item-for-in-view">ループ処理を置き換える</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     既存のループで負荷がかかっている処理を、
+     Pot.js のイテレータを用いて軽減させることができます。
+    </p>
+    <pre>function someLoop(n, c) {
+    var results = [];
+    for (var i = 0; i &lt; n; i++) {
+        var array = [];
+        for (var j = 0; j &lt; c; j++) {
+            array[j] = j;
+        }
+        results[i] = array;
+    }
+    return results;
+}</pre>
+    <p>
+     例えばこのような関数があったとします。
+     <br>
+     引数 c 回ループした配列を引数 n 個分持つ配列を返す関数です。
+    </p>
+    <p>
+     例えばこれを、
+    </p>
+    <pre>var array = someLoop(100000, 1000);</pre>
+    <p>
+     このような大きい配列を作るとなると、
+     スペックにもよりますが、
+     瞬間的な負荷は大きくなり UI を独占してしまうでしょう。
+    </p>
+    <p>
+     この関数を Deferred 化してみます。
+    </p>
+    <pre>function someLoopDefer(n, c) {
+    var results = [];
+    return Deferred.repeat(n, function(i) {
+        var array = [];
+        for (var j = 0; j &lt; c; j++) {
+            array[j] = j;
+        }
+        results[i] = array;
+    }).then(function() {
+        return results;
+    });
+}</pre>
+    <p>
+     例として、このようになります。
+     <br>
+     内側の for はこのままでいいのかと思うかもしれませんが、
+     おそらく <a href="reference.function.Pot.repeat">repeat</a>、<a herf="#reference.function.Pot.repeat">Deferred.repeat</a> 等に変えたところで
+     必要以上に負荷が分散され、結果としてかなり速度は落ちてしまうでしょう。
+     <br>
+     なので、いちばん外側のループのみを置き換えます。
+     <br>
+     もっとも、この例の場合は
+     内側の for を何度も実行する必要はありませんが、
+     あくまで例として捉えてください。
+     <br>
+     返り値は Deferred になります。
+    </p>
+    <pre>someLoopDefer(100000, 1000).then(function(res) {
+    var array = res;
+});</pre>
+    <p>
+     Deferred が返るので、<a href="#reference.function.Pot.Deferred.prototype.then">then</a> などで結果を取得します。
+     そのままチェインを繋げることもできます。
+    </p>
+    <p>
+     この変化により、瞬間的な処理の重さが分散され
+     安定した処理が可能となります。
+     <br>
+     そのかわり、処理時間は若干伸びる可能性があります。
+    </p>
+    <p>
+     Pot.Deferred のイテレータを使う場合、
+     このように
+     あまり意識せずに分散的なループが可能となります。
+    </p>
+   </div>
+   <h3 id="manualsub.Deferred.Reference.StopIteration" class="potjs-manual-item-for-in-view">イテレートを止める</h3>
+   <div class="potjs-manual-item-for-in-view">
+    <p>
+     Pot.js, PotLite.js で実装されている
+     すべてのイテレータは、
+     <br>
+     <a href="#reference.property.Pot.StopIteration">StopIteration</a> を throw することで中断できます。
+    </p>
+    <pre>var foo = '';
+forEver(function(i) {
+    foo += 'foo';
+    if (foo.length &gt; 10) {
+        throw StopIteration;
+    }
+});
+
+debug(foo);</pre>
+    <p>
+     この例は、debug 関数により
+     コンソールに 'foofoofoofoo' と出力されます。
+    </p>
+    <p>
+     <a href="#reference.function.Pot.forEver">forEver (Pot.forEver)</a> は、<a href="#reference.property.Pot.StopIteration">StopIteration</a> が throw されるまで
+     永遠にループします。
+     <br>
+     複雑な条件式でループを制御する場合や、
+     そのような既存の重い処理を
+     Deferred.forEver で置き換えたい場合などに活用できます。
+    </p>
+    <p>
+     StopIteration は、 Array.prototype.forEach が有効な環境など、
+     コンフリクトする可能性があるときは
+     Pot.StopIteration と明示することで解消できます。
+    </p>
+    <p>
+     StopIteration を判別する方法は、
+    </p>
+    <pre>if (isStopIter(e)) {...}</pre>
+    <p>
+     または、
+    </p>
+    <pre>if (e == StopIteration) {...}</pre>
+    <p>
+     と単純に比較か、
+    </p>
+    <pre>if (e instanceof StopIteration) {...}</pre>
+    <p>
+     とすることもできます。
+    </p>
+    <p>
+     おそらく Pot.js ライブラリが実装している
+     <a href="#reference.function.Pot.isStopIter">isStopIter (Pot.isStopIter)</a> が確実です。
+    </p>
+    <p><br></p>
+    <p>
+     実装されているすべてのイテレータは、
+     コールバック関数が非同期の Deferred オブジェクトを
+     いくつにもネストしたとしても、
+     <br>
+     throw StopIteration によりスコープ間を超えて
+     実行中のイテレータ関数のスコープまで届くよう設計されています。
+    </p>
+    <pre>var result = [];
+begin(function() {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+}).forEach(function(value) {
+    return begin(function() {
+        var d = new Deferred();
+        return d.then(function() {
+            if (value &gt; 5) {
+
+                // 実行しているイテレータのスコープが対象になるため
+                // この例では いちばん外側の .forEach まで届く
+
+                throw StopIteration;
+            }
+            return value * 100;
+        }).begin();
+    }).then(function(res) {
+        result.push(res);
+    });
+}).then(function() {
+    debug(result);
+    //  =&gt;  [100, 200, 300, 400, 500]
+});</pre>
+   </div>
+ </div>
+</div>

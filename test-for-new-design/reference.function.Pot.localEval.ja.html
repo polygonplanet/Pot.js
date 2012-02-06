@@ -1,0 +1,32 @@
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.localEval"><em>Pot.</em>localEval</dfn>
+    (<em>{String}</em> code [, <em>{Object|*}</em> scope])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      グローバルスコープに影響させずに eval します。
+    </p>
+    <div>
+      <p>
+ 引数 code をグローバルスコープに影響させずに実行します。
+ <br>
+ コード内で宣言した関数や変数は、グローバルスコープに影響しません。
+ <br>
+ グローバルスコープで実行したい場合は、かわりに <a href="#reference.function.Pot.globalEval">Pot.globalEval()</a> が利用できます。
+ <br>
+ 任意のオブジェクトを引数 scope として指定すると、実行コンテキストが可能な限り scope に向きます。
+</p>
+<p>
+ eval と同じく、最後に評価された式または文の結果が返ります。
+</p>
+<pre>localEval('function hoge() { return &quot;hoge&quot;; }');
+
+debug(hoge()); // (Error: hoge is undefined)</pre>
+    </div>
+  </dd>
+</dl>
