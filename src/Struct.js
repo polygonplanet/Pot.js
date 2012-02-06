@@ -64,7 +64,7 @@ update(Pot.Struct, {
    * @public
    */
   clone : function(x) {
-    var result, f, c, k, System = Pot.System;
+    var result, f, c, System = Pot.System;
     if (x == null) {
       return x;
     }
@@ -365,7 +365,7 @@ update(Pot.Struct, {
       if (isArray(items)) {
         result = null;
         each(items, function(item) {
-          var key, i, len, v, k, pairs = [];
+          var i, len, v, k, pairs = [];
           if (item) {
             if (Pot.isArrayLike(item)) {
               i = 0;
@@ -385,7 +385,7 @@ update(Pot.Struct, {
               });
             }
             each(pairs, function(pair) {
-              var rv, p;
+              var rv;
               try {
                 switch (type) {
                   case 'hash':
@@ -1282,7 +1282,7 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty, keys, p, v, i, len, k;
+    var result = false, cmp, empty, keys, p, i, len, k;
     /**@ignore*/
     cmp = Pot.isFunction(func) ? func : (function(a, b) { return a === b; });
     if (object == null) {
@@ -1820,8 +1820,8 @@ update(Pot.Struct, {
    */
   implode : function(object/*[, delimiter[, separator[, tail]]]*/) {
     var
-    result = '', ins = [], p, d, s, o, t, nop,
-    args = arguments, len = args.length, i, v, params,
+    result = '', ins = [], d, s, o, t, nop,
+    args = arguments, len = args.length, i, params,
     isString = Pot.isString, isObject = Pot.isObject,
     defs = {
       delimiter : ':',

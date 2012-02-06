@@ -599,7 +599,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   forInLoop : function(object, callback, context) {
-    var copy, i = 0, p, v;
+    var copy, i = 0;
     //XXX: Should use "yield" for duplicate loops.
     if (Pot.isFunction(callback)) {
       copy = [];
@@ -702,7 +702,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   items : function(object, callback, context) {
-    var that = this, copy, i = 0, value, prop, isPair;
+    var that = this, copy, i = 0, isPair;
     if (Pot.isObject(object)) {
       copy = [];
       each(object, function(ov, op) {
@@ -1862,7 +1862,7 @@ update(Pot.Iter, {
    * @public
    */
   toIter : function(x) {
-    var iter, o, p, v, arrayLike, objectLike;
+    var iter, o, arrayLike, objectLike;
     if (Pot.isIter(x)) {
       return x;
     }
