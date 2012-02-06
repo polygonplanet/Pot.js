@@ -9,14 +9,15 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.06
- * @date           2012-01-19
+ * @version        1.07
+ * @date           2012-02-06
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
 var Assert = {
   JSON_URL     : './pot.test.json',
-  JSONP_URL    : 'http://api.polygonpla.net/js/pot/pot.test.json'
+  JSONP_URL    : 'http://api.polygonpla.net/js/pot/pot.test.json',
+  POTJS_LOADED : false
 };
 
 $(function() {
@@ -32,6 +33,10 @@ $(function() {
   if (Pot.TYPE === 'lite') {
     throw 'This test-run cannot execute by PotLite.js';
   }
+  if (Assert.POTJS_LOADED) {
+    return;
+  }
+  Assert.POTJS_LOADED = true;
   Pot.globalize();
   update(Assert, {
     results : [],
@@ -327,7 +332,12 @@ $(function() {
         return Deferred.forEach(Assert.Units, function(unit) {
           return Assert.log(unit.title, unit.code, unit.expect);
         });
-      }).wait(1).ensure(function() {
+      }).wait(1).ensure(function(ex) {
+        
+        if (isError(ex)) {
+          alert(ex);
+        }
+        
         Assert.msg('End Test Run.').then(function() {
           var total = {
             count : {
@@ -996,6 +1006,15 @@ $(function() {
       code   : function() {
         var url = 'http://api.polygonpla.net/js/pot/pot.test.json?callback=?';
         return jsonp(url).then(function(data) {
+          return data.foo;
+        });
+      },
+      expect : 'FOO "1"'
+    }, {
+      title  : 'Pot.getJSON()',
+      code   : function() {
+        var url = './pot.test.json';
+        return getJSON(url).then(function(data) {
           return data.foo;
         });
       },

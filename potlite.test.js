@@ -9,14 +9,15 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.17
- * @date           2012-01-19
+ * @version        1.18
+ * @date           2012-02-06
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
 var Assert = {
   JSON_URL     : './potlite.test.json',
-  JSONP_URL    : 'http://api.polygonpla.net/js/pot/potlite.test.json'
+  JSONP_URL    : 'http://api.polygonpla.net/js/pot/potlite.test.json',
+  POTJS_LOADED : false
 };
 
 $(function() {
@@ -29,6 +30,10 @@ $(function() {
     setTimeout(arguments.callee, 13);
     return;
   }
+  if (Assert.POTJS_LOADED) {
+    return;
+  }
+  Assert.POTJS_LOADED = true;
   Pot.globalize();
   update(Assert, {
     results : [],
@@ -815,6 +820,15 @@ $(function() {
       code   : function() {
         var url = 'http://api.polygonpla.net/js/pot/potlite.test.json?callback=?';
         return jsonp(url).then(function(data) {
+          return data.foo;
+        });
+      },
+      expect : 'FOO "1"'
+    }, {
+      title  : 'Pot.getJSON()',
+      code   : function() {
+        var url = './potlite.test.json';
+        return getJSON(url).then(function(data) {
           return data.foo;
         });
       },
