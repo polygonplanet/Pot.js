@@ -6,7 +6,7 @@
  *  for solution to heavy process.
  * That is fully ECMAScript compliant.
  *
- * Version 1.12, 2012-01-19
+ * Version 1.13, 2012-02-06
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -32,8 +32,8 @@
  *
  * @fileoverview   Pot.js utility library
  * @author         polygon planet
- * @version        1.12
- * @date           2012-01-19
+ * @version        1.13
+ * @date           2012-02-06
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -67,7 +67,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.12', TYPE : 'full'},
+var Pot = {VERSION : '1.13', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push = Array.prototype.push,
@@ -87,6 +87,7 @@ XLINK_NS_URI = 'http://www.w3.org/1999/xlink',
 XSL_NS_URI   = 'http://www.w3.org/1999/XSL/Transform',
 SVG_NS_URI   = 'http://www.w3.org/2000/svg',
 XUL_NS_URI   = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
+JS_VOID_URI  = 'javascript:void(0)',
 
 // Constant strings.
 UPPER_ALPHAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -565,7 +566,15 @@ Pot.update({
    * @static
    * @const
    */
-  XUL_NS_URI : XUL_NS_URI
+  XUL_NS_URI : XUL_NS_URI,
+  /**
+   * JavaScript void URI.
+   *
+   * @type  String
+   * @static
+   * @const
+   */
+  JS_VOID_URI : JS_VOID_URI
 });
 
 // Definition of System.
@@ -976,6 +985,42 @@ Pot.update({
   /**
    * @lends Pot
    */
+  /**
+   * A shortcut of "Components.classes".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cc : Cc,
+  /**
+   * A shortcut of "Components.interfaces".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Ci : Ci,
+  /**
+   * A shortcut of "Components.results".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cr : Cr,
+  /**
+   * A shortcut of "Components.utils".
+   *
+   * @type  Object
+   * @static
+   * @const
+   * @public
+   */
+  Cu : Cu,
   /**
    * Emulate StopIteration.
    *
@@ -1514,7 +1559,7 @@ Pot.update({
    *
    *
    * @param  {Number}   n  The number to test.
-   * @return {boolean}     Whether `n` is an integer.
+   * @return {Boolean}     Whether `n` is an integer.
    * @type Function
    * @function
    * @static
@@ -1800,7 +1845,7 @@ if (typeof StopIteration === 'undefined') {
 
 // Definition of current Document and URI.
 (function() {
-  var win, doc, uri, wp, dp;
+  var win, doc, uri, wp, dp, a;
   wp = 'window contentWindow defaultView parentWindow content top'.split(' ');
   dp = 'ownerDocument document'.split(' ');
   /**@ignore*/
@@ -1882,7 +1927,13 @@ if (typeof StopIteration === 'undefined') {
     if (!uri && win) {
       try {
         uri = win.location && win.location.href || win.location;
-      } catch (e) {}
+      } catch (e) {
+        try {
+          a = doc.createElement('a');
+          a.href = '';
+          uri = a.href;
+        } catch (ex) {}
+      }
     }
   }
   update(Pot.System, {
@@ -1998,6 +2049,84 @@ Pot.update({
   /**
    * @lends Pot
    */
+  /**
+   * Collect the object key names like ES5's Object.keys().
+   *
+   *
+   * @example
+   *   var obj = {foo: 1, bar: 2, baz: 3};
+   *   debug(keys(obj));
+   *   // @results ['foo', 'bar', 'baz']
+   *   var array = [10, 20, 30, 40, 50];
+   *   debug(keys(array));
+   *   // @results [0, 1, 2, 3, 4]
+   *   delete array[2];
+   *   debug(keys(array));
+   *   // @results [0, 1, 3, 4]
+   *
+   *
+   * {@link https://developer.mozilla.org/en/JavaScript/
+   *                Reference/Global_Objects/Object/keys }
+   *
+   * @param  {Object|Function|*}  o  The target object.
+   * @return {Array}                 The collected key names as an array.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  keys : (function() {
+    var hasDontEnumBug = !({toString : null})
+                            .propertyIsEnumerable('toString'),
+        dontEnums = [
+          'toString',
+          'toLocaleString',
+          'valueOf',
+          'hasOwnProperty',
+          'isPrototypeOf',
+          'propertyIsEnumerable',
+          'constructor'
+        ],
+        dontEnumsLength = dontEnums.length;
+    return function(object) {
+      var results = [], type = typeof object, len, p, i;
+      if (type !== 'object' && type !== 'function' || object === null) {
+        return results;
+      }
+      if (Pot.isArrayLike(object)) {
+        len = object.length;
+        for (i = 0; i < len; i++) {
+          if (i in object) {
+            results[results.length] = i;
+          }
+        }
+      } else {
+        if (Pot.System.isBuiltinObjectKeys) {
+          try {
+            results = Object.keys(object);
+            return results;
+          } catch (e) {}
+        }
+        for (p in object) {
+          try {
+            if (hasOwnProperty.call(object, p)) {
+              results[results.length] = p;
+            }
+          } catch (ex) {}
+        }
+        if (hasDontEnumBug) {
+          for (i = 0; i < dontEnumsLength; i++) {
+            try {
+              if (hasOwnProperty.call(object, dontEnums[i])) {
+                results[results.length] = dontEnums[i];
+              }
+            } catch (er) {}
+          }
+        }
+      }
+      return results;
+    };
+  }()),
   /**
    * Evaluates a script in a global context.
    *
@@ -2744,7 +2873,7 @@ Pot.update({
  * @ignore
  */
 function update() {
-  var args = arguments, len = args.length, i = 1, o, p, x;
+  var args = arguments, len = args.length, i = 1, j, o, p, x, keys, n;
   if (len === i) {
     o = this || {};
     i--;
@@ -2755,10 +2884,23 @@ function update() {
     do {
       x = args[i];
       if (x) {
-        for (p in x) {
-          try {
-            o[p] = x[p];
-          } catch (e) {}
+        if (Pot.keys) {
+          keys = Pot.keys(x);
+          n = keys.length;
+          for (j = 0; j < n; j++) {
+            p = keys[j];
+            try {
+              o[p] = x[p];
+            } catch (e) {}
+          }
+        } else {
+          for (p in x) {
+            try {
+              if (hasOwnProperty.call(x, p)) {
+                o[p] = x[p];
+              }
+            } catch (e) {}
+          }
         }
       }
     } while (++i < len);
@@ -2951,7 +3093,7 @@ function numeric(value, defaults) {
  * @ignore
  */
 function now() {
-  return (new Date()).getTime();
+  return +new Date;
 }
 
 /**
@@ -3642,10 +3784,10 @@ Pot.update({
    *
    * @example
    *   var time = now(); // equals (new Date()).getTime();
-   *   debug(time); // 1323446177282
+   *   debug(time); // e.g. 1323446177282
    *
    *
-   * @return    Return the current time as milliseconds.
+   * @return {Number} Return the current time as milliseconds.
    *
    * @type  Function
    * @function
@@ -3681,7 +3823,7 @@ Pot.update({
  * @internal
  */
 function each(object, callback, context) {
-  var i, len, val, err;
+  var i, len, val, err, p, keys;
   if (object) {
     len = object.length;
     try {
@@ -3697,13 +3839,16 @@ function each(object, callback, context) {
           }
         }
       } else {
-        for (i in object) {
+        keys = Pot.keys(object);
+        len = keys.length;
+        for (i = 0; i < len; i++) {
+          p = keys[i];
           try {
-            val = object[i];
+            val = object[p];
           } catch (e) {
             continue;
           }
-          callback.call(context, val, i, object);
+          callback.call(context, val, p, object);
         }
       }
     } catch (ex) {
@@ -7297,18 +7442,13 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   forInLoop : function(object, callback, context) {
-    var copy, i = 0, p, v;
+    var copy, i = 0;
     //XXX: Should use "yield" for duplicate loops.
     if (Pot.isFunction(callback)) {
       copy = [];
-      for (p in object) {
-        try {
-          v = object[p];
-        } catch (e) {
-          continue;
-        }
-        copy[copy.length] = [v, p];
-      }
+      each(object, function(value, prop) {
+        copy[copy.length] = [value, prop];
+      });
     }
     if (!copy || !copy.length) {
       return this.noop();
@@ -7405,19 +7545,12 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   items : function(object, callback, context) {
-    var that = this, copy, i = 0, value, prop, isPair;
+    var that = this, copy, i = 0, isPair;
     if (Pot.isObject(object)) {
       copy = [];
-      for (prop in object) {
-        if (hasOwnProperty.call(object, prop)) {
-          try {
-            value = object[prop];
-          } catch (e) {
-            continue;
-          }
-          copy[copy.length] = [prop, value];
-        }
-      }
+      each(object, function(ov, op) {
+        copy[copy.length] = [op, ov];
+      });
       isPair = true;
     } else if (Pot.isArrayLike(object)) {
       copy = arrayize(object);
@@ -8572,7 +8705,7 @@ update(Pot.Iter, {
    * @public
    */
   toIter : function(x) {
-    var iter, o, p, v, arrayLike, objectLike;
+    var iter, o, arrayLike, objectLike;
     if (Pot.isIter(x)) {
       return x;
     }
@@ -8580,14 +8713,9 @@ update(Pot.Iter, {
     objectLike = x && !arrayLike && Pot.isObject(x);
     if (objectLike) {
       o = [];
-      for (p in x) {
-        try {
-          v = x[p];
-        } catch (e) {
-          continue;
-        }
-        o[o.length] = [v, p];
-      }
+      each(x, function(xv, xp) {
+        o[o.length] = [xv, xp];
+      });
     } else {
       o = arrayize(x);
     }
@@ -8641,7 +8769,7 @@ update(Pot.Iter, {
           }
         };
       }
-    })();
+    }());
     return iter;
   },
   /**
@@ -8870,7 +8998,7 @@ update(Pot.Iter, {
           });
         }
         return first;
-      })();
+      }());
     } else {
       value = initial;
     }
@@ -9197,21 +9325,16 @@ update(Pot.Iter, {
       }
     } else if (objectLike) {
       passed = false;
-      for (key in object) {
-        try {
-          if (!passed && argn >= 3 && from !== key) {
-            continue;
-          } else {
-            passed = true;
-          }
-          val = object[key];
-          if (val === subject) {
-            result = key;
-          }
-        } catch (e) {
-          continue;
+      each(object, function(ov, op) {
+        if (!passed && argn >= 3 && from !== key) {
+          return;
+        } else {
+          passed = true;
         }
-      }
+        if (ov === subject) {
+          result = op;
+        }
+      });
     } else if (object != null) {
       try {
         val = (object.toString && object.toString()) || String(object);
@@ -9318,21 +9441,16 @@ update(Pot.Iter, {
     } else if (objectLike) {
       pairs = [];
       passed = false;
-      for (key in object) {
-        try {
-          val = object[key];
-        } catch (e) {
-          continue;
+      each(object, function(ov, op) {
+        pairs[pairs.length] = [op, ov];
+        if (ov === subject) {
+          result = op;
         }
-        pairs[pairs.length] = [key, val];
-        if (val === subject) {
-          result = key;
-        }
-        if (key === from) {
+        if (op === from) {
           passed = true;
-          break;
+          throw Pot.StopIteration;
         }
-      }
+      });
       if (passed) {
         result = -1;
         len = pairs.length;
@@ -11941,7 +12059,7 @@ update(Pot.URI, {
       'i'
     );
     return function(url/*[, query]*/) {
-      var uri, args = arguments, c, s, index,
+      var uri, args = arguments, c, s, index, query,
           queryString = args[1],
           encode = Pot.URI.urlEncode,
           serialize = Pot.Serializer.serializeToQueryString,
@@ -13151,6 +13269,9 @@ update(Pot.Net, {
    *                                 - headers     : {Object}    null
    *                                 - mimeType    : {String}    null
    *                                 - cache       : {Boolean}   true
+   *                                 - binary      : {Boolean}   false
+   *                                 - cookie      : {Boolean}   false
+   *                                 - crossDomain : {Boolean}   false
    *                                 </pre>
    * @return {Deferred}            Return the instance of Pot.Deferred.
    * @type Function
@@ -13267,6 +13388,9 @@ update(Pot.Net, {
      *                                 - headers     : {Object}    null
      *                                 - mimeType    : {String}    null
      *                                 - cache       : {Boolean}   true
+     *                                 - binary      : {Boolean}   false
+     *                                 - cookie      : {Boolean}   false
+     *                                 - crossDomain : {Boolean}   false
      *                                 </pre>
      * @return {Deferred}            Return the instance of Pot.Deferred.
      * @type Function
@@ -13278,7 +13402,11 @@ update(Pot.Net, {
       /**@ignore*/
       var Request = function(url, options) {
         return new Request.prototype.doit(url, options);
-      };
+      },
+      PATTERNS = {
+        URI : /^([^:]+)(?::+\/{0,}((?:[^@]+@|)[^\/\\?&#:;]*)(?::(\d+)|)|)/
+      },
+      CURRENT_URIS = PATTERNS.URI.exec(Pot.currentURI().toLowerCase()) || [];
       Request.prototype = update(Request.prototype, {
         /**
          * @ignore
@@ -13347,17 +13475,22 @@ update(Pot.Net, {
          * @ignore
          */
         setOptions : function(options) {
-          var defaults, opts;
-          defaults = {
+          var opts, parts, defaults = {
             method      : 'GET',
             sendContent : null,
             queryString : null,
             callback    : null,
             username    : null,
             password    : null,
-            headers     : null,
             mimeType    : null,
-            cache       : true
+            binary      : false,
+            cache       : true,
+            cookie      : false,
+            crossDomain : null,
+            headers     : {
+              'Accept'           : ['*/'] + ['*'], //XXX: Check MimeType.
+              'X-Requested-With' : 'XMLHttpRequest'
+            }
           };
           if (Pot.isObject(options)) {
             opts = update({}, options);
@@ -13384,6 +13517,17 @@ update(Pot.Net, {
                this.options.method === 'HEAD')) {
             this.url = addNoCache(this.url);
           }
+          if (this.options.crossDomain == null) {
+            parts = PATTERNS.URI.exec(Pot.currentURI().toLowerCase());
+            this.options.crossDomain = !!(parts &&
+              (parts[1] !== CURRENT_URIS[1] ||
+               parts[2] !== CURRENT_URIS[2] ||
+               parts[3] !== CURRENT_URIS[3])
+            );
+          }
+          if (this.options.binary && !this.options.mimeType) {
+            this.options.mimeType = 'text/plain; charset=x-user-defined';
+          }
         },
         /**
          * @private
@@ -13409,13 +13553,18 @@ update(Pot.Net, {
         setHeaders : function() {
           var that = this, contentType;
           try {
+            if (this.options.cookie) {
+              try {
+                // https://developer.mozilla.org/en/HTTP_access_control
+                this.xhr.withCredentials = 'true';
+              } catch (e) {}
+            }
             try {
               if (this.xhr.overrideMimeType &&
                   this.options.mimeType != null) {
                 this.xhr.overrideMimeType(this.options.mimeType);
               }
             } catch (e) {}
-            this.xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             if (this.options.contentType != null) {
               contentType = this.options.contentType;
             }
@@ -13458,11 +13607,11 @@ update(Pot.Net, {
               // 1223 is apparently a bug in IE
               if ((status >= 200 && status < 300) ||
                   status === 304 || status === 1223) {
+                that.assignResponseText();
                 if (Pot.isFunction(that.options.callback)) {
                   Pot.Deferred.flush(function() {
                     that.options.callback.call(
-                      that.xhr,
-                      that.xhr.responseText, that.xhr
+                      that.xhr, that.xhr.responseText, that.xhr
                     );
                   }).ensure(function(res) {
                     that.deferred.begin(that.xhr);
@@ -13478,6 +13627,30 @@ update(Pot.Net, {
               }
             }
           };
+        },
+        /**
+         * @private
+         * @ignore
+         */
+        assignResponseText : function() {
+          var i, len, bytes, chars, sc, c, s;
+          if (this.options.binary) {
+            bytes = [];
+            chars = [];
+            s = this.xhr.responseText || '';
+            len = s.length;
+            sc = String.fromCharCode;
+            for (i = 0; i < len; i++) {
+              c = s.charCodeAt(i) & 0xFF;
+              bytes[i] = c;
+              chars[i] = sc(c);
+            }
+            try {
+              this.xhr.originalText  = s;
+              this.xhr.responseBytes = bytes;
+              this.xhr.responseText  = chars.join('');
+            } catch (e) {}
+          }
         },
         /**
          * @private
@@ -13718,12 +13891,12 @@ update(Pot.Net, {
        * @ignore
        */
       defaultHeaders : {
-        'Accept'     : '*/*',
+        'Accept'     : ['*/'] + ['*'],
         'User-Agent' : [
-          'Pot.js/', Pot.VERSION,
-          ' ', Pot.TYPE,
-          ' ', '(Node.js; *)'
-        ].join('')
+          'Pot.js/' + Pot.VERSION,
+          Pot.TYPE,
+          '(Node.js; *)'
+        ].join(' ')
       },
       /**
        * @private
@@ -13878,7 +14051,7 @@ update(Pot.Net, {
       });
       return (new SimpleRequestByNode(opts)).deferred;
     };
-  })(),
+  }()),
   /**
    * Send request by JSONP.
    *
@@ -14043,7 +14216,40 @@ update(Pot.Net, {
       }
       return d;
     };
-  })(),
+  }()),
+  /**
+   * Get the JSON data by HTTP GET request.
+   *
+   *
+   * @example
+   *   var url = 'http://www.example.com/hoge.json';
+   *   getJSON(url).then(function(data) {
+   *     debug(data.results[0].text);
+   *   });
+   *
+   *
+   * @param  {String}     url      The request URL.
+   * @param  {Object}   (options)  Request options. (@see Pot.Net.request)
+   * @return {Deferred}            Return the instance of Pot.Deferred.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  getJSON : (function() {
+    var fixJson = /^[^{]*|[^}]*$/g;
+    return function(url, options) {
+      return Pot.Net.request(url, update({
+        mimeType : 'text/javascript',
+        headers  : {
+          'Content-Type' : 'text/javascript'
+        }
+      }, options || {})).then(function(res) {
+        var data = trim(res && res.responseText).replace(fixJson, '');
+        return Pot.Serializer.parseFromJSON(data);
+      });
+    };
+  }()),
   /**
    * Non-blocking script loader.
    *
@@ -14149,7 +14355,7 @@ update(Pot.Net, {
       }
       return d;
     };
-  })()
+  }())
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -14242,10 +14448,11 @@ function insertId(url, id, defaults) {
 Pot.update({
   request    : Pot.Net.request,
   jsonp      : Pot.Net.requestByJSONP,
+  getJSON    : Pot.Net.getJSON,
   loadScript : Pot.Net.loadScript
 });
 
-})();
+}());
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
@@ -17946,7 +18153,7 @@ update(Pot.Struct, {
    * @public
    */
   clone : function(x) {
-    var result, f, c, k, System = Pot.System;
+    var result, f, c, System = Pot.System;
     if (x == null) {
       return x;
     }
@@ -17980,17 +18187,13 @@ update(Pot.Struct, {
             // Some environments cannot clone object by function prototype.
             //XXX: frozen object
             result = {};
-            for (k in x) {
-              if (hasOwnProperty.call(x, k)) {
-                try {
-                  result[k] = x[k];
-                } catch (e) {}
-              }
-            }
+            each(x, function(v, k) {
+              result[k] = v;
+            });
           }
           break;
       case 'error':
-          result = new Error(x.message || x.description || x);
+          result = new Error(Pot.getErrorMessage(x));
           update(result, x);
           break;
       case 'date':
@@ -18132,28 +18335,7 @@ update(Pot.Struct, {
    * @static
    * @public
    */
-  keys : function(o) {
-    var r = [], objectLike;
-    if (o) {
-      objectLike = Pot.isObject(o);
-      if (objectLike && Pot.System.isBuiltinObjectKeys) {
-        try {
-          r = Object.keys(o);
-          return r;
-        } catch (e) {}
-      }
-      if (objectLike || Pot.isArrayLike(o)) {
-        each(o, function(v, k) {
-          try {
-            if (hasOwnProperty.call(o, k)) {
-              r[r.length] = k;
-            }
-          } catch (e) {}
-        });
-      }
-    }
-    return r;
-  },
+  keys : Pot.keys,
   /**
    * Collect the object values.
    *
@@ -18181,12 +18363,8 @@ update(Pot.Struct, {
     var r = [];
     if (o) {
       if (Pot.isObject(o) || Pot.isArrayLike(o)) {
-        each(o, function(v, k) {
-          try {
-            if (hasOwnProperty.call(o, k)) {
-              r[r.length] = v;
-            }
-          } catch (e) {}
+        each(o, function(v) {
+          r[r.length] = v;
         });
       }
     }
@@ -18276,7 +18454,7 @@ update(Pot.Struct, {
       if (isArray(items)) {
         result = null;
         each(items, function(item) {
-          var key, i, len, v, k, pairs = [];
+          var i, len, v, k, pairs = [];
           if (item) {
             if (Pot.isArrayLike(item)) {
               i = 0;
@@ -18291,16 +18469,12 @@ update(Pot.Struct, {
                 } while (i < len);
               }
             } else if (isObject(item)) {
-              for (key in item) {
-                try {
-                  k = stringify(key, true);
-                  v = item[key];
-                  pairs[pairs.length] = [k, v];
-                } catch (ex) {}
-              }
+              each(item, function(val, p) {
+                pairs[pairs.length] = [p, val];
+              });
             }
             each(pairs, function(pair) {
-              var rv, p;
+              var rv;
               try {
                 switch (type) {
                   case 'hash':
@@ -18351,11 +18525,9 @@ update(Pot.Struct, {
                         if (isArray(rv)) {
                           result[rv[0]] = rv[1];
                         } else if (isObject(rv)) {
-                          for (p in rv) {
-                            try {
-                              result[p] = rv[p];
-                            } catch (err) {}
-                          }
+                          each(rv, function(val, prop) {
+                            result[prop] = val;
+                          });
                         } else {
                           result[pair[0]] = rv;
                         }
@@ -18545,7 +18717,7 @@ update(Pot.Struct, {
    * @public
    */
   count : function(o) {
-    var c = 0, p;
+    var c = 0;
     if (o != null) {
       switch (Pot.typeLikeOf(o)) {
         case 'array':
@@ -18554,9 +18726,9 @@ update(Pot.Struct, {
             break;
         case 'object':
         case 'function':
-            for (p in o) {
+            each(o, function() {
               c++;
-            }
+            });
             break;
         case 'number':
             c = Math.abs(Math.round(o));
@@ -18756,19 +18928,13 @@ update(Pot.Struct, {
             }
             break;
         case 'object':
-            for (p in o) {
-              if (hasOwnProperty.call(o, p)) {
-                try {
-                  if (keyOnly) {
-                    r = p;
-                  } else {
-                    r = o[p];
-                  }
-                } catch (e) {
-                  continue;
-                }
+            each(o, function(v, k) {
+              if (keyOnly) {
+                r = k;
+              } else {
+                r = v;
               }
-            }
+            });
             break;
         default:
             break;
@@ -18913,7 +19079,7 @@ update(Pot.Struct, {
               try {
                 if (!done &&
                     ((!loose && object[i] === subject) ||
-                     (loose  && object[i] ==  subject))) {
+                      (loose && object[i] ==  subject))) {
                   done = true;
                 } else {
                   result[result.length] = object[i];
@@ -18923,17 +19089,15 @@ update(Pot.Struct, {
             break;
         case 'object':
             result = {};
-            for (i in object) {
-              try {
-                if (!done &&
-                    ((!loose && object[i] === subject) ||
-                     (loose  && object[i] ==  subject))) {
-                  done = true;
-                } else {
-                  result[i] = object[i];
-                }
-              } catch (e) {}
-            }
+            each(object, function(v, p) {
+              if (!done &&
+                  ((!loose && v === subject) ||
+                    (loose && v ==  subject))) {
+                done = true;
+              } else {
+                result[p] = v;
+              }
+            });
             break;
         case 'number':
             result = object.toString().replace(subject, '') - 0;
@@ -19001,7 +19165,7 @@ update(Pot.Struct, {
             for (i = 0; i < len; i++) {
               try {
                 if ((!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
+                     (loose && object[i] ==  subject)) {
                   continue;
                 }
                 result[result.length] = object[i];
@@ -19010,15 +19174,13 @@ update(Pot.Struct, {
             break;
         case 'object':
             result = {};
-            for (i in object) {
-              try {
-                if ((!loose && object[i] === subject) ||
-                    (loose  && object[i] ==  subject)) {
-                  continue;
-                }
-                result[i] = object[i];
-              } catch (e) {}
-            }
+            each(object, function(v, p) {
+              if ((!loose && v === subject) ||
+                   (loose && v ==  subject)) {
+                return;
+              }
+              result[p] = v;
+            });
             break;
         case 'number':
             result = object.toString().split(subject).join('') - 0;
@@ -19063,7 +19225,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAt : function(object, index, length) {
-    var result, me = arguments.callee, i, idx, len, n;
+    var result, me = arguments.callee, idx, len, n, minus;
     result = object;
     if (object != null) {
       idx = index - 0;
@@ -19093,14 +19255,12 @@ update(Pot.Struct, {
         case 'object':
             result = {};
             n = 0;
-            for (i in object) {
+            each(object, function(v, p) {
               if (n < idx || n > idx + len) {
-                try {
-                  result[i] = object[i];
-                } catch (e) {}
+                result[p] = v;
               }
               n++;
-            }
+            });
             break;
         case 'number':
             minus = (object < 0);
@@ -19211,7 +19371,7 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty, keys, p, v, i, len, k;
+    var result = false, cmp, empty, keys, i, len, k;
     /**@ignore*/
     cmp = Pot.isFunction(func) ? func : (function(a, b) { return a === b; });
     if (object == null) {
@@ -19249,27 +19409,23 @@ update(Pot.Struct, {
               ) {
                 result = (object === subject);
               } else {
-                keys = [];
-                for (p in subject) {
-                  keys[keys.length] = p;
-                }
+                keys = Pot.keys(subject);
                 len = keys.length;
                 i = 0;
                 result = true;
-                for (p in object) {
+                each(object, function(value, p) {
                   if (!(i in keys) || keys[i] !== p) {
                     result = false;
-                    break;
+                    throw Pot.StopIteration;
                   }
                   try {
-                    v = object[p];
-                    if (!cmp(v, subject[p])) {
+                    if (!cmp(value, subject[p])) {
                       result = false;
-                      break;
+                      throw Pot.StopIteration;
                     }
                   } catch (e) {}
                   i++;
-                }
+                });
               }
             }
             break;
@@ -19488,7 +19644,7 @@ update(Pot.Struct, {
    * @public
    */
   flip : function(o) {
-    var result;
+    var result, sc;
     switch (Pot.typeLikeOf(o)) {
       case 'object':
           result = {};
@@ -19506,8 +19662,9 @@ update(Pot.Struct, {
           break;
       case 'string':
           result = '';
+          sc = String.fromCharCode;
           each(o.split(''), function(c) {
-            result += String.fromCharCode(
+            result += sc(
               c.charCodeAt(0) ^ 0xFFFF
             );
           });
@@ -19752,8 +19909,8 @@ update(Pot.Struct, {
    */
   implode : function(object/*[, delimiter[, separator[, tail]]]*/) {
     var
-    result = '', ins = [], p, d, s, o, t, nop,
-    args = arguments, len = args.length, i, v, params,
+    result = '', ins = [], d, s, o, t, nop,
+    args = arguments, len = args.length, i, params,
     isString = Pot.isString, isObject = Pot.isObject,
     defs = {
       delimiter : ':',
@@ -19783,14 +19940,9 @@ update(Pot.Struct, {
       if (s === nop) {
         s = defs.separator;
       }
-      for (p in o) {
-        try {
-          v = o[p];
-        } catch (e) {
-          continue;
-        }
-        ins[ins.length] = p + d + stringify(v);
-      }
+      each(o, function(val, prop) {
+        ins[ins.length] = prop + d + stringify(val);
+      });
       result = ins.join(s);
       if (t) {
         result += isString(t) ? t : s;
@@ -24067,6 +24219,66 @@ update(Pot.Text, {
     return stringify(s).replace(/([A-Z]+)/g, '_$1').toLowerCase();
   },
   /**
+   * Extract a substring from string .
+   *
+   *
+   * @example
+   *   var result = extract('foo:bar', /:(\w+)$/);
+   *   debug(result);
+   *   // @results 'bar'
+   *
+   *
+   * @example
+   *   var result = extract('foo:bar', /^:(\w+)/);
+   *   debug(result);
+   *   // @results ''
+   *
+   *
+   * @example
+   *   var result = extract('foo.html', /(foo|bar)\.([^.]+)$/, 2);
+   *   debug(result);
+   *   // @results 'html'
+   *
+   *
+   * @example
+   *   var result = extract('foobar', 'foo');
+   *   debug(result);
+   *   // @results 'foo'
+   *
+   *
+   * @example
+   *   var result = extract('foobar', 'fo+');
+   *   debug(result);
+   *   // @results ''
+   *
+   *
+   * @param  {String|*}       string    A target string.
+   * @param  {RegExp|String}  pattern   A pattern for extract substring.
+   * @param  {Number}         (index)   (Optional) Index number of
+   *                                      captured group.
+   * @return {String}                   Return extracted substring.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  extract : function(string, pattern, index) {
+    var r = '', s = stringify(string), re, idx, m;
+    if (s && pattern) {
+      if (Pot.isRegExp(pattern)) {
+        re = pattern;
+      } else {
+        re = new RegExp(Pot.rescape(pattern));
+      }
+      idx = (index != null && Pot.isNumeric(index)) ? index : 1;
+      m = s.match(re);
+      if (m) {
+        r = r + m[(m[idx] == null) ? 0 : idx];
+      }
+    }
+    return r;
+  },
+  /**
    * Increment the argument value.
    * This incrementation like Perl and PHP etc that
    *   uses alphabets [a-z] + [A-Z] and digits [0-9]
@@ -25028,6 +25240,7 @@ Pot.update({
   camelize       : Pot.Text.camelize,
   hyphenize      : Pot.Text.hyphenize,
   underscore     : Pot.Text.underscore,
+  extract        : Pot.Text.extract,
   inc            : Pot.Text.inc,
   dec            : Pot.Text.dec,
   br             : Pot.Text.br,
@@ -28684,6 +28897,7 @@ update(Pot.Internal, {
     XSL_NS_URI              : Pot.XSL_NS_URI,
     SVG_NS_URI              : Pot.SVG_NS_URI,
     XUL_NS_URI              : Pot.XUL_NS_URI,
+    JS_VOID_URI             : Pot.JS_VOID_URI,
     isBoolean               : Pot.isBoolean,
     isNumber                : Pot.isNumber,
     isString                : Pot.isString,
@@ -28773,6 +28987,7 @@ update(Pot.Internal, {
     toDataURI               : Pot.URI.toDataURI,
     request                 : Pot.Net.request,
     jsonp                   : Pot.Net.requestByJSONP,
+    getJSON                 : Pot.Net.getJSON,
     loadScript              : Pot.Net.loadScript,
     hashCode                : Pot.Crypt.hashCode,
     md5                     : Pot.Crypt.md5,
@@ -28875,6 +29090,7 @@ update(Pot.Internal, {
     camelize                : Pot.Text.camelize,
     hyphenize               : Pot.Text.hyphenize,
     underscore              : Pot.Text.underscore,
+    extract                 : Pot.Text.extract,
     inc                     : Pot.Text.inc,
     dec                     : Pot.Text.dec,
     br                      : Pot.Text.br,
