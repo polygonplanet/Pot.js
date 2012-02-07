@@ -1014,7 +1014,7 @@ td.marker, td.marker * {
 <script type="text/javascript" async="async" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 setTimeout(function() {
-  var done;
+  var done, loaded;
   if (typeof Pot === 'undefined' || typeof google === 'undefined' || typeof $ === 'undefined') {
     return setTimeout(arguments.callee, 13);
   }
@@ -1029,7 +1029,7 @@ setTimeout(function() {
   });
 
   function searchCallback() {
-    var loaded, customSearchControl, drawOptions;
+    var customSearchControl, drawOptions;
 
     if (typeof google.search === 'undefined' || !google.search.CustomSearchControl) {
       return setTimeout(arguments.callee, 13);
@@ -1046,7 +1046,25 @@ setTimeout(function() {
     customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
     drawOptions.setAutoComplete(true);
     drawOptions.setSearchFormRoot($('#cse-search-form').get(0));
-    customSearchControl.draw($('#cse-search-result-container').get(0), drawOptions);
+    customSearchControl.setSearchCompleteCallback(null, function() {
+
+      $('.gsc-result a[href$=".ja.html"], .gsc-result a[href$=".en.html"]').each(function() {
+        var href = $(this).attr('href').split(/[\/\\]/).pop().replace(/#+/g, '');
+        href = '#' + href.replace(/[.](?:ja|en)[.]html$/g, '.' + Pot.LANG + '.html');
+        $(this)
+          .attr({href : Pot.JS_VOID_URI})
+          .click(function(ev) {
+            location.hash = href;
+            customSearchControl.clearAllResults();
+            return Pot.cancelEvent(ev);
+          });
+      });
+
+    });
+
+    Pot.callLazy(function() {
+      customSearchControl.draw($('#cse-search-result-container').get(0), drawOptions);
+    });
   }
 
 }, 20);
@@ -1230,6 +1248,12 @@ a.gsc-trailing-more-results:link {
   margin: 0;
   padding: 0 4px 0 2px;
   text-align: left;
+}
+
+.gsc-adBlock iframe,
+.gsc-wrapper ..gsc-adBlock,
+.gsc-webResult .gsc-result {
+  border: 0 none;
 }
 
 </style>
