@@ -896,7 +896,7 @@ setTimeout(function() {
   }
   done = true;
 
-  google.load('search', '1', {language: Pot.LANG, style : google.loader.themes.MINIMALIST});
+  google.load('search', '1', {language : Pot.LANG});
   google.setOnLoadCallback(function() {
     var customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y'),
         drawOptions         = new google.search.DrawOptions();
