@@ -47,6 +47,11 @@ setTimeout(function() {
           });
         } catch (ex) {
           location.hash = hash;
+          try {
+            if (hash && /^(?:manual|reference)[.]/.test(hash)) {
+              $('.content-broader').scrollTo(0, 0);
+            }
+          } catch (er) {}
           d.begin();
         }
       } else if (page && currentPage != page) {
@@ -229,8 +234,12 @@ setTimeout(function() {
         contentExpr = '.content-broader',
         initLayout;
 
-    return function() {
-      var height = $('body').height() - $('.header').outerHeight() - $('.footer').outerHeight();
+    return function(isHidden) {
+      var height = $('body').height() -
+                   (isHidden ? 0 : $('.header').outerHeight()) - 
+                   $('#cse-search-result-container').outerHeight() -
+                   $('.header-expand-container').outerHeight() -
+                   Math.min(50, $('.footer').outerHeight());
 
       if (!initLayout) {
         $(menuExpr).hover(function() {
@@ -300,7 +309,10 @@ setTimeout(function() {
       lang = getLang(Pot.LANG);
     }
 
+    $('.content-sitemap').empty().remove();
     $('.header-desc-' + getLang(lang, true)).hide();
+    $('.header-desc, .header-logo').height(172);
+    $('.header-search').css({marginTop : 6});
     $('a[href="#"]').attr({href : Pot.parseURI(Pot.currentURI()).filename});
 
     $('<a/>')
@@ -317,7 +329,64 @@ setTimeout(function() {
         location.reload();
       })
       .text(getLang(lang, true))
-      .appendTo('.header-lang-container');
+      .appendTo(
+        $('.header-lang-container')
+          .remove()
+          .insertBefore(
+            $('.header-title').css({marginTop : 2})
+          )
+          .css({margin : '4px 6px'})
+      );
+
+    (function() {
+      var isDown = false, icon = {
+        base : 'header-expand-icon',
+        up   : 'header-expand-icon-up',
+        down : 'header-expand-icon-down'
+      }, labels = {
+        en   : {up : 'Expand', down : 'Show'},
+        ja   : {up : '隠す',   down : '表示'}
+      };
+      $('.header-expand-button')
+        .addClass(icon.base)
+        .addClass(icon.up)
+        .attr({title : labels[lang].up})
+        .hover(function() {
+          if (isDown) {
+            $(this).removeClass(icon.down).addClass(icon.down + '-hover');
+          } else {
+            $(this).removeClass(icon.up).addClass(icon.up + '-hover');
+          }
+        }, function() {
+          if (isDown) {
+            $(this).removeClass(icon.down + '-hover').addClass(icon.down);
+          } else {
+            $(this).removeClass(icon.up + '-hover').addClass(icon.up);
+          }
+        })
+        .click(function() {
+          var elems = $('.header, #cse-search-result-container');
+          if (isDown) {
+            elems.show();
+            $(this)
+              .removeClass(icon.down)
+              .removeClass(icon.down + '-hover')
+              .addClass(icon.up)
+              .attr({title : labels[lang].up});
+          } else {
+            elems.hide();
+            $(this)
+              .removeClass(icon.up)
+              .removeClass(icon.up + '-hover')
+              .addClass(icon.down)
+              .attr({title : labels[lang].down});
+          }
+          isDown = !isDown;
+          adjustContainerLayout(isDown);
+        });
+    }());
+
+    $('.header-expand-container').show()
 
     $.getJSON(MENU_URI).then(function(data) {
       var id, subId, index = 0,
@@ -420,9 +489,9 @@ setTimeout(function() {
         });
         $('.menu-accordion-container').empty().append(wrap);
       }
-      return [firstPage, firstHash, loadPage];
+      return [firstPage, firstHash];
 
-    }).then(function(firstPage, firstHash, loadPage) {
+    }).then(function(firstPage, firstHash) {
 
       $('.menu-accordion-container').accordion({
         header      : '.menu-accordion-item',
@@ -456,30 +525,44 @@ setTimeout(function() {
               prevItem, processing, initHighlightProcess;
 
           var addHighlightClass = function(menuItem) {
-            var delay = 0;
+            var delay = 0, doScrollItem, isOpend;
 
-            if (menuItem && menuItem.item &&
-                (menuItem.item !== prevItem || !initHighlightProcess)) {
-              prevItem && prevItem.removeClass(highlightClass);
-              menuItem.item.addClass(highlightClass);
-              if ((!initHighlightProcess || currentPage !== menuItem.page) &&
-                  menuItem.index != null &&
-                  accordion.accordion('option', 'active') !== menuItem.index
-              ) {
-                accordion.accordion('activate', menuItem.index);
-                delay = initHighlightProcess ? 1 : 0.5;
+            if (menuItem && menuItem.item) {
+
+              if (menuItem.item !== prevItem) {
+                prevItem && prevItem.removeClass(highlightClass);
+                menuItem.item.addClass(highlightClass);
+                prevItem = menuItem.item;
+                doScrollItem = true;
+              } else if (!initHighlightProcess) {
+                doScrollItem = true;
               }
 
-              Pot.callLater(delay, function() {
-                if (!isMouseInMenu || !initHighlightProcess) {
-                  leftSide.scrollTo(menuItem.item, 20, {
-                    axis    : 'y',
-                    offset  : -Math.floor(leftSide.height() / 2 - menuItem.item.height() / 2)
-                  });
+              if (!isMouseInMenu) {
+                isOpend = accordion.find('.ui-accordion-content-active').length > 0;
+                if (!isOpend) {
+                  accordion.accordion('activate', menuItem.index);
+                  delay = initHighlightProcess ? 1 : 0.5;
+                } else {
+                  if (doScrollItem || !initHighlightProcess || currentPage !== menuItem.page) {
+                    if (accordion.accordion('option', 'active') !== menuItem.index) {
+                      accordion.accordion('activate', menuItem.index);
+                      delay = initHighlightProcess ? 1 : 0.5;
+                    }
+                  }
                 }
-              });
+              }
 
-              prevItem = menuItem.item;
+              if (doScrollItem) {
+                Pot.callLater(delay, function() {
+                  if (!isMouseInMenu || !initHighlightProcess) {
+                    leftSide.scrollTo(menuItem.item, 20, {
+                      axis    : 'y',
+                      offset  : -Math.floor(leftSide.height() / 2 - menuItem.item.height() / 2)
+                    });
+                  }
+                });
+              }
             }
           };
 
@@ -628,12 +711,47 @@ body > .layout-liquid-container {
   border-color: #666677;
   border-style: solid;
   border-width: 1px 0 0 0;
+  height: 50px;
+  max-height: 50px;
 }
 
 .layout-liquid-container #cse-search-result-container {
   overflow: hidden;
   width: 100%;
   max-width: 100%;
+}
+
+.layout-liquid-container .header-expand-container {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  display: none;
+  text-align: center;
+}
+
+.layout-liquid-container .header-expand-icon {
+  background: url(http://api.polygonpla.net/img/icon/arrows-ns.png?2) no-repeat scroll 50% 50% transparent;
+  width: 16px;
+  height: 16px;
+  margin: 2px auto;
+  padding: 0;
+  cursor: pointer;
+}
+
+.layout-liquid-container .header-expand-icon-up {
+  background-position: 0 -32px;
+}
+
+.layout-liquid-container .header-expand-icon-up-hover {
+  background-position: 0 -48px;
+}
+
+.layout-liquid-container .header-expand-icon-down {
+  background-position: 0 0;
+}
+
+.layout-liquid-container .header-expand-icon-down-hover {
+  background-position: 0 -16px;
 }
 
 .leftside-wrapper {
@@ -712,6 +830,15 @@ body > .layout-liquid-container {
 .header-lang-container {
   margin: 16px 12px 4px 4px;
   text-align: right;
+}
+
+.content-sitemap {
+  height: 10px;
+  max-height: 12px;
+  overflow: hidden;
+  position: absolute;
+  left: 0px;
+  top: -99999px;
 }
 
 .content-loading {
@@ -888,7 +1015,7 @@ td.marker, td.marker * {
 <script type="text/javascript">
 setTimeout(function() {
   var done;
-  if (typeof Pot === 'undefined' || typeof google === 'undefined') {
+  if (typeof Pot === 'undefined' || typeof google === 'undefined' || typeof $ === 'undefined') {
     return setTimeout(arguments.callee, 13);
   }
   if (done) {
@@ -896,18 +1023,32 @@ setTimeout(function() {
   }
   done = true;
 
-  google.load('search', '1', {language : Pot.LANG});
-  google.setOnLoadCallback(function() {
-    var customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y'),
-        drawOptions         = new google.search.DrawOptions();
+  google.load('search', '1', {
+    language : Pot.LANG,
+    callback : searchCallback
+  });
 
+  function searchCallback() {
+    var loaded, customSearchControl, drawOptions;
+
+    if (typeof google.search === 'undefined' || !google.search.CustomSearchControl) {
+      return setTimeout(arguments.callee, 13);
+    }
+    if (loaded) {
+      return;
+    }
+    loaded = true;
+
+    customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y', {});
     //customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
     customSearchControl.setResultSetSize(google.search.Search.LARGE_RESULTSET);
+    drawOptions = new google.search.DrawOptions();
     customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
     drawOptions.setAutoComplete(true);
-    drawOptions.setSearchFormRoot('cse-search-form');
-    customSearchControl.draw('cse-search-result-container', drawOptions);
-  }, true);
+    drawOptions.setSearchFormRoot($('#cse-search-form').get(0));
+    customSearchControl.draw($('#cse-search-result-container').get(0), drawOptions);
+  }
+
 }, 20);
 </script>
 <style type="text/css">
@@ -1051,6 +1192,46 @@ a.gsc-trailing-more-results:link {
 .gs-promotion .gs-visibleUrl-short {
   color: #3d42cf;
 }
+
+/* Custom Style */
+#cse-search-form {
+  width: 99%;
+  text-align: right;
+}
+
+#cse-search-form table, #cse-search-form table td {
+  border: 0 none;
+}
+
+#cse-search-form form.gsc-search-box {
+  width: auto;
+}
+
+#cse-search-form table.gsc-search-box {
+  display: table;
+  margin: 0 0 0 auto;
+  table-layout: auto;
+  width: 300px;
+}
+
+#cse-search-form input.gsc-input {
+  width: 200px;
+  border-color: #544fa6 #bab2f2 #bab2f2 #544fa6;
+  border-style: solid;
+  border-width: 1px;
+  background-image: none !important;
+}
+
+#cse-search-form .gsc-branding {
+  display: none;
+}
+
+#cse-search-form .gsc-clear-button {
+  margin: 0;
+  padding: 0 4px 0 2px;
+  text-align: left;
+}
+
 </style>
 <!--/Google Custom Search-->
 </head>
@@ -1063,6 +1244,7 @@ a.gsc-trailing-more-results:link {
             <a href="#"
                title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library">Pot.js + PotLite.js</a>
           </h1>
+          <div class="header-lang-container"></div>
           <div class="header-desc-container">
             <div class="header-desc-ja">
              Pot.js は CPU に負荷をかけることなく JavaScript の実行を可能とするユーティリティライブラリです。
@@ -1092,7 +1274,6 @@ a.gsc-trailing-more-results:link {
             <button type="button" class="header-search-submit hoge" title="Search">Search</button>
             -->
           </div>
-          <div class="header-lang-container"></div>
         </div>
       </div>
       <div class="header-logo">
@@ -1103,6 +1284,9 @@ a.gsc-trailing-more-results:link {
       </div>
     </div>
     <div id="cse-search-result-container"></div>
+    <div class="header-expand-container">
+      <div class="header-expand-button"></div>
+    </div>
     <div class="layout-2-column-left-menu clearfix">
       <div class="content">
         <div class="content-broader">
@@ -1122,6 +1306,100 @@ a.gsc-trailing-more-results:link {
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>
+    </div>
+    <div class="content-sitemap">
+      <a href="manual.Deferred.Reference.en.html" lang="en">manual.Deferred.Reference.en.html</a>
+      <a href="manual.Deferred.Reference.ja.html" lang="ja">manual.Deferred.Reference.ja.html</a>
+      <a href="manual.overview.en.html" lang="en">manual.overview.en.html</a>
+      <a href="manual.overview.ja.html" lang="ja">manual.overview.ja.html</a>
+      <a href="overview.en.html" lang="en">overview.en.html</a>
+      <a href="overview.ja.html" lang="ja">overview.ja.html</a>
+      <a href="reference.Pot.Core.functionsAndProperties.en.html" lang="en">reference.Pot.Core.functionsAndProperties.en.html</a>
+      <a href="reference.Pot.Core.functionsAndProperties.ja.html" lang="ja">reference.Pot.Core.functionsAndProperties.ja.html</a>
+      <a href="reference.function.Pot.arrayize.en.html" lang="en">reference.function.Pot.arrayize.en.html</a>
+      <a href="reference.function.Pot.arrayize.ja.html" lang="ja">reference.function.Pot.arrayize.ja.html</a>
+      <a href="reference.function.Pot.currentDocument.en.html" lang="en">reference.function.Pot.currentDocument.en.html</a>
+      <a href="reference.function.Pot.currentDocument.ja.html" lang="ja">reference.function.Pot.currentDocument.ja.html</a>
+      <a href="reference.function.Pot.currentURI.en.html" lang="en">reference.function.Pot.currentURI.en.html</a>
+      <a href="reference.function.Pot.currentURI.ja.html" lang="ja">reference.function.Pot.currentURI.ja.html</a>
+      <a href="reference.function.Pot.currentWindow.en.html" lang="en">reference.function.Pot.currentWindow.en.html</a>
+      <a href="reference.function.Pot.currentWindow.ja.html" lang="ja">reference.function.Pot.currentWindow.ja.html</a>
+      <a href="reference.function.Pot.debug.en.html" lang="en">reference.function.Pot.debug.en.html</a>
+      <a href="reference.function.Pot.debug.ja.html" lang="ja">reference.function.Pot.debug.ja.html</a>
+      <a href="reference.function.Pot.getErrorMessage.en.html" lang="en">reference.function.Pot.getErrorMessage.en.html</a>
+      <a href="reference.function.Pot.getErrorMessage.ja.html" lang="ja">reference.function.Pot.getErrorMessage.ja.html</a>
+      <a href="reference.function.Pot.globalEval.en.html" lang="en">reference.function.Pot.globalEval.en.html</a>
+      <a href="reference.function.Pot.globalEval.ja.html" lang="ja">reference.function.Pot.globalEval.ja.html</a>
+      <a href="reference.function.Pot.globalize.en.html" lang="en">reference.function.Pot.globalize.en.html</a>
+      <a href="reference.function.Pot.globalize.ja.html" lang="ja">reference.function.Pot.globalize.ja.html</a>
+      <a href="reference.function.Pot.hasReturn.en.html" lang="en">reference.function.Pot.hasReturn.en.html</a>
+      <a href="reference.function.Pot.hasReturn.ja.html" lang="ja">reference.function.Pot.hasReturn.ja.html</a>
+      <a href="reference.function.Pot.isArray.en.html" lang="en">reference.function.Pot.isArray.en.html</a>
+      <a href="reference.function.Pot.isArray.ja.html" lang="ja">reference.function.Pot.isArray.ja.html</a>
+      <a href="reference.function.Pot.isArrayLike.en.html" lang="en">reference.function.Pot.isArrayLike.en.html</a>
+      <a href="reference.function.Pot.isArrayLike.ja.html" lang="ja">reference.function.Pot.isArrayLike.ja.html</a>
+      <a href="reference.function.Pot.isBoolean.en.html" lang="en">reference.function.Pot.isBoolean.en.html</a>
+      <a href="reference.function.Pot.isBoolean.ja.html" lang="ja">reference.function.Pot.isBoolean.ja.html</a>
+      <a href="reference.function.Pot.isBuiltinMethod.en.html" lang="en">reference.function.Pot.isBuiltinMethod.en.html</a>
+      <a href="reference.function.Pot.isBuiltinMethod.ja.html" lang="ja">reference.function.Pot.isBuiltinMethod.ja.html</a>
+      <a href="reference.function.Pot.isDate.en.html" lang="en">reference.function.Pot.isDate.en.html</a>
+      <a href="reference.function.Pot.isDate.ja.html" lang="ja">reference.function.Pot.isDate.ja.html</a>
+      <a href="reference.function.Pot.isDeferred.en.html" lang="en">reference.function.Pot.isDeferred.en.html</a>
+      <a href="reference.function.Pot.isDeferred.ja.html" lang="ja">reference.function.Pot.isDeferred.ja.html</a>
+      <a href="reference.function.Pot.isDocument.en.html" lang="en">reference.function.Pot.isDocument.en.html</a>
+      <a href="reference.function.Pot.isDocument.ja.html" lang="ja">reference.function.Pot.isDocument.ja.html</a>
+      <a href="reference.function.Pot.isElement.en.html" lang="en">reference.function.Pot.isElement.en.html</a>
+      <a href="reference.function.Pot.isElement.ja.html" lang="ja">reference.function.Pot.isElement.ja.html</a>
+      <a href="reference.function.Pot.isError.en.html" lang="en">reference.function.Pot.isError.en.html</a>
+      <a href="reference.function.Pot.isError.ja.html" lang="ja">reference.function.Pot.isError.ja.html</a>
+      <a href="reference.function.Pot.isFunction.en.html" lang="en">reference.function.Pot.isFunction.en.html</a>
+      <a href="reference.function.Pot.isFunction.ja.html" lang="ja">reference.function.Pot.isFunction.ja.html</a>
+      <a href="reference.function.Pot.isInt.en.html" lang="en">reference.function.Pot.isInt.en.html</a>
+      <a href="reference.function.Pot.isInt.ja.html" lang="ja">reference.function.Pot.isInt.ja.html</a>
+      <a href="reference.function.Pot.isIter.en.html" lang="en">reference.function.Pot.isIter.en.html</a>
+      <a href="reference.function.Pot.isIter.ja.html" lang="ja">reference.function.Pot.isIter.ja.html</a>
+      <a href="reference.function.Pot.isIterable.en.html" lang="en">reference.function.Pot.isIterable.en.html</a>
+      <a href="reference.function.Pot.isIterable.ja.html" lang="ja">reference.function.Pot.isIterable.ja.html</a>
+      <a href="reference.function.Pot.isNodeLike.en.html" lang="en">reference.function.Pot.isNodeLike.en.html</a>
+      <a href="reference.function.Pot.isNodeLike.ja.html" lang="ja">reference.function.Pot.isNodeLike.ja.html</a>
+      <a href="reference.function.Pot.isNodeList.en.html" lang="en">reference.function.Pot.isNodeList.en.html</a>
+      <a href="reference.function.Pot.isNodeList.ja.html" lang="ja">reference.function.Pot.isNodeList.ja.html</a>
+      <a href="reference.function.Pot.isNumber.en.html" lang="en">reference.function.Pot.isNumber.en.html</a>
+      <a href="reference.function.Pot.isNumber.ja.html" lang="ja">reference.function.Pot.isNumber.ja.html</a>
+      <a href="reference.function.Pot.isNumeric.en.html" lang="en">reference.function.Pot.isNumeric.en.html</a>
+      <a href="reference.function.Pot.isNumeric.ja.html" lang="ja">reference.function.Pot.isNumeric.ja.html</a>
+      <a href="reference.function.Pot.isObject.en.html" lang="en">reference.function.Pot.isObject.en.html</a>
+      <a href="reference.function.Pot.isObject.ja.html" lang="ja">reference.function.Pot.isObject.ja.html</a>
+      <a href="reference.function.Pot.isRegExp.en.html" lang="en">reference.function.Pot.isRegExp.en.html</a>
+      <a href="reference.function.Pot.isRegExp.ja.html" lang="ja">reference.function.Pot.isRegExp.ja.html</a>
+      <a href="reference.function.Pot.isScalar.en.html" lang="en">reference.function.Pot.isScalar.en.html</a>
+      <a href="reference.function.Pot.isScalar.ja.html" lang="ja">reference.function.Pot.isScalar.ja.html</a>
+      <a href="reference.function.Pot.isStopIter.en.html" lang="en">reference.function.Pot.isStopIter.en.html</a>
+      <a href="reference.function.Pot.isStopIter.ja.html" lang="ja">reference.function.Pot.isStopIter.ja.html</a>
+      <a href="reference.function.Pot.isString.en.html" lang="en">reference.function.Pot.isString.en.html</a>
+      <a href="reference.function.Pot.isString.ja.html" lang="ja">reference.function.Pot.isString.ja.html</a>
+      <a href="reference.function.Pot.isWindow.en.html" lang="en">reference.function.Pot.isWindow.en.html</a>
+      <a href="reference.function.Pot.isWindow.ja.html" lang="ja">reference.function.Pot.isWindow.ja.html</a>
+      <a href="reference.function.Pot.localEval.en.html" lang="en">reference.function.Pot.localEval.en.html</a>
+      <a href="reference.function.Pot.localEval.ja.html" lang="ja">reference.function.Pot.localEval.ja.html</a>
+      <a href="reference.function.Pot.now.en.html" lang="en">reference.function.Pot.now.en.html</a>
+      <a href="reference.function.Pot.now.ja.html" lang="ja">reference.function.Pot.now.ja.html</a>
+      <a href="reference.function.Pot.override.en.html" lang="en">reference.function.Pot.override.en.html</a>
+      <a href="reference.function.Pot.override.ja.html" lang="ja">reference.function.Pot.override.ja.html</a>
+      <a href="reference.function.Pot.rescape.en.html" lang="en">reference.function.Pot.rescape.en.html</a>
+      <a href="reference.function.Pot.rescape.ja.html" lang="ja">reference.function.Pot.rescape.ja.html</a>
+      <a href="reference.function.Pot.stringify.en.html" lang="en">reference.function.Pot.stringify.en.html</a>
+      <a href="reference.function.Pot.stringify.ja.html" lang="ja">reference.function.Pot.stringify.ja.html</a>
+      <a href="reference.function.Pot.trim.en.html" lang="en">reference.function.Pot.trim.en.html</a>
+      <a href="reference.function.Pot.trim.ja.html" lang="ja">reference.function.Pot.trim.ja.html</a>
+      <a href="reference.function.Pot.typeLikeOf.en.html" lang="en">reference.function.Pot.typeLikeOf.en.html</a>
+      <a href="reference.function.Pot.typeLikeOf.ja.html" lang="ja">reference.function.Pot.typeLikeOf.ja.html</a>
+      <a href="reference.function.Pot.typeOf.en.html" lang="en">reference.function.Pot.typeOf.en.html</a>
+      <a href="reference.function.Pot.typeOf.ja.html" lang="ja">reference.function.Pot.typeOf.ja.html</a>
+      <a href="reference.function.Pot.update.en.html" lang="en">reference.function.Pot.update.en.html</a>
+      <a href="reference.function.Pot.update.ja.html" lang="ja">reference.function.Pot.update.ja.html</a>
+      <a href="reference.property.Pot.StopIteration.en.html" lang="en">reference.property.Pot.StopIteration.en.html</a>
+      <a href="reference.property.Pot.StopIteration.ja.html" lang="ja">reference.property.Pot.StopIteration.ja.html</a>
     </div>
   </div>
   <noscript>

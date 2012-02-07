@@ -1,4 +1,0 @@
-User-agent: *
-Disallow:
-
-Sitemap: http://polygonplanet.github.com/Pot.js/sitemap.xml
