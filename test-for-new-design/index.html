@@ -888,7 +888,7 @@ td.marker, td.marker * {
 <script type="text/javascript">
 setTimeout(function() {
   var done;
-  if (typeof Pot === 'undefined') {
+  if (typeof Pot === 'undefined' || typeof google === 'undefined') {
     return setTimeout(arguments.callee, 13);
   }
   if (done) {
