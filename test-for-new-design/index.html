@@ -699,7 +699,9 @@ setTimeout(function() {
       setTimeout(arguments.callee, 20);
     } else if (!done) {
       done = true;
-      init();
+      $(function() {
+        init();
+      });
     }
   }());
 
