@@ -607,6 +607,11 @@ setTimeout(function() {
               return;
             }
 
+            if (Pot.Reference.doRelayout) {
+              adjustContainerLayout();
+              Pot.Reference.doRelayout = false;
+            }
+
             if (curHash !== itemId) {
               backItem = tree.get(curHash);
               if (backItem && backItem.page) {
@@ -1090,17 +1095,34 @@ setTimeout(function() {
       Pot.Reference.currentPager = 0;
       container.show();
 
-      $('.layout-2-column-left-menu').height(1).hide();
+      
+      $('.leftside-wrapper, .content-broader').height(1);
+      $('.layout-2-column-left-menu').hide();
       $('#cse-search-result-container').height(1).height(
         $('body').height() -
           $('.header').outerHeight() -
-          $('.layout-2-column-left-menu').outerHeight() -
+          $('.header-expand-container').outerHeight() -
+          ($('.layout-2-column-left-menu').outerHeight() || 0) -
           $('.footer').outerHeight()
       ).css({
         overflow  : 'auto',
         overflowX : 'hidden',
         overflowY : 'auto'
       });
+
+      $('.gsc-clear-button').click(function() {
+        Pot.Reference.isShownSearchResult = false;
+        Pot.Reference.doRelayout = true;
+        $('#cse-search-result-container').height(1).hide();
+        $('.leftside-wrapper, .content-broader').height(
+          $('body').height() -
+            $('.header').outerHeight() -
+            $('.header-expand-container').outerHeight() -
+            $('.footer').outerHeight()
+        );
+        $('.layout-2-column-left-menu').show();
+      });
+
     });
 
     Pot.callLazy(function() {
@@ -1409,7 +1431,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-02-07
+          Last modified: 2012-02-08
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>
