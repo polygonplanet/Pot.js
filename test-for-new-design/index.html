@@ -104,7 +104,7 @@ setTimeout(function() {
           cache    : false
         }).then(function(res) {
 
-          target.append(res.responseText).find('a[href^="#"]').each(function() {
+          target.empty().append(res.responseText).find('a[href^="#"]').each(function() {
             var that = $(this), id = that.attr('href').substring(1);
 
             if (tree.has(id)) {
