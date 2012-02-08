@@ -100,7 +100,8 @@ setTimeout(function() {
       return Pot.Deferred.wait(0.2).then(function() {
 
         return Pot.request(page, {
-          mimeType : 'text/html'
+          mimeType : 'text/html',
+          cache    : false
         }).then(function(res) {
 
           target.append(res.responseText).find('a[href^="#"]').each(function() {
