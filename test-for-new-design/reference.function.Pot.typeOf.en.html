@@ -1,0 +1,53 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.typeOf"><em>Pot.</em>typeOf</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の型を調べ、その表現を文字列で取得します。
+    </p>
+    <div>
+      <p>
+ 引数 o の型の文字列表現を返します。
+ <br>
+ typeof 演算子を補完したようなものです。
+</p>
+<p>
+ 表現として返る値は以下のうちいずれかになります。
+</p>
+<pre>boolean, number, string, function, array,
+date, regexp, object, error, null, undefined</pre>
+<p>
+ o の型の文字列表現を全て小文字で返します。
+</p>
+<pre>debug(typeOf(null));                     // 'null'
+debug(typeOf(undefined));                // 'undefined'
+debug(typeOf(false));                    // 'boolean'
+debug(typeOf(true));                     // 'boolean'
+debug(typeOf(new Boolean(true)));        // 'boolean'
+debug(typeOf(0));                        // 'number'
+debug(typeOf(-123.456));                 // 'number'
+debug(typeOf(NaN));                      // 'number'
+debug(typeOf(Infinity));                 // 'number'
+debug(typeOf(new Number(100)));          // 'number'
+debug(typeOf('abc'));                    // 'string'
+debug(typeOf(new String('abc')));        // 'string'
+debug(typeOf([1, 2, 3]));                // 'array'
+debug(typeOf(new Array(10)));            // 'array'
+debug(typeOf({a: 1, b: 2}));             // 'object'
+debug(typeOf(new Object));               // 'object'
+debug(typeOf(/[a-z]+/));                 // 'regexp'
+debug(typeOf(new RegExp('[A-Z]*')));     // 'regexp'
+debug(typeOf((function(){})));           // 'function'
+debug(typeOf(new Function('return 1'))); // 'function'
+debug(typeOf(new Date));                 // 'date'
+debug(typeOf(new Error('hogeError')));   // 'error'</pre>
+
+    </div>
+  </dd>
+</dl>

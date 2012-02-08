@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isElement"><em>Pot.</em>isElement</dfn>
+    (<em>{Element|Node|*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が DOM Element オブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が DOM Element オブジェクトかどうか調べます。
+</p>
+<p>
+ x が Element オブジェクトなら true を返し、それ以外は false を返します。
+</p>
+<pre>// For Web Browser.
+debug(isElement(window));                               // false
+debug(isElement(document));                             // false
+debug(isElement(document.body));                        // true
+debug(isElement(document.getElementById('container'))); // true (if exists)
+debug(isElement(document.getElementsByTagName('div'))); // false</pre>
+    </div>
+  </dd>
+</dl>

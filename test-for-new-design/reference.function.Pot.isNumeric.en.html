@@ -1,0 +1,40 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isNumeric"><em>Pot.</em>isNumeric</dfn>
+    (<em>{Number|*}</em> n)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 n が数えられるかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 n が数えられる値かどうか調べます。
+ <br>
+ 有効な値は、<code>1, -1, 1e8, '10', '0xFF'</code> などです。
+</p>
+<p>
+ n が数えられるなら true を返し、数えられない場合は false を返します。
+</p>
+<pre>debug(isNumeric(0));               // true
+debug(isNumeric(1234567890));      // true
+debug(isNumeric(new Number(25)));  // true
+debug(isNumeric(null));            // false
+debug(isNumeric((void 0)));        // false
+debug(isNumeric('abc'));           // false
+debug(isNumeric('0xFF'));          // true
+debug(isNumeric('1e8'));           // true
+debug(isNumeric('10px'));          // false
+debug(isNumeric('-512 +1'));       // false
+debug(isNumeric([]));              // false
+debug(isNumeric([100]));           // false
+debug(isNumeric(new Date()));      // false
+debug(isNumeric({}));              // false
+debug(isNumeric((function() {}))); // false</pre>
+    </div>
+  </dd>
+</dl>

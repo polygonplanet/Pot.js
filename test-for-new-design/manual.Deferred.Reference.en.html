@@ -433,68 +433,57 @@ d.then(function() {
     console.log(3);
 }).begin();</pre>
     <p>
-     
-     
-     
-     
-     
-     <h1 class="error">途中...<br>The translation is still going on...</h1>
-     
-     
-     
-     
-     
-     こうすることで、各コールバックはゆっくり実行されます。
+     By doing this, each callback is executed slowly.
      <br>
-     この例では、console.log() が 1, 2, 3 とゆっくり表示されます。
+     This example will display slowly '1', '2' and '3' by console.log().
     </p>
     <p>
-     速度の指定は、speed メソッドにより指定できます。
-     定義された値の文字列、または数値 (ms) で指定できます。
-     定義された文字列値は 下の表 を参照ください。
+     You can specify speed by the 'speed' method.
+     You can specify speed by the 'speed' method with String or Number (ms) argument value.
+     Refer constant string value following table.
     </p>
     <div>
      <table class="grid" id="manualsub.Deferred.Reference.controlSpeedMap">
       <tr>
-       <td class="marker row-head">値 / メソッド名</td>
-       <td class="marker row-head">速度</td>
+       <td class="marker row-head">value / method name</td>
+       <td class="marker row-head">speed</td>
       </tr>
       <tr>
        <td>limp</td>
-       <td>最も遅い</td>
+       <td>most slowly</td>
       </tr>
       <tr>
        <td>doze</td>
-       <td>遅い</td>
+       <td>more slowly</td>
       </tr>
       <tr>
        <td>slow</td>
-       <td>遅め</td>
+       <td>slowly</td>
       </tr>
       <tr>
        <td>normal</td>
-       <td>通常</td>
+       <td>normal</td>
       </tr>
       <tr>
        <td>fast</td>
-       <td>速め</td>
+       <td>fast</td>
       </tr>
       <tr>
        <td>rapid</td>
-       <td>速い</td>
+       <td>faster</td>
       </tr>
       <tr>
        <td>ninja</td>
-       <td>最も速い</td>
+       <td>fastest</td>
       </tr>
      </table>
     </div>
     <p>
-     または、コンストラクタに引数のオプションとして渡すことができます。
+     Alternatively, you can pass an argument to the constructor as an option.
     </p>
     <pre>var d = new Deferred({ speed : 'slow' });</pre>
     <p>
-     コールバックチェインの途中で速度を変更することも可能です。
+     It is also possible to change the speed in the middle of the callback chain.
     </p>
     <pre>var d = new Deferred();
 d.then(function() {
@@ -506,14 +495,14 @@ d.then(function() {
     console.log(res); // 3
 }).begin();</pre>
     <p>
-     上の例のように、コールバック関数を用いないメソッドは
-     結果の値を引き継ぎ、次のコールバックに渡します。
+     As in the example above, chain can taking over the value of the result
+      and passes to the next callback if the method not needs callback function.
      <br>
-     したがって、speed() や wait() などを使用しても
-     次のコールバックに渡す引数の値が失われることはありません。
+     Therefore, the value of the following arguments to pass to the callback
+      even if you used <a href="#reference.function.Pot.Deferred.prototype.speed">speed()</a>, <a href="#reference.function.Pot.Deferred.prototype.wait">wait()</a> etc. will not be lost the value.
     </p>
     <p>
-     何らかの重い処理を分割して処理する場合、speed の指定により負荷を軽減できます。
+     If you want to handle some heavy processing to split, you can reduce the load by specifying the speed.
     </p>
     <pre>begin(function() {
     return someHeavyProcess();
@@ -525,7 +514,7 @@ d.then(function() {
     alert(res);
 });</pre>
     <p>
-     途中で wait を置くことも可能です。
+     It is also possible to put a wait in the middle.
     </p>
     <pre>begin(function() {
     return someHeavyProcess();
@@ -537,88 +526,91 @@ d.then(function() {
     alert(res);
 });</pre>
     <p>
-     wait は、秒数を引数に設定します。
-     ミリ秒ではないので注意してください。
+     <a href="#reference.function.Pot.Deferred.prototype.wait">wait()</a> is treats argument as the number of seconds.
+     Note that because it is not in milliseconds.
     </p>
    </div>
-   <h3 id="manualsub.Deferred.Reference.fireChain" class="potjs-manual-item-for-in-view">チェインを実行</h3>
+   <h3 id="manualsub.Deferred.Reference.fireChain" class="potjs-manual-item-for-in-view">Fire Chain</h3>
    <div class="potjs-manual-item-for-in-view">
     <p>
-     今までの例の途中でもいくつか出ましたが、
-     <br>
-     .begin() メソッドによりチェインを開始することができます。
+     Pot.Deferred's chain can start by <a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> method.
     </p>
     <p>
-     関数としての begin (Pot.Deferred.begin) は、
-     Deferred のインスタンスを生成し、
-     チェインを開始するショートカットのようなものです。
-     別ものなので注意してください。
+     begin (Pot.Deferred.begin) as a function is a shortcut
+      to create an instance of Pot.Deferred, to start the chain.
+     <br>
+     Note that Pot.Deferred.begin() and Pot.Deferred.prototype.begin() are different.
     </p>
     <pre>var d = new Deferred();
 d.then(function() {
     alert('hoge');
 });</pre>
     <p>
-     この例は、何も実行されません。
-     'hoge' とアラートもされません。
+     This example never alert 'hoge'.
      <br>
-     単に変数 d にコールバックを登録しただけです。
+     Just registered a callback to variable 'd' simply.
     </p>
     <p>
-     これを実行するには、
+     If you add code like the following, will be started the callback chain.
     </p>
     <pre>d.begin();</pre>
     <p>
-     とすると、コールバックチェインが開始されます。
-    </p>
-    <p>
-     また、引数に値を設定することができます。
+     You can also set the value of an argument.
     </p>
     <pre>var d = new Deferred();
 d.then(function(value) {
     alert(value);
 }).begin('hoge');</pre>
     <p>
-     この例では、hoge とアラートされます。
+     In this example, will be alert 'hoge'.
     </p>
     <p>
-     次 (この場合は最初) のコールバックの引数の値として渡すことができます。
+     The argument value can be passed as the next (in this case, first) callback's arguments.
     </p>
     <p>
-     また、何らかの事態により .begin を通常処理ではなくエラーと扱いたい場合は、
+     You can start with the <a href="#reference.function.Pot.Deferred.prototype.raise">.raise()</a> method
+      instead of the <a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> method
+      if you want to treat any error by the situation.
     </p>
     <pre>var d = new Deferred();
 d.then(function() {
-    // 成功時
+    // On success.
     successFunc();
 }).rescue(function() {
-    // エラー時
+    // On error.
     errorFunc();
 }).ensure(function() {
-    // 最終的な処理
+    // Final processing.
     finallyFunc();
 });
 
-// チェックが通れば成功とする場合
+// Validate and succeed if passes the check.
 if (check()) {
     d.begin();
 } else {
+    // Raise a error.
     d.raise();
 }</pre>
     <p>
-     このような分岐が必要な場合、
-     .begin() のかわりに .raise() を実行することで
-     エラー扱いでコールバックチェインを開始することができます。
+     You can start the callback chain with an error.
      <br>
-     エラーから始まるので、最初に then があった場合は そのコールバックは無視されます。
+     Since starting from the error,
+      if there is a <a href="#reference.function.Pot.Deferred.prototype.then">.then()</a>
+      the first callback will be ignored.
     </p>
     <p>
-     .raise() も同様に、引数に何らかの値を与え
-     次のエラーバック関数の引数として渡すことができます。
+     The .raise()'s argument value can be passed like .begin() as the next callback's arguments.
     </p>
    </div>
-   <h3 id="manualsub.Deferred.Reference.replaceToDeferred" class="potjs-manual-item-for-in-view">関数を Deferred 化</h3>
+   <h3 id="manualsub.Deferred.Reference.replaceToDeferred" class="potjs-manual-item-for-in-view">Deferrize function</h3>
    <div class="potjs-manual-item-for-in-view">
+    
+    
+    
+    <h1 class="error">途中...<br>The translation is still going on...</h1>
+    
+    
+    
     <p>
      既存の関数や、ユーザー定義の関数を Deferred 化、
      つまり Pot.Deferred のインスタンスが返るよう置き換えたり

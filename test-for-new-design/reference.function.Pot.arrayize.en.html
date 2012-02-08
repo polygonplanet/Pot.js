@@ -1,0 +1,53 @@
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.arrayize"><em>Pot.</em>arrayize</dfn>
+    (<em>{*}</em> x [, <em>{Number}</em> index])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      任意の値 x を配列として返します。
+    </p>
+    <div>
+      <p>
+ 任意の値 x を配列として評価して返します。
+ <br>
+ 引数 index が指定されるとそこから slice して返します。
+ <br>
+ Array.prototype.slice.call(x [, index]) としたような働きをします。
+ <br>
+ arguments や、DOM NodeList を配列にする際に役立ちます。
+ <br>
+ <a href="#reference.function.Pot.stringify">Pot.stringify()</a> の Array版 のような感じです。
+</p>
+<p>
+  コピーした配列としての値が返ります。
+</p>
+<pre>arrayize(null);               // [null]
+arrayize((void 0));           // [undefined]
+arrayize(true);               // [true]
+arrayize(false);              // [false]
+arrayize('');                 // ['']
+arrayize('hoge');             // ['hoge']
+arrayize([]);                 // []
+arrayize(new Array(1, 2, 3)); // [1, 2, 3]
+arrayize([1, 2, 3]);          // [1, 2, 3]
+arrayize([[]]);               // [[]]
+arrayize([[100]]);            // [[100]]
+arrayize({});                 // [{}]
+arrayize({foo: 'bar'});       // [{foo: 'bar'}]
+arrayize(document.getElementsByTagName('div')); // [&lt;div/&gt;, &lt;div/&gt;, ...]
+
+(function(a, b, c) {
+    arrayize(arguments); // [1, 2, 3]
+})(1, 2, 3);
+
+(function(a, b, c) {
+    arrayize(arguments, 2); // [3]
+})(1, 2, 3);</pre>
+    </div>
+  </dd>
+</dl>

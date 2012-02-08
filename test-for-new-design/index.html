@@ -2,7 +2,13 @@
 <html dir="ltr">
 <head>
 <meta charset="UTF-8">
-<title>Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library</title>
+<!--Cache Control for Test-->
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="max-age=0">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="cache-control" content="no-store">
+<!--/Cache Control for Test-->
+<title>Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library</title>
 <link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico?2">
 <meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for string operations and asynchronous iterable processing with Deferred.">
 <meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
@@ -74,10 +80,18 @@ setTimeout(function() {
     return d;
   };
 
-  var loadPage = function(page, hash) {
+  var loadPage = function(page, hash, isClick) {
     var target = $('.content-wrapper');
 
     if (currentPage == page) {
+
+      // Fixed Bug: Don't click the menu items too quickly.
+      // https://news.ycombinator.com/item?id=3566141
+      if (!isClick) {
+        currentId = hash;
+        return;
+      }
+
       scrollToHash(page, hash);
       currentId = hash;
     } else {
@@ -115,7 +129,10 @@ setTimeout(function() {
             //TODO: Remove if completed.
             $('<div/>')
               .append(
-                $('<h2/>').text('ページが取得できません')
+                $('<h2/>').text(
+                  lang === 'ja' ? '現在作成中です…'
+                                : 'Now Creating...'
+                )
               )
               .appendTo(target.empty());
 
@@ -316,6 +333,7 @@ setTimeout(function() {
       initHash = initHash.split(':');
       lang = initHash.pop().toLowerCase();
       initHash = initHash.join(':');
+      location.hash = initHash.replace(/:(?:en|ja)/ig, '');
     }
     if (/ja|en/.test(lang)) {
       lang = getLang(lang);
@@ -358,8 +376,8 @@ setTimeout(function() {
         up   : 'header-expand-icon-up',
         down : 'header-expand-icon-down'
       }, labels = {
-        en   : {up : 'Expand', down : 'Show'},
-        ja   : {up : '隠す',   down : '表示'}
+        en   : {up : 'Hide', down : 'Show'},
+        ja   : {up : '隠す', down : '表示'}
       };
       $('.header-expand-button')
         .addClass(icon.base)
@@ -441,7 +459,7 @@ setTimeout(function() {
                   Pot.Deferred.till(function() {
                     return changed;
                   }).then(function() {
-                    loadPage(fileName, id);
+                    loadPage(fileName, id, true);
                   });
                 })
             );
@@ -483,7 +501,7 @@ setTimeout(function() {
                     Pot.Deferred.till(function() {
                       return changed;
                     }).then(function() {
-                      loadPage(subFileName, subId);
+                      loadPage(subFileName, subId, true);
                     });
                   })
               );
@@ -537,6 +555,7 @@ setTimeout(function() {
               forInViewClass = 'potjs-manual-item-for-in-view',
               accordion = $('.menu-accordion-container'),
               leftSide  = $('.leftside-wrapper'),
+              isLang = /:(?:en|ja)/i,
               prevItem, processing, initHighlightProcess;
 
           var addHighlightClass = function(menuItem) {
@@ -592,6 +611,12 @@ setTimeout(function() {
             }
 
             processing = true;
+
+            if (isLang.test(curHash)) {
+              location.reload();
+              processing = false;
+              return;
+            }
 
             if (Pot.Reference.isShownSearchResult) {
               curPager = Pot.trim($('.gsc-cursor-current-page').text()) - 0;
@@ -1095,7 +1120,6 @@ setTimeout(function() {
       Pot.Reference.currentPager = 0;
       container.show();
 
-      
       $('.leftside-wrapper, .content-broader').height(1);
       $('.layout-2-column-left-menu').hide();
       $('#cse-search-result-container').height(1).height(
@@ -1431,7 +1455,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-02-08
+          Last modified: 2012-02-09
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>

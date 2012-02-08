@@ -1,0 +1,32 @@
+<dl>
+  <dt>
+    <dfn id="definition.reference.property.Pot.StopIteration"><em>Pot.</em>StopIteration</dfn>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      イテレーション/ループを止めるためのオブジェクト。
+    </p>
+    <div>
+      <p>
+ 実行中のイテレーションを止めるために使用します。
+ <br>
+ StopIteration を throw することで、実行中のループが止まります。
+ <br>
+ StopIteration により、for ループなどの中で break するようなことが可能となります。
+</p>
+<pre>var n = 0;
+
+Pot.forEach([1, 2, 3, 4, 5], function(val) {
+    if (n &gt; 5) {
+        throw Pot.StopIteration;
+    }
+    n += val;
+});
+
+debug(n); // 6</pre>
+    </div>
+  </dd>
+</dl>

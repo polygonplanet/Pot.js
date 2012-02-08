@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isNodeLike"><em>Pot.</em>isNodeLike</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が DOM Node のようなオブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が DOM Node のようなものか調べます。
+</p>
+<p>
+ x が Node のようなオブジェクトなら true を返し、それ以外は false を返します。
+</p>
+<pre>// For Web Browser.
+debug(isNodeLike(window));                               // false
+debug(isNodeLike(document));                             // true
+debug(isNodeLike(document.body));                        // true
+debug(isNodeLike(document.getElementById('container'))); // true (if exists)
+debug(isNodeLike(document.getElementsByTagName('div'))); // false</pre>
+    </div>
+  </dd>
+</dl>

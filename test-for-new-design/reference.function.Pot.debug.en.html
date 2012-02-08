@@ -1,0 +1,30 @@
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.debug"><em>Pot.</em>debug</dfn>
+    (<em>{*}</em> msg)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      コンソールにデバッグ出力します。
+    </p>
+    <div>
+      <p>
+ 引数 msg をコンソールに出力します。
+ <br>
+ 主に console.log と同様です。
+ <br>
+ Greasemonkey では GM_log が定義されている場合、それを使用します。
+ <br>
+ コンソールがない環境では擬似的にコンソールを作り表示します。
+ <br>
+ デバッグ出力用です。
+</p>
+<pre>debug('hoge'); // 'hoge'</pre>
+
+    </div>
+  </dd>
+</dl>

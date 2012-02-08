@@ -1,0 +1,37 @@
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.currentURI"><em>Pot.</em>currentURI</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      現在の URI もしくはファイル名を取得します。
+    </p>
+    <div>
+      <p>
+ Pot.js もしくは PotLite.js 読み込み時の URI、または実行中のファイル名を返します。
+ <br>
+ 基本的に location.href の値と同じです。
+ <br>
+ Node.js などの非ブラウザ環境では、実行中のファイル名が返ります。
+ <br>
+ canonical などの影響により URI が取得できなかった場合は、空文字 '' を返します。
+ <br>
+ 複数の window が存在する環境 (XUL など) で効果が現れます。
+ <br>
+ 返す値は、読み込み時以降 違う URI になったりせず、変化することはありません。
+</p>
+<p>
+ 現在の URI またはファイル名、もしくは空文字 '' が返ります。
+</p>
+<pre>// 例えば http://www.example.com/hoge.html 上で実行中の場合
+
+var uri = currentURI();
+debug(uri); // 'http://www.example.com/hoge.html'</pre>
+    </div>
+  </dd>
+</dl>

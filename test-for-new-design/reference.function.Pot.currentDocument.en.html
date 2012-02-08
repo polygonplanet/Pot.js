@@ -1,0 +1,31 @@
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.currentDocument"><em>Pot.</em>currentDocument</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      現在の document オブジェクトを取得します。
+    </p>
+    <div>
+      <p>
+ Pot.js もしくは PotLite.js 読み込み時の document オブジェクトを返します。
+ <br>
+ document が存在しない場合は 空のオブジェクト {} を返します。
+ <br>
+ 複数の window や document が存在する環境 (XUL など) で効果が現れます。
+ <br>
+ 返す値は、読み込み時以降 違う document オブジェクトになったりせず、変化することはありません。
+</p>
+<p>
+ 現在の document オブジェクトもしくは空のオブジェクト {} が返ります。
+</p>
+<pre>var doc = currentDocument();
+debug( doc.getElementById('hoge').tagName ); // e.g., 'DIV'</pre>
+    </div>
+  </dd>
+</dl>

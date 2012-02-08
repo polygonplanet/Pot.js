@@ -1,0 +1,29 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isBoolean"><em>Pot.</em>isBoolean</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が真偽値かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が真偽値かどうか調べ、適正なら true を返します。
+ <br>
+ 真偽値でない場合、false が返ります。
+</p>
+<p>
+ x が真偽値であれば true を返します。
+</p>
+<pre>debug(isBoolean(true));               // true
+debug(isBoolean(new Boolean(false))); // true
+debug(isBoolean('hoge'));             // false</pre>
+
+    </div>
+  </dd>
+</dl>

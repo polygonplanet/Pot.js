@@ -1,0 +1,94 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.hasReturn"><em>Pot.</em>hasReturn</dfn>
+    (<em>{Function|String}</em> func)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      関数 func が return 文を持っているかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数の関数 func が return 文を持ち、実行すると最終的に return されて返るかどうか調べます。
+ <br>
+ func が文字列で与えられると、それをコードみなしチェックします。
+ <br>
+ この関数は、たんに return があるかどうか調べるわけではなく、
+ <br>
+ JavaScript として解析したうえで、関数の最初のブロック直下で return により返されるかをチェックします。
+ <br>
+ 関数 func を実行するわけでありません。
+ <br>
+ 任意のユーザー定義関数が return されるものかどうか調べたいときなどに便利になります。
+<p>
+<p>
+ func が return されるなら true を返し、そうでない場合 false を返します。
+</p>
+<pre>var func = function() {
+  return &#039;hoge&#039;;
+};
+debug(hasReturn(func)); // true</pre>
+
+<pre>var func = function() {
+  var hoge = 1;
+};
+debug(hasReturn(func)); // false</pre>
+
+<pre>var func = function return_test(return1, return$2) {
+  // dummy comment: return &#039;hoge&#039;;
+  var $return = &#039;return(1)&#039; ? (function(a) {
+    if (a) {
+      return true;
+    }
+    return false;
+  })(/return true/) : &quot;return false&quot;;
+};
+debug(hasReturn(func)); // false</pre>
+
+<pre>var func = function() {
+  if (1) {
+    return (function() {
+      return &#039;hoge&#039;;
+    })();
+  }
+};
+debug(hasReturn(func)); // true</pre>
+
+<pre>// E4X が利用できる環境での例
+var func = function() {
+  // return &#039;hoge&#039;;
+  var e1 = &lt;&gt;return&lt;/&gt;;
+  var e2 = &lt;&gt;&lt;![CDATA[
+    return 1;
+  ]]&gt;&lt;/&gt;;
+  var e3 = &lt;&gt; &lt;div data={(function() {
+    return &#039;hoge&#039;;
+  })()}&gt;
+    return 1;
+  &lt;/div&gt;&lt;/&gt;;
+  var e4 = &lt;&gt;&lt;!--&lt;/&gt;--&gt;return 1;&lt;/&gt;;
+  var re = /&lt;&gt;&lt;!--[\/]--&gt;&lt;\/&gt;/gim;
+  var e5 = &lt;root&gt;&lt;hoge fuga={(function() {
+    return 1;
+  })()} piyo=&quot;&lt;root&gt;&quot;&gt;
+  &lt;root&gt;return&lt;/root&gt;return;&lt;!--&lt;/root&gt;&quot;&lt;root&gt;&quot;--&gt;return;
+  &lt;!--return--&gt;
+  &lt;/hoge&gt;&lt;/root&gt;;
+  var root = &quot;&lt;/root&gt;&quot;;
+  var r = &#039;return(1)&#039; ? (function(a) {
+    if (a) {
+      return true;
+    }
+    return false;
+  })(/return true/) : &quot;return false&quot;;
+};
+debug(hasReturn(func)); // false</pre>
+
+
+    </div>
+  </dd>
+</dl>

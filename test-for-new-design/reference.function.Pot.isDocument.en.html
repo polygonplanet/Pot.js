@@ -1,0 +1,27 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isDocument"><em>Pot.</em>isDocument</dfn>
+    (<em>{Document|Element|Node|*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が DOM Document オブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が DOM Document オブジェクトかどうか調べます。
+</p>
+<p>
+ x が document オブジェクトなら true を返し、それ以外は false を返します。
+</p>
+<pre>// For Web Browser.
+debug(isDocument(window));        // false
+debug(isDocument(document));      // true
+debug(isDocument(document.body)); // false</pre>
+    </div>
+  </dd>
+</dl>

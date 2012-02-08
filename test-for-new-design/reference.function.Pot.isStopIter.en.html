@@ -1,0 +1,40 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isStopIter"><em>Pot.</em>isStopIter</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o が StopIteration かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 o が StopIteration かどうかを調べます。
+ <br>
+ StopIteration は、<a href="#reference.property.Pot.StopIteration">Pot.StopIteration</a> または ビルトインの StopIteration が対象になります。
+</p>
+<p>
+ o が StopIteration なら true を返します。違う場合は false を返します。
+</p>
+<pre>try {
+    throw StopIteration;
+} catch (e) {
+    debug( isStopIter(e) ); // true;
+    try {
+        throw Pot.StopIteration;
+    } catch (ex) {
+        debug( isStopIter(ex) ); // true
+        try {
+            throw new Error('hoge');
+        } catch (err) {
+            debug( isStopIter(err) ); // false
+        }
+    }
+}</pre>
+    </div>
+  </dd>
+</dl>

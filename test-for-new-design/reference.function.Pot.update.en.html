@@ -1,0 +1,47 @@
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.update"><em>Pot.</em>update</dfn>
+    (<em>{Object}</em> target, <em>{Object}</em> subject [, <em>{Object}</em> subject2 [, ...]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 subject が持つプロパティをすべて 引数 target オブジェクトにコピーして返します。
+    </p>
+    <p>
+      mixin のようなものです。
+      または jQuery でいう jQuery.extend に似ています。
+      <br>
+      第一引数 subject 以降は可変です。
+      与えられた引数のプロパティを順に target にコピーします。
+      <br>
+      target が同じプロパティを持っていた場合、上書きされます。
+    </p>
+    <p>
+      コピーが済みアップデートされたオブジェクト target が返ります。
+    </p>
+    <pre>var obj = {foo: 'v1', bar: 'v2'};
+var src = {baz: 'v3'};
+
+update(obj, src);
+
+debug(obj);
+// obj = {foo: 'v1', bar: 'v2', baz: 'v3'}</pre>
+    <pre>var defaults = {a: 1, b: 2, c: 3};
+var options = {a: 10, c: 30};
+
+var result = update({}, defaults, options);
+
+debug(result);
+// {a: 10, b: 2, c: 30}</pre>
+    <p>
+      シンプルにオブジェクトのコピーを作成できます。
+    </p>
+    <pre>var obj = {foo: 1, bar: 2, baz: 3};
+var copy = update({}, obj);
+debug(copy); // {foo: 1, bar: 2, baz: 3}</pre>
+  </dd>
+</dl>

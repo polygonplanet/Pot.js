@@ -1,0 +1,32 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isObject"><em>Pot.</em>isObject</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x がオブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x がオブジェクトかどうか調べ、適正なら true を返します。
+ <br>
+ オブジェクトでない場合、false が返ります。
+</p>
+<p>
+ x がオブジェクトなら true を返します。
+</p>
+<pre>
+debug(isObject({}));           // true
+debug(isObject({a: 1, b: 2})); // true
+debug(isObject(new Object())); // true
+debug(isObject([100]));        // false
+debug(isObject('hoge'));       // false</pre>
+
+    </div>
+  </dd>
+</dl>

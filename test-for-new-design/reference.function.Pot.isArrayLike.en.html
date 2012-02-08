@@ -1,0 +1,30 @@
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isArrayLike"><em>Pot.</em>isArrayLike</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o が配列のようなオブジェクトかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 o が配列のようなオブジェクトかどうか調べます。
+ <br>
+ 基本的に <a href="#reference.function.Pot.isArray">Pot.isArray()</a> と同じです。
+ 違いは、arguments や NodeList も true として返すことです。
+</p>
+<p>
+ o が配列のようなオブジェクトなら true を返し、それ以外は false を返します。
+</p>
+<pre>(function(a, b, c) {
+    debug( isArray(arguments) );     // false (ECMA-262 3rd Edition)
+    debug( isArrayLike(arguments) ); // true
+})(1, 2, 3);</pre>
+    </div>
+  </dd>
+</dl>
