@@ -232,14 +232,17 @@ setTimeout(function() {
   var adjustContainerLayout = (function() {
     var menuExpr = '.leftside-wrapper',
         contentExpr = '.content-broader',
+        resultExpr = '#cse-search-result-container',
         initLayout;
 
     return function(isHidden) {
-      var height = $('body').height() -
-                   (isHidden ? 0 : $('.header').outerHeight()) - 
-                   $('#cse-search-result-container').outerHeight() -
-                   $('.header-expand-container').outerHeight() -
-                   Math.min(50, $('.footer').outerHeight());
+      var height = $('body').height() - (
+          isHidden ? 0
+                   : $('.header').outerHeight()
+        ) - $('.header-expand-container').outerHeight() - Math.min(
+          50,
+          $('.footer').outerHeight()
+        );
 
       if (!initLayout) {
         $(menuExpr).hover(function() {
@@ -259,7 +262,8 @@ setTimeout(function() {
       $(menuExpr).css({
         height : height
       });
-      $(contentExpr).css({
+
+      $(Pot.Reference.isShownSearchResult ? resultExpr : contentExpr).css({
         height : height
       });
 
@@ -279,6 +283,15 @@ setTimeout(function() {
           position  : 'relative',
           zoom      : 1
         });
+        if (Pot.Reference.isShownSearchResult) {
+          $(resultExpr).css({
+            overflow  : 'auto',
+            overflowX : 'hidden',
+            overflowY : 'auto',
+            position  : 'relative',
+            zoom      : 1
+          });
+        }
       }
 
     };
@@ -296,6 +309,7 @@ setTimeout(function() {
     };
 
     Pot.deferrizejQueryAjax();
+    Pot.Reference = {};
 
     initHash = Pot.stringify(location.hash).substring(1);
     if (~initHash.indexOf(':')) {
@@ -365,16 +379,17 @@ setTimeout(function() {
           }
         })
         .click(function() {
-          var elems = $('.header, #cse-search-result-container');
+          var header = $('.header');
+
           if (isDown) {
-            elems.show();
+            header.show();
             $(this)
               .removeClass(icon.down)
               .removeClass(icon.down + '-hover')
               .addClass(icon.up)
               .attr({title : labels[lang].up});
           } else {
-            elems.hide();
+            header.hide();
             $(this)
               .removeClass(icon.up)
               .removeClass(icon.up + '-hover')
@@ -570,13 +585,27 @@ setTimeout(function() {
             var item = tree.get(currentId),
                 itemId = currentId,
                 curHash = Pot.stringify(location.hash).substring(1),
-                backPage, backId, backItem;
+                backPage, backId, backItem, curPager;
 
             if (processing || scrolling) {
               return;
             }
 
             processing = true;
+
+            if (Pot.Reference.isShownSearchResult) {
+              curPager = Pot.trim($('.gsc-cursor-current-page').text()) - 0;
+              if (Pot.Reference.currentPager != curPager && Pot.isNumeric(curPager)) {
+                Pot.Reference.currentPager = curPager;
+                Pot.callLazy(function() {
+                  adjustContainerLayout(!Pot.isShown($('.header').get(0)));
+                  processing = false;
+                });
+              } else {
+                processing = false;
+              }
+              return;
+            }
 
             if (curHash !== itemId) {
               backItem = tree.get(curHash);
@@ -716,9 +745,15 @@ body > .layout-liquid-container {
 }
 
 .layout-liquid-container #cse-search-result-container {
-  overflow: hidden;
+  display: none;
+  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
   max-width: 100%;
+  border-color: #666677;
+  border-style: solid;
+  border-width: 1px 0 0 0;
 }
 
 .layout-liquid-container .header-expand-container {
@@ -842,7 +877,7 @@ body > .layout-liquid-container {
 }
 
 .content-loading {
-  background: url(http://api.polygonpla.net/img/icon/loading-circle-cycle.gif?2) no-repeat scroll 45% 45% transparent;
+  background: url(http://api.polygonpla.net/img/icon/loading-circle-cycle.gif?2) no-repeat scroll 45% 35% transparent;
   height: 500px;
 }
 
@@ -1029,7 +1064,7 @@ setTimeout(function() {
   });
 
   function searchCallback() {
-    var customSearchControl, drawOptions;
+    var customSearchControl, drawOptions, container;
 
     if (typeof google.search === 'undefined' || !google.search.CustomSearchControl) {
       return setTimeout(arguments.callee, 13);
@@ -1039,8 +1074,10 @@ setTimeout(function() {
     }
     loaded = true;
 
-    customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y', {});
-    //customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    container = $('#cse-search-result-container');
+    customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y', {
+      adoptions : {layout : 'noTop'}
+    });
     customSearchControl.setResultSetSize(google.search.Search.LARGE_RESULTSET);
     drawOptions = new google.search.DrawOptions();
     customSearchControl.setLinkTarget(google.search.Search.LINK_TARGET_SELF);
@@ -1048,22 +1085,28 @@ setTimeout(function() {
     drawOptions.setSearchFormRoot($('#cse-search-form').get(0));
     customSearchControl.setSearchCompleteCallback(null, function() {
 
-      $('.gsc-result a[href$=".ja.html"], .gsc-result a[href$=".en.html"]').each(function() {
-        var href = $(this).attr('href').split(/[\/\\]/).pop().replace(/#+/g, '');
-        href = '#' + href.replace(/[.](?:ja|en)[.]html$/g, '.' + Pot.LANG + '.html');
-        $(this)
-          .attr({href : Pot.JS_VOID_URI})
-          .click(function(ev) {
-            location.hash = href;
-            customSearchControl.clearAllResults();
-            return Pot.cancelEvent(ev);
-          });
-      });
+      Pot.Reference = Pot.Reference || {};
+      Pot.Reference.isShownSearchResult = true;
+      Pot.Reference.currentPager = 0;
+      container.show();
 
+      $('.layout-2-column-left-menu').height(1).hide();
+      $('#cse-search-result-container').height(1).height(
+        $('body').height() -
+          $('.header').outerHeight() -
+          $('.layout-2-column-left-menu').outerHeight() -
+          $('.footer').outerHeight()
+      ).css({
+        overflow  : 'auto',
+        overflowX : 'hidden',
+        overflowY : 'auto'
+      });
     });
 
     Pot.callLazy(function() {
-      customSearchControl.draw($('#cse-search-result-container').get(0), drawOptions);
+      customSearchControl.draw(container.get(0), drawOptions);
+      $('input.gsc-input').attr({placeholder : 'Search'});
+      container.hide();
     });
   }
 
@@ -1079,8 +1122,10 @@ input.gsc-input {
   border-color: #6368ac;
 }
 input.gsc-search-button {
-  border-color: #6368ac;
   background-color: #ccccff;
+  border-color: #BAB2F2 #544FA6 #544FA6 #BAB2F2;
+  border-style: solid;
+  border-width: 1px;
 }
 .gsc-tabHeader.gsc-tabhInactive {
   border-color: #6368ac;
@@ -1217,6 +1262,12 @@ a.gsc-trailing-more-results:link {
   text-align: right;
 }
 
+#cse-search-result-container .gsc-control-cse {
+  font-family: verdana, arial, sans-serif;
+  padding: 1em;
+  width: auto;
+}
+
 #cse-search-result-container .gsc-control-wrapper-cse {
   width: 99%;
 }
@@ -1255,7 +1306,6 @@ a.gsc-trailing-more-results:link {
 }
 
 .gsc-adBlock iframe,
-.gsc-wrapper .gsc-adBlock,
 .gsc-webResult .gsc-result,
 .gsc-webResult.gsc-result,
 .gsc-webResult .gsc-result:hover,
@@ -1267,6 +1317,27 @@ a.gsc-trailing-more-results:link {
   width: 99%;
 }
 
+.gsc-control-wrapper-cse .gsc-result-info {
+  border: 0 none;
+  color: #676767;
+  margin-left: 5px;
+  padding: 2px 5px;
+  text-align: left;
+}
+
+table.gsc-resultsHeader {
+  border: 1px solid #e9e9e9;
+  clear: both;
+  display: block;
+  height: 1px;
+  overflow: hidden;
+  width: 100%;
+}
+
+table.gcsc-branding, table.gcsc-branding td,
+table.gcsc-branding *, table.gcsc-branding td * {
+  background: transparent;
+}
 
 </style>
 <!--/Google Custom Search-->
@@ -1319,10 +1390,10 @@ a.gsc-trailing-more-results:link {
         </div>
       </div>
     </div>
-    <div id="cse-search-result-container"></div>
     <div class="header-expand-container">
       <div class="header-expand-button"></div>
     </div>
+    <div id="cse-search-result-container"></div>
     <div class="layout-2-column-left-menu clearfix">
       <div class="content">
         <div class="content-broader">
