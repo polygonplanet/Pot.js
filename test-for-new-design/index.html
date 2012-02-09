@@ -2,31 +2,29 @@
 <html dir="ltr">
 <head>
 <meta charset="UTF-8">
-<!--Cache Control for Test-->
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="max-age=0">
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="cache-control" content="no-store">
-<!--/Cache Control for Test-->
 <title>Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library</title>
 <link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico?2">
-<meta name="description" lang="en" content="Pot.js/PotLite.js - JavaScript utility library for string operations and asynchronous iterable processing with Deferred.">
+<meta name="description" lang="en" content="Pot.js/PotLite.js is an implemental utility library that can execute JavaScript without burdening the CPU.">
 <meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
-<meta name="description" lang="ja" content="Pot.js/PotLite.jsは,非ブロックでの非同期処理を直列的に書けるようにし,UIやCPUへの負担を軽減するループ処理を中心にDeferredと共に実装されたJavaScriptライブラリ.">
+<meta name="description" lang="ja" content="Pot.js/PotLite.jsはCPUに負荷をかけることなくJavaScriptの実行を可能とするユーティリティライブラリ.">
 <meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
 <link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
 <link rel="Pot.js Develop Blog - CPU Benchmark with jQuery" href="http://polygon-planet.blogspot.com/2011/11/javascript.html">
 <link rel="Pot.js Develop Blog - Deferred" href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html">
 <link rel="author" title="polygon planet" href="http://polygonpla.net/">
-<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css">
+<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css?2">
 <!--[if lt IE 7]>
 <script>var IE7_PNG_SUFFIX = '.png';</script>
 <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
 <![endif]-->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript" async="async" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js"></script>
-<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.13/pot.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/jquery/jquery.scrollto-min.js?2"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.13/pot.min.js?2"></script>
 <script type="text/javascript" async="async" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-16159469-28"></script>
 <script type="text/javascript">
 setTimeout(function() {
@@ -80,6 +78,14 @@ setTimeout(function() {
     return d;
   };
 
+  var extractReferenceContent = (function() {
+    var re = /<!--#Pot\.js-reference-content:[{]{3}-->([\s\S]*?)<!--[}]{3}:#Pot\.js-reference-content-->/;
+
+    return function(html) {
+      return Pot.extract(html, re) || html;
+    };
+  }());
+
   var loadPage = function(page, hash, isClick) {
     var target = $('.content-wrapper');
 
@@ -104,7 +110,7 @@ setTimeout(function() {
           cache    : false
         }).then(function(res) {
 
-          target.empty().append(res.responseText).find('a[href^="#"]').each(function() {
+          target.empty().append(extractReferenceContent(res.responseText)).find('a[href^="#"]').each(function() {
             var that = $(this), id = that.attr('href').substring(1);
 
             if (tree.has(id)) {
@@ -1118,38 +1124,97 @@ setTimeout(function() {
     drawOptions.setSearchFormRoot($('#cse-search-form').get(0));
     customSearchControl.setSearchCompleteCallback(null, function() {
 
-      Pot.Reference = Pot.Reference || {};
-      Pot.Reference.isShownSearchResult = true;
-      Pot.Reference.currentPager = 0;
-      container.show();
+      var limit = 200, isCompleteSearch;
 
-      $('.leftside-wrapper, .content-broader').height(1);
-      $('.layout-2-column-left-menu').hide();
-      $('#cse-search-result-container').height(1).height(
-        $('body').height() -
-          $('.header').outerHeight() -
-          $('.header-expand-container').outerHeight() -
-          ($('.layout-2-column-left-menu').outerHeight() || 0) -
-          $('.footer').outerHeight()
-      ).css({
-        overflow  : 'auto',
-        overflowX : 'hidden',
-        overflowY : 'auto'
-      });
+      (function() {
+        if ($('.gsc-result-info').length === 0) {
+          if (--limit >= 0) {
+            setTimeout(arguments.callee, 50);
+          }
+          return;
+        }
+        if (isCompleteSearch) {
+          return;
+        }
+        isCompleteSearch = true;
 
-      $('.gsc-clear-button').click(function() {
-        Pot.Reference.isShownSearchResult = false;
-        Pot.Reference.doRelayout = true;
-        $('#cse-search-result-container').height(1).hide();
-        $('.leftside-wrapper, .content-broader').height(
+        Pot.Reference = Pot.Reference || {};
+        Pot.Reference.isShownSearchResult = true;
+        Pot.Reference.currentPager = 0;
+        container.show();
+
+        $('.leftside-wrapper, .content-broader').height(1);
+        $('.layout-2-column-left-menu').hide();
+        $('#cse-search-result-container').height(1).height(
           $('body').height() -
             $('.header').outerHeight() -
             $('.header-expand-container').outerHeight() -
+            ($('.layout-2-column-left-menu').outerHeight() || 0) -
             $('.footer').outerHeight()
-        );
-        $('.layout-2-column-left-menu').show();
-      });
+        ).css({
+          overflow  : 'auto',
+          overflowX : 'hidden',
+          overflowY : 'auto'
+        });
 
+        $('.gsc-clear-button').click(function() {
+          Pot.Reference.isShownSearchResult = false;
+          Pot.Reference.doRelayout = true;
+          $('#cse-search-result-container').height(1).hide();
+          $('.leftside-wrapper, .content-broader').height(
+            $('body').height() -
+              $('.header').outerHeight() -
+              $('.header-expand-container').outerHeight() -
+              $('.footer').outerHeight()
+          );
+          $('.layout-2-column-left-menu').show();
+        });
+
+        $('.gsc-result a').each((function() {
+          var re = {
+                hash : /[.](ja|en)[.]html.*$/,
+                base : /^[^:]+:|\/[^\/]*$/g,
+                href : /^https?:\/+(?:[^.]+?[.]|)google[.][^\/]*\/.*?q=(http[^&]+)(?:&|$)/i
+              },
+              curBase = Pot.currentURI().replace(re.base, '');
+
+          return function() {
+            var that = $(this),
+                uri = Pot.stringify(
+                  that.attr('data-ctorig') || that.attr('href') || that.attr('data-cturl')
+                ),
+                base, fileName, parts, fileLang, m, fileHash, fileProtocol;
+
+            uri = Pot.extract(uri, re.href) || uri;
+            base = uri.replace(re.base, '');
+
+            if (!uri || !base || ~uri.indexOf('//code.google')) {
+              return;
+            }
+
+            if (base === curBase) {
+              parts = uri.split('/');
+              fileProtocol = Pot.trim(Pot.stringify(parts[0]).split(':').shift(), ':') || 'http';
+              fileName = Pot.stringify(parts.pop());
+              m = fileName.match(re.hash);
+
+              if (m && m[1]) {
+                fileLang = m[1];
+                fileHash = fileName.replace(re.hash, '');
+
+                if (fileHash) {
+                  uri = Pot.sprintf('%s:%s/#%s:%s', fileProtocol, curBase, fileHash, fileLang);
+                  that.attr({
+                    href         : uri,
+                    'data-cturl' : uri
+                  });
+                }
+              }
+            }
+          };
+        }()));
+
+      }());
     });
 
     Pot.callLazy(function() {
@@ -1157,6 +1222,7 @@ setTimeout(function() {
       $('input.gsc-input').attr({placeholder : 'Search'});
       container.hide();
     });
+
   }
 
 }, 20);
@@ -1398,7 +1464,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
         <div class="header-desc-negative-wrapper">
           <h1 class="header-title">
             <a href="#"
-               title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library">Pot.js + PotLite.js</a>
+               title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library">Pot.js + PotLite.js</a>
           </h1>
           <div class="header-lang-container"></div>
           <div class="header-desc-container">
@@ -1425,17 +1491,13 @@ table.gcsc-branding *, table.gcsc-branding td * {
           </div>
           <div class="header-search">
             <div id="cse-search-form"></div>
-            <!--
-            <input type="text" class="header-search-input" placeholder="Search" value="まだ動かないのです">
-            <button type="button" class="header-search-submit hoge" title="Search">Search</button>
-            -->
           </div>
         </div>
       </div>
       <div class="header-logo">
         <div class="header-logo-wrapper">
           <a href="#"
-             title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript Async + String Utility Library"><img src="http://api.polygonpla.net/img/logo/pot.js.mini.png?2"></a>
+             title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library"><img src="http://api.polygonpla.net/img/logo/pot.js.mini.png?2"></a>
         </div>
       </div>
     </div>
@@ -1458,7 +1520,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-02-09
+          Last modified: 2012-02-10
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>
@@ -1586,7 +1648,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="layout-script-warn-container">
       <div class="layout-script-warn-wrapper">
         <div class="script-warning">
-         このページは JavaScript で動きます - This page require JavaScript.
+         このページは JavaScript で動きます / This page require JavaScript.
         </div>
       </div>
     </div>

@@ -1,3 +1,20 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#manual.Deferred.Reference">
+<title>Pot.js Deferred Reference</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#manual.Deferred.Reference';
+</script>
+</head>
+<body>
+<h1>Pot.js Deferred Reference</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
 <div>
  <div>
    <h2 id="manualsub.Deferred.Reference.Reference" class="potjs-manual-item-for-in-view">Deferred Reference</h2>
@@ -769,71 +786,61 @@ timer(function() {
     
     
     <p>
-     Deferred に関連する イテレータのすべては、速度を調整することができます。
+     All related to the Pot.js asynchronous iterator, you can adjust the speed.
      <br>
-     各ループをゆっくり実行したい場合は、
+     If you want to run slowly, like as follows:
     </p>
     <pre>Deferred.forEach.slow(obj, function() {...});</pre>
     <p>
-     逆に速くしたい場合は、
+     If you want to run fast, like as follows:
     </p>
     <pre>Deferred.forEach.fast(obj, function() {...});</pre>
     <p>
-     などの指定が可能です。
-     <br>
-     他には 遅い順に limp, doze, slow, normal, fast, rapid, ninja が指定可能です。
-     速度の指定値については、<a href="#manualsub.Deferred.Reference.controlSpeedMap">上の速度の表</a> を参照ください。
-     <br>
-     その場に応じて使い分けができます。
+     Refer <a href="#manualsub.Deferred.Reference.controlSpeedMap">speed value table</a> if you want to use other speed.
     </p>
     <p>
-     時間のかかるループだけでなく、
+     Also it is might be the frequent load and freeze by burdening process on web browser not only time-consuming loop.
      <br>
-     瞬間的に負荷がかかり
-     Web ブラウザが頻発して一瞬だけ固まる、といった事例もあげられます。
-     <br>
-     そのような処理も、1 回で済まそうとしないで分割することで解消できます。
+     Such handle also, you can be fixed by cutback processing and run without burdening the CPU.
     </p>
     <p>
-     例えば DOM 要素を大量に扱って操作する場合、
+     When handling a large amount of DOM elements, for example:
     </p>
-    <pre>// ものすごい巨大なページだったとします。
+    <pre>// Suppose the HTML page that is larger and it has many elements.
 var elems = document.getElementsByTagName('*');</pre>
     <p>
-     従来通りループする場合、
+     The conventional synchronization loop will not be give a rest for thread till end of loop.
     </p>
     <pre>var len = elems.length;
 for (var i = 0; i &lt; len; i++) {
     var elem = elems[i];
-    someHeavyProcess(elem); // 何らかの重い処理
+    someHeavyProcess(elem); // Some heavy processing function.
 }</pre>
     <p>
-     この方法では休む間を与えられず、UI が固まっていても容赦なく処理が続行されてしまいます。
+     This example code will crazy loops even if web browser is freezed.
     </p>
     <p>
-     これを Pot.Deferred を使って書くと、
+     You can write loop with the Pot.Deferred object.
     </p>
     <pre>Deferred.repeat(elems.length, function(i) {
     var elem = elems[i];
-    someHeavyProcess(elem); // 何らかの重い処理
+    someHeavyProcess(elem); // Some heavy processing function.
 });</pre>
     <p>
-     一見あまり変化なさそうですが、
-     1 ループごとに処理の負荷を計算して
-     ある程度重いと判断した場合は Web ブラウザに制御を返し、
-     UI を独占しないよう調節します。
+     Most load will be reduced by this refactoring.
+     Pot.js's iterator calculate the load of processing for each loop.
+     If CPU utilization is over to some extent,
+      will be returned control to the web browser,
+      and then adjusted so as not to monopolize the thread.
     </p>
     <p>
-     または、forEach を使うこともできます。
+     Also, you can use <a href="#reference.function.Pot.forEach">forEach</a> method.
     </p>
     <pre>Deferred.forEach(elems, function(elem) {
-    someHeavyProcess(elem); // 何らかの重い処理
+    someHeavyProcess(elem); // Some heavy processing function.
 });</pre>
     <p>
-     someHeavyProcess() と 1 つの関数だけで表現しましたが、
-     <br>
-     これが、someHeavyProcess1, someHeavyProcess2, ... と
-     いくつかの関数で構成されている場合、
+     If someHeavyProcess() is able to divide to some callbacks, you can write other way.
     </p>
     <pre>Deferred.forEach(elems, function(elem) {
     return begin(function() {
@@ -845,56 +852,30 @@ for (var i = 0; i &lt; len; i++) {
     });
 });</pre>
     <p>
-     このように分割し、任意に wait などを入れることが可能です。
+     Split the processing of cases like this,
+      you can connected with a method such as the chain <a href="#reference.function.Pot.Deferred.prototype.wait">.wait()</a> etc.
     </p>
     <p>
-     なお、begin (Pot.Deferred.begin) は、
-     Pot.Deferred オブジェクトのインスタンスを返すので
-     Deferred.forEach などの中で実行する場合、
-     return が必要です。
-     return しないと整合性がとれなくなってしまいます。
+     Note:
+     <br>
+     <a href="#reference.function.Pot.Deferred.begin">begin()</a> will be returned an instance of the Pot.Deferred.
+     Callback function should has a return statement
+      if you want to run asynchronous processing in the asynchronous iterator (e.g. Pot.Deferred.forEach)
+      for consistent of each iteration.
     </p>
     <p>
-     それでも重い場合、
+     If load balancing is still necessary,
+      you can eliminate by specifying the speed of slow (refer <a href="manualsub.Deferred.Reference.controlSpeedMap">speed control table's value</a>).
     </p>
-    <pre>Deferred.forEach.slow(elems, function(elem) {
+    <pre>Deferred.forEach.<strong>slow</strong>(elems, function(elem) {
     someHeavyProcess(elem);
 });</pre>
     <p>
-     ゆっくり実行することを明示し slow を指定して速度を調整できます。
-    </p>
-    <p>
-     slow の次に遅い doze にすると、必ず毎回のループごとに
-     Web ブラウザに制御を返します。
-     <br>
-     結果として処理時間は長くなりますが、
-     途中で固まったりカクカクするようなことが避けられます。
-    </p>
-    <p>
-     速度指定は 'メソッド.速度()' の形式で利用できます。
-     <br>
-     例えば、 'forEach.rapid(...)' のような指定です。
-     <br>
-     forEach, repeat, map, filter など、すべてのイテレータで指定可能です。
-    </p>
-    <p>
-     定義された速度の値は、<a href="#manualsub.Deferred.Reference.controlSpeedMap">上の速度の表</a> を参照してください。
-    </p>
-    <p>
-     速度指定の表にある 「最も速い」 という表記は、
-     <br>
-     逆に言うと
-     最も負荷をかけやすいとも言えます。
-     <br>
-     とはいっても for-in などでループすることと比べたら
-     UI への配慮は少なからず存在するという差はあります。
-    </p>
-    <p>
-     大抵は自ら速度調整する必要はありませんが、
-     特殊な用途やデバッグ時など、必要になることもあります。
+     All of Pot.js's asynchronous iterator can control to speed.
+     (e.g. 'forEach.rapid(function() {...})').
     </p>
    </div>
-   <h3 id="manualsub.Deferred.Reference.replaceLoop" class="potjs-manual-item-for-in-view">ループ処理を置き換える</h3>
+   <h3 id="manualsub.Deferred.Reference.replaceLoop" class="potjs-manual-item-for-in-view">Optimize loop</h3>
    <div class="potjs-manual-item-for-in-view">
     <p>
      既存のループで負荷がかかっている処理を、
@@ -1062,3 +1043,9 @@ begin(function() {
    </div>
  </div>
 </div>
+
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
