@@ -12,7 +12,7 @@
 <h2 id="manualsub.overview.overview" class="potjs-manual-item-for-in-view">Overview</h2>
 <div class="potjs-manual-item-for-in-view">
   <p>
-   Pot.js is a JavaScript library that can be performed without causing stress to the UI and
+   <strong>Pot.js</strong> is a JavaScript library that can be performed without causing stress to the UI and
     the CPU load by using easy loop iteration functions.
   </p>
   <p>
@@ -21,23 +21,23 @@
   <p>
    Pot.js is built around the asynchronous processing and iterator with Deferred.
    <br>
-   Pot.Deferred is a Deferred object like MochiKit (or JSDeferred like).
+   <a href="#reference.Pot.Deferred.methods">Pot.Deferred</a> is a Deferred object like MochiKit (or JSDeferred like).
    <br>
-   That makes it possible to various iterations (forEach, filter, map, reduce, zip, repeat, some etc.).
+   That makes it possible to various iterations (<a href="#reference.function.Pot.forEach">forEach</a>, <a href="#reference.function.Pot.filter">filter</a>, <a href="#reference.function.Pot.map">map</a>, <a href="#reference.function.Pot.reduce">reduce</a>, <a href="#reference.function.Pot.zip">zip</a>, <a href="#reference.function.Pot.repeat">repeat</a>, <a href="#reference.function.Pot.some">some</a> etc.).
   </p>
   <p>
    Moreover, Pot.js is an utility library that handles string processes with various algorithms,
    <br>
-   and it has the Signal object that can write like aspect-oriented (AOP),
+   and it has the <a href="#reference.Pot.Signal.functions">Signal</a> object that can write like aspect-oriented (AOP),
    <br>
    and it has the Event object for DOM listener,
    <br>
-   and treats it the File API for HTML5. etc.
+   and treats it the <a href="#reference.Pot.DropFile.prototype.functions">File API for HTML5</a>. etc.
   </p>
   <p>
    And, Pot.js never pollute the prototype of the global objects.
    <br>
-   We only define the 'Pot' object in the global scope basically.
+   We only define the '<strong>Pot</strong>' object in the global scope basically.
    <br>
    You can use Pot.js with other available libraries without fear of conflict.
   </p>
@@ -46,7 +46,7 @@
    Node.js, userscript (Greasemonkey, Scriptish) XUL, or (Firefox Add-ons) etc.
   </p>
   <p>
-   PotLite.js is a light version that extracts only the part of
+   <strong>PotLite.js</strong> is a light version that extracts only the part of
    asynchronous processing (Deferred etc.) has been implemented in Pot.js.
   </p>
 </div>
@@ -118,15 +118,15 @@
   Or you can use the API hosting server for the Pot.js available.
   That referenced followings.
 --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.12/pot.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/1.13/pot.min.js&quot;&gt;&lt;/script&gt;
 </pre>
  <p>
-  Example for after loading of PotLite.js:
+  Example for after loading of Pot.js:
  </p>
  <pre>&lt;script type=&quot;text/javascript&quot;&gt;
 // You can use short method name in any by
 //   Pot.globalize method. (see below).
-Pot.globalize();
+<a href="#reference.function.Pot.globalize">Pot.globalize()</a>;
 
 begin(function() {
     return request('./hoge.json', {
@@ -149,7 +149,7 @@ var Pot = require('./pot.min.js');
 Pot.debug(Pot.VERSION);
 
 Pot.Deferred.begin(function() {
-    Pot.debug('Hello Deferred!');
+    Pot.debug('Hello World!');
 }).then(function() {...})
 // ...</pre>
  <p>
@@ -162,7 +162,9 @@ Pot.Deferred.begin(function() {
 // ==/UserScript==
 
 Pot.Deferred.begin(function() {
-    return Pot.request('http://www.example.com/data.json').then(function(res) {
+    return Pot.request('http://www.example.com/data.json', {
+        mimeType : 'application/json'
+    }).then(function(res) {
         return Pot.parseFromJSON(res.responseText);
     });
 }).then(function(res) {
@@ -176,30 +178,30 @@ Pot.Deferred.begin(function() {
   On GitHub link above defects may occur due to differences in implementation because it is always up to date.
  </p>
  <div>
-  <p>Example for use the Pot.js version 1.12:</p>
+  <p>Example for use the Pot.js version 1.13:</p>
   <ul>
    <li>
-    v1.12 :
-     <a href="http://api.polygonpla.net/js/pot/1.12/pot.min.js"
-        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.12/pot.min.js</a>
+    v1.13 :
+     <a href="http://api.polygonpla.net/js/pot/1.13/pot.min.js"
+        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.13/pot.min.js</a>
    </li>
   </ul>
  </div>
  <p>
-  This can be changed to fit the part of the released version 1.12.
+  This can be changed to fit the part of the released version 1.13.
   <br>
   When tagged version (e.g. 1.xx), we will put a new package to the API server together with the repository.
  </p>
  <p>
-  For example, if you use 1.12 with Greasemonkey (userscript):
+  For example, if you use 1.13 with Greasemonkey (userscript):
  </p>
  <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/1.12/pot.min.js
+// @require  http://api.polygonpla.net/js/pot/1.13/pot.min.js
 // ...
 // ==/UserScript==</pre>
  <p>
-  Note: This example uses the version numbers of 1.12, it is not always up to date.
+  Note: This example uses the version numbers of 1.13, it is not always up to date.
   <br>
   Please select the version with more stable.
  </p>
@@ -209,9 +211,9 @@ Pot.Deferred.begin(function() {
   </p>
   <ul>
    <li>
-    PotLite.js v1.29 :
-     <a href="http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js"
-        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js</a>
+    PotLite.js v1.30 :
+     <a href="http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js"
+        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js</a>
    </li>
   </ul>
   <p>
@@ -245,7 +247,7 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
     // (...Do something after hide() method completed.)
 });</pre>
  <p>
-  Pot.deferrizejQueryAjax() does not execute in library now.
+  <a href="#reference.function.Pot.deferrizejQueryAjax">Pot.deferrizejQueryAjax()</a> does not execute in library now.
   So, if you use as plugin, must call first.
  </p>
 </div>
@@ -276,10 +278,10 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
  </p>
  <ul>
   <li>
-   <a href="pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
+   <a href="http://polygonplanet.github.com/Pot.js/pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
   </li>
   <li>
-   <a href="potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
+   <a href="http://polygonplanet.github.com/Pot.js/potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
   </li>
  </ul>
 </div>
@@ -323,10 +325,10 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
 <h2 id="manualsub.overview.forJSDoc" class="potjs-manual-item-for-in-view">JSDoc Document</h2>
 <div class="potjs-manual-item-for-in-view">
  <ul>
-  <li><a href="jsdoc/index.html"
+  <li><a href="http://polygonplanet.github.com/Pot.js/jsdoc/index.html"
          title="Pot.js - JsDoc Reference - Index">JSDoc Document (Pot.js)</a>
   </li>
-  <li><a href="jsdoc/potlite/index.html"
+  <li><a href="http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html"
          title="PotLite.js - JsDoc Reference - Index">JSDoc Document (PotLite.js)</a>
   </li>
  </ul>
@@ -357,10 +359,10 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
    <p>
     Execute this code in the first.
     For example, you can be called only &quot;begin&quot;,
-    As method name of the &quot;Pot.Deferred.begin&quot;.
+    As method name of the &quot;<a href="#reference.function.Pot.Deferred.begin">Pot.Deferred.begin</a>&quot;.
    </p>
    <p>
-    And, &quot;Pot.globalize&quot; can be useful when define any object into the global scope.
+    And, &quot;<a href="#reference.function.Pot.globalize">Pot.globalize</a>&quot; can be useful when define any object into the global scope.
    </p>
    <pre>var obj = {
     foo: function() { return 'foo' },
@@ -383,15 +385,15 @@ alert(foo() + bar()); // 'foobar'</pre>
    <ul>
      <li>
        <a href="http://polygon-planet.blogspot.com/2011/11/javascript.html"
-          title="フリーズやカクカクしない安定した動作のアプリやアドオン、ゲームなどが作れるJavaScriptライブラリ | 圧縮電子精神音楽浮遊構造体">Pot.js / PotLite.js と jQuery のループ処理 CPU 負荷をグラフで比較 | 圧縮電子精神音楽浮遊構造体</a>
+          title="フリーズやカクカクしない安定した動作のアプリやアドオン、ゲームなどが作れるJavaScriptライブラリ | 圧縮電子精神音楽浮遊構造体">Compare CPU usage and graph of loop processing with Pot.js and jQuery - 圧縮電子精神音楽浮遊構造体</a>
      </li>
      <li>
        <a href="http://polygon-planet.blogspot.com/2011/11/javascript-potlitejs-122-signal.html"
-          title="JavaScript非同期ライブラリ PotLite.js 1.22 リリース。アスペクト指向っぽく書けるSignal実装 | 圧縮電子精神音楽浮遊構造体">Pot.js / PotLite.js - アスペクト指向っぽく書けるSignal実装 | 圧縮電子精神音楽浮遊構造体</a>
+          title="JavaScript非同期ライブラリ PotLite.js 1.22 リリース。アスペクト指向っぽく書けるSignal実装 | 圧縮電子精神音楽浮遊構造体">Pot.Signal can write code like aspect-oriented (AOP) - 圧縮電子精神音楽浮遊構造体</a>
      </li>
      <li>
        <a href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html"
-          title="JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子精神音楽浮遊構造体">JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子精神音楽浮遊構造体</a>
+          title="JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子精神音楽浮遊構造体">We implemented JavaScript asynchronous iteration library with Deferred - 圧縮電子精神音楽浮遊構造体</a>
      </li>
    </ul>
  </div>

@@ -75,7 +75,8 @@
         "reference.function.Pot.currentWindow":{"ja":"currentWindow","en":"currentWindow"},
         "reference.function.Pot.currentDocument":{"ja":"currentDocument","en":"currentDocument"},
         "reference.function.Pot.currentURI":{"ja":"currentURI","en":"currentURI"},
-        "reference.function.Pot.globalize":{"ja":"globalize","en":"globalize"}
+        "reference.function.Pot.globalize":{"ja":"globalize","en":"globalize"},
+        "reference.function.Pot.deferrizejQueryAjax":{"ja":"deferrizejQueryAjax","en":"deferrizejQueryAjax"}
       }
     },
     "reference.Pot.Iter.functions":{
