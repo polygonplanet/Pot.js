@@ -40,6 +40,8 @@ Install
 Will work with common ways.
 
     <script type="text/javascript" src="pot.min.js"></script>
+    <!-- or -->
+    <script type="text/javascript" src="potlite.min.js"></script>
 
 For Node.js.
 
@@ -48,7 +50,7 @@ For Node.js.
     Pot.debug(Pot.VERSION);
     
     Pot.Deferred.begin(function() {
-        Pot.debug('Hello Deferred!');
+        Pot.debug('Hello World!');
     }).then(function() {...})
     // ...
 
@@ -56,7 +58,7 @@ Example of Greasemonkey (userscript).
 
     // ==UserScript==
     // ...
-    // @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
+    // @require  https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js
     // ...
     // ==/UserScript==
     Pot.Deferred.begin(function() {
@@ -120,8 +122,6 @@ Copyright &copy; 2012 polygon planet
 
 Documentation And Reference
 ========
-Currently available stable library is PotLite.js.    
-That is limited with asynchronous processing as lightweight version of Pot.js.
 
   * **[Pot.js + PotLite.js - Document and Reference - (Test for new design)][Documentation_TEST]**  
   * **[Pot.js/PotLite.js - Document and Reference (Japanese)][Documentation_JA]**  
