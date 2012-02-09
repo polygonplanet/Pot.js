@@ -2,22 +2,49 @@ Pot.js
 ========
 
 **Pot.js / PotLite.js** :  
-JavaScript utility library for asynchronous processing with Deferred.
+Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.
 
 Pot.js / PotLite.js implements practical tendency as a substitution utility library.  
 That includes asynchronous methods as "Deferred" for solution to heavy process.  
 That is fully ECMAScript compliant.
 
+
+**Pot.js** is a JavaScript library that can be performed without causing stress to the UI and
+the CPU load by using easy loop iteration functions.
+
+With respect to load, you can implement a particular application without requiring the programmer to be aware of.
+
+Pot.js is built around the asynchronous processing and iterator with Deferred.
+**Pot.Deferred** is a Deferred object like MochiKit (or JSDeferred like).  
+That makes it possible to various iterations (forEach, filter, map, reduce, zip, repeat, some etc.).
+
+Moreover, Pot.js is an utility library that handles string processes with various algorithms,
+and it has the *Signal* object that can write like aspect-oriented (AOP),  
+and it has the Event object for DOM listener,
+and treats it the File API for HTML5. etc.
+
+And, Pot.js never pollute the prototype of the global objects.
+
+We only define the '*Pot*' object in the global scope basically.  
+You can use Pot.js with other available libraries without fear of conflict.
+
+Pot.js is a cross-browser library that works on a Web browser,
+Node.js, userscript (Greasemonkey, Scriptish) XUL, or (Firefox Add-ons) etc.
+
+**PotLite.js** is a light version that extracts only the part of
+asynchronous processing (Deferred etc.) has been implemented in Pot.js.
+
+
 Install
 ========
 Will work with common ways.
 
-    <script type="text/javascript" src="potlite.min.js"></script>
+    <script type="text/javascript" src="pot.min.js"></script>
 
 For Node.js.
 
     // Example to define Pot object on Node.js.
-    var Pot = require('./potlite.js');
+    var Pot = require('./pot.min.js');
     Pot.debug(Pot.VERSION);
     
     Pot.Deferred.begin(function() {
@@ -59,7 +86,7 @@ As for jQuery plugin.
     // Will added 'deferred' method for effects etc
     //  that convert to Deferred functions.
     $('div#hoge').deferred('hide', 'slow').then(function() {
-        // (Do something after hide() method completed.)
+        // (...Do something after hide() method completed.)
     });
 
 Compatibility
@@ -89,13 +116,14 @@ Test Run
 License
 ========
 Dual licensed under the MIT and GPL v2 licenses.    
-Copyright &copy; 2011 polygon planet
+Copyright &copy; 2012 polygon planet
 
 Documentation And Reference
 ========
 Currently available stable library is PotLite.js.    
 That is limited with asynchronous processing as lightweight version of Pot.js.
 
+  * **[Pot.js + PotLite.js - Document and Reference - (Test for new design)][Documentation_TEST]**  
   * **[Pot.js/PotLite.js - Document and Reference (Japanese)][Documentation_JA]**  
   * JSDoc Document
       * [Pot.js - JsDoc Reference - Index][Pot_JSDoc]
@@ -116,7 +144,7 @@ A simple iterate and Deferred object usage with asynchronous and synchronous.
         // A simple HTTP request
         //  that even works on Node.js (non-browser).
         return request('pot.js.example.json', {
-            mimeType : 'text/plain'
+            mimeType : 'application/json'
         }).ensure(function(res) {
             if (isError(res)) {
                 return {
@@ -223,6 +251,8 @@ Refer document if you want to need more example and usage.
 [Pot_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/index.html "Pot.js - JsDoc Reference - Index"
 
 [PotLite_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html "PotLite.js - JsDoc Reference - Index"
+
+[Documentation_TEST]: http://polygonplanet.github.com/Pot.js/test-for-new-design/index.html "Pot.js + PotLite.js - Document and Reference - (Test for new design)"
 
 [Documentation_JA]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js + PotLite.js - Document and Reference (Japanese)"
 
