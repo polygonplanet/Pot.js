@@ -200,7 +200,11 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
         </div>
         <h1 id="top">Pot.js + PotLite.js</h1>
         <p>
-         JavaScript utility library for asynchronous processing with Deferred.
+         Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.
+         <br>
+         <a href="http://polygonplanet.github.com/Pot.js/test-for-new-design/index.html"
+            title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library"
+            style="font-weight: bold;">新しいデザインでリファレンス作成中です。 Now creating new design reference.</a>
         </p>
       </div>
     </div>
@@ -237,11 +241,11 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
             <h4>Pot.js</h4>
            </div>
            <ul>
-             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
-                    title="Development (Uncompressed Code)"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
-             </li>
              <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js"
                     title="Production (Minified)"><strong>pot.min.js</strong> - Production (Minified)</a>
+             </li>
+             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
+                    title="Development (Uncompressed Code)"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
              </li>
            </ul>
          </div>
@@ -250,11 +254,11 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
             <h4>PotLite.js (lite)</h4>
            </div>
            <ul>
-             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.js"
-                    title="Development (Uncompressed Code)"><strong>potlite.js</strong> - Development (Uncompressed Code)</a>
-             </li>
              <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js"
                     title="Production (Minified)"><strong>potlite.min.js</strong> - Production (Minified)</a>
+             </li>
+             <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.js"
+                    title="Development (Uncompressed Code)"><strong>potlite.js</strong> - Development (Uncompressed Code)</a>
              </li>
            </ul>
          </div>
@@ -279,10 +283,10 @@ initScrollTo('.layout-liquid-container .footer a[href*="#"]');
          <p>
           例:
          </p>
-         <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;potlite.min.js&quot;&gt;&lt;/script&gt;
+         <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;pot.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;!-- または下記で説明する API サーバが利用できます --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/1.13/pot.min.js&quot;&gt;&lt;/script&gt;
 </pre>
          <p>
           読み込み後の例:
@@ -308,11 +312,11 @@ begin(function() {
           Node.js の場合。
          </p>
          <pre>// Example to define Pot object on Node.js.
-var Pot = require('./potlite.js');
+var Pot = require('./pot.min.js');
 Pot.debug(Pot.VERSION);
 
 Pot.Deferred.begin(function() {
-    Pot.debug('Hello Deferred!');
+    Pot.debug('Hello World!');
 }).then(function() {...})
 // ...</pre>
          <p>
@@ -320,7 +324,7 @@ Pot.Deferred.begin(function() {
          </p>
          <pre>// ==UserScript==
 // ...
-// @require  https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js
+// @require  https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js
 // ...
 // ==/UserScript==
 
@@ -341,34 +345,34 @@ Pot.Deferred.begin(function() {
           そのため、ホスティング用に API サーバを用意しました。
          </p>
          <div>
-          <p>PotLite.js Version 1.25 を使う場合:</p>
+          <p>PotLite.js Version 1.30 を使う場合:</p>
           <ul>
            <li>
-            v1.25 :
-             <a href="http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js"
-                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js</a>
+            v1.30 :
+             <a href="http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js"
+                title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js</a>
            </li>
           </ul>
          </div>
          <p>
-          これは、1.25 の部分をリリース済みのバージョンに合わせて変更できます。
+          これは、1.30 の部分をリリース済みのバージョンに合わせて変更できます。
           <br>
           レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
           あわせて API サーバに置くようにしています。
          <p>
          <p>
-          例えば Greasemonkey で 1.25 を使いたい場合、
+          例えば Greasemonkey で 1.30 を使いたい場合、
          </p>
          <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/potlite/1.25/potlite.min.js
+// @require  http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js
 // ...
 // ==/UserScript==</pre>
          <p>
           と記述できます。
          </p>
          <p>
-          この例では 1.25 としていますが、このマニュアルは常に更新しているわけではないので
+          この例では 1.30 としていますが、このマニュアルは常に更新しているわけではないので
           最新とは限りません。
           <br>
           より安定したバージョンを選び使ってください。

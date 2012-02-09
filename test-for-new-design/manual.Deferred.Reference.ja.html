@@ -67,23 +67,23 @@
          <tr>
            <td class="row-head marker">
              <a href="http://polygonplanet.github.com/Pot.js/index.html"
-                title="Pot.js + PotLite.js - ドキュメントリファレンス">Pot.Deferred</a>
+                title="Pot.js + PotLite.js - ドキュメントリファレンス"><strong>Pot.Deferred</strong></a>
            </td>
            <td class="row-head">
              <a href="http://mochi.github.com/mochikit/doc/html/MochiKit/Async.html#fn-deferred"
-                title="MochiKit.Async - manage asynchronous tasks">MochiKit.Async.Deferred</a>
+                title="MochiKit.Async - manage asynchronous tasks"><strong>MochiKit.Async.Deferred</strong></a>
            </td>
            <td class="row-head">
              <a href="http://cho45.stfuawsc.com/jsdeferred/"
-                title="JSDeferred - cho45.stfuawsc.com">JSDeferred</a>
+                title="JSDeferred - cho45.stfuawsc.com"><strong>JSDeferred</strong></a>
            </td>
            <td class="row-head">
              <a href="http://api.jquery.com/category/deferred-object/"
-                title="Deferred Object -- jQuery API">jQuery.Deferred</a>
+                title="Deferred Object -- jQuery API"><strong>jQuery.Deferred</strong></a>
            </td>
            <td class="row-head">
              <a href="http://docs.dojocampus.org/dojo/Deferred"
-                title="dojo/Deferred - DojoCampus - Docs">dojo.Deferred</a>
+                title="dojo/Deferred - DojoCampus - Docs"><strong>dojo.Deferred</strong></a>
            </td>
          </tr>
          <tr>
@@ -452,8 +452,8 @@ d.then(function() {
     <div>
      <table class="grid" id="manualsub.Deferred.Reference.controlSpeedMap">
       <tr>
-       <td class="marker row-head">値 / メソッド名</td>
-       <td class="marker row-head">速度</td>
+       <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+       <td class="marker row-head"><strong>速度</strong></td>
       </tr>
       <tr>
        <td>limp</td>
@@ -794,7 +794,7 @@ timer(function() {
     <p>
      Deferred チェイン上で実行する場合も同じ扱いですが、引数が異なります。
     </p>
-    <pre>(new Deferred()).forEach(function(value, key) {...}).begin([1, 2, 3]);</pre>
+    <pre>(new Deferred()).forEach(function(value, key) {...}).begin( object );</pre>
     <p>
      各ループは、コールバック関数の処理の重さにより負荷がかからないよう
      自動調節します。
@@ -887,7 +887,7 @@ for (var i = 0; i &lt; len; i++) {
     });
 });</pre>
     <p>
-     このように分割し、任意に <a hrf="#reference.function.Pot.Deferred.prototype.wait">wait</a> などを入れることが可能です。
+     このように分割し、任意に <a href="#reference.function.Pot.Deferred.prototype.wait">wait</a> などを入れることが可能です。
     </p>
     <p>
      なお、<a href="#reference.function.Pot.Deferred.begin">begin (Pot.Deferred.begin)</a> は、

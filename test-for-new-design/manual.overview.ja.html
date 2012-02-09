@@ -1,7 +1,7 @@
 <h2 id="manualsub.overview.overview" class="potjs-manual-item-for-in-view">概要</h2>
 <div class="potjs-manual-item-for-in-view">
   <p>
-    Pot.js は、
+    <strong>Pot.js</strong> は、
     <br>
     JavaScript のループ処理における CPU 負荷を抑え、UI にストレスを与えることなく実行できるライブラリです。
   </p>
@@ -23,7 +23,7 @@
   <p>
     そして、グローバルオブジェクトの prototype を汚染しません。
     <br>
-    基本的にグローバルに定義されるのは 'Pot' オブジェクトだけなので
+    基本的にグローバルに定義されるのは '<strong>Pot</strong>' オブジェクトだけなので
     <br>
     コンフリクトの心配なく、他の JavaScript ライブラリと共に利用できます。
   </p>
@@ -33,7 +33,7 @@
     userscript (Greasemonkey, Scriptish) や XUL (Firefox アドオン) 上などで動きます。
   </p>
   <p>
-    PotLite.js は、
+    <strong>PotLite.js</strong> は、
     <br>
     Pot.js で実装されている Deferred などの非同期処理の部分だけを抽出したライトバージョンです。
   </p>
@@ -103,7 +103,7 @@
  <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;pot.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;!-- または下記で説明する API サーバが利用できます --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/potlite/1.12/pot.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/1.13/pot.min.js&quot;&gt;&lt;/script&gt;
 </pre>
  <p>
   読み込み後の例:
@@ -133,7 +133,7 @@ var Pot = require('./pot.min.js');
 Pot.debug(Pot.VERSION);
 
 Pot.Deferred.begin(function() {
-    Pot.debug('Hello Deferred!');
+    Pot.debug('Hello World!');
 }).then(function() {...})
 // ...</pre>
  <p>
@@ -162,34 +162,34 @@ Pot.Deferred.begin(function() {
   その場合、ホスティング用の API サーバが利用できます。
  </p>
  <div>
-  <p>Pot.js Version 1.12 を使う場合:</p>
+  <p>Pot.js Version 1.13 を使う場合:</p>
   <ul>
    <li>
-    v1.12 :
-     <a href="http://api.polygonpla.net/js/pot/1.12/pot.min.js"
-        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.12/pot.min.js</a>
+    v1.13 :
+     <a href="http://api.polygonpla.net/js/pot/1.13/pot.min.js"
+        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.13/pot.min.js</a>
    </li>
   </ul>
  </div>
  <p>
-  これは、1.12 の部分をリリース済みのバージョンに合わせて変更できます。
+  これは、1.13 の部分をリリース済みのバージョンに合わせて変更できます。
   <br>
   レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
   あわせて API サーバに置くようにしています。
  </p>
  <p>
-  例えば Greasemonkey で 1.12 を使いたい場合、
+  例えば Greasemonkey で 1.13 を使う場合、
  </p>
  <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/1.12/pot.min.js
+// @require  http://api.polygonpla.net/js/pot/1.13/pot.min.js
 // ...
 // ==/UserScript==</pre>
  <p>
   と記述できます。
  </p>
  <p>
-  この例では 1.12 としていますが、このマニュアルは常に更新しているわけではないので
+  この例では 1.13 としていますが、このマニュアルは常に更新しているわけではないので
   最新とは限りません。
   <br>
   より安定したバージョンを選び使ってください。
@@ -200,9 +200,9 @@ Pot.Deferred.begin(function() {
   </p>
   <ul>
    <li>
-    PotLite.js v1.29 :
-     <a href="http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js"
-        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.29/potlite.min.js</a>
+    PotLite.js v1.30 :
+     <a href="http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js"
+        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.30/potlite.min.js</a>
    </li>
   </ul>
   <p>
@@ -215,7 +215,7 @@ Pot.Deferred.begin(function() {
   API サーバからの Pot.js および PotLite.js の読み込みに関して、利用はフリーです。
  </p>
  <p>
-  最新のバージョン番号は <a href="https://github.com/polygonplanet/Pot.js/tags" title="All Tags for polygonplanet's Pot.js - GitHub">レポジトリ</a> を確認してください。
+  最新のバージョン番号は <a href="https://github.com/polygonplanet/Pot.js/tags" title="All Tags for polygonplanet's Pot.js - GitHub">レポジトリ (All Tags)</a> を確認してください。
  </p>
  <p><hr></p>
  <p>
@@ -238,7 +238,7 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
     // ...( hide() が終了したあとの処理)
 });</pre>
  <p>
-  Pot.deferrizejQueryAjax() は現状、ライブラリ側で実行しません。
+  <a href="#reference.function.Pot.deferrizejQueryAjax">Pot.deferrizejQueryAjax()</a> は現状、ライブラリ側で実行しません。
   なので、プラグインを使用する場合は
   コードの最初などで実行する必要があります。
  </p>
@@ -270,10 +270,10 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
  </p>
  <ul>
   <li>
-   <a href="pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
+   <a href="http://polygonplanet.github.com/Pot.js/pot.test.html" title="Pot.js - Test Run">Pot.js Test Run</a>
   </li>
   <li>
-   <a href="potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
+   <a href="http://polygonplanet.github.com/Pot.js/potlite.test.html" title="PotLite.js - Test Run">PotLite.js Test Run</a>
   </li>
  </ul>
 </div>
@@ -313,10 +313,10 @@ $('div#hoge').deferred('hide', 'slow').then(function() {
 <h2 id="manualsub.overview.forJSDoc" class="potjs-manual-item-for-in-view">JSDoc ドキュメント</h2>
 <div class="potjs-manual-item-for-in-view">
  <ul>
-  <li><a href="jsdoc/index.html"
+  <li><a href="http://polygonplanet.github.com/Pot.js/jsdoc/index.html"
          title="Pot.js - JsDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
   </li>
-  <li><a href="jsdoc/potlite/index.html"
+  <li><a href="http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html"
          title="PotLite.js - JsDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
   </li>
  </ul>
