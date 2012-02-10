@@ -868,14 +868,10 @@ for (var i = 0; i &lt; len; i++) {
    </div>
    <h3 id="manualsub.Deferred.Reference.replaceLoop" class="potjs-manual-item-for-in-view">Optimize loop</h3>
    <div class="potjs-manual-item-for-in-view">
-    
-    
-    <h1 class="error">途中...<br>The translation is still going on...</h1>
-    
-    
     <p>
-     既存のループで負荷がかかっている処理を、
-     Pot.js のイテレータを用いて軽減させることができます。
+     You can optimize loop by Pot.js's iterator on behalf of the JavaScript iteration.
+     <br>
+     Example loop function that returns large array:
     </p>
     <pre>function someLoop(n, c) {
     var results = [];
@@ -889,21 +885,12 @@ for (var i = 0; i &lt; len; i++) {
     return results;
 }</pre>
     <p>
-     例えばこのような関数があったとします。
-     <br>
-     引数 c 回ループした配列を引数 n 個分持つ配列を返す関数です。
-    </p>
-    <p>
-     例えばこれを、
+     For example, if you execute like below,
+      function will monopolize the CPU depending on the load in most environments.
     </p>
     <pre>var array = someLoop(100000, 1000);</pre>
     <p>
-     このような大きい配列を作るとなると、
-     スペックにもよりますが、
-     瞬間的な負荷は大きくなり UI を独占してしまうでしょう。
-    </p>
-    <p>
-     この関数を Deferred 化してみます。
+     Try deferrize the function.
     </p>
     <pre>function someLoopDefer(n, c) {
     var results = [];
@@ -918,46 +905,27 @@ for (var i = 0; i &lt; len; i++) {
     });
 }</pre>
     <p>
-     例として、このようになります。
+     As an example, can be converted in this way.
      <br>
-     内側の for はこのままでいいのかと思うかもしれませんが、
-     おそらく repeat、Deferred.repeat 等に変えたところで
-     必要以上に負荷が分散され、結果としてかなり速度は落ちてしまうでしょう。
-     <br>
-     なので、いちばん外側のループのみを置き換えます。
-     <br>
-     もっとも、この例の場合は
-     内側の for を何度も実行する必要はありませんが、
-     あくまで例として捉えてください。
-     <br>
-     返り値は Deferred になります。
+     Returns an instance of Pot.Deferred.
     </p>
     <pre>someLoopDefer(100000, 1000).then(function(res) {
     var array = res;
 });</pre>
     <p>
-     Deferred が返るので、then などで結果を取得します。
-     そのままチェインを繋げることもできます。
-    </p>
-    <p>
-     この変化により、瞬間的な処理の重さが分散され
-     安定した処理が可能となります。
+     By this change, instantaneous load is distributed, stable processing is possible.
      <br>
-     そのかわり、処理時間は若干伸びる可能性があります。
+     Instead, the processing time may be extend slightly.
     </p>
     <p>
-     Pot.Deferred のイテレータを使う場合、
-     このように
-     あまり意識せずに分散的なループが可能となります。
+     In this way, decentralized loop will be possible
+      without too much consciousness if you use Pot.Deferred iterator.
     </p>
    </div>
-   <h3 id="manualsub.Deferred.Reference.StopIteration" class="potjs-manual-item-for-in-view">イテレートを止める</h3>
+   <h3 id="manualsub.Deferred.Reference.StopIteration" class="potjs-manual-item-for-in-view">Stop Iteration</h3>
    <div class="potjs-manual-item-for-in-view">
     <p>
-     Pot.js, PotLite.js で実装されている
-     すべてのイテレータは、
-     <br>
-     StopIteration を throw することで中断できます。
+     All of Pot.js's iterator can stopped the iteration by <em>throw</em> the <a href="#reference.property.Pot.StopIteration">StopIteration</a>.
     </p>
     <pre>var foo = '';
 forEver(function(i) {
@@ -969,49 +937,28 @@ forEver(function(i) {
 
 debug(foo);</pre>
     <p>
-     この例は、debug 関数により
-     コンソールに 'foofoofoofoo' と出力されます。
+     This example will be outputs 'foofoofoofoo' by function <a href="#reference.function.Pot.debug">debug</a>.
     </p>
     <p>
-     forEver (Pot.forEver) は、StopIteration が throw されるまで
-     永遠にループします。
-     <br>
-     複雑な条件式でループを制御する場合や、
-     そのような既存の重い処理を
-     Deferred.forEver で置き換えたい場合などに活用できます。
+     <a href="#reference.function.Pot.forEver">forEver (Pot.forEver)</a> iterates callback function until thrown the <a href="#reference.property.Pot.StopIteration">StopIteration</a>.
     </p>
     <p>
-     StopIteration は、 Array.prototype.forEach が有効な環境など、
-     コンフリクトする可能性があるときは
-     Pot.StopIteration と明示することで解消できます。
+     If environment already has StopIteration, you can resolve by using <strong>Pot.</strong>StopIteration.
     </p>
     <p>
-     StopIteration を判別する方法は、
+     How to check whether StopIteration:
     </p>
-    <pre>if (isStopIter(e)) {...}</pre>
-    <p>
-     または、
-    </p>
+    <pre>if (<a href="#reference.function.Pot.isStopIter">isStopIter</a>(e)) {...}</pre>
     <pre>if (e == StopIteration) {...}</pre>
-    <p>
-     と単純に比較か、
-    </p>
     <pre>if (e instanceof StopIteration) {...}</pre>
     <p>
-     とすることもできます。
-    </p>
-    <p>
-     おそらく Pot.js ライブラリが実装している
-     isStopIter (Pot.isStopIter) が確実です。
+     We recommend check the StopIteration by <a href="#reference.function.Pot.isStopIter">Pot.isStopIter</a> function.
     </p>
     <p><br></p>
     <p>
-     実装されているすべてのイテレータは、
-     コールバック関数が非同期の Deferred オブジェクトを
-     いくつにもネストしたとしても、
-     <br>
-     throw StopIteration によりスコープ間を超えて
-     実行中のイテレータ関数のスコープまで届くよう設計されています。
+     All of Pot.js's iterators designed Nested-StopIteration.
+     If you throw StopIteration from nested callback function scope,
+      it will reach the scope of the iterator function running.
     </p>
     <pre>var result = [];
 begin(function() {
@@ -1022,8 +969,9 @@ begin(function() {
         return d.then(function() {
             if (value &gt; 5) {
 
-                // 実行しているイテレータのスコープが対象になるため
-                // この例では いちばん外側の .forEach まで届く
+                // Because the scope of the iterator
+                //  that is running becomes the target,
+                //  in this case will reach up to the outermost .forEach().
 
                 throw StopIteration;
             }
