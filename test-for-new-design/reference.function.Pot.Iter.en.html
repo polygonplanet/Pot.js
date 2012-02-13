@@ -24,35 +24,35 @@ location.href = './#reference.function.Pot.Iter';
   </dt>
   <dd>
     <p class="potjs-reference-compatibility">
-      Pot.js �� PotLite.js �ŗ��p�\�B
+      Pot.js と PotLite.js で利用可能。
     </p>
     <p class="potjs-reference-description">
-      �R���X�g���N�^�BPot.Iter �C���X�^���X���쐬���܂��B
+      コンストラクタ。Pot.Iter インスタンスを作成します。
     </p>
     <div>
       <p>
- Pot.Iter �R���X�g���N�^�B
+ Pot.Iter コンストラクタ。
  <br>
- �V���� Pot.Iter �C���X�^���X���쐬���܂��B
+ 新しい Pot.Iter インスタンスを作成します。
 </p>
 <p>
- Pot.Iter �𗘗p���邱�ƂŁA�Ǝ��̃C�e���[�^���쐬���邱�Ƃ��ł��܂��B
+ Pot.Iter を利用することで、独自のイテレータを作成することができます。
  <br>
- �C���X�^���X�� next �Ƃ������O�̃��\�b�h���`���邱�Ƃ�
- �C�e���[�^�Ƃ��ĔF������܂��B
+ インスタンスに next という名前のメソッドを定義することで
+ イテレータとして認識されます。
  <br>
- �쐬�����C�e���[�^�́A<a href="#reference.function.Pot.iterate">Pot.iterate()</a> �ɂ�胋�[�v�������s�����Ƃ��ł��܂��B
+ 作成したイテレータは、<a href="#reference.function.Pot.iterate">Pot.iterate()</a> によりループ処理を行うことができます。
 </p>
 <p>
- <a href="#reference.function.Pot.globalize">Pot.globalize()</a> ���K������Ă���ꍇ�Anew Iter() �Ƃ��č쐬�ł��܂��B
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、new Iter() として作成できます。
 </p>
 <p>
- Pot.Iter �I�u�W�F�N�g �C���X�^���X��Ԃ��܂��B
+ Pot.Iter オブジェクト インスタンスを返します。
 </p>
 <pre>var results = [];
 var iter = new Pot.Iter();
 
-// next �� StopIteration �� throw ���邱�ƂŏI�����܂�
+// next は StopIteration を throw することで終了します
 iter.next = (function() {
     var i = 0;
     var end = 10;

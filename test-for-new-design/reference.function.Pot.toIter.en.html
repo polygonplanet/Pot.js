@@ -23,25 +23,25 @@ location.href = './#reference.function.Pot.toIter';
   </dt>
   <dd>
     <p class="potjs-reference-compatibility">
-      Pot.js �� PotLite.js �ŗ��p�\�B
+      Pot.js と PotLite.js で利用可能。
     </p>
     <p class="potjs-reference-description">
-      ���� x ���C�e���[�g�\�� Pot.Iter �C���X�^���X�ɂ��ĕԂ��܂��B
+      引数 x をイテレート可能な Pot.Iter インスタンスにして返します。
     </p>
     <div>
       <p>
- ���� x ���\�Ȍ���C�e���[�g�\�� Pot.Iter �C���X�^���X�Ƃ��ĕԂ��܂��B
+ 引数 x を可能な限りイテレート可能な Pot.Iter インスタンスとして返します。
 </p>
 <p>
- �I�u�W�F�N�g��z���n���ƁA�e�A�C�e���𑖍�����C�e���[�^�Ƃ��č쐬����܂��B
+ オブジェクトや配列を渡すと、各アイテムを走査するイテレータとして作成されます。
  <br>
- �쐬�����C���X�^���X�́A<a href="#reference.function.Pot.Iter">new Pot.Iter()</a> �Ƃ����̂Ɠ�����
- <a href="#reference.function.Pot.iterate">Pot.iterate()</a> �ɂ����s�ł��܂��B
+ 作成したインスタンスは、<a href="#reference.function.Pot.Iter">new Pot.Iter()</a> としたのと同じく
+ <a href="#reference.function.Pot.iterate">Pot.iterate()</a> により実行できます。
  <br>
- <a href="#reference.function.Pot.globalize">Pot.globalize()</a> ���K���ς݂̏ꍇ�APot.toIter() �� toIter() �ƌĂяo���܂��B
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.toIter() が toIter() と呼び出せます。
 </p>
 <p>
- �V���� Pot.Iter �I�u�W�F�N�g �C���X�^���X��Ԃ��܂��B
+ 新しい Pot.Iter オブジェクト インスタンスを返します。
 </p>
 <pre>var obj = {a: 1, b: 2, c: 3};
 var iter = Pot.toIter(obj);
