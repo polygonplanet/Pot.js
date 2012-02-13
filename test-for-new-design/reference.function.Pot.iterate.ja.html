@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.iterate">
+<title>Pot.iterate</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.iterate';
+</script>
+</head>
+<body>
+<h1>Pot.iterate</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{*}</em>
+      <dfn id="definition.reference.function.Pot.iterate"><em>Pot.</em>iterate</dfn>
+      (<em>{Pot.Iter|Object|*}</em> iter [, <em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.iterate"><em>Pot.</em>Deferred.iterate</dfn>
+      (<em>{Pot.Iter|Object|*}</em> iter [, <em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.iterate"><em>Pot.Deferred.prototype.</em>iterate</dfn>
+      ([<em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Pot.Iter インスタンスや yield ジェネレータをイテレートします。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Iter">Pot.Iter インスタンス</a> や、yield 演算子で生成したイテレータオブジェクトをイテレートします。
+ <br>
+ 引数 iter には、Pot.Iter インスタンスや yield ジェネレータを指定します。
+ <br>
+ 引数 callback は、任意にイテレートする関数を指定します。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+</p>
+
+<p>
+ コールバック関数 callback の引数は以下のようになります。
+</p>
+<pre>function (value, key, object) { this === context }
+
+    value  : <em class="var-type">{*}</em>         iter.next() の戻り値。イテレータによって変化します。
+    key    : <em class="var-type">{*}</em>         iter.next() の戻り値。イテレータによって変化します。
+    object : <em class="var-type">{Object|*}</em>   object 自身。
+
+</pre>
+<p>
+ 例えば、以下のように [value, key] として返すと、 callback で value, key として得られます。
+</p>
+<pre>var iter = new Pot.Iter();
+iter.next = (function() {
+    var chars = 'abcdef'.split('');
+    var i = 0;
+    return function() {
+        var result = [chars[i], i];
+        i++;
+        if (i &gt;= chars.length) {
+            throw Pot.StopIteration;
+        }
+        return result;
+    };
+})();
+
+var string = '';
+
+Pot.iterate(iter, function(value, key, object) {
+    string += value + key + ':';
+});
+debug(string); // 'a0:b1:c2:d3:e4:'</pre>
+
+<p>
+ 処理は 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.iterate</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は iterate() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.iterate</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.iterate() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.iterate</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
+<p>
+ <code>Pot.Deferred.iterate.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ callback の最終的な戻り値が返ります。
+</p>
+<p>
+ Pot.iterate で同期処理の例:
+</p>
+<pre>// Pot.Iter インスタンスによるイテレートの例
+
+var results = [];
+var iter = new Pot.Iter();
+
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw StopIteration;
+        }
+        return i++;
+    };
+})();
+
+Pot.iterate(iter, function(i) {
+    results.push(i);
+});
+debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
+
+<pre>// yield によるジェネレータを使用する例
+
+var results = [];
+var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield i;
+    }
+})();
+
+Pot.iterate(iter, function(i) {
+    results.push(i);
+});
+debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
+
+<p>
+ Pot.Deferred.iterate で非同期処理の例:
+</p>
+<pre>// Pot.Iter インスタンスによるイテレートの例
+
+var results = [];
+var iter = new Pot.Iter();
+
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw StopIteration;
+        }
+        return i++;
+    };
+})();
+
+Pot.Deferred.iterate(iter, function(i) {
+    results.push(i);
+}).then(function() {
+    debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+});</pre>
+
+<pre>// yield によるジェネレータを使用する例
+
+var results = [];
+var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield i;
+    }
+})();
+
+Pot.Deferred.iterate(iter, function(i) {
+    results.push(i);
+}).then(function() {
+    debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.iterate で非同期処理の例:
+</p>
+<pre>// Pot.Iter インスタンスによるイテレートの例
+
+var results = [];
+var iter = new Pot.Iter();
+
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw StopIteration;
+        }
+        return i++;
+    };
+})();
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return iter;
+}).iterate(function(i) {
+    results.push(i);
+}).then(function() {
+    debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}).begin();</pre>
+
+<pre>// yield によるジェネレータを使用する例
+
+var results = [];
+var iter = (function() {
+    for (var i = 0; i &lt; 10; i++) {
+        yield i;
+    }
+})();
+
+var d = new Pot.Deferred();
+
+d.iterate(function(i) {
+    results.push(i);
+}).then(function() {
+    debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}).begin(iter);</pre>
+
+<pre>// Pot.Iter インスタンスによるイテレートの例 (2)
+
+var results = [];
+var iter = new Pot.Iter();
+
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw StopIteration;
+        }
+        return i++;
+    };
+})();
+
+
+Pot.Deferred.begin(function() {
+    return iter;
+}).iterate(function(i) {
+    results.push(i);
+}).then(function() {
+    debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

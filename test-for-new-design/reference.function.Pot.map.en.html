@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.map">
+<title>Pot.map</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.map';
+</script>
+</head>
+<body>
+<h1>Pot.map</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Object|Array|*}</em>
+      <dfn id="definition.reference.function.Pot.map"><em>Pot.</em>map</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.map"><em>Pot.</em>Deferred.map</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.map"><em>Pot.Deferred.prototype.</em>map</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      与えられた関数 callback を object のすべての要素に対して実行し、
+      <br>
+      その結果からなる新しいオブジェクト/配列を生成して返します。
+    </p>
+    <div>
+      <p>
+ 処理は、Array.prototype.map と同じように実行されます。
+ <br>
+ 引数 object には、対象の配列またはオブジェクトを指定します。
+ <br>
+ 引数 callback は、実行する関数を指定します。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+</p>
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (value, key, object) { this === context }
+
+    value  : <em class="var-type">{*}</em>              object の各値
+    key    : <em class="var-type">{String|Number|*}</em>  object の各キー
+    object : <em class="var-type">{Object|Array}</em>     object 自身
+
+</pre>
+
+<p>
+ 処理は 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.map</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は map() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.map</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.map() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.map</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
+<p>
+ <code>Pot.Deferred.map.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ 与えられた関数 callback を object のすべての要素に対して実行した結果からなる
+ 新しいオブジェクト/配列 を返します。
+</p>
+<p>
+ Pot.map で同期処理の例:
+</p>
+<pre>// 配列の例
+
+var words = ['foot', 'goose', 'moose'];
+
+var result = Pot.map(words, function(value, i, array) {
+  return value.replace(/o/g, 'e');
+});
+debug(result); // ['feet', 'geese', 'meese']</pre>
+
+<pre>// オブジェクトの例
+
+var obj = {foo: 'foo1', bar: 'bar2', baz: 'baz3'};
+
+var result = Pot.map(obj, function(value, key, object) {
+  return value + '00';
+});
+debug(result); // {foo: 'foo100', bar: 'bar200', baz: 'baz300'}</pre>
+
+<p>
+ Pot.Deferred.map で非同期処理の例:
+</p>
+<pre>// 配列の例
+
+var words = ['foot', 'goose', 'moose'];
+
+Pot.Deferred.map(words, function(value, i, array) {
+    return value.replace(/o/g, 'e');
+}).then(function(result) {
+    debug(result); // ['feet', 'geese', 'meese']
+});</pre>
+
+<pre>// オブジェクトの例
+
+var obj = {foo: 'foo1', bar: 'bar2', baz: 'baz3'};
+
+Pot.Deferred.map(obj, function(value, key, object) {
+    return value + '00';
+}).then(function(result) {
+    debug(result); // {foo: 'foo100', bar: 'bar200', baz: 'baz300'}
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.map で非同期処理の例:
+</p>
+<pre>// 配列の例
+
+var words = ['foot', 'goose', 'moose'];
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return words;
+}).map(function(value, i, array) {
+    return value.replace(/o/g, 'e');
+}).then(function(result) {
+    debug(result); // ['feet', 'geese', 'meese']
+}).begin();</pre>
+
+<pre>// 配列の例 (2)
+
+var words = ['foot', 'goose', 'moose'];
+
+var d = new Pot.Deferred();
+
+d.map(function(value, i, array) {
+    return value.replace(/o/g, 'e');
+}).then(function(result) {
+    debug(result); // ['feet', 'geese', 'meese']
+}).begin(words);</pre>
+
+
+<pre>// オブジェクトの例
+
+var obj = {foo: 'foo1', bar: 'bar2', baz: 'baz3'};
+
+Pot.Deferred.begin(function() {
+    return obj;
+}).map(function(value, key, object) {
+    return value + '00';
+}).then(function(result) {
+    debug(result); // {foo: 'foo100', bar: 'bar200', baz: 'baz300'}
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

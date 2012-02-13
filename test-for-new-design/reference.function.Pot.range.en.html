@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.range">
+<title>Pot.range</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.range';
+</script>
+</head>
+<body>
+<h1>Pot.range</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.range"><em>Pot.</em>range</dfn>
+    ([<em>{Number|String}</em> begin = 0,] <em>{Number|String|Object}</em> end [, <em>{Number}</em> step = 1])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 begin から end までを step のステップで得られた値を配列で返します。
+    </p>
+    <div>
+      <p>
+ 引数 begin は、任意に開始する値を 数値または文字列で指定します。
+ begin を省略すると 0 から始まります。
+ <br>
+ 引数 end には、終了する値を 数値または文字列で指定します。
+ <br>
+ 引数 step が数値で指定されると、step のステップでイテレート処理が行われます。
+ step のデフォルトは 1 です。
+ <br>
+ 引数が 1 つのみ与えると、それを end とみなします。
+ <br>
+ 引数が 1 つのみで、かつそれがオブジェクトの場合、そのキーが対象になります。
+</p>
+<pre style="border-color: #9999aa;">以下の 2 つの例は同じ結果が返ります。
+
+range(1, 5, 1);                     // [1, 2, 3, 4, 5]
+range({begin: 1, end: 5, step: 1}); // [1, 2, 3, 4, 5]</pre>
+
+<p>
+ begin と end が文字の場合、文字の範囲を返します。
+</p>
+<pre style="border-color: #9999aa;">range('a', 'f'); // ['a', 'b', 'c', 'd', 'e', 'f']</pre>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.range() が range() で実行できます。
+</p>
+<p>
+ begin から end までを step のステップで得られた値を持つ配列が返ります。
+</p>
+
+<pre>var numbers = Pot.range(1, 5);
+debug(numbers); // [1, 2, 3, 4, 5]
+
+var chars = Pot.Iter.range('a', 'f');
+debug(chars);   // ['a', 'b', 'c', 'd', 'e', 'f']
+
+var ranges = Pot.range({begin: 0, step: 10, end: 50});
+debug(ranges);  // [0, 10, 20, 30, 40, 50]</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

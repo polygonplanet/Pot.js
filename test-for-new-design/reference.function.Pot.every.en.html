@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.every">
+<title>Pot.every</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.every';
+</script>
+</head>
+<body>
+<h1>Pot.every</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Boolean}</em>
+      <dfn id="definition.reference.function.Pot.every"><em>Pot.</em>every</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.every"><em>Pot.</em>Deferred.every</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.every"><em>Pot.Deferred.prototype.</em>every</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 object のすべての要素について
+      <br>
+      関数 callback によって実行した結果が 真 (true) となる場合、true を返します。
+    </p>
+    <div>
+      <p>
+ 処理は、Array.prototype.every と同じように実行されます。
+ <br>
+ 引数 object には、対象の配列またはオブジェクトを指定します。
+ <br>
+ 引数 callback は、実行する関数を指定します。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+</p>
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (value, key, object) { this === context }
+
+    value  : <em class="var-type">{*}</em>              object の各値
+    key    : <em class="var-type">{String|Number|*}</em>  object の各キー
+    object : <em class="var-type">{Object|Array}</em>     object 自身
+
+</pre>
+
+<p>
+ 処理は 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.every</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は every() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.every</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.every() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.every</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
+<p>
+ <code>Pot.Deferred.every.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ object のすべての要素について、関数 callback によって実行した結果が 真 (true) となる場合、true を返します。
+ <br>
+ それ以外は false を返します。
+</p>
+<p>
+ Pot.every で同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+function isBigEnough(value, index, array) {
+  return (value &gt;= 10);
+}
+
+var arr1 = [12, 5, 8, 130, 44];
+var result1 = Pot.every(arr1, isBigEnough);
+debug(result1); // false
+
+var arr2 = [12, 54, 18, 130, 44];
+var result2 = Pot.every(arr2, isBigEnough);
+debug(result2); // true</pre>
+
+<pre>// オブジェクトに対しての例
+
+function isBigEnough(value, key, object) {
+  return (value &gt;= 10);
+}
+
+var obj1 = {a: 1, b: 10, c: 50, d: 107};
+var result1 = Pot.every(obj1, isBigEnough);
+debug(result1); // false
+
+var obj2 = {a: 122, b: 10, c: 50, d: 107};
+var result2 = Pot.every(obj2, isBigEnough);
+debug(result2); // true</pre>
+
+<p>
+ Pot.Deferred.every で非同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+function isBigEnough(value, index, array) {
+  return (value &gt;= 10);
+}
+
+var arr1 = [12, 5, 8, 130, 44];
+Pot.Deferred.every(arr1, isBigEnough).then(function(result) {
+    debug(result); // false
+});
+
+var arr2 = [12, 54, 18, 130, 44];
+Pot.Deferred.every(arr2, isBigEnough).then(function(result) {
+    debug(result); // true
+});</pre>
+
+<pre>// オブジェクトに対しての例
+
+function isBigEnough(value, key, object) {
+  return (value &gt;= 10);
+}
+
+var obj1 = {a: 1, b: 10, c: 50, d: 107};
+Pot.Deferred.every(obj1, isBigEnough).then(function(result) {
+    debug(result); // false
+});
+
+var obj2 = {a: 122, b: 10, c: 50, d: 107};
+Pot.Deferred.every(obj2, isBigEnough).then(function(result) {
+    debug(result); // true
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.every で非同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+function isBigEnough(value, index, array) {
+  return (value &gt;= 10);
+}
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return [12, 5, 8, 130, 44];
+}).every(isBigEnough).then(function(result) {
+    debug(result); // false
+}).then(function() {
+    return [12, 54, 18, 130, 44];
+}).every(isBigEnough).then(function(result) {
+    debug(result); // true
+}).begin();</pre>
+
+<pre>// オブジェクトに対しての例
+
+function isBigEnough(value, key, object) {
+  return (value &gt;= 10);
+}
+
+Pot.Deferred.begin(function() {
+    return {a: 1, b: 10, c: 50, d: 107};
+}).every(isBigEnough).then(function(result) {
+    debug(result); // false
+}).then(function() {
+    return {a: 122, b: 10, c: 50, d: 107};
+}).every(isBigEnough).then(function(result) {
+    debug(result); // true
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

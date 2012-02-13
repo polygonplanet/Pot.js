@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.reduce">
+<title>Pot.reduce</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.reduce';
+</script>
+</head>
+<body>
+<h1>Pot.reduce</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{*}</em>
+      <dfn id="definition.reference.function.Pot.reduce"><em>Pot.</em>reduce</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{*}</em> initial [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.reduce"><em>Pot.</em>Deferred.reduce</dfn>
+      (<em>{Object|Array|*}</em> object, <em>{Function}</em> callback [, <em>{*}</em> initial [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.reduce"><em>Pot.Deferred.prototype.</em>reduce</dfn>
+      (<em>{Function}</em> callback [, <em>{*}</em> initial [, <em>{Object|*}</em> context]])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 object の (左から右へ) 2 つの値に対して
+      <br>
+      同時に関数 callback を適用し、単一の値にして返します。
+    </p>
+    <div>
+      <p>
+ 処理は、Array.prototype.reduce と同じように実行されます。
+ <br>
+ 引数 object には、対象の配列またはオブジェクトを指定します。
+ <br>
+ 引数 callback は、実行する関数を指定します。
+ <br>
+ 引数 initial を指定すると、callback の最初の呼び出しのときに、最初の実引数として用いるための値として使われます。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+</p>
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (leftValue, rightValue, key, object) { this === context }
+
+    leftValue  : <em class="var-type">{*}</em>              object の各要素のうち 左 (前) の値
+    rightValue : <em class="var-type">{*}</em>              object の各要素のうち 右 (今) の値
+    key        : <em class="var-type">{String|Number|*}</em>  object の各キー
+    object     : <em class="var-type">{Object|Array}</em>     object 自身
+
+</pre>
+
+<p>
+ initial を指定すると、最初のイテレートの時の leftValue として使用されます。
+ <br>
+ 省略すると、object の最初の値が使用されます。
+</p>
+<p>
+ 処理は 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.reduce</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は reduce() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.reduce</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.reduce() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.reduce</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
+<p>
+ <code>Pot.Deferred.reduce.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ object の (左から右へ) 2 つの値に対して
+ 同時に関数 callback を適用した結果の 単一の値を返します。
+</p>
+<p>
+ Pot.reduce で同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+var arr = [1, 2, 3, 4, 5];
+
+var total = Pot.reduce(arr, function(leftValue, rightValue, i, array) {
+    return leftValue + rightValue;
+});
+debug(total); // 15</pre>
+
+<pre>// initial を指定した例
+
+var arr = [0, 1, 2, 3, 4];
+
+var result = Pot.reduce(arr, function(leftValue, rightValue, i, array) {
+    return leftValue + rightValue;
+}, 10);
+debug(result); // 20</pre>
+
+<pre>// オブジェクトに対しての例
+
+var obj = {a: 1, b: 2, c: 3};
+
+var total = Pot.reduce(obj, function(leftValue, rightValue, key, object) {
+    return leftValue + rightValue;
+});
+debug(total); // 6</pre>
+
+<p>
+ Pot.Deferred.reduce で非同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+var arr = [1, 2, 3, 4, 5];
+
+Pot.Deferred.reduce(arr, function(leftValue, rightValue, i, array) {
+    return leftValue + rightValue;
+}).then(function(result) {
+    debug(result); // 15
+});</pre>
+
+<pre>// オブジェクトに対しての例
+
+var obj = {a: 1, b: 2, c: 3};
+
+Pot.Deferred.reduce(obj, function(leftValue, rightValue, key, object) {
+    return leftValue + rightValue;
+}).then(function(result) {
+    debug(result); // 6
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.reduce で非同期処理の例:
+</p>
+<pre>// 配列に対しての例
+
+var arr = [1, 2, 3, 4, 5];
+
+var d = new Pot.Deferred();
+
+d.reduce(function(leftValue, rightValue, i, array) {
+    return leftValue + rightValue;
+}).then(function(result) {
+    debug(result); // 15
+}).begin(arr);</pre>
+
+<pre>// オブジェクトに対しての例
+
+var obj = {a: 1, b: 2, c: 3};
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return obj;
+}).reduce(function(leftValue, rightValue, key, object) {
+    return leftValue + rightValue;
+}).then(function(result) {
+    debug(result); // 6
+}).begin();</pre>
+
+<pre>// オブジェクトに対しての例 (2)
+
+var obj = {a: 1, b: 2, c: 3};
+
+Pot.Deferred.begin(function() {
+    return obj;
+}).reduce(function(leftValue, rightValue, key, object) {
+    return leftValue + rightValue;
+}).then(function(result) {
+    debug(result); // 6
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

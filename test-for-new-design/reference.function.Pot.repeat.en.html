@@ -87,7 +87,7 @@ end   : <em class="var-type">{Number}</em>  終了する数値。省略時は 0 
 </pre>
 
 <p>
- 同期処理、非同期処理、それぞれ異なります。
+ 処理は 同期処理、非同期処理、それぞれ異なります。
 </p>
 <div>
   <ul class="potjs-reference-broad-list">
@@ -108,6 +108,10 @@ end   : <em class="var-type">{Number}</em>  終了する数値。省略時は 0 
     </li>
   </ul>
 </div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
 <p>
  <code>Pot.Deferred.repeat.<strong>slow</strong>()</code> のようにして速度の指定ができます。
  <br>

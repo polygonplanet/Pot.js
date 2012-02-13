@@ -79,7 +79,7 @@ Pot.forEver(function() {
 </pre>
 
 <p>
- 同期処理、非同期処理、それぞれ異なります。
+ 処理は 同期処理、非同期処理、それぞれ異なります。
 </p>
 <div>
   <ul class="potjs-reference-broad-list">
@@ -100,6 +100,10 @@ Pot.forEver(function() {
     </li>
   </ul>
 </div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
 <p>
  <code>Pot.Deferred.forEver.<strong>slow</strong>()</code> のようにして速度の指定ができます。
  <br>

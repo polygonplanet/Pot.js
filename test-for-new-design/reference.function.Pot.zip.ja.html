@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.zip">
+<title>Pot.zip</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.zip';
+</script>
+</head>
+<body>
+<h1>Pot.zip</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Array}</em>
+      <dfn id="definition.reference.function.Pot.zip"><em>Pot.</em>zip</dfn>
+      (<em>{Array}</em> object [, <em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.zip"><em>Pot.</em>Deferred.zip</dfn>
+      (<em>{Array}</em> object [, <em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.zip"><em>Pot.Deferred.prototype.</em>zip</dfn>
+      ([<em>{Function}</em> callback [, <em>{Object|*}</em> context]])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      与えられた配列 object の各アイテム n 番目の要素からなる配列を作成して返します。
+    </p>
+    <div>
+      <p>
+ 引数 object は、対象の配列を指定します。
+ <br>
+ 引数 callback は、任意にイテレートする関数を指定します。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+ <br>
+ この関数は、<a href="http://docs.python.org/library/functions.html#zip" title="2. Built-in Functions - Python documentation">Python の zip()</a> のように振る舞います。
+</p>
+<pre style="border-color: #999;">引数が以下のような配列とすると、
+  [ [1, 2, 3],
+    [4, 5, 6] ]
+
+結果は以下のようになります。
+
+  [ [1, 4],
+    [2, 5],
+    [3, 6] ]</pre>
+
+<p>
+ 言いかえると、各要素を縦に見立てて新しい配列を作ります。
+ <br>
+ 要素数の扱いは「最小」であり、溢れたものは除外されます。
+</p>
+
+<p>
+ コールバック関数 callback の引数は以下のようになります。
+</p>
+<pre>function (item, object) { this === context }
+
+    item   : <em class="var-type">{Array}</em>      n 番目のアイテムを持つ配列。
+    object : <em class="var-type">{Object|*}</em>   object 自身。
+
+</pre>
+<p>
+ 処理は 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.zip</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は zip() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.zip</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.zip() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.zip</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ callback 関数の中で
+ <a href="#reference.property.Pot.StopIteration">StopIteration (Pot.StopIteration)</a> を throw することでループを止められます。
+</p>
+<p>
+ <code>Pot.Deferred.zip.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ 引数 object のアイテムからなる配列が返ります。
+</p>
+<p>
+ Pot.zip で同期処理の例:
+</p>
+<pre>var result = Pot.zip([
+    [1, 2, 3],
+    [4, 5, 6]
+]);
+debug(result);
+// [
+//   [1, 4],
+//   [2, 5],
+//   [3, 6]
+// ]</pre>
+
+<pre>var result = Pot.zip([
+    [1, 2, 3],
+    [1, 2, 3, 4, 5]
+]);
+debug(result);
+// [
+//   [1, 1],
+//   [2, 2],
+//   [3, 3]
+// ]</pre>
+
+<pre>var result = Pot.zip([
+    [ 1,  2, 3],
+    [ 4,  5, 6],
+    [ 7,  8, 9],
+    [10, 11]
+]);
+debug(result);
+// [
+//   [1, 4, 7, 10],
+//   [2, 5, 8, 11]
+// ]</pre>
+
+<pre>var result = Pot.zip(['hoge']);
+debug(result); // [['hoge']]</pre>
+
+<pre>var result = Pot.zip([[1], [2], [3]]);
+debug(result); // [[1, 2, 3]]</pre>
+
+<pre>var result = Pot.zip([
+    [    1,     2,     3],
+    ['foo', 'bar', 'baz'],
+    [    4,     5]
+]);
+debug(result);
+// [
+//   [1, 'foo', 4],
+//   [2, 'bar', 5]
+// ]</pre>
+
+<pre>// コールバック関数を使った例
+var result = Pot.zip([
+    [1, 2, 3],
+    [4, 5, 6]
+], function(item, array) {
+    return item[0] + item[1];
+});
+debug(result); // [5, 7, 9]</pre>
+
+<p>
+ Pot.Deferred.zip で非同期処理の例:
+</p>
+<pre>Pot.Deferred.zip([
+    [1, 2, 3],
+    [4, 5, 6]
+]).then(function(result) {
+    debug(result);
+    // [
+    //   [1, 4],
+    //   [2, 5],
+    //   [3, 6]
+    // ]
+});</pre>
+
+<pre>// コールバック関数を使った例
+
+Pot.Deferred.zip([
+    [1, 2, 3],
+    [4, 5, 6]
+], function(item, array) {
+    return item[0] + item[1];
+}).then(function(result) {
+    debug(result); // [5, 7, 9]
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.zip で非同期処理の例:
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    return [
+        [1, 2, 3],
+        [4, 5, 6]
+    ];
+}).zip().then(function(result) {
+    debug(result);
+    // [
+    //   [1, 4],
+    //   [2, 5],
+    //   [3, 6]
+    // ]
+}).begin();</pre>
+
+<pre>Pot.Deferred.begin(function() {
+    return [
+        [1, 2, 3],
+        [4, 5, 6]
+    ];
+}).zip().then(function(result) {
+    debug(result);
+    // [
+    //   [1, 4],
+    //   [2, 5],
+    //   [3, 6]
+    // ]
+});</pre>
+
+<pre>// コールバック関数を使った例
+
+var d = new Pot.Deferred();
+
+d.zip(function(item, array) {
+    return item[0] + item[1];
+}).then(function(result) {
+    debug(result); // [5, 7, 9]
+}).begin([
+    [1, 2, 3],
+    [4, 5, 6]
+]);</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
