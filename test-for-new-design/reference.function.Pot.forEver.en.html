@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.forEver">
+<title>Pot.forEver</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.forEver';
+</script>
+</head>
+<body>
+<h1>Pot.forEver</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Void|*}</em>
+      <dfn id="definition.reference.function.Pot.forEver"><em>Pot.</em>forEver</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.forEver"><em>Pot.</em>Deferred.forEver</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.forEver"><em>Pot.Deferred.prototype.</em>forEver</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      StopIteration が throw されるまで永久にループします。
+    </p>
+    <div>
+      <p>
+ StopIteration (Pot.StopIteration) が throw されるまで、永久に引数 callback をループ実行します。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+ <br>
+ 例えば、以下の 2 つの処理は同じ出力結果になります。
+</p>
+<pre>var end = 10;
+var i = 0;
+
+while (true) {
+    if (++i &gt;= end) {
+        break;
+    }
+    debug(i);
+}</pre>
+
+<pre>var end = 10;
+var i = 0;
+
+Pot.forEver(function() {
+    if (++i &gt;= end) {
+        throw Pot.StopIteration;
+    }
+    debug(i);
+});</pre>
+
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (i) { this === context }
+
+    i  : <em class="var-type">{Number}</em>  0 から始まって各ループごとに 1 加算される数値。
+                  Number.MAX_VALUE を超えると 0 に戻る。
+
+</pre>
+
+<p>
+ 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.forEver</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は forEver() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.forEver</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.forEver() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.forEver</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ <code>Pot.Deferred.forEver.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ 戻り値はありません。
+</p>
+<p>
+ Pot.forEver で同期処理の例:
+</p>
+<pre>var string = '';
+var abc = 'abc*';
+
+Pot.forEver(function(i) {
+    string += i + ':' + abc;
+    if (string.length &gt; 50) {
+        throw Pot.StopIteration;
+    }
+});
+debug(string); // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'</pre>
+
+<p>
+ Pot.Deferred.forEver で非同期処理の例:
+</p>
+<pre>var string = '';
+var abc = 'abc*';
+
+Pot.Deferred.forEver(function(i) {
+    string += i + ':' + abc;
+    if (string.length &gt; 50) {
+        throw Pot.StopIteration;
+    }
+}).then(function() {
+    debug(string); // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.forEver で非同期処理の例:
+</p>
+<pre>var string = '';
+var abc = 'abc*';
+
+var d = new Pot.Deferred();
+
+d.forEver(function(i) {
+    string += i + ':' + abc;
+    if (string.length &gt; 50) {
+        throw Pot.StopIteration;
+    }
+}).then(function() {
+    debug(string); // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'
+}).begin();</pre>
+
+<pre>// 例 (2)
+
+var string = '';
+var abc = 'abc*';
+var limit;
+
+Pot.Deferred.begin(function() {
+    limit = 50;
+}).forEver(function(i) {
+    string += i + ':' + abc;
+    if (string.length &gt; limit) {
+        throw Pot.StopIteration;
+    }
+}).then(function() {
+    debug(string); // '0:abc*1:abc*2:abc*3:abc*4:abc*5:abc*6:abc*7:abc*8:abc*'
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
