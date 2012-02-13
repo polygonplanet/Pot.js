@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Iter">
+<title>Pot.Iter</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Iter';
+</script>
+</head>
+<body>
+<h1>Pot.Iter</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Iter}</em>
+    <em>new</em>
+    <dfn id="definition.reference.function.Pot.Iter"><em>Pot.</em>Iter</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      コンストラクタ。Pot.Iter インスタンスを作成します。
+    </p>
+    <div>
+      <p>
+ Pot.Iter コンストラクタ。
+ <br>
+ 新しい Pot.Iter インスタンスを作成します。
+</p>
+<p>
+ Pot.Iter を利用することで、独自のイテレータを作成することができます。
+ <br>
+ インスタンスに next という名前のメソッドを定義することで
+ イテレータとして認識されます。
+ <br>
+ 作成したイテレータは、<a href="#reference.function.Pot.iterate">Pot.iterate()</a> によりループ処理を行うことができます。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、new Iter() として作成できます。
+</p>
+<p>
+ Pot.Iter オブジェクト インスタンスを返します。
+</p>
+<pre>var results = [];
+var iter = new Pot.Iter();
+
+// next は StopIteration を throw することで終了します
+iter.next = (function() {
+    var i = 0;
+    var end = 10;
+    return function() {
+        if (i &gt;= end) {
+            throw Pot.StopIteration;
+        }
+        return i++;
+    };
+})();
+
+Pot.iterate(iter, function(i) {
+    results.push(i);
+});
+
+debug(results); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

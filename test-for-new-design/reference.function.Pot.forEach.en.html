@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.forEach">
+<title>Pot.forEach</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.forEach';
+</script>
+</head>
+<body>
+<h1>Pot.forEach</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Object|Array|*}</em>
+      <dfn id="definition.reference.function.Pot.forEach"><em>Pot.</em>forEach</dfn>
+      (<em>{Object|Array}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.forEach"><em>Pot.</em>Deferred.forEach</dfn>
+      (<em>{Object|Array}</em> object, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.forEach"><em>Pot.Deferred.prototype.</em>forEach</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 object の各アイテムに対してイテレートします。
+    </p>
+    <div>
+      <p>
+ 引数 object の各アイテムに対して、引数 callback を実行しながらイテレートします。
+ <br>
+ 処理は、Array.prototype.forEach と同じように実行されます。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+</p>
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (value, key, object) { this === context }
+
+    value  : <em class="var-type">{*}</em>              object の各値
+    key    : <em class="var-type">{String|Number|*}</em>  object の各キー
+    object : <em class="var-type">{Object|Array}</em>     object 自身
+
+</pre>
+
+<p>
+ 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.forEach</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は forEach() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.forEach</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.forEach() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.forEach</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ <code>Pot.Deferred.forEach.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ 第一引数の object が返ります。
+</p>
+<p>
+ Pot.forEach で同期処理の例:
+</p>
+<pre>// 配列の例
+var result = 0;
+
+Pot.forEach([1, 2, 3], function(value, i, array) {
+    result += value;
+});
+debug(result); // 6</pre>
+
+<pre>// オブジェクトの例
+var result = '';
+
+Pot.forEach({a: 'foo', b: 'bar'}, function(value, key, object) {
+    result += key + '=' + value + ',';
+});
+debug(result); // 'a=foo,b=bar,'</pre>
+
+<p>
+ Pot.Deferred.forEach で非同期処理の例:
+</p>
+<pre>// 配列の例
+var result = 0;
+
+Pot.Deferred.forEach([1, 2, 3], function(value, i, array) {
+    result += value;
+}).then(function() {
+    debug(result); // 6
+});</pre>
+
+<pre>// オブジェクトの例
+var result = '';
+
+Pot.Deferred.forEach({a: 'foo', b: 'bar'}, function(value, key, object) {
+    result += key + '=' + value + ',';
+}).then(function() {
+    debug(result); // 'a=foo,b=bar,'
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.forEach で非同期処理の例:
+</p>
+<pre>// 配列の例 (1)
+var result = 0;
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return [1, 2, 3];
+}).forEach(function(value, i, array) {
+    result += value;
+}).then(function() {
+    debug(result); // 6
+}).begin();</pre>
+
+
+<pre>// 配列の例 (2)
+var result = 0;
+
+var d = new Pot.Deferred();
+
+d.forEach(function(value, i, array) {
+    result += value;
+}).then(function() {
+    debug(result); // 6
+}).begin([1, 2, 3]);</pre>
+
+<pre>// 配列の例 (3)
+var result = 0;
+
+Pot.Deferred.begin(function() {
+    return [1, 2, 3];
+}).forEach(function(value, i, array) {
+    result += value;
+}).then(function() {
+    debug(result); // 6
+});</pre>
+
+<pre>// オブジェクトの例
+var result = '';
+
+Pot.Deferred.begin(function() {
+    return {a: 'foo', b: 'bar'};
+}).forEach(function(value, key, object) {
+    result += key + '=' + value + ',';
+}).then(function() {
+    debug(result); // 'a=foo,b=bar,'
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

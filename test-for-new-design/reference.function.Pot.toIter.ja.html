@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.toIter">
+<title>Pot.toIter</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.toIter';
+</script>
+</head>
+<body>
+<h1>Pot.toIter</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Iter}</em>
+    <dfn id="definition.reference.function.Pot.toIter"><em>Pot.</em>toIter</dfn>
+    (<em>{Object|Array|*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x をイテレート可能な Pot.Iter インスタンスにして返します。
+    </p>
+    <div>
+      <p>
+ 引数 x を可能な限りイテレート可能な Pot.Iter インスタンスとして返します。
+</p>
+<p>
+ オブジェクトや配列を渡すと、各アイテムを走査するイテレータとして作成されます。
+ <br>
+ 作成したインスタンスは、<a href="#reference.function.Pot.Iter">new Pot.Iter()</a> としたのと同じく
+ <a href="#reference.function.Pot.iterate">Pot.iterate()</a> により実行できます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.toIter() が toIter() と呼び出せます。
+</p>
+<p>
+ 新しい Pot.Iter オブジェクト インスタンスを返します。
+</p>
+<pre>var obj = {a: 1, b: 2, c: 3};
+var iter = Pot.toIter(obj);
+
+var result = '';
+
+Pot.iterate(iter, function(value, key, obj) {
+    result += key + value;
+});
+
+Pot.debug(result); // 'a1b2c3'</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

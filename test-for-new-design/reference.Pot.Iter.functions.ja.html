@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.Pot.Iter.functions">
+<title>Pot.js - Pot Iterator functions</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.Pot.Iter.functions';
+</script>
+</head>
+<body>
+<h1>Pot.js - Pot Iterator functions</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<h2 id="description.reference.Pot.Iter.functions">Pot Iterator functions</h2>
+<p>
+ このセクションでは Pot.js / PotLite.js で実装している各イテレータやイテレート関数について解説します。
+</p>
+<p>
+ イテレート関数を非同期で実行する場合、
+ 例えば <a href="#reference.function.Pot.forEach">Pot.forEach</a> が Pot.Deferred.forEach になり、
+ <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+ <br>
+ Pot オブジェクトから直接参照できる <a href="#reference.function.Pot.forEach">Pot.forEach</a> や <a href="#reference.function.Pot.map">Pot.map</a> などは同期で実行されます。
+ <br>
+ 基本的に、同期と非同期の差はなく 引数や処理は同じです。
+ <br>
+ また、Pot.Deferred のチェイン上で使用する場合、
+ 第一引数が object などの
+ コールバック関数 (callback) でないものは、
+ 第一引数 (object) がシフトし、
+ コールバック関数 (callback) が第一引数となり、
+ もともと使われるはずの第一引数 (object) は 
+ Deferred コールバックチェインの実行結果にとって代わります。
+ <br>
+ それ以外は引数の扱いに関して同じです。
+</p>
+<p>
+ 同期で実行:
+</p>
+<pre>var result = '';
+Pot.forEach({a: 1, b: 2, c: 3}, function(value, key) {
+    result += key + value;
+});
+Pot.debug(result); // 'a1b2c3'</pre>
+<p>
+ 非同期で実行:
+</p>
+<pre>var result = '';
+Pot.Deferred.forEach({a: 1, b: 2, c: 3}, function(value, key) {
+    result += key + value;
+}).then(function() {
+    Pot.debug(result); // 'a1b2c3'
+});</pre>
+<p>
+ 非同期で Pot.Deferred チェイン上で実行:
+</p>
+<pre>var result = '';
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return {a: 1, b: 2, c: 3};
+}).forEach(function(value, key) {
+    result += key + value;
+}).then(function() {
+    Pot.debug(result); // 'a1b2c3'
+}).begin();</pre>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、例えば Pot.forEach が、たんに forEach になり、
+ Pot.Deferred.forEach は Deferred.forEach として実行できます。
+</p>
+<p>
+ このリファレンスのサンプルコードの多くは、
+ 便宜上 <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されたと仮定して記述しています。
+ <br>
+ 例えば、<a href="#reference.function.Pot.forEach">Pot.forEach</a> として定義されている関数を forEach(...) と表現している場合があります。
+ これは、Pot.globalize() がされていない場合 Pot.forEach(...) として呼び出せます。
+ 他の関数も同様です。
+ <br>
+ Pot.globalize() が適応済みの場合、定義名のままで呼び出せます。
+</p>
+<p>
+ また、サンプルコードでは コンソールに出力するデバッグ用関数 <a href="#reference.function.Pot.debug">Pot.debug()</a> を多用しています。
+ <br>
+ Pot.debug() を、たんに debug() と表している場合もあります。
+ <br>
+ Pot.debug については このセクションで扱っているので詳しくはメニューから参照ください。
+</p>
+<p>
+ このリファレンスは Pot.js, PotLite.js の関数を事細かく解説しているわけではないので、
+ 足りない情報があるかもしれません。
+ <br>
+ より詳しくは
+ ソースコードから自動生成された
+ <a href="jsdoc/index.html" 
+    title="Pot.js - JSDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
+ or
+ <a href="jsdoc/potlite/index.html" 
+    title="PotLite.js - JSDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
+ または直接ソースコードを参照ください。
+</p>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

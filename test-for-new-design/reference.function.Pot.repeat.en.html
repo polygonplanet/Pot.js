@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.repeat">
+<title>Pot.repeat</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.repeat';
+</script>
+</head>
+<body>
+<h1>Pot.repeat</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <div>
+      <em>{Void|*}</em>
+      <dfn id="definition.reference.function.Pot.repeat"><em>Pot.</em>repeat</dfn>
+      (<em>{Number|Object}</em> max, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.repeat"><em>Pot.</em>Deferred.repeat</dfn>
+      (<em>{Number|Object}</em> max, <em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+    <div>
+      <em>{Pot.Deferred}</em>
+      <dfn id="definition.reference.function.Pot.Deferred.prototype.repeat"><em>Pot.Deferred.prototype.</em>repeat</dfn>
+      (<em>{Function}</em> callback [, <em>{Object|*}</em> context])
+    </div>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 max を最大数とし、max 回、ループ処理を実行します。
+    </p>
+    <div>
+      <p>
+ 引数 max を最大数として、最大 max 回、コールバック関数 callback を実行します。
+ <br>
+ 処理は、for 文、もしくは for-of のように実行されます。
+ <br>
+ 引数 context が指定されると、callback 関数の this が context にとって代わります。
+ <br>
+ 例えば、10 回繰り返し処理を行うとすると
+</p>
+<pre>for (var i = 0; i &lt; 10; i++) { debug(i); }</pre>
+<pre>Pot.repeat(10, function(i) { debug(i) });</pre>
+<p>
+ この 2 つの例の出力結果は同じになります。
+</p>
+<p>
+ 引数 max には、数値以外にオブジェクトを渡すことができます。
+<p>
+<pre>var result = [];
+
+Pot.repeat({begin: 0, end: 100, step: 10}, function(i) {
+    result.push(i);
+});
+debug(result); // [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]</pre>
+
+<pre>引数 max をオブジェクトで指定する場合:
+
+begin : <em class="var-type">{Number}</em>  開始する数値。省略時は 0 になります。
+step  : <em class="var-type">{Number}</em>  1 ループごとのステップ。省略時は 1 になります。
+end   : <em class="var-type">{Number}</em>  終了する数値。省略時は 0 になります。
+
+</pre>
+<p>
+ これらを指定することで、例えば 重い for 文を Pot.Deferred.repeat に置き換える際に役立ちます。
+</p>
+<p>
+ コールバック関数の引数は以下のようになります。
+</p>
+<pre>function (i, last, loops) { this === context }
+
+    i     : <em class="var-type">{Number}</em>   step or 0 から始まって 1 ずつ繰り上がる/繰り下がる数値
+    last  : <em class="var-type">{Boolean}</em>  ループの最後なら true になる値
+    loops : <em class="var-type">{Object}</em>   ループに関する情報
+
+</pre>
+
+<p>
+ 同期処理、非同期処理、それぞれ異なります。
+</p>
+<div>
+  <ul class="potjs-reference-broad-list">
+    <li>
+      <strong>Pot.repeat</strong> は同期処理になります。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は repeat() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.repeat</strong> は非同期処理になり、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> のインスタンスを返します。
+      <br>
+      <a href="#reference.function.Pot.globalize">Pot.globalize()</a> 適応済みの場合は Deferred.repeat() で実行できます。
+    </li>
+    <li>
+      <strong>Pot.Deferred.prototype.repeat</strong> は、<a href="#reference.function.Pot.Deferred.prototype.async">Pot.Deferred.prototype.async()</a> によって 同期/非同期 が変化します。
+      <br>
+      <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> チェイン上で実行でき、Pot.Deferred のインスタンスを返します。
+    </li>
+  </ul>
+</div>
+<p>
+ <code>Pot.Deferred.repeat.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 非同期では、ほとんどの環境で速度指定が可能ですが、
+ 同期での速度指定は一部の環境 (XUL 上など) のみになります。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ 戻り値はありません。
+</p>
+<p>
+ Pot.repeat で同期処理の例:
+</p>
+<pre>var result = [];
+
+Pot.repeat(10, function(i) {
+    result.push(i);
+});
+debug(result); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</pre>
+
+<pre>// コールバック第二引数 last を利用した例
+
+var string = '';
+var chars = 'abcdef'.split('');
+
+Pot.repeat(chars.length, function(i, last) {
+    string += chars[i] + '=' + i + (last ? ';' : ',');
+});
+debug(string); // 'a=0,b=1,c=2,d=3,e=4,f=5;'</pre>
+
+<pre>// オブジェクトで指定した例
+
+var result = [];
+
+Pot.repeat({begin: 0, end: 100, step: 10}, function(i) {
+    result.push(i);
+});
+debug(result); // [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]</pre>
+
+<p>
+ Pot.Deferred.repeat で非同期処理の例:
+</p>
+<pre>var result = [];
+
+Pot.Deferred.repeat(10, function(i) {
+    result.push(i);
+}).then(function() {
+    debug(result); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+});</pre>
+
+<pre>// コールバック第二引数 last を利用した例
+
+var string = '';
+var chars = 'abcdef'.split('');
+
+Pot.Deferred.repeat(chars.length, function(i, last) {
+    string += chars[i] + '=' + i + (last ? ';' : ',');
+}).then(function() {
+    debug(string); // 'a=0,b=1,c=2,d=3,e=4,f=5;'
+});</pre>
+
+<pre>// オブジェクトで指定した例
+
+var result = [];
+
+Pot.Deferred.repeat({begin: 0, end: 100, step: 10}, function(i) {
+    result.push(i);
+}).then(function() {
+    debug(result); // [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+});</pre>
+
+<p>
+ Pot.Deferred.prototype.repeat で非同期処理の例:
+</p>
+<pre>var result = [];
+
+var d = new Pot.Deferred();
+
+d.then(function() {
+    return 10;
+}).repeat(function(i) {
+    result.push(i);
+}).then(function() {
+    debug(result); // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}).begin();</pre>
+
+<pre>// コールバック第二引数 last を利用した例
+
+var string = '';
+var chars = 'abcdef'.split('');
+
+var d = new Pot.Deferred();
+
+d.repeat(function(i, last) {
+    string += chars[i] + '=' + i + (last ? ';' : ',');
+}).then(function() {
+    debug(string); // 'a=0,b=1,c=2,d=3,e=4,f=5;'
+}).begin(chars);</pre>
+
+<pre>// オブジェクトで指定した例
+
+var result = [];
+
+Pot.Deferred.begin(function() {
+    return {
+        begin : 0,
+        end   : 100,
+        step  : 10
+    };
+}).repeat(function(i) {
+    result.push(i);
+}).then(function() {
+    debug(result); // [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
