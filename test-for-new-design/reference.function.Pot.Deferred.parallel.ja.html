@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.parallel">
+<title>Pot.Deferred.parallel</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.parallel';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.parallel</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.parallel"><em>Pot.Deferred.</em>parallel</dfn>
+    (<em>{Array|Object|*}</em> deferredList [, <em>{Array|Object|*}</em> deferredList2 [, ...]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 deferredList を並列処理で実行します。
+    </p>
+    <div>
+      <p>
+ 配列またはオブジェクトからなる Pot.Deferred のリスト deferredList の、
+ <br>
+ すべての結果が揃ってから
+ 返り値となる Pot.Deferred インスタンスを実行します。
+ <br>
+ この関数により、未知数の Deferred を同時実行 (並列) で処理することができます。
+ <br>
+ 次のチェインの実行完了を待たずに
+ 引数の複数コールバックを実行します。
+ <br>
+ すべての結果が揃うと、
+ 返り値の Pot.Deferred インスタンスを開始します。
+ <br>
+ MochiKit でいう DeferredList と似ています。
+ そして JSDeferred.parallel をベースとしています。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.parallel() が parallel() で実行できます。
+</p>
+<p>
+ 新しい Pot.Deferred インスタンスを返します。
+</p>
+<pre>// 配列で指定
+Pot.Deferred.parallel([
+    Pot.Deferred.begin(function() {
+        return 'foo';
+    }),
+    function() {
+        return Pot.Deferred.succeed().then(function() {
+            return Pot.Deferred.wait(1).then(function() {
+                return 'bar';
+            });
+        });
+    },
+    (new Pot.Deferred()).then(function() {
+        return 'baz';
+    })
+]).then(function(values) {
+    Pot.debug(values);
+    // values[0] == 'foo'
+    // values[1] == 'bar'
+    // values[2] == 'baz'
+});</pre>
+<p>
+ オブジェクトで指定。
+</p>
+
+<pre>Pot.Deferred.parallel({
+    foo : function() {
+        return 1;
+    },
+    bar : (new Pot.Deferred()).then(function() {
+        return Pot.Deferred.begin(function() {
+            return Pot.Deferred.wait(1).then(function() {
+                return Pot.Deferred.succeed(2);
+            });
+        });
+    }),
+    baz : function() {
+        var d = new Pot.Deferred();
+        return d.async(false).then(function() {
+            return 3;
+        });
+    }
+}).then(function(values) {
+    Pot.debug(values);
+    // values.foo == 1
+    // values.bar == 2
+    // values.baz == 3
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

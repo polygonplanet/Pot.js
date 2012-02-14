@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.till">
+<title>Pot.Deferred.till</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.till';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.till</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.till"><em>Pot.Deferred.</em>till</dfn>
+    (<em>{Function|*}</em> cond)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      条件式 cond が 真 (true) を返すまで待機します。
+    </p>
+    <div>
+      <p>
+ 引数 cond は、真偽値を返す関数 または任意の値を指定します。
+ <br>
+ この関数は Pot.Deferred インスタンスを返し、
+ <br>
+ cond が 真 (true) となる値を返すまで
+ 返されたインスタンスは実行されません。
+ <br>
+ チェイン上の <a href="#reference.function.Pot.Deferred.prototype.till">till()</a> と同じように扱えます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.till() が till() で実行できます。
+</p>
+<p>
+ 新しい Pot.Deferred インスタンスを返します。
+</p>
+
+<pre>Pot.debug('Begin till');
+
+Pot.Deferred.till(function() {
+    // body が読み込まれるまで待機
+    if (!document.body) {
+        return false;
+    } else {
+        return true;
+    }
+}).then(function() {
+    Pot.debug('End till');
+    document.body.innerHTML += 'hoge';
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.chain">
+<title>Pot.Deferred.chain</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.chain';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.chain</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.chain"><em>Pot.Deferred.</em>chain</dfn>
+    (<em>{Function|Array|Object|*}</em> args [, <em>{Function|Array|Object|*}</em> args2 [, ...]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数に与えられたチェインと共に新しい Pot.Deferred のインスタンスを作成して返します。
+    </p>
+    <div>
+      <p>
+ この関数は、
+ 引数に与えられたコールバック関数または、
+ <br>
+ DeferredList となる配列やオブジェクトを
+ Deferred インスタンスにコールバックチェインとして追加し、
+ <br>
+ それを開始して返り値とします。
+ <br>
+ つまり、<code>new Pot.Deferred</code> から始まって <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などで追加していく一連の流れを
+ <br>
+ 引数の指定みで行えるコンストラクタ代わりに使えます。
+ <br>
+ chain は、JSDeferred.chain から由来しています。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.chain() が chain() で実行できます。
+</p>
+
+<pre>var deferred = Pot.Deferred.chain(
+    function() {
+        return Pot.Deferred.wait(1).then(function() {
+            Pot.debug(1);
+        });
+    },
+    function(res) {
+        throw new Error('error');
+    },
+    // 関数名に rescue と付けることで rescue メソッド扱いになる
+    function rescue(err) {
+        Pot.debug(err);
+    },
+    function(res) {
+        return Pot.Deferred.succeed(res).then(function(val) {
+            Pot.debug(2);
+        });
+    },
+    {
+        foo : function(res) {
+            Pot.debug(3);
+        },
+        bar : function(res) {
+            return Pot.Deferred.begin(function() {
+                Pot.debug(4);
+            });
+        }
+    },
+    function(res) {
+        Pot.debug(5);
+    },
+    [
+        function(res) {
+            return Pot.Deferred.wait(1).then(function() {
+                Pot.debug(6);
+            });
+        },
+        function(res) {
+            return Pot.Deferred.begin(function() {
+                return Pot.Deferred.succeed(7).then(function(val) {
+                    Pot.debug(val);
+                });
+            });
+        }
+    ]
+);
+// 1, (Error: error), 2, 3, 4, 5, 6, 7
+// と出力される</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

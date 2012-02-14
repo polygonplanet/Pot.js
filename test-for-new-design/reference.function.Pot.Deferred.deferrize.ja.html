@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.deferrize">
+<title>Pot.Deferred.deferrize</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.deferrize';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.deferrize</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Function}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.deferrize"><em>Pot.Deferred.</em>deferrize</dfn>
+    (<em>{Object|Function}</em> object [, <em>{String|Function}</em> method])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      関数を Deferred 化します。
+    </p>
+    <div>
+      <p>
+ 関数 method の返り値を Pot.Deferred インスタンスにし、Deferred 化した関数を返します。
+ <br>
+ 引数 object は、対象の関数の親オブジェクトを指定します。
+ <br>
+ 引数 method は、関数名を文字列で指定 もしくは関数オブジェクトを渡します。
+ <br>
+ 引数 object が関数オブジェクトで、 method が省略された場合は object が対象の関数になります。
+</p>
+<p>
+ コールバック関数を使用するようなものに対して
+ より効果的で、
+ <br>
+ 非同期であればさらに適しています。
+ <br>
+ 同期で実行される関数に対しても適応できます。
+ <br>
+ Deferred 化した関数オブジェクトが返ります。
+ <br>
+ 返り値の関数の仕様方法、引数などは Deferred 化する前と同じです。
+ <br>
+ 違いは、Pot.Deferred オブジェクトのインスタンスが返る点です。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.deferrize() が deferrize() で実行できます。
+</p>
+<p>
+ Deferred 化した関数が返ります。
+</p>
+
+<pre>// setTimeout を Deferred 化
+var timer = Pot.Deferred.deferrize(window, 'setTimeout');
+
+timer(function() {
+    Pot.debug('in timer (2000 ms.)');
+}, 2000).then(function() {
+    Pot.debug('End timer');
+});</pre>
+
+<p>
+ 同期で実行される関数を Deferred 化:
+</p>
+<pre>var byId = Pot.Deferred.deferrize(document, 'getElementById');
+
+byId('container').then(function(element) {
+    Pot.debug('End byId()');
+    Pot.debug('tagName = ' + element.tagName); // e.g. 'DIV'
+});</pre>
+
+<p>
+ 関数を第一引数に直接与えることができます。
+ <br>
+ その場合、第二引数は必要ありません。
+</p>
+<pre>// 文字列を charCode からなる配列に変換する関数
+var toCharCode = Pot.Deferred.deferrize(function(string) {
+    var chars = [], i, len = string.length;
+    for (i = 0; i &lt; len; i++) {
+        chars.push(string.charCodeAt(i));
+    }
+    return chars;
+});
+
+var string = 'abcdef';
+Pot.Deferred.begin(function() {
+    return toCharCode(string).then(function(result) {
+        Pot.debug(result); // [97, 98, 99, 100, 101, 102]
+    });
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

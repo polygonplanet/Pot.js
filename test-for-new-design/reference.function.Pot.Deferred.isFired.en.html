@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.isFired">
+<title>Pot.Deferred.isFired</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.isFired';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.isFired</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.isFired"><em>Pot.Deferred.</em>isFired</dfn>
+    (<em>{Pot.Deferred}</em> deferred)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 deferred のチェインが開始されているかどうかの真偽値を返します。
+    </p>
+    <div>
+      <p>
+ 引数 deferred が Pot.Deferred インスタンスであり、すでに開始されている場合は true を返し、
+ <br>
+ そうでない場合は false を返します。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.isFired() が isFired() で実行できます。
+</p>
+<p>
+ 引数 deferred のチェインが開始されているかどうかの真偽値を返します。
+</p>
+
+<pre>var d = new Pot.Deferred();
+
+Pot.debug( Pot.Deferred.isFired(d) ); // false
+
+d.then(function() {
+    return 'hoge';
+});
+
+Pot.debug( Pot.Deferred.isFired(d) ); // false
+d.begin();
+Pot.debug( Pot.Deferred.isFired(d) ); // true</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

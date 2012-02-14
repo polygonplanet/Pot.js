@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.callLazy">
+<title>Pot.Deferred.callLazy</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.callLazy';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.callLazy</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.callLazy"><em>Pot.Deferred.</em>callLazy</dfn>
+    (<em>{Function}</em> callback)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      関数 callback を非同期で実行します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Deferred.callLater">callLater</a> と似ているところもありますが、
+ <br>
+ この関数は <code>callLater(0, function() {...})</code> とするより速く実行されます。
+ <br>
+ オーバーヘッドが少ないので、単にバックグラウンドで実行したいときなどに適します。
+ <br>
+ 返り値は callLater と同様 Pot.Deferred インスタンスになります。
+ <br>
+ <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などで繋げることもできます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.callLazy() が callLazy() で実行できます。
+</p>
+<p>
+ Pot.Deferred インスタンスを返します。
+</p>
+
+<pre>// 非同期で実行
+Pot.Deferred.callLazy(function() {
+    Pot.debug('hoge');
+});</pre>
+
+<pre>// チェインを繋げる場合
+Pot.Deferred.callLazy(function() {
+    Pot.debug('hoge');
+}).then(function() {
+    Pot.debug('fuga');
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

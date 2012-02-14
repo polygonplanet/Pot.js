@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.maybeDeferred">
+<title>Pot.Deferred.maybeDeferred</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.maybeDeferred';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.maybeDeferred</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.maybeDeferred"><em>Pot.Deferred.</em>maybeDeferred</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred かどうか分からない値を確実に Deferred インスタンスにして返します。
+    </p>
+    <div>
+      <p>
+ 引数 x を、次のチェインに値が渡せるよう Deferred インスタンス化して返します。
+ <br>
+ 何らかの関数の戻り値などが Deferred インスタンスなのかどうか
+ 曖昧なときなどに有用です。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.maybeDeferred() が maybeDeferred() で実行できます。
+</p>
+<p>
+ Pot.Deferred インスタンスを返します。
+</p>
+
+<pre>// ランダムに Deferred や Error, 文字列を返す関数
+function randomDeferred() {
+    var n = Math.random() * 10;
+    if (n &lt; 2) {
+        return new Error('error');
+    } else if (n &lt; 5) {
+        return 'string';
+    } else if (n &lt; 7) {
+        return new Pot.Deferred().then(function() {
+            return 'unfired';
+        });
+    } else {
+        return Pot.Deferred.begin(function() {
+            return 'fired';
+        });
+    }
+}
+
+Pot.Deferred.begin(function() {
+    // 不明な値を取得
+    var value = randomDeferred();
+    // 次のチェインに繋げられるように Deferred 化する
+    return Pot.Deferred.maybeDeferred(value);
+}).ensure(function(res) {
+    Pot.debug(res); // (Error: error) or 'string' or 'unfired' or 'fired'
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

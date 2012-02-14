@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.wait">
+<title>Pot.Deferred.wait</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.wait';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.wait</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.wait"><em>Pot.Deferred.</em>wait</dfn>
+    (<em>{Number}</em> seconds [, <em>{*}</em> value])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      秒単位で待機します。
+    </p>
+    <div>
+      <p>
+ 秒単位で待機した後、新しい Pot.Deferred インスタンスを返します。
+ <br>
+ 引数 seconds 秒経つまで次のチェインは実行されません。
+ <br>
+ Pot.Deferred チェイン上での <a href="#reference.function.Pot.Deferred.prototype.wait">wait()</a> と同じです。
+ <br>
+ 任意に 引数 value を設定すると、その値を引き継ぎます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.wait() が wait() で実行できます。
+</p>
+<p>
+ 新しい Pot.Deferred インスタンスを返します。
+</p>
+
+<pre>// 5 秒後に実行
+Pot.Deferred.wait(5).then(function() {
+    // 2 秒後に 'fuga' を値として実行
+    return Pot.Deferred.wait(2, 'fuga').then(function(res) {
+        return 'hoge' + res;
+    });
+}).then(function(res) {
+    debug(res); // 'hogefuga'
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

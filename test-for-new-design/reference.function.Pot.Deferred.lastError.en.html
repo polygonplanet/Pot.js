@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.lastError">
+<title>Pot.Deferred.lastError</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.lastError';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.lastError</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.lastError"><em>Pot.Deferred.</em>lastError</dfn>
+    (<em>{Pot.Deferred}</em> deferred [, <em>{*}</em> value])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 deferred の保持している最後のエラーを取得または設定します。
+    </p>
+    <div>
+      <p>
+ 引数 deferred は Pot.Deferred インスタンスを指定します。
+ <br>
+ 引数 value が渡されると、deferred の保持している最後のエラーを value に設定します。
+ <br>
+ 引数 value が省略されると、deferred の保持している最後のエラーを取得します。
+ <br>
+ <a href="#reference.function.Pot.Deferred.lastResult">lastResult</a> のエラー版のようなものです。
+ <br>
+ 通常、<a href="#reference.function.Pot.Deferred.prototype.rescue">rescue</a> により取得できるエラーを取得できます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.lastError() が lastError() で実行できます。
+</p>
+<p>
+ deferred の保持している最後のエラーを取得した場合は、エラーを変えします。
+ <br>
+ value が指定され、設定した場合は deferred が返ります。
+</p>
+
+<pre>var d = new Pot.Deferred({ async : false });
+
+d.then(function() {
+  throw new Error('foo');
+}).then(function(res) {
+  throw new Error('bar');
+}).then(function(res) {
+  throw new Error('baz');
+}).begin();
+
+var result = Pot.Deferred.lastError(d);
+Pot.debug(result); // Error: foo</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.failure">
+<title>Pot.Deferred.failure</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.failure';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.failure</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.failure"><em>Pot.Deferred.</em>failure</dfn>
+    ([<em>{*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      エラーバックとして開始済みの Pot.Deferred インスタンスを返します。
+    </p>
+    <div>
+      <p>
+ エラーバックとして開始済みとは、<a href="#reference.function.Pot.Deferred.prototype.raise">.raise()</a> により実行済みということです。
+ <br>
+ <a href="#reference.function.Pot.Deferred.succeed">succeed()</a> のエラー版のようなものです。
+ <br>
+ 空のチェインに対して <a href="#reference.function.Pot.Deferred.prototype.raise">.raise()</a> が実行済みのインスタンスが返ります。
+ <br>
+ 引数に何らかの値を渡すと、
+ その値を Error インスタンスとして
+ 次のエラーバックの引数に渡ります。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.failure() が failure() で実行できます。
+</p>
+<p>
+ エラーバックとして開始済みの Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>Pot.request('./foo.json').then(function(data) {
+    return (
+        data.result ? Pot.Deferred.succeed(data.result) 
+                      // 失敗したらエラーとして処理する場合
+                    : Pot.Deferred.failure(data)
+    ).ensure(function(res) {
+        if (Pot.isError(res)) {
+            // 何らかのエラー処理
+            return handleError(res);
+        } else {
+            // 成功時の処理
+            return handleSuccess(res);
+        }
+    });
+}).then(function(res) {
+    // 何らかの最終的な処理
+    handleEnd(res);
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

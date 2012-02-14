@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.unregister">
+<title>Pot.Deferred.unregister</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.unregister';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.unregister</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.unregister"><em>Pot.Deferred.</em>unregister</dfn>
+    (<em>{String|Array}</em> name)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      register で登録したメソッドを解除します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Deferred.register">register</a> で登録したメソッドを解除します。
+ <br>
+ 引数 name は、解除する関数名を文字列で指定、もしくは配列で複数指定します。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.unregister() が unregister() で実行できます。
+</p>
+<p>
+ 解除した関数の数を返します。
+</p>
+<pre>// メソッドを登録
+Pot.Deferred.register('add', function(args) {
+    return args.inputs[0] + args.results[0];
+});
+
+var d = new Pot.Deferred();
+d.then(function() {
+    return 100;
+// 登録したメソッド add を使用し 50 加算する
+}).add(50).then(function(res) {
+    Pot.debug(res); // 150
+});
+d.begin();
+
+// 登録を解除
+d.then(function() {
+    Pot.Deferred.unregister('add');
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

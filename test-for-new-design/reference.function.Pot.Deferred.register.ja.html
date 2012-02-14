@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.register">
+<title>Pot.Deferred.register</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.register';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.register</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.register"><em>Pot.Deferred.</em>register</dfn>
+    (<em>{String|Object}</em> name [, <em>{Function}</em> func])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      チェインで使用できるユーザー定義のメソッドを登録します。
+    </p>
+    <div>
+      <p>
+ 引数 name は、登録する関数名を文字列で指定します。
+ <br>
+ 引数 func は、登録する関数を渡します。
+ <br>
+ 引数 name が key-value のオブジェクトで渡されると、
+ <br>
+ key を 関数名、value を関数とし すべて登録します。
+ <br>
+ name をオブジェクトで指定した際は、func は省略できます。
+ <br>
+ 登録したメソッドは、既存のメソッドと同じく
+ コールバックチェイン上で実行することができます。
+ <br>
+ 登録したメソッドは、Pot.Deferred.prototype に影響するため
+ すべてのインスタンスで使用できるようになります。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.register() が register() で実行できます。
+</p>
+<p>
+ 登録した関数の数を返します。
+</p>
+<pre>// チェインの結果値とメソッドの引数の値を足すメソッドを登録
+Pot.Deferred.register('add', function(args) {
+    // 引数 args はオブジェクトで渡されます
+    //  - args.inputs  : 登録したメソッドに渡された arguments
+    //  - args.results : チェインの結果値となる arguments
+
+    return args.inputs[0] + args.results[0];
+});
+
+var d = new Pot.Deferred();
+d.then(function() {
+    return 100;
+// 登録したメソッド add を使用し 50 加算する
+}).add(50).then(function(res) {
+    Pot.debug(res); // 150
+});
+d.begin();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

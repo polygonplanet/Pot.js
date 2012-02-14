@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.begin">
+<title>Pot.Deferred.begin</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.begin';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.begin</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.begin"><em>Pot.Deferred.</em>begin</dfn>
+    (<em>{Function|*}</em> callback)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      コールバック関数 callback を追加した Pot.Deferred インスタンスを作成し、チェインを開始した状態で返します。
+    </p>
+    <div>
+      <p>
+ この関数は、新しい Pot.Deferred インスタンスを作成し
+ <br>
+ チェインに 引数 callback を追加した後、そのチェインを開始してから インスタンスを返します。
+ <br>
+ 開始済みとは、<a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> が実行済みということです。
+ <br>
+ <code>new Pot.Deferred();</code> として <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> でコールバック関数を追加し、
+ <a href="#reference.function.Pot.Deferred.prototype.begin">.begin()</a> により開始するステップが省けます。
+ <br>
+ 戻り値のインスタンスは、開始済みのため チェインの最後に .begin() で実行する必要ありません。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.begin() が begin() で実行できます。
+</p>
+<p>
+ 新しい Pot.Deferred インスタンスを返します。
+</p>
+<pre>Pot.Deferred.begin(function() {
+    return 1;
+}).then(function(res) {
+    return res + 1;
+}).then(function(res) {
+    debug(res); // 2
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

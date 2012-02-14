@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.lastResult">
+<title>Pot.Deferred.lastResult</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.lastResult';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.lastResult</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.lastResult"><em>Pot.Deferred.</em>lastResult</dfn>
+    (<em>{Pot.Deferred}</em> deferred [, <em>{*}</em> value])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 deferred の保持している最後の結果値を取得または設定します。
+    </p>
+    <div>
+      <p>
+ 引数 deferred は Pot.Deferred インスタンスを指定します。
+ <br>
+ 引数 value が渡されると、deferred の最後の結果値を value に設定します。
+ <br>
+ value が省略されると、deferred の保持している最後の結果値を取得します。
+ <br>
+ 取得したところで、deferred の結果値がなくなるわけではありません。
+ <br>
+ 通常はコールバック関数の引数として取得できますが、
+ <br>
+ 何らかの事情で値を確認したい時や、使用したい時に有用です。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.lastResult() が lastResult() で実行できます。
+</p>
+<p>
+ 取得時に deferred の最後の結果値、設定時に deferred が返ります。
+</p>
+
+<pre>var d = new Pot.Deferred({ async : false });
+d.then(function() {
+    return 'foo';
+}).then(function(res) {
+    return 'bar';
+}).then(function(res) {
+    return 'baz';
+}).begin();
+
+var result = Pot.Deferred.lastResult(d);
+Pot.debug(result); // 'baz'</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
