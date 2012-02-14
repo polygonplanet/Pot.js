@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.till">
+<title>Pot.Deferred.prototype.till</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.till';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.till</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.till"><em>Pot.Deferred.prototype.</em>till</dfn>
+    (<em>{Function|*}</em> cond)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      条件式 cond が 真 (true) を返すまで待機します。
+    </p>
+    <div>
+      <p>
+ 条件式 cond が 真 (true) を返すまで Deferred チェイン上で待機します。
+ <br>
+ 引数 cond は、真偽値を返す関数 または値を指定します。
+ <br>
+ cond が 真 (true) となる値を返すまで
+ 次のチェインは実行されません。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    debug('Begin till');
+}).till(function() {
+    // body が読み込まれるまで待機
+    if (!document.body) {
+        return false;
+    } else {
+        return true;
+    }
+}).then(function() {
+    debug('End till');
+    document.body.innerHTML += 'hoge';
+}).begin();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

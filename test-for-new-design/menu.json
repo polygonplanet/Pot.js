@@ -82,7 +82,7 @@
     "reference.Pot.Iter.functions":{
       "title":{"ja":"Pot.Iter","en":"Pot.Iter"},
       "items":{
-        "reference.function.Pot.Iter":{"ja":"Iter","en":"Iter"},
+        "reference.function.Pot.Iter":{"ja":"new Iter","en":"new Iter"},
         "reference.function.Pot.toIter":{"ja":"toIter","en":"toIter"},
         "reference.function.Pot.forEach":{"ja":"forEach","en":"forEach"},
         "reference.function.Pot.repeat":{"ja":"repeat","en":"repeat"},

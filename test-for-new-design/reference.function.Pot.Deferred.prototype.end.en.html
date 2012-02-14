@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.end">
+<title>Pot.Deferred.prototype.end</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.end';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.end</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.end"><em>Pot.Deferred.prototype.</em>end</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred チェインを終了し、閉じます。
+    </p>
+    <div>
+      <p>
+ チェインを終了し、閉じます。
+ <br>
+ 終了したチェインは
+ <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などでコールバックを追加しても実行されません。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = Pot.Deferred.begin(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+}).end(); // チェインを終了する
+
+// その後に関数を追加しても何も起こらない
+d.then(function() {
+    debug('Help me!');
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

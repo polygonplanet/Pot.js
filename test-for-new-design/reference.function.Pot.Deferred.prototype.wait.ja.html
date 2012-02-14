@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.wait">
+<title>Pot.Deferred.prototype.wait</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.wait';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.wait</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.wait"><em>Pot.Deferred.prototype.</em>wait</dfn>
+    (<em>{Number}</em> seconds [, <em>{*}</em> value])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      秒単位で待機します。
+    </p>
+    <div>
+      <p>
+ Deferred チェイン上で、秒単位で待機します。
+ <br>
+ 引数 seconds 秒たつまで次のチェインは実行されません。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>Pot.Deferred.begin(function() {
+    return 1;
+}).wait(1).then(function(res) { // 1 秒待つ
+    debug(res);
+    return res + 1;
+}).wait(1.5).then(function(res) { // 1.5 秒待つ
+    debug(res); // 2
+    return res + 1;
+}).wait(0).then(function(res) { // 瞬間的な間隔をおく
+    debug(res); // 3
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.rescue">
+<title>Pot.Deferred.prototype.rescue</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.rescue';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.rescue</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.rescue"><em>Pot.Deferred.prototype.</em>rescue</dfn>
+    (<em>{Function}</em> errback)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      エラー時に実行されるエラーバック関数を Deferred チェインに追加します。
+    </p>
+    <div>
+      <p>
+ エラーバック関数をチェインに追加します。
+ <br>
+ エラーバックはコールバックチェインで
+ エラーが発生したときに、引数にエラーを持ち実行されます。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    // エラーを発生させる
+    throw new Error('MyError');
+}).rescue(function(err) {
+    // エラーをキャッチ
+    debug(err); // Error: MyError
+    return 1;
+}).then(function(res) {
+    // チェインを継続
+    if (res == 1) {
+        // 再度エラーを発生させる
+        // Error オブジェクトでなくても throw されるとエラー扱い
+        throw res;
+    }
+}).rescue(function(err) {
+    // エラーを捕捉
+    debug(err); // Error: 1
+});
+d.begin();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.then">
+<title>Pot.Deferred.prototype.then</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.then';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.then</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.then"><em>Pot.Deferred.prototype.</em>then</dfn>
+    (<em>{Function}</em> callback [, <em>{Function}</em> errback])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred チェインにコールバック関数を追加します。
+    </p>
+    <div>
+      <p>
+ コールバック関数 callback をチェインに追加します。
+ <br>
+ 任意に、関数 errback が与えられると、
+ エラーバックとしてチェインに追加します。
+ <br>
+ エラーバック関数は <a href="#reference.function.Pot.Deferred.prototype.rescue">rescue()</a> で登録することと同じです。
+ <br>
+ callback は成功時に実行されます。
+ errback はエラー時に、エラーを引数に持ち実行されます。
+ <br>
+ errback は省略可能です。
+ <br>
+ 2 つの関数を、成功時、エラー時
+ として追加することで手間が省けます。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = new Deferred();
+
+d.then(function() {
+    return someFunc();
+}).then(function(res) {
+    // 成功時
+    debug(res);
+}, function(err) {
+    // エラー時
+    debug(err);
+});
+d.begin();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

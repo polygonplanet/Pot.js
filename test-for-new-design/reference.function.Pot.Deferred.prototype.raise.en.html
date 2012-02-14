@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.raise">
+<title>Pot.Deferred.prototype.raise</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.raise';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.raise</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.raise"><em>Pot.Deferred.prototype.</em>raise</dfn>
+    ([<em>{*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      エラーと共に Deferred チェインを開始します。
+    </p>
+    <div>
+      <p>
+ エラーと共にチェインを開始します。
+ <br>
+ <a href="#reference.function.Pot.Deferred.prototype.begin">begin()</a> のエラー版のようなものです。
+ <br>
+ 何らかの事情でエラー扱いにしたい時に有用です。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    // 成功時
+    successFunc();
+}).rescue(function(err) {
+    // エラー時
+    errorFunc(err);
+}).ensure(function() {
+    // 最終的な処理
+    finalFunc();
+});
+
+// チェックが通らなければエラーとする
+if (!someCheck()) {
+    d.raise(); // エラーと共に開始
+} else {
+    d.begin(); // 正常に開始
+}</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

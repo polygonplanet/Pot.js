@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.data">
+<title>Pot.Deferred.prototype.data</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.data';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.data</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred|*}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.data"><em>Pot.Deferred.prototype.</em>data</dfn>
+    ([<em>{String|Object|*}</em> key [, <em>{*}</em> value]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      現在のチェイン上で使えるストレージとして値を設定または取得します。
+    </p>
+    <div>
+      <p>
+ Pot.Deferred チェインには、ストレージとしてのデータ領域があります。
+ <br>
+ data メソッドを使うことで、
+ <br>
+ そのストレージに任意の値を設定、または設定した値を取得することができます。
+ <br>
+ ストレージは Pot.Deferred 1 インスタンスごとに存在します。
+ <br>
+ 何らかの一時的な値や、
+ チェインの外側で定義してチェイン上で使う変数などの省略になります。
+ <br>
+ 特に、オブジェクトをハッシュとして使うときには代用できます。
+ <br>
+ 設定するときは、第一引数 key にキー名を、value に任意の値を渡します。
+ <br>
+ key をオブジェクトで渡して設定することもできます。
+ <br>
+ 取得する場合は、設定したキー名を key に渡します。
+ <br>
+ 対応する値があればそれを返します。
+ <br>
+ 引数を省略して実行すると、ストレージのデータすべてがオブジェクトで返ります。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+ <br>
+ value を省略した場合は、対応する値があれば返ります。
+ <br>
+ 引数をすべて省略すると、データすべてがオブジェクトで返ります。
+</p>
+
+<pre>var d = new Pot.Deferred();
+
+d.data({
+    // データを設定する (オブジェクトの場合は引数一つ)
+    count : 0,
+    begin : 'BEGIN',
+    end   : 'END'
+}).then(function() {
+    // データを取得
+    debug( this.data('begin') ); // BEGIN
+
+    return this.data('count') + 1;
+
+}).then(function(res) {
+    debug(res); // 1
+
+    // データを更新
+    this.data('count', res + 1);
+
+    return this.data('count');
+}).then(function(res) {
+    debug(res); // 2
+    debug( this.data('end') ); // END
+});
+d.begin();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

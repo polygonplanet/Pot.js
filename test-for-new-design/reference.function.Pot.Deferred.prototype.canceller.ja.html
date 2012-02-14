@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.canceller">
+<title>Pot.Deferred.prototype.canceller</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.canceller';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.canceller</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred|Array}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.canceller"><em>Pot.Deferred.prototype.</em>canceller</dfn>
+    (<em>{Function}</em> func)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred チェインのキャンセル時に実行される関数を登録 または取得します。
+    </p>
+    <div>
+      <p>
+ キャンセル時に実行される関数を登録、または取得します。
+ <br>
+ <a href="#reference.function.Pot.Deferred.prototype.cancel">cancel()</a> が呼ばれた時に実行される関数を登録します。
+ <br>
+ canceller はスタッカブルに関数を保持しているため、
+ 複数の関数を登録することができます。
+ <br>
+ 引数を省略して実行した場合、登録済みの関数を持つ配列が返ります。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+ <br>
+ 引数に何も与えずに実行した場合、登録済みの関数を持つ配列が返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.canceller(function() {
+    debug('cancelled!');
+}).canceller(function() {
+    debug('cancelled!!');
+}).then(function() {
+    debug('start chain');
+});
+d.cancel();
+// cancelled!
+// cancelled!!
+// と出力される</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

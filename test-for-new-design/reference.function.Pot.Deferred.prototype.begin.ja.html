@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.begin">
+<title>Pot.Deferred.prototype.begin</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.begin';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.begin</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.begin"><em>Pot.Deferred.prototype.</em>begin</dfn>
+    ([<em>{*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred チェインを開始します。
+    </p>
+    <div>
+      <p>
+ コールバックチェインを開始します。
+ <br>
+ 任意に、引数に値を持たせ
+ 次のコールバック関数の引数に渡すことができます。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    debug(1);
+    return 1;
+});
+// この時点ではチェインは実行されていない
+
+// なんらかの条件が通ればコールバック関数を追加
+if (check()) {
+    d.then(function(res) {
+        return someFunc(res);
+    });
+}
+// チェインを実行
+d.begin();
+
+// その後は追加した時に実行される
+d.then(function(res) {
+    return 'hoge';
+});
+d.then(function(res) {
+    debug(res); // 'hoge'
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

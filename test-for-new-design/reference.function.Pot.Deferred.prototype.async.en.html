@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.async">
+<title>Pot.Deferred.prototype.async</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.async';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.async</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred|Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.async"><em>Pot.Deferred.prototype.</em>async</dfn>
+    (<em>{Boolean}</em> sync)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      処理の同期と非同期を切り替え設定します。
+    </p>
+    <div>
+      <p>
+ Deferred チェインの処理の、同期と非同期を 切り替えます。
+ <br>
+ デフォルトは非同期です。
+ 同期にするには false を渡します。
+ <br>
+ 非同期で実行するには true を渡します。
+ <br>
+ 同期的に実行するには、
+ <br>
+ <code>var d = new Pot.Deferred();</code>
+ とコンストラクタから開始した場合のみ適応できます。
+ <br>
+ なぜなら <a href="#reference.function.Pot.Deferred.begin">Pot.Deferred.begin</a> などの関数は、
+ <br>
+ 関数内で非同期として <code>new Pot.Deferred()</code> と生成しているからです。
+ <br>
+ 最初の実行時に非同期だった場合、同期にしたとしても意味はありません。
+ <br>
+ または、同期にする場合
+ コンストラクタの引数にオプションで、
+</p>
+<pre>var syncDederred = new Pot.Deferred({ async : false });</pre>
+<p>
+ と設定することもできます。
+ <br>
+ 詳しくは、<a href="#reference.function.Pot.Deferred">Pot.Deferred コンストラクタ</a> を参照ください。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+ <br>
+ 引数に何も与えずに実行した場合、現在の 同期/非同期設定の値が返ります。
+</p>
+
+<pre>var value = null;
+var d = new Pot.Deferred();
+
+// 同期に設定
+d.async(false).then(function() {
+    return 'sync';
+}).then(function(res) {
+    return res + 'hron';
+}).then(function(res) {
+    return res + 'ous';
+}).then(function(res) {
+    value = res;
+}).begin();
+
+debug(value); // 'synchronous'</pre>
+<p>
+ 非同期で実行:
+</p>
+<pre>var value = null;
+var d = new Pot.Deferred();
+
+// 非同期に設定 (デフォルトは true なので本来必要ありません)
+d.async(true).then(function() {
+    return 'async';
+}).then(function(res) {
+    return res + 'hron';
+}).then(function(res) {
+    return res + 'ous';
+}).then(function(res) {
+    value = res;
+}).begin();
+
+// 非同期のためすぐには取得できない
+debug(value); // null
+
+// 少し待ってから取得
+Pot.Deferred.wait(1).then(function() {
+    debug(value); // 'asynchronous'
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

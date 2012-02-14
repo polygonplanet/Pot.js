@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.cancel">
+<title>Pot.Deferred.prototype.cancel</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.cancel';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.cancel</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.cancel"><em>Pot.Deferred.prototype.</em>cancel</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Deferred チェインを中止します。
+    </p>
+    <div>
+      <p>
+ Deferred チェインを中止します。
+ <br>
+ 中止すると、次以降のチェインは実行されません。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+});
+
+// チェックが通れば開始
+if (check()) {
+    d.begin();
+} else {
+    // 通らなければ中止
+    d.cancel();
+    // キャンセルしたチェインに追加しても何も起きない
+    d.then(function() {
+        debug('hoge');
+    });
+    d.begin(); // begin も無視される
+}</pre>
+<p>
+ コールバックチェインの中で cancel する場合。
+</p>
+<pre>Pot.Deferred.begin(function() {
+    debug(1);
+}).then(function() {
+    debug(2);
+    // ここでキャンセル
+    this.cancel();
+}).then(function() {
+    // このコールバック関数は実行されない
+    debug(3);
+});</pre>
+<p>
+ チェイン上で実行される
+ コールバック関数内の this は、
+ 自身の Pot.Deferred インスタンスです。
+</p>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

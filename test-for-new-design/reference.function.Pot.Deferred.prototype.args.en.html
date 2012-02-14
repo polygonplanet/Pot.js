@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Deferred.prototype.args">
+<title>Pot.Deferred.prototype.args</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Deferred.prototype.args';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.prototype.args</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred|*}</em>
+    <dfn id="definition.reference.function.Pot.Deferred.prototype.args"><em>Pot.Deferred.prototype.</em>args</dfn>
+    ([<em>{*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      チェインの結果となる値を設定または取得します。
+    </p>
+    <div>
+      <p>
+ Deferred チェインの結果となる値を設定または取得します。
+ <br>
+ この値は、前のコールバック関数で return された値です。
+ <br>
+ args を使用することで、任意の値に設定または上書きできます。
+ <br>
+ また、コールバック関数内で <code>var res = this.args();</code> のようにして本来の引数が取得できます。
+</p>
+<p>
+ 実行時の Pot.Deferred インスタンスが返ります。
+ <br>
+ 引数を省略して実行すると、前のコールバックの結果が返ります。
+</p>
+<pre>var d = new Pot.Deferred();
+
+d.then(function(res) {
+    debug(res); // undefined
+// args により値を設定
+}).args('hoge').then(function(res) {
+    debug(res); // 'hoge'
+    return res + res;
+});
+d.begin();
+
+d.then(function(res) {
+    // 現在の値を取得
+    debug( this.args() ); // 'hogehoge'
+    // res と同じものです
+    debug( this.args() === res ); // true
+});
+
+// 分割代入ぽいことするには楽です
+d.args(1, 2, 3).then(function(a, b, c) {
+    debug(a); // 1
+    debug(b); // 2
+    debug(c); // 3
+});
+// 配列でも可
+d.args(['A', 'B', 'C']).then(function(a, b, c) {
+    debug(a); // 'A'
+    debug(b); // 'B'
+    debug(c); // 'C'
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.Pot.Deferred.methods">
+<title>Pot.js - Pot.Deferred.prototype methods</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.Pot.Deferred.methods';
+</script>
+</head>
+<body>
+<h1>Pot.js - Pot.Deferred.prototype methods</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<h2 id="description.reference.Pot.Deferred.methods">Pot.Deferred.prototype methods</h2>
+<p>
+ このセクションは Deferred (Pot.Deferred) の prototype メソッドを扱います。
+</p>
+<p>
+ prototype メソッドは、<code>new Pot.Deferred()</code> のチェインから繋げられる関数/メソッドです。
+ <br>
+ または、<a href="#reference.function.Pot.Deferred.begin">Pot.Deferred.begin()</a> のような
+ Pot.Deferred インスタンスを返す関数から繋げられるものです。
+ <br>
+ static な関数は <a href="#reference.Pot.Deferred.functions">次のセクション Pot.Deferred の関数</a> で扱っています。
+ <br>
+ Pot.Deferred についての詳しい情報は <a href="#manual.Deferred.Reference">Deferred リファレンス</a> を参照ください。
+</p>
+<p>
+ Pot.Deferred のチェインは、柔軟に繋げていくことができます。
+</p>
+<pre>// HTML body に要素名と数を表示する適当な例
+
+var d = new Pot.Deferred();
+
+// 速度を調節
+d.speed('slow').till(function() {
+    // body が読み込まれるまで待機
+    if (!document.body) {
+        return false;
+    } else {
+        return true;
+    }
+}).then(function() {
+    // タグ名を取得
+    return document.getElementsByTagName('*');
+}).wait(1).then(function(res) {
+    // 1 秒待ってから配列化
+    return arrayize(res);
+}).speed('fast').filter(function(node) {
+    // タグ名があるものだけに絞る
+    return node &amp;&amp; node.tagName;
+}).wait(0.2).speed('normal').map(function(node) {
+    // スピードを調節して小文字にする
+    return node.tagName.toLowerCase();
+}).reduce.slow(function(tags, tag) {
+    // {タグ名: 数} のオブジェクトを作る
+    tags[tag] = (tags[tag] || 0) + 1;
+    return tags;
+}, {}).forEach(function(val, key) {
+    // body に挿入
+    var text = '&lt;' + key + '/&gt;:' + val + '\n';
+    document.body.appendChild(document.createTextNode(text));
+}).rescue(function(err) {
+    // エラーが起きたら通知
+    alert(err);
+}).begin(); // チェインを開始</pre>
+<p>
+ これは、あくまでメソッドの使用例なので やり方は追求しません。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、
+ 例えば new Pot.Deferred が、 new Deferred と実行できます。
+</p>
+<p>
+ このリファレンスのサンプルコードの多くは、
+ 便宜上 <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されたと仮定して記述しています。
+ <br>
+ 例えば、<a href="#reference.function.Pot.forEach">Pot.forEach</a> として定義されている関数を forEach(...) と表現している場合があります。
+ これは、Pot.globalize() がされていない場合 Pot.forEach(...) として呼び出せます。
+ 他の関数も同様です。
+ <br>
+ Pot.globalize() が適応済みの場合、定義名のままで呼び出せます。
+</p>
+<p>
+ また、サンプルコードでは コンソールに出力するデバッグ用関数 <a href="#reference.function.Pot.debug">Pot.debug()</a> を多用しています。
+ <br>
+ Pot.debug() を、たんに debug() と表している場合もあります。
+ <br>
+ Pot.debug については このセクションで扱っているので詳しくはメニューから参照ください。
+</p>
+<p>
+ このリファレンスは Pot.js, PotLite.js の関数を事細かく解説しているわけではないので、
+ 足りない情報があるかもしれません。
+ <br>
+ より詳しくは
+ ソースコードから自動生成された
+ <a href="jsdoc/index.html" 
+    title="Pot.js - JSDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
+ or
+ <a href="jsdoc/potlite/index.html" 
+    title="PotLite.js - JSDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
+ または直接ソースコードを参照ください。
+</p>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
