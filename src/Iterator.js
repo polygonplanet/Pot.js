@@ -2054,26 +2054,41 @@ update(Pot.Iter, {
    * @static
    * @public
    */
-  filter : function(object, callback, context) {
-    var result, arrayLike, objectLike, iterateDefer, it, iterable;
-    iterateDefer = this && this.iterateSpeed;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
-    if (arrayLike) {
-      result = [];
-    } else if (objectLike) {
-      result = {};
-    } else {
-      result = null;
-    }
-    iterable = iterateDefer || this && this.iterateSpeedSync || Pot.iterate;
+  filter : (function() {
     /**@ignore*/
-    it = function() {
-      return iterable(object, function(val, key, obj) {
-        var res = callback.call(context, val, key, obj);
-        if (Pot.isDeferred(res)) {
-          return res.then(function(rv) {
-            if (rv) {
+    var emptyFilter = function(a) { return a; };
+    return function(object, callback, context) {
+      var result, arrayLike, objectLike, iterateDefer, it, iterable, cb;
+      cb = callback || emptyFilter;
+      iterateDefer = this && this.iterateSpeed;
+      arrayLike  = object && Pot.isArrayLike(object);
+      objectLike = object && !arrayLike && Pot.isObject(object);
+      if (arrayLike) {
+        result = [];
+      } else if (objectLike) {
+        result = {};
+      } else {
+        result = null;
+      }
+      iterable = iterateDefer || this && this.iterateSpeedSync || Pot.iterate;
+      /**@ignore*/
+      it = function() {
+        return iterable(object, function(val, key, obj) {
+          var res = cb.call(context, val, key, obj);
+          if (Pot.isDeferred(res)) {
+            return res.then(function(rv) {
+              if (rv) {
+                if (arrayLike) {
+                  result[result.length] = val;
+                } else if (objectLike) {
+                  result[key] = val;
+                } else {
+                  result = val;
+                }
+              }
+            });
+          } else {
+            if (res) {
               if (arrayLike) {
                 result[result.length] = val;
               } else if (objectLike) {
@@ -2082,29 +2097,19 @@ update(Pot.Iter, {
                 result = val;
               }
             }
-          });
-        } else {
-          if (res) {
-            if (arrayLike) {
-              result[result.length] = val;
-            } else if (objectLike) {
-              result[key] = val;
-            } else {
-              result = val;
-            }
           }
-        }
-      }, context);
-    };
-    if (iterateDefer) {
-      return it().then(function() {
+        }, context);
+      };
+      if (iterateDefer) {
+        return it().then(function() {
+          return result;
+        });
+      } else {
+        it();
         return result;
-      });
-    } else {
-      it();
-      return result;
-    }
-  },
+      }
+    };
+  }()),
   /**
    * Apply a function against an accumulator and each value of
    *  the object (from left-to-right) as to reduce it to a single value.
@@ -2434,15 +2439,15 @@ update(Pot.Iter, {
    * @param  {*}              (from)  (Optional) The index at
    *                                    which to begin the search.
    *                                  Defaults to 0.
-   * @return {Number}                 Return the index of result, or -1.
+   * @return {Number|String}          Return the index of result, or -1.
    * @type Function
    * @function
    * @static
    * @public
    */
   indexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike;
-    var i, len,  key, val, args, argn, passed;
+    var result = -1, arrayLike, objectLike,
+        i, len, val, args, argn, passed;
     args = arguments;
     argn = args.length;
     arrayLike  = object && Pot.isArrayLike(object);
@@ -2461,7 +2466,7 @@ update(Pot.Iter, {
         }
       } catch (err) {
         len = (object && object.length) || 0;
-        i = Number(from) || 0;
+        i = (+from) || 0;
         i = (i < 0) ? Math.ceil(i) : Math.floor(i);
         if (i < 0) {
           i += len;
@@ -2483,7 +2488,7 @@ update(Pot.Iter, {
     } else if (objectLike) {
       passed = false;
       each(object, function(ov, op) {
-        if (!passed && argn >= 3 && from !== key) {
+        if (!passed && argn >= 3 && from !== op) {
           return;
         } else {
           passed = true;
@@ -2543,15 +2548,15 @@ update(Pot.Iter, {
    * @param  {*}             (from)   (Optional) The index at which to
    *                                    start searching backwards.
    *                                  Defaults to the array's length.
-   * @return {Number}                 Return the index of result, or -1.
+   * @return {Number|String}          Return the index of result, or -1.
    * @type Function
    * @function
    * @static
    * @public
    */
   lastIndexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike;
-    var i, len,  key, val, args, argn, passed, pairs;
+    var result = -1, arrayLike, objectLike,
+        i, len,  key, val, args, argn, passed, pairs;
     args = arguments;
     argn = args.length;
     arrayLike  = object && Pot.isArrayLike(object);
@@ -2570,7 +2575,7 @@ update(Pot.Iter, {
         }
       } catch (err) {
         len = (object && object.length) || 0;
-        i = Number(from);
+        i = (+from);
         if (isNaN(i)) {
           i = len - 1;
         } else {
