@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.signal">
+<title>Pot.Signal.signal</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.signal';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.signal</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Signal.signal"><em>Pot.Signal.</em>signal</dfn>
+    (<em>{Object|Function}</em> object, <em>{String|Array}</em> signalName [, <em>{*}</em>...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      attach* によって登録したシグナルを実行します。
+    </p>
+    <div>
+      <p>
+ 引数 object と signalName に一致するシグナルがすべて実行されます。
+ <br>
+ 実行される関数には第三引数～以降に任意の引数が渡せます。
+ <br>
+ 戻り値は <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> になり、<a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などで次の処理に繋げることができます。
+ <br>
+ これは、シグナルが非同期で実行され Deferred を返した時などでも整合性をとるためです。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.signal() が signal() で実行できます。
+</p>
+<p>
+ Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>var MyObj = {};
+
+// 独自のシグナルを登録
+var handler = Pot.attach(MyObj, 'clear-data', function() {
+    // プロパティの初期化など
+    MyObj.data = null;
+    MyObj.time = null;
+});
+
+Pot.attach(window, 'load', function() {
+    // 初期化するシグナルを送信
+    Pot.signal(MyObj, 'clear-data');
+
+    // リセットボタンを押した時にもクリアするよう設定
+    Pot.attach('#reset', 'click', function() {
+        Pot.signal(MyObj, 'clear-data');
+    });
+
+    // 既存の処理など
+    myLoadProcess();
+    //...
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

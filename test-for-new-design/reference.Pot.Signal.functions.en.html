@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.Pot.Signal.functions">
+<title>Pot.js - Pot.Signal functions</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.Pot.Signal.functions';
+</script>
+</head>
+<body>
+<h1>Pot.js - Pot.Signal functions</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<h2 id="description.reference.Pot.Signal.functions">Pot.Signal functions</h2>
+<p>
+ このセクションではシグナルやイベント処理を扱う Pot.Signal について扱います。
+</p>
+<p>
+ Pot.Signal は、任意のハンドラを登録し
+ シグナルを送信して実行に移すことが可能です。
+ <br>
+ 言い方を変えると、自らイベントを作成し、任意のタイミングで呼び出せるようなものです。
+</p>
+<p>
+ Pot.Signal には大まかに以下の関数があります。
+</p>
+<div>
+ <ul>
+  <li><a href="#reference.function.Pot.Signal.attach">attach</a> : シグナル (イベント) を登録</li>
+  <li><a href="#reference.function.Pot.Signal.detach">detach</a> : シグナル (イベント) を解除</li>
+  <li><a href="#reference.function.Pot.Signal.signal">signal</a> : シグナル (イベント) を実行</li>
+ </ul>
+</div>
+<p>
+ そして、<a href="#reference.function.Pot.Signal.attachBefore">attachBefore()</a> は <a href="#reference.function.Pot.Signal.attach">attach()</a> で登録したシグナルの前に実行されるコールバックを登録します。
+ <br>
+ <a href="#reference.function.Pot.Signal.attachAfter">attachAfter()</a> は、同じく <a href="#reference.function.Pot.Signal.attach">attach()</a> ハンドラの後に実行されるコールバック関数を登録できます。
+</p>
+<p>
+ これらの関数、とくに Before, After を使うことで、
+ アスペクト指向 (AOP) なプログラミングが可能となります。
+</p>
+<p>
+ また、attach 系の関数 (attach*) の後に <strong>.once</strong> を付けると、一度だけ実行されます。
+</p>
+<pre>// 一度クリックしたら解除される
+attach.once('#hoge', 'click', function() {
+   // ...
+});</pre>
+<p>
+ Pot.Signal 自体は コンストラクタではなくオブジェクトです。
+ <br>
+ 各関数は、Pot オブジェクトから参照できるため
+ <a href="#reference.function.Pot.Signal.attach">Pot.attach()</a> のとして呼び出せます。
+ <br>
+ 明示的に Pot.Signal.attach() と呼び出しても同じです。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合は、
+ 各関数、例えば Pot.attach() が 単に attach() とコールできます。
+</p>
+<p>
+ このリファレンスのサンプルコードの多くは、
+ 便宜上 <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されたと仮定して記述しています。
+ <br>
+ 例えば、<a href="#reference.function.Pot.forEach">Pot.forEach</a> として定義されている関数を forEach(...) と表現している場合があります。
+ これは、Pot.globalize() がされていない場合 Pot.forEach(...) として呼び出せます。
+ 他の関数も同様です。
+ <br>
+ Pot.globalize() が適応済みの場合、定義名のままで呼び出せます。
+</p>
+<p>
+ また、サンプルコードでは コンソールに出力するデバッグ用関数 <a href="#reference.function.Pot.debug">Pot.debug()</a> を多用しています。
+ <br>
+ Pot.debug() を、たんに debug() と表している場合もあります。
+ <br>
+ Pot.debug については このセクションで扱っているので詳しくはメニューから参照ください。
+</p>
+<p>
+ このリファレンスは Pot.js, PotLite.js の関数を事細かく解説しているわけではないので、
+ 足りない情報があるかもしれません。
+ <br>
+ より詳しくは
+ ソースコードから自動生成された
+ <a href="jsdoc/index.html" 
+    title="Pot.js - JSDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
+ or
+ <a href="jsdoc/potlite/index.html" 
+    title="PotLite.js - JSDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
+ または直接ソースコードを参照ください。
+</p>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

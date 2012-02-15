@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.attachBefore">
+<title>Pot.Signal.attachBefore</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.attachBefore';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.attachBefore</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object|Array}</em>
+    <dfn id="definition.reference.function.Pot.Signal.attachBefore"><em>Pot.Signal.</em>attachBefore</dfn>
+    (<em>{Object|Function|String}</em> object, <em>{String|Array}</em> signalName, <em>{Function}</em> callback )
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      スロットに存在するハンドラが呼ばれる前に実行されるシグナルを登録します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Signal.attach">attach()</a> で登録したものと同じシグナル signalName で登録した場合、
+ attach() のハンドラが呼ばれる前に実行されるシグナルを登録します。
+ <br>
+ 同じシグナルが存在しない場合 <a href="#reference.function.Pot.Signal.signal">signal()</a> によって実行しても何も起きません。
+ <br>
+ DOM エレメントに対して attach() した場合も同様です。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.attachBefore() が attachBefore() で実行できます。
+</p>
+<p>
+ ユニークな ID を保持する ハンドラオブジェクトが返ります。
+</p>
+<pre>// 保存ボタンを押した時のイベントを設定
+Pot.attach('#saveData', 'click', function() {
+    // 保存する関数
+    mySaveData(document.getElementById('inputText').value);
+    // ユーザーに保存を伝える関数
+    myShowSaveData('Saved!');
+});
+
+// これにフォーカス移動するよう後付けする
+Pot.attachAfter('#saveData', 'click', function() {
+    document.getElementById('inputText').focus();
+});
+
+// その前にログを取るよう設定する
+Pot.attachBefore('#saveData', 'click', function() {
+    MyLogger.log('Save inputText');
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

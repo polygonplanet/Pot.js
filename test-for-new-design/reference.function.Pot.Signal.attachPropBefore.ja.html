@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.attachPropBefore">
+<title>Pot.Signal.attachPropBefore</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.attachPropBefore';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.attachPropBefore</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object|Array}</em>
+    <dfn id="definition.reference.function.Pot.Signal.attachPropBefore"><em>Pot.Signal.</em>attachPropBefore</dfn>
+    (<em>{Object|Function|String}</em> object, <em>{String|Array}</em> propName, <em>{Function}</em> callback)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      object が持つ関数 propName が呼ばれる前に実行されるシグナル callback を登録します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Signal.attachBefore">attachBefore()</a> と違い、<a href="#reference.function.Pot.Signal.attach">attach()</a> の必要はありません。
+ <br>
+ 登録すると、<a href="#reference.function.Pot.Signal.signal">signal()</a> を呼ばなくても
+ object[propName] が呼ばれた時に自動的に実行されます。
+ <br>
+ attachPropBefore は、DOM オブジェクトに対しての動作は保証されません。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.attachPropBefore() が attachPropBefore() で実行できます。
+</p>
+<p>
+ ユニークな ID を保持する ハンドラオブジェクトが返ります。
+</p>
+<pre>// 例えば何らかのアプリケーションを実行する時に、ログをとりたくなった場合
+var MyApp = {
+    execute : function() {
+        // 何らかの処理を開始する
+        myAppDoit();
+    }
+};
+
+Pot.attach('#execute', 'click', function() {
+    // アプリケーションを実行
+    MyApp.execute();
+});
+
+// 実行する前にログを取る
+Pot.attachPropBefore(MyApp, 'execute', function() {
+    MyLogger.log('Begin execute');
+});
+
+// 実行した後のログを取る
+Pot.attachPropAfter(MyApp, 'execute', function() {
+    MyLogger.log('End execute');
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

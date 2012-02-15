@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.detach">
+<title>Pot.Signal.detach</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.detach';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.detach</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Signal.detach"><em>Pot.Signal.</em>detach</dfn>
+    (<em>{Object|Function}</em> object [, <em>{String}</em> signalName [, <em>{Function}</em> callback [, <em>{Boolean}</em> useCapture]]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      attach* によって登録したシグナルを 1 つ解除します。
+    </p>
+    <div>
+      
+<p>
+ <a href="#reference.function.Pot.Signal.attach">attach()</a> によって登録したシグナルを 1 つ解除します。
+ <br>
+ <a href="#reference.function.Pot.Signal.attachBefore">attachBefore()</a>, <a href="#reference.function.Pot.Signal.attachAfter">attachAfter()</a>, <a href="#reference.function.Pot.Signal.attachPropBefore">attachPropBefore()</a>, <a href="#reference.function.Pot.Signal.attachPropAfter">attachPropAfter()</a> で登録したものも同様に解除可能です。
+ <br>
+ 引数に attach() などの返り値のハンドラオブジェクト object を渡した場合、関連するシグナルが 1 つ解除されます。
+ <br>
+ 引数 object, signalName, callback をそれぞれ登録時に使用したものとして渡しても同様に解除できます。
+ <br>
+ 登録と解除の関係は、setTimeout と clearTimeout の関係と同じように扱うことができます。
+ <br>
+ DOM エレメントに対しては、removeEventListener と同様に扱うことができます。
+ <br>
+ 解除に成功すると true を返します。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.detach() が detach() で実行できます。
+</p>
+<p>
+ 解除成功時に true、失敗時に false が返ります。
+</p>
+<pre>// イベントを登録
+var handler = Pot.attach('#foo', 'click', function(ev) {
+    // ...
+});
+
+// イベント解除
+Pot.detach(handler);</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

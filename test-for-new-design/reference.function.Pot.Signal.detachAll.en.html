@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.detachAll">
+<title>Pot.Signal.detachAll</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.detachAll';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.detachAll</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Void}</em>
+    <dfn id="definition.reference.function.Pot.Signal.detachAll"><em>Pot.Signal.</em>detachAll</dfn>
+    ([<em>{Object|Function}</em> object [, <em>{String|Array}</em> signals]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      attach* によって登録したシグナルをすべて解除します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Signal.attach">attach()</a> によって登録したシグナルをすべて解除します。
+ <br>
+ <a href="#reference.function.Pot.Signal.attachBefore">attachBefore()</a>, <a href="#reference.function.Pot.Signal.attachAfter">attachAfter()</a>, <a href="#reference.function.Pot.Signal.attachPropBefore">attachPropBefore()</a>, <a href="#reference.function.Pot.Signal.attachPropAfter">attachPropAfter()</a> で登録したものも同様に解除可能です。
+ <br>
+ 引数に object だけを渡した場合、関連するシグナルがすべて解除されます。
+ <br>
+ 引数 signals を渡すと一致するシグナルがすべて解除できます。
+ <br>
+ 引数を省略すると存在するすべてのシグナルが解除されます。
+ <br>
+ シグナル名となる signals は文字列または配列で複数指定できます。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.detachAll() が detachAll() で実行できます。
+</p>
+<p>
+ 値を返しません。
+</p>
+<pre>// すべてのイベントを解除する例
+var foo = document.getElementById('foo');
+Pot.attach(foo, 'click',     function(ev) { /*...*/ });
+Pot.attach(foo, 'mouseover', function(ev) { /*...*/ });
+Pot.attach(foo, 'mouseout',  function(ev) { /*...*/ });
+
+// foo のイベントをすべて解除
+Pot.detachAll(foo);</pre>
+
+<pre>// 異なるすべてのシグナルを解除する例
+Pot.attach(window,        'load',      function(ev) { /*...*/ });
+Pot.attach(document.body, 'mousemove', function(ev) { /*...*/ });
+Pot.attach('#foo',        'click',     function(ev) { /*...*/ });
+
+// すべて解除
+Pot.detachAll();</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

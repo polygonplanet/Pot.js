@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.attach">
+<title>Pot.Signal.attach</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.attach';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.attach</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object|Array}</em>
+    <dfn id="definition.reference.function.Pot.Signal.attach"><em>Pot.Signal.</em>attach</dfn>
+    (<em>{Object|Function|String}</em> object, <em>{String|Array}</em> signalName, <em>{Function}</em> callback [, <em>{Boolean}</em> useCapture = false])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      スロットにシグナルを登録します。
+    </p>
+    <div>
+      <p>
+ Pot.Signal が保持しているハンドラリストに任意のオブジェクトとコールバック関数を登録します。
+ <br>
+ 引数 object が DOM エレメントだった場合、addEventListener と同じように働きます。
+ <br>
+ 引数 signalName は、登録するシグナルの名前を文字列で渡します。
+ <br>
+ signalName が配列の場合、複数のシグナルを同時に登録します。
+ <br>
+ 戻り値は、<a href="#reference.function.Pot.Signal.detach">detach()</a> などに渡すことができる ハンドラオブジェクトです。
+ <br>
+ signalName が配列で複数登録した場合、戻り値は登録したハンドラオブジェクトの配列になります。
+ <br>
+ attach() と、detach() の関係は、setTimeout() と clearTimeout() の登録/解除の関係のように扱うことができます。
+ <br>
+ 引数 object を文字列で渡すと id と認識され document.getElementById を使用します。
+ <br>
+ <code>'#foo'</code> のように シャープ記号 '#' が付いている場合、最初のシャープ記号は無視されます。
+ <br>
+ object に jQuery オブジェクトを渡すと、get(0) によって最初の要素が対象となります。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.attach() が attach() で実行できます。
+</p>
+<p>
+ ユニークな ID を保持する ハンドラオブジェクトが返ります。
+ <br>
+ signalName が配列で複数登録した場合、登録したハンドラオブジェクトの配列が返ります。
+</p>
+
+<pre>// イベントを登録
+//  この例では明示的に ID を示すため '#' を付けています
+
+var handler = Pot.attach('#foo', 'click', function(ev) {
+    // ...
+});
+
+// イベント解除
+Pot.detach(handler);</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

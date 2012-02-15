@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Signal.cancelEvent">
+<title>Pot.Signal.cancelEvent</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Signal.cancelEvent';
+</script>
+</head>
+<body>
+<h1>Pot.Signal.cancelEvent</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Signal.cancelEvent"><em>Pot.Signal.</em>cancelEvent</dfn>
+    (<em>{Event|Object|*}</em> ev)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数で与えられたイベントをキャンセルします。
+    </p>
+    <div>
+      <p>
+ 引数で与えられた Event オブジェクトを中止します。
+ <br>
+ この関数は、
+</p>
+<pre>ev.preventDefault();
+ev.stopPropagation();</pre>
+<p>
+ とするのと同じ働きをします。
+ <br>
+ また、常に false を返すので
+ <br>
+ jQuery イベント内などで <code>return Pot.cancelEvent(ev);</code> と返すことで false 扱いもできます。
+ <br>
+ コードを短くする用途などに活用できます。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.cancelEvent() が cancelEvent() で実行できます。
+</p>
+<p>
+ 常に false を返します。
+</p>
+<pre>Pot.attach('#foo', 'click', function(ev) {
+    myProcess();
+    // イベントが伝達しないようキャンセル
+    return cancelEvent(ev);
+});</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
