@@ -428,7 +428,7 @@ setTimeout(function() {
 
     $('.header-expand-container').show()
 
-    $.getJSON(MENU_URI).then(function(data) {
+    $.getJSON(MENU_URI + '?' + Pot.now()).then(function(data) {
       var id, subId, index = 0,
           wrap = $('<div/>'),
           subWrap, firstPage, firstHash;
@@ -929,6 +929,10 @@ body > .layout-liquid-container {
 
 .potjs-reference-broad-list li {
   margin-bottom: 1em;
+}
+
+.potjs-cross-reference-content-list li {
+  margin-bottom: 0.5em;
 }
 
 

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Serializer.parseFromQueryString">
+<title>Pot.Serializer.parseFromQueryString</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Serializer.parseFromQueryString';
+</script>
+</head>
+<body>
+<h1>Pot.Serializer.parseFromQueryString</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array|Object}</em>
+    <dfn id="definition.reference.function.Pot.Serializer.parseFromQueryString"><em>Pot.Serializer.</em>parseFromQueryString</dfn>
+    (<em>{String}</em> queryString [, <em>{Boolean}</em> toObject = false])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      クエリ文字列 queryString を配列またはオブジェクトにデコードして返します。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.Serializer.serializeToQueryString">serializeToQueryString</a> で作成できるクエリ文字列 queryString を、
+ <br>
+ 2 つのアイテムを持つ配列からなる配列にして返します。
+ <br>
+ 引数 toObject が 真 (true) として渡されると、
+ <br>
+ キーバリューのペアでなるオブジェクトとして返します。
+ <br>
+ 各値とキーは、<a href="#reference.function.Pot.URI.urlDecode">Pot.urlDecode()</a> によってデコードされます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.parseFromQueryString() が parseFromQueryString() で実行できます。
+</p>
+<p>
+ クエリ文字列からデコードされた配列 (items 形式) が返ります。
+ <br>
+ toObject が true の場合、オブジェクトで返ります。
+</p>
+
+
+<pre>// デフォルトは配列 (items 形式) です
+var query = &#039;foo=1&amp;bar=bar2&amp;baz=&#039;;
+Pot.debug(Pot.parseFromQueryString(query));
+// =&gt; [[&#039;foo&#039;, &#039;1&#039;], [&#039;bar&#039;, &#039;bar2&#039;], [&#039;baz&#039;, &#039;&#039;]]</pre>
+
+
+<pre>// 第二引数 toObject を true で渡した場合はオブジェクトになります。
+var query = &#039;key1=value1&amp;key2=value2&#039;;
+Pot.debug(Pot.parseFromQueryString(query, true));
+// =&gt; {key1: &#039;value1&#039;, key2: &#039;value2&#039;}</pre>
+
+
+<pre>// 次のような for-in などの動作に影響する未知の名前の可能性がある場合は、
+// 配列で扱うと確実です。
+var query = &#039;prototype=value1&amp;__iterator__=value2&#039;;
+Pot.debug(Pot.parseFromQueryString(query));
+// =&gt; [[&#039;prototype&#039;, &#039;value1&#039;], [&#039;__iterator__&#039;, &#039;value2&#039;]]</pre>
+
+
+<pre>// キーなしの場合
+var query = &#039;http%3A%2F%2Fwww.example.com%2F&#039;;
+Pot.debug(Pot.parseFromQueryString(query));
+// =&gt; [[&#039;&#039;, &#039;http://www.example.com/&#039;]]</pre>
+
+
+<pre>var query = &#039;%40A=16%5E2%262&amp;%40B=(2%2B3%3E%3D1)&#039;;
+Pot.debug(Pot.parseFromQueryString(query, true));
+// =&gt; {&#039;@A&#039;: &#039;16^2&amp;2&#039;, &#039;@B&#039;: &#039;(2+3&gt;=1)&#039;}</pre>
+
+
+<pre>var query = &#039;foo=bar&amp;baz[]=qux&amp;baz[]=quux&amp;corge=&#039;;
+Pot.debug(Pot.parseFromQueryString(query, true));
+// =&gt; {foo: &#039;bar&#039;, baz: [&#039;qux&#039;, &#039;quux&#039;], corge: &#039;&#039;}</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

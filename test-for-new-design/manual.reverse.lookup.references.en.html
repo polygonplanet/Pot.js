@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#manual.reverse.lookup.references">
+<title>Pot.js Cross Reference</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#manual.reverse.lookup.references';
+</script>
+</head>
+<body>
+<h1>Pot.js Cross Reference</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<div>
+ <h2 id="manualsub.reverse.lookup.references.references" class="potjs-manual-item-for-in-view">Cross Reference</h2>
+ <div class="potjs-manual-item-for-in-view">
+  <ul class="potjs-cross-reference-content-list">
+    <li><a href="#reference.function.Pot.Deferred.begin"><strong>begin</strong> : コールバック関数 callback を追加した Pot.Deferred インスタンスを作成し、チェインを開始した状態で返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.callLater"><strong>callLater</strong> : seconds 秒後に関数 callback を実行します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.callLazy"><strong>callLazy</strong> : 関数 callback を非同期で実行します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.chain"><strong>chain</strong> : 引数に与えられたチェインと共に新しい Pot.Deferred のインスタンスを作成して返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.deferrize"><strong>deferrize</strong> : 関数を Deferred 化します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred"><strong>Deferred</strong> : コンストラクタ。Pot.Deferred インスタンスを作成します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.failure"><strong>failure</strong> : エラーバックとして開始済みの Pot.Deferred インスタンスを返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.flush"><strong>flush</strong> : 関数を実行し Pot.Deferred インスタンスを返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.isFired"><strong>isFired</strong> : 引数 deferred のチェインが開始されているかどうかの真偽値を返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.lastError"><strong>lastError</strong> : 引数 deferred の保持している最後のエラーを取得または設定します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.lastResult"><strong>lastResult</strong> : 引数 deferred の保持している最後の結果値を取得または設定します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.maybeDeferred"><strong>maybeDeferred</strong> : Deferred かどうか分からない値を確実に Deferred インスタンスにして返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.parallel"><strong>parallel</strong> : 引数 deferredList を並列処理で実行します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.args"><strong>args</strong> : チェインの結果となる値を設定または取得します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.async"><strong>async</strong> : 処理の同期と非同期を切り替え設定します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.begin"><strong>begin</strong> : Deferred チェインを開始します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.cancel"><strong>cancel</strong> : Deferred チェインを中止します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.canceller"><strong>canceller</strong> : Deferred チェインのキャンセル時に実行される関数を登録 または取得します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.data"><strong>data</strong> : 現在のチェイン上で使えるストレージとして値を設定または取得します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.end"><strong>end</strong> : Deferred チェインを終了し、閉じます。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.ensure"><strong>ensure</strong> : 成功時、エラー時どちらでも実行される関数を Deferred チェインに追加します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.raise"><strong>raise</strong> : エラーと共に Deferred チェインを開始します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.rescue"><strong>rescue</strong> : エラー時に実行されるエラーバック関数を Deferred チェインに追加します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.speed"><strong>speed</strong> : 各チェイン間の実行速度を設定または取得します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.then"><strong>then</strong> : Deferred チェインにコールバック関数を追加します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.till"><strong>till</strong> : 条件式 cond が 真 (true) を返すまで待機します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.prototype.wait"><strong>wait</strong> : 秒単位で待機します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.register"><strong>register</strong> : チェインで使用できるユーザー定義のメソッドを登録します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.succeed"><strong>succeed</strong> : コールバックチェイン開始済みの Pot.Deferred インスタンスを返します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.till"><strong>till</strong> : 条件式 cond が 真 (true) を返すまで待機します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.unregister"><strong>unregister</strong> : register で登録したメソッドを解除します。</a></li>
+    <li><a href="#reference.function.Pot.Deferred.wait"><strong>wait</strong> : 秒単位で待機します。</a></li>
+    <li><a href="#reference.function.Pot.Iter"><strong>Iter</strong> : コンストラクタ。Pot.Iter インスタンスを作成します。</a></li>
+    <li><a href="#reference.function.Pot.Net.getJSON"><strong>getJSON</strong> : HTTP リクエストで JSON ファイルを取得し、展開して返します。</a></li>
+    <li><a href="#reference.function.Pot.Net.jsonp"><strong>jsonp</strong> : JSONP による通信でデータを取得します。</a></li>
+    <li><a href="#reference.function.Pot.Net.loadScript"><strong>loadScript</strong> : 非同期でスクリプトを読み込みます。</a></li>
+    <li><a href="#reference.function.Pot.Net.request"><strong>request</strong> : HTTP リクエストを実行します。</a></li>
+    <li><a href="#reference.function.Pot.Serializer.parseFromJSON"><strong>parseFromJSON</strong> : JSON をパースして返します。</a></li>
+    <li><a href="#reference.function.Pot.Serializer.parseFromQueryString"><strong>parseFromQueryString</strong> : クエリ文字列 queryString を配列またはオブジェクトにデコードして返します。</a></li>
+    <li><a href="#reference.function.Pot.Serializer.serializeToJSON"><strong>serializeToJSON</strong> : 引数 value を JSON に変換します。</a></li>
+    <li><a href="#reference.function.Pot.Serializer.serializeToQueryString"><strong>serializeToQueryString</strong> : オブジェクトまたは配列で与えられた引数 params をクエリ文字列にして返します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.attach"><strong>attach</strong> : スロットにシグナルを登録します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.attachAfter"><strong>attachAfter</strong> : スロットに存在するハンドラが呼ばれた後に実行されるシグナルを登録します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.attachBefore"><strong>attachBefore</strong> : スロットに存在するハンドラが呼ばれる前に実行されるシグナルを登録します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.attachPropAfter"><strong>attachPropAfter</strong> : object が持つ関数 propName が呼ばれた後に実行されるシグナル callback を登録します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.attachPropBefore"><strong>attachPropBefore</strong> : object が持つ関数 propName が呼ばれる前に実行されるシグナル callback を登録します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.cancelEvent"><strong>cancelEvent</strong> : 引数で与えられたイベントをキャンセルします。</a></li>
+    <li><a href="#reference.function.Pot.Signal.detach"><strong>detach</strong> : attach* によって登録したシグナルを 1 つ解除します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.detachAll"><strong>detachAll</strong> : attach* によって登録したシグナルをすべて解除します。</a></li>
+    <li><a href="#reference.function.Pot.Signal.signal"><strong>signal</strong> : attach* によって登録したシグナルを実行します。</a></li>
+    <li><a href="#reference.function.Pot.URI.urlDecode"><strong>urlDecode</strong> : 引数 string を URL (Percent) デコードして返します。</a></li>
+    <li><a href="#reference.function.Pot.URI.urlEncode"><strong>urlEncode</strong> : 引数 string を URL (Percent) エンコードして返します。</a></li>
+    <li><a href="#reference.function.Pot.arrayize"><strong>arrayize</strong> : 任意の値 x を配列として返します。</a></li>
+    <li><a href="#reference.function.Pot.currentDocument"><strong>currentDocument</strong> : 現在の document オブジェクトを取得します。</a></li>
+    <li><a href="#reference.function.Pot.currentURI"><strong>currentURI</strong> : 現在の URI もしくはファイル名を取得します。</a></li>
+    <li><a href="#reference.function.Pot.currentWindow"><strong>currentWindow</strong> : 現在の window オブジェクトを取得します。</a></li>
+    <li><a href="#reference.function.Pot.debug"><strong>debug</strong> : コンソールにデバッグ出力します。</a></li>
+    <li><a href="#reference.function.Pot.every"><strong>every</strong> : 引数 object のすべての要素について <br> 関数 callback によって実行した結果が 真 (true) となる場合、true を返します。</a></li>
+    <li><a href="#reference.function.Pot.filter"><strong>filter</strong> : 引数 object の各値に、 与えられた関数 callback を実行し、 <br> その戻り値が真 (true) となるすべての要素からなる 新しいオブジェクト/配列を生成して返します。</a></li>
+    <li><a href="#reference.function.Pot.forEach"><strong>forEach</strong> : 引数 object の各アイテムに対してイテレートします。</a></li>
+    <li><a href="#reference.function.Pot.forEver"><strong>forEver</strong> : StopIteration が throw されるまで永久にループします。</a></li>
+    <li><a href="#reference.function.Pot.getErrorMessage"><strong>getErrorMessage</strong> : error オブジェクトからエラーメッセージを取得します。</a></li>
+    <li><a href="#reference.function.Pot.globalEval"><strong>globalEval</strong> : グローバルスコープで eval します。</a></li>
+    <li><a href="#reference.function.Pot.globalize"><strong>globalize</strong> : Pot.js ライブラリまたは target をグローバル化します。</a></li>
+    <li><a href="#reference.function.Pot.hasReturn"><strong>hasReturn</strong> : 関数 func が return 文を持っているかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.indexOf"><strong>indexOf</strong> : 引数 object の中で、subject が見つけられた最初の添字を返します。 <br> もし存在しなければ -1 を返します。</a></li>
+    <li><a href="#reference.function.Pot.isArray"><strong>isArray</strong> : 引数 x が配列かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isArrayLike"><strong>isArrayLike</strong> : 引数 o が配列のようなオブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isBoolean"><strong>isBoolean</strong> : 引数 x が真偽値かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isBuiltinMethod"><strong>isBuiltinMethod</strong> : 引数 method がビルトイン関数かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isDate"><strong>isDate</strong> : 引数 x が日時 (Date インスタンス) かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isDeferred"><strong>isDeferred</strong> : 引数 x が Pot.Deferred のインスタンスかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isDocument"><strong>isDocument</strong> : 引数 x が DOM Document オブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isElement"><strong>isElement</strong> : 引数 x が DOM Element オブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isError"><strong>isError</strong> : 引数 x がエラー (error オブジェクト) かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isFunction"><strong>isFunction</strong> : 引数 x が関数オブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isInt"><strong>isInt</strong> : 引数 n が整数かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isIter"><strong>isIter</strong> : 引数 x が Pot.Iter のインスタンスかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isIterable"><strong>isIterable</strong> : 引数 x がイテレート可能なオブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isNodeLike"><strong>isNodeLike</strong> : 引数 x が DOM Node のようなオブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isNodeList"><strong>isNodeList</strong> : 引数 x が DOM NodeList かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isNumber"><strong>isNumber</strong> : 引数 x が数値かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isNumeric"><strong>isNumeric</strong> : 引数 n が数えられるかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isObject"><strong>isObject</strong> : 引数 x がオブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isRegExp"><strong>isRegExp</strong> : 引数 x が正規表現オブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isScalar"><strong>isScalar</strong> : 引数 x がスカラー型かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isStopIter"><strong>isStopIter</strong> : 引数 o が StopIteration かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isString"><strong>isString</strong> : 引数 x が文字列かどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.isWindow"><strong>isWindow</strong> : 引数 x が DOM Window オブジェクトかどうかチェックします。</a></li>
+    <li><a href="#reference.function.Pot.items"><strong>items</strong> : 引数 object を 2 つのアイテムからなる配列をもつ配列 (items 形式) に変換して返します。</a></li>
+    <li><a href="#reference.function.Pot.iterate"><strong>iterate</strong> : Pot.Iter インスタンスや yield ジェネレータをイテレートします。</a></li>
+    <li><a href="#reference.function.Pot.lastIndexOf"><strong>lastIndexOf</strong> : 引数 object の要素を逆から検索し、subject が見つけられた最初の添字を返します。 <br> もし存在しなければ -1 を返します。</a></li>
+    <li><a href="#reference.function.Pot.localEval"><strong>localEval</strong> : グローバルスコープに影響させずに eval します。</a></li>
+    <li><a href="#reference.function.Pot.map"><strong>map</strong> : 与えられた関数 callback を object のすべての要素に対して実行し、 <br> その結果からなる新しいオブジェクト/配列を生成して返します。</a></li>
+    <li><a href="#reference.function.Pot.now"><strong>now</strong> : 現在日時に対応する数値を返します。</a></li>
+    <li><a href="#reference.function.Pot.override"><strong>override</strong> : object の関数をオーバーライドします。</a></li>
+    <li><a href="#reference.function.Pot.range"><strong>range</strong> : 引数 begin から end までを step のステップで得られた値を配列で返します。</a></li>
+    <li><a href="#reference.function.Pot.reduce"><strong>reduce</strong> : 引数 object の (左から右へ) 2 つの値に対して <br> 同時に関数 callback を適用し、単一の値にして返します。</a></li>
+    <li><a href="#reference.function.Pot.repeat"><strong>repeat</strong> : 引数 max を最大数とし、max 回、ループ処理を実行します。</a></li>
+    <li><a href="#reference.function.Pot.rescape"><strong>rescape</strong> : 文字列 s を正規表現パターンとみなしエスケープして返します。</a></li>
+    <li><a href="#reference.function.Pot.some"><strong>some</strong> : 引数 object のすべての要素について <br> 関数 callback によって実行した結果が 真 (true) となる要素があるかどうかを調べます。 <br> あれば true を返します。</a></li>
+    <li><a href="#reference.function.Pot.stringify"><strong>stringify</strong> : 任意の値 x を文字列として評価して返します。</a></li>
+    <li><a href="#reference.function.Pot.toIter"><strong>toIter</strong> : 引数 x をイテレート可能な Pot.Iter インスタンスにして返します。</a></li>
+    <li><a href="#reference.function.Pot.trim"><strong>trim</strong> : 文字列 s の両端のホワイトスペースを除去して返します。</a></li>
+    <li><a href="#reference.function.Pot.typeLikeOf"><strong>typeLikeOf</strong> : 引数 o の型を調べ、その表現を文字列で取得します。</a></li>
+    <li><a href="#reference.function.Pot.typeOf"><strong>typeOf</strong> : 引数 o の型を調べ、その表現を文字列で取得します。</a></li>
+    <li><a href="#reference.function.Pot.update"><strong>update</strong> : 引数 subject が持つプロパティをすべて 引数 target オブジェクトにコピーして返します。</a></li>
+    <li><a href="#reference.function.Pot.zip"><strong>zip</strong> : 与えられた配列 object の各アイテム n 番目の要素からなる配列を作成して返します。</a></li>
+    <li><a href="#reference.property.Pot.StopIteration"><strong>StopIteration</strong> : イテレーション/ループを止めるためのオブジェクト。</a></li>
+  </ul>
+ </div>
+</div>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

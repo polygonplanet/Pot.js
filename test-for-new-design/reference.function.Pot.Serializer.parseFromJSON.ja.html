@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Serializer.parseFromJSON">
+<title>Pot.Serializer.parseFromJSON</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Serializer.parseFromJSON';
+</script>
+</head>
+<body>
+<h1>Pot.Serializer.parseFromJSON</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.Serializer.parseFromJSON"><em>Pot.Serializer.</em>parseFromJSON</dfn>
+    (<em>{String}</em> text)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      JSON をパースして返します。
+    </p>
+    <div>
+      <p>
+ 与えられた JSON 文字列 text をパースして返します。
+ <br>
+ 結果的に、JSON.parse() で処理したことと同じです。
+ <br>
+ 不正な文字やコードが入ってる場合はその値 (キー) を無視します。
+ <br>
+ JSON オブジェクトが未定義の環境でも互換性がとれるよう実装されています。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.parseFromJSON() が parseFromJSON() で実行できます。
+</p>
+<p>
+ パースした結果が返ります。
+</p>
+
+<pre>var str = '{&quot;Hello\\u000aWorld!&quot;:[1,{&quot;a&quot;:&quot;{ABC}&quot;}]}';
+Pot.debug( Pot.parseFromJSON(str) );
+// =&gt; {'Hello\nWorld!':[1,{a:'{ABC}'}]}</pre>
+
+<pre>debug(parseFromJSON(&#039;&quot;hoge&quot;&#039;));                      // &#039;hoge&#039;
+debug(parseFromJSON(&#039;null&#039;));                        // null
+debug(parseFromJSON(&#039;true&#039;));                        // true
+debug(parseFromJSON(&#039;false&#039;));                       // false
+debug(parseFromJSON(&#039;&quot;Hello\\u000aWorld!\\u000a&quot;&#039;)); // &#039;Hello\nWorld!\n&#039;
+debug(parseFromJSON(&#039;[1,2,3]&#039;));                     // [1,2,3]
+debug(parseFromJSON(&#039;[1E1,&quot;(///\\&quot;v\\&quot;///)&quot;]&#039;));     // [10,&#039;(///&quot;v&quot;///)&#039;]
+
+debug(parseFromJSON(&#039;{&quot;Hello\\u000aWorld!&quot;:[1,{&quot;a&quot;:&quot;{ABC}&quot;}]}&#039;));
+// =&gt; {&#039;Hello\nWorld!&#039;:[1,{a:&#039;{ABC}&#039;}]}
+
+debug(parseFromJSON(&#039;{&quot;key1&quot;:&quot;12345&quot;,&quot;key2&quot;:null}&#039;));
+// =&gt; {key1:&#039;12345&#039;,key2:null}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

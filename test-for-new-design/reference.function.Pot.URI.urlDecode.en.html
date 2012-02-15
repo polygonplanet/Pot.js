@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.URI.urlDecode">
+<title>Pot.URI.urlDecode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.URI.urlDecode';
+</script>
+</head>
+<body>
+<h1>Pot.URI.urlDecode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.URI.urlDecode"><em>Pot.URI.</em>urlDecode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 string を URL (Percent) デコードして返します。
+    </p>
+    <div>
+      <p>
+ この関数は、ほとんど decodeURIComponent と同じです。
+ <br>
+ decodeURIComponent との違いは、
+ <br>
+ プラス記号 '+' をスペースに変換する処理が追加されていることです。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.urlDecode() が urlDecode() で実行できます。
+</p>
+<p>
+ デコードした文字列が返ります。
+</p>
+
+<pre>var s = 'abc(%2F%2F%2F)%E3%81%B5%E3%81%87%E3%81%87';
+Pot.debug( Pot.urlDecode(s) ); // 'abc(///)ふぇぇ'</pre>
+
+<p>
+ '+' を含むエンコードがされてた場合。
+</p>
+<pre>var s = '%23foo+.bar+%3Abaz';
+
+Pot.debug( decodeURIComponent(s) ); // '#foo+.bar+:baz'
+Pot.debug( Pot.urlDecode(s) );      // '#foo .bar :baz'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

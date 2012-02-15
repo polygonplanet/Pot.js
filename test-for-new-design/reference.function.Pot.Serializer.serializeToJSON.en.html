@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Serializer.serializeToJSON">
+<title>Pot.Serializer.serializeToJSON</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Serializer.serializeToJSON';
+</script>
+</head>
+<body>
+<h1>Pot.Serializer.serializeToJSON</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Serializer.serializeToJSON"><em>Pot.Serializer.</em>serializeToJSON</dfn>
+    (<em>{*}</em> value)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 value を JSON に変換します。
+    </p>
+    <div>
+      <p>
+ 結果的に、JSON.stringify() と同じです。
+ <br>
+ JSON オブジェクトが未定義の環境でも互換となるよう実装されています。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.serializeToJSON() が serializeToJSON() で実行できます。
+</p>
+<p>
+ JSON に変換された文字列が返ります。
+</p>
+
+<pre>var obj = {'Hello\nWorld!': [1, {a: '{ABC}'}]};
+
+Pot.debug( Pot.serializeToJSON(obj) );
+// =&gt; &quot;{\&quot;Hello\\nWorld!\&quot;:[1,{\&quot;a\&quot;:\&quot;{ABC}\&quot;}]}&quot;</pre>
+
+<pre>debug(serializeToJSON(100));                  // &quot;100&quot;
+debug(serializeToJSON(&#039;100&#039;));                // &quot;\&quot;100\&quot;&quot;
+debug(serializeToJSON(&#039;hoge&#039;));               // &quot;\&quot;hoge\&quot;&quot;
+debug(serializeToJSON(null));                 // &quot;null&quot;
+debug(serializeToJSON(true));                 // &quot;true&quot;
+debug(serializeToJSON(false));                // &quot;false&quot;
+debug(serializeToJSON(&#039;Hello\nWorld!\n&#039;));    // &quot;\&quot;Hello\\nWorld!\\n\&quot;&quot;
+debug(serializeToJSON([1, 2, 3]));            // &quot;[1,2,3]&quot;
+debug(serializeToJSON([1E1, &#039;(///&quot;v&quot;///)&#039;])); // &quot;[10,\&quot;(///\\\&quot;v\\\&quot;///)\&quot;]&quot;
+
+debug(serializeToJSON({&#039;Hello\nWorld!&#039;: [1, {a: &#039;{ABC}&#039;}]}));
+// =&gt; &quot;{\&quot;Hello\\nWorld!\&quot;:[1,{\&quot;a\&quot;:\&quot;{ABC}\&quot;}]}&quot;
+
+debug(serializeToJSON({key1: function() {}, key2: new Date()}));
+// e.g. &quot;{\&quot;key2\&quot;:\&quot;2011-08-30T16:32:28Z\&quot;}&quot;</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

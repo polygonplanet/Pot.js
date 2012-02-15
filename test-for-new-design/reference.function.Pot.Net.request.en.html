@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Net.request">
+<title>Pot.Net.request</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Net.request';
+</script>
+</head>
+<body>
+<h1>Pot.Net.request</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Net.request"><em>Pot.Net.</em>request</dfn>
+    (<em>{String}</em> url [, <em>{Object}</em> options])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      HTTP リクエストを実行します。
+    </p>
+    <div>
+<p>
+ XMLHttpRequest によるリクエストを実行します。
+ <br>
+ XMLHttpRequest のない環境 (Node.js など) では
+ http/https request によるリクエストを実行します。
+ <br>
+ 返り値などは同じに扱えます (responseText で取得できるなど)。
+ <br>
+ Greasemonkey (userscript) も、同じオプション指定、返り値で扱えます。
+ <br>
+ 返り値に XMLHttpRequest レスポンスを設定した
+ Pot.Deferred のインスタンスが返ります。
+</p>
+<pre>レスポンス取得の例:
+Pot.request(url).then(function(res) {
+    // 成功時
+    return res.responseText; // or res.responseXML etc.
+}).rescue(function(err) {
+    // 失敗時
+    alert('Error: ' + err);
+});</pre>
+<p>
+ 他のレスポンス結果のプロパティ詳細は、<a href="http://www.w3.org/TR/XMLHttpRequest/#response" title="XMLHttpRequest - W3C">XMLHttpRequest - W3C</a> などを参照ください。
+ <br>
+ 引数 url には、HTTP リクエストを実行する URL を指定します。
+ <br>
+ 引数 options は、任意に以下のオプションを設定できます。
+</p>
+<p>
+ options で使用できるキー(すべて任意):
+</p>
+<div style="margin: 1.5em">
+ <dl>
+  <dt><em>{String}</em> <dfn>method</dfn> = 'GET'</dt>
+  <dd>
+   HTTP メソッド。
+   <br>
+   デフォルトは 'GET' です。
+   <br>
+   例: <code>'GET'</code>, <code>'POST'</code>, <code>'HEAD'</code> etc.
+  </dd>
+  <dt><em>{Object|String|*}</em> <dfn>sendContent</dfn> = null</dt>
+  <dd>
+   POST 時に送るデータ。
+   <br>
+   値は、<a href="#reference.function.Pot.Serializer.serializeToQueryString">Pot.serializeToQueryString()</a> よって変換されます。
+   <br>
+   queryString と同じ指定の仕方ができます。
+   <br>
+   sendContent が指定され、queryString と method が指定されてない場合、'POST' に切り替わります。
+   <br>
+   例: <code>{data: 'hoge', data2: 'fuga'}</code>
+  </dd>
+  <dt><em>{Object}</em> <dfn>queryString</dfn> = null</dt>
+  <dd>
+   GET 時に送るデータ。
+   <br>
+   値は、<a href="#reference.function.Pot.Serializer.serializeToQueryString">Pot.serializeToQueryString()</a> よって変換されます。
+   <br>
+   sendContent と同じ指定の仕方ができます。
+   <br>
+   例: <code>{q: 'JavaScript', hl: 'ja'}</code>
+  </dd>
+  <dt><em>{String}</em> <dfn>username</dfn> = null</dt>
+  <dd>
+   Basic 認証時に使用するユーザー名。
+   <br>
+   使用する場合、合わせて password も指定します。
+   <br>
+   例: <code>'hoge'</code>
+  </dd>
+  <dt><em>{String}</em> <dfn>password</dfn> = null</dt>
+  <dd>
+   Basic 認証時に使用するパスワード。
+   <br>
+   指定する場合、合わせて username も指定します。
+   <br>
+   例: <code>'hogepass'</code>
+  </dd>
+  <dt><em>{Object}</em> <dfn>headers</dfn> = null</dt>
+  <dd>
+   送信するヘッダー。
+   <br>
+   例: <code>{'Content-Type': 'text/javascript'}</code>
+  </dd>
+  <dt><em>{String}</em> <dfn>mimeType</dfn> = null</dt>
+  <dd>
+   MIMEType を指定する場合。
+   <br>
+   例: <code>'text/javascript'</code>
+  </dd>
+  <dt><em>{Boolean}</em> <dfn>cache</dfn> = true</dt>
+  <dd>
+   キャッシュを有効にするか、無効にするかの真偽値。
+   <br>
+   false にするとキャッシュしないでレスポンスを取得します。
+   <br>
+   デフォルトは true で、キャッシュします。
+  </dd>
+  <dt><em>{Boolean}</em> <dfn>binary</dfn> = false</dt>
+  <dd>
+   結果をバイナリで取得する場合は true に設定します。
+   <br>
+   binary を true にすると、MIMEType が 'text/plain; charset=x-user-defined' になり、
+   <br>
+   レスポンスのオブジェクトは以下のように変化し、追加されます。
+   <pre>responseBytes : <em class="var-type">{Array}</em>  結果のバイト列の配列。
+responseText  : <em class="var-type">{String}</em> 結果のバイナリ文字列 (responseBytes を文字列にしたもの)。
+originalText  : <em class="var-type">{String}</em> オリジナルの responseText。</pre>
+  </dd>
+  <dt><em>{Boolean}</em> <dfn>cookie</dfn> = false</dt>
+  <dd>
+   cookie を送信する場合 true に設定します。
+   <br>
+   false にしても、cookie の送信を抑制するわけではありません。
+   <br>
+   cookie が送信されない環境や設定で、有効にするためのオプションです。
+  </dd>
+  <dt><em>{String}</em> <dfn>crossDomain</dfn> = false</dt>
+  <dd>
+   クロスドメイン通信を明示したい時に true に設定します。
+   <br>
+   true にしてもクロスドメイン通信が可能になるわけではありません。
+   <br>
+   多くの環境では、クロスドメイン通信は
+   <br>
+   サーバ側で 'Access-Control-Allow-Origin' ヘッダなどの設定が必要です。
+  </dd>
+ </dl>
+</div>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.request() が request() で実行できます。
+</p>
+<p>
+ レスポンス結果を持った Pot.Deferred インスタンスが返ります。
+</p>
+
+
+<pre>Pot.request('./data.php', {
+    method : 'POST',
+    sendContent : {
+        query  : 'Book OR Media', // 文字列は Pot.urlEncode() でエンコードされる
+        start  : 0,
+        length : 15,
+        format : 'json'
+    },
+    mimeType : 'application/json',
+    headers  : {
+        'User-Agent'   : 'Pot.js',
+        'Content-Type' : 'application/json'
+    }
+}).then(function(res) {
+
+    // 成功時
+    Pot.debug(res.responseText);
+
+}, function(err) {
+
+    // 失敗時
+    Pot.debug('Error! ' + err);
+
+});</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

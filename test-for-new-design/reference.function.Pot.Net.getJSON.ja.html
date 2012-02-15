@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Net.getJSON">
+<title>Pot.Net.getJSON</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Net.getJSON';
+</script>
+</head>
+<body>
+<h1>Pot.Net.getJSON</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Net.getJSON"><em>Pot.Net.</em>getJSON</dfn>
+    (<em>{String}</em> url [, <em>{Object}</em> options])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      HTTP リクエストで JSON ファイルを取得し、展開して返します。
+    </p>
+    <div>
+      <p>
+ リクエスト先を JSON ファイルとみなし <a href="#reference.function.Pot.Net.request">Pot.request()</a> を実行します。
+ <br>
+ 引数 url には対象の URL を渡します。
+ <br>
+ 引数 options は、任意にリクエストの設定が可能です。
+ <br>
+ 返り値や引数は Pot.request() と同じです。(内部で Pot.request を使用しています)
+ <br>
+ 引数 options や返り値の詳細は <a href="#reference.function.Pot.Net.request">Pot.request()</a> を参照ください。
+ <br>
+ 違う点は、レスポンス結果を JSON として展開して返すことです。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.getJSON() が getJSON() で実行できます。
+</p>
+<p>
+ レスポンス結果を持った Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>// JSON 取得の例
+var url = 'http://www.example.com/hoge.json';
+Pot.getJSON(url).then(function(data) {
+    // data はすでに展開されている
+    Pot.debug(data.results[0].text);
+}).rescue(function(err) {
+    Pot.debug('Error! ' + err);
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

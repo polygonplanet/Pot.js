@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Net.jsonp">
+<title>Pot.Net.jsonp</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Net.jsonp';
+</script>
+</head>
+<body>
+<h1>Pot.Net.jsonp</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.Net.jsonp"><em>Pot.Net.</em>jsonp</dfn>
+    (<em>{String}</em> url [, <em>{Object}</em> options])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      JSONP による通信でデータを取得します。
+    </p>
+    <div>
+      <p>
+ JSONP により、データを取得します。
+ <br>
+ この関数は、Node.js などのサーバでの実行は考慮されていません。
+ <br>
+ 返り値に JSONP の引数を持った Pot.Deferred のインスタンスが返ります。
+</p>
+<p>
+ 引数 url には、対象の URL を指定します。
+ <br>
+ url には、<code>callback=?</code> 形式のパラメータが指定できます。
+</p>
+<pre>var url = 'http://www.example.com/jsonp?callback=?';</pre>
+<p>
+ 上の例のように指定すると、一時的に 実行する関数と共にユニークな関数名を生成し実行します。
+ <br>
+ この方法がもっとも簡単です。
+ <br>
+ 引数 options は、任意に以下のオプションを設定できます。
+</p>
+<p>
+ options で使用できるキー(すべて任意):
+</p>
+<div style="margin: 1.5em">
+ <dl>
+  <dt><em>{Object}</em> <dfn>queryString</dfn> = null</dt>
+  <dd>
+   付加するパラメータ。
+   <br>
+   値は、<a href="#reference.function.Pot.Serializer.serializeToQueryString">Pot.serializeToQueryString()</a> よって変換されます。
+   <br>
+   例: <code>{name: 'hoge', id: 'fuga'}</code>
+  </dd>
+  <dt><em>{Boolean}</em> <dfn>cache</dfn> = false</dt>
+  <dd>
+   キャッシュを有効にするか、無効にするかの真偽値。
+   <br>
+   true にするとレスポンスをキャッシュします。キャッシュがあればそこから取得します。
+   <br>
+   デフォルトは false で、キャッシュしません。
+  </dd>
+  <dt><em>{Function|String}</em> <dfn>callback</dfn> = null</dt>
+  <dd>
+   結果を実行する関数、もしくは文字列で関数名を指定できます。
+   <br>
+   指定する場合、グローバルスコープから可視な関数もしくは関数名にする必要があります。
+   <br>
+   何も指定されなかった場合、一時的にユニークな関数名および関数を生成し、実行します。
+  </dd>
+  <dt><em>{String}</em> <dfn>charset</dfn> = null</dt>
+  <dd>
+   &lt;script/&gt; 要素の charset が指定できます。
+   <br>
+   省略すると要素に charset を設定しません。
+  </dd>
+  <dt><em>{String}</em> <dfn>type</dfn> = null</dt>
+  <dd>
+   &lt;script/&gt; 要素の type が指定できます。
+   <br>
+   省略すると、要素に type を指定しません。
+  </dd>
+ </dl>
+</div>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.jsonp() が jsonp() で実行できます。
+</p>
+<p>
+ Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>// jQuery.getJSON と同じ URL コールバックの指定が可能
+var url = 'http://www.example.com/test/jsonp?callback=?';
+
+Pot.jsonp(url, {
+    queryString : {
+        q : 'JavaScript OR ECMAScript' // 文字列は Pot.urlEncode() によりエンコードされる
+    }
+}).then(function(data) {
+
+    // 成功時
+    Pot.debug(data.results[0].text);
+
+}).rescue(function(err) {
+
+    // エラー時
+    Pot.debug('Error! ' + err);
+
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>

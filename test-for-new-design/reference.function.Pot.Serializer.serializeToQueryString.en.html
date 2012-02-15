@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=./#reference.function.Pot.Serializer.serializeToQueryString">
+<title>Pot.Serializer.serializeToQueryString</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Serializer.serializeToQueryString';
+</script>
+</head>
+<body>
+<h1>Pot.Serializer.serializeToQueryString</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Serializer.serializeToQueryString"><em>Pot.Serializer.</em>serializeToQueryString</dfn>
+    (<em>{Object|Array|String|*}</em> params)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      オブジェクトまたは配列で与えられた引数 params をクエリ文字列にして返します。
+    </p>
+    <div>
+      <p>
+ HTTP などで使用される queryString を作成します。
+ <br>
+ 引数 params に文字列が与えられた場合は、単にそのまま返されます。
+ <br>
+ 各値とキーは、<a href="#reference.function.Pot.URI.urlEncode">Pot.urlEncode()</a> によってエンコードされます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.serializeToQueryString() が serializeToQueryString() で実行できます。
+</p>
+<p>
+ 変換したクエリ文字列が返ります。
+</p>
+
+<pre>var query = {foo: 1, bar: &#039;bar2&#039;, baz: null};
+Pot.debug(Pot.serializeToQueryString(query));
+// =&gt; &#039;foo=1&amp;bar=bar2&amp;baz=&#039;</pre>
+
+<pre>// オブジェクトのキー名として使用できないものを扱う場合は配列 (items 形式) が便利です。
+
+var query = [[&#039;prototype&#039;, &#039;value1&#039;], [&#039;__iterator__&#039;, &#039;value2&#039;]];
+
+Pot.debug(Pot.serializeToQueryString(query));
+// =&gt; &#039;prototype=value1&amp;__iterator__=value2&#039;</pre>
+
+
+<pre>var query = {&#039;&#039;: &#039;http://www.example.com/&#039;};
+Pot.debug(Pot.serializeToQueryString(query));
+// =&gt; &#039;http%3A%2F%2Fwww.example.com%2F&#039;</pre>
+
+
+<pre>var query = &#039;a=value1&amp;b=value2&#039;;
+Pot.debug(Pot.serializeToQueryString(query));
+// =&gt; &#039;a=value1&amp;b=value2&#039;</pre>
+
+
+<pre>var query = {foo: &#039;bar&#039;, baz: [&#039;qux&#039;, &#039;quux&#039;], corge: &#039;&#039;};
+Pot.debug(Pot.serializeToQueryString(query));
+// =&gt; &#039;foo=bar&amp;baz[]=qux&amp;baz[]=quux&amp;corge=&#039;</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+</body>
+</html>
