@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.deferrizejQueryAjax</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.deferrizejQueryAjax';
+</script>
+</head>
+<body>
+<h1>Pot.deferrizejQueryAjax</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Void}</em>
+    <dfn id="definition.reference.function.Pot.deferrizejQueryAjax"><em>Pot.</em>deferrizejQueryAjax</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      jQuery の Ajax 系関数を Pot.Deferred 化し、プラグインを追加します。
+    </p>
+    <div>
+      <p>
+ Pot.deferrizejQueryAjax() を実行することで jQuery プラグインとして利用できます。
+ <br>
+ jQuery が利用可能な場合、 jQuery.ajax 系の関数の戻り値が <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> になるよう変換します。
+ <br>
+ jQuery.ajax(), jQuery.get(), jQuery.post(), jQuery.getJSON() などの関数に影響します。
+ <br>
+ また、プラグインとして deferred というメソッドを追加します。
+ <br>
+ jQuery.fn.deferred() は、任意の jQuery メソッドを Deferred 化し、Pot.Deferred インスタンスが返るようにします。
+</p>
+<div style="margin: 1.5em;">
+ <dl>
+  <dt><em>{Pot.Deferred}</em> <dfn>jQuery.fn.deferred</dfn> (<em>{String|*}</em> method [, <em>{*}</em> ...args])</dt>
+  <dd>
+   jQuery のメソッド (jQuery.fn.xxx) を、Deferred 化し、実行します。
+   <br>
+   引数 method は、実行するメソッド名を指定します。
+   <br>
+   任意に、第二引数～以降にメソッドに渡す引数を指定できます。
+   <br>
+   返り値は <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> になります。
+   <br>
+   返り値の インスタンスは、コールバック関数が完了すると開始されます。
+   <br>
+   エフェクトなどの非同期処理に対して実行すると、より効果的です。
+   <br>
+   deferred プラグインは、内部で <a href="#reference.function.Pot.Deferred.deferrize">Pot.Deferred.deferrize()</a> を使用しています。
+   <pre>jQuery('div#hoge').deferred('hide', 'slow').then(function() {
+    // .hide() が完了した後に実行される
+    jQuery('div#message').text('div#hoge closed');
+});</pre>
+  </dd>
+ </dl>
+</div>
+<p>
+ Pot.deferrizejQueryAjax() は現状、ライブラリ側で実行しません。
+ <br>
+ なので、プラグインを使用する場合は コードの最初などで実行する必要があります。 
+</p>
+<p>
+ 返り値はありません。
+</p>
+<pre>// jQuery を読み込んだ後に実行
+Pot.deferrizejQueryAjax();
+
+// Ajax 系の関数が Pot.Deferred を返すようになる
+$.getJSON('/hoge.json').then(function(data) {
+    alert(data.results[0].text);
+}).rescue(function(err) {
+    alert('Error! ' + err);
+}).ensure(function() {
+    return someNextProcess();
+});
+
+// エフェクトなどを Deferred 化する 'deferred' が追加される
+$('div#hoge').deferred('hide', 'slow').then(function() {
+    // ...( hide() が終了したあとの処理)
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
