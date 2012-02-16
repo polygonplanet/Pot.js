@@ -123,8 +123,7 @@ Copyright &copy; 2012 polygon planet
 Documentation And Reference
 ========
 
-  * **[Pot.js + PotLite.js - Document and Reference - (Test for new design)][Documentation_TEST]**  
-  * **[Pot.js/PotLite.js - Document and Reference (Japanese)][Documentation_JA]**  
+  * **[Pot.js + PotLite.js - Document and Reference][Reference]**  
   * JSDoc Document
       * [Pot.js - JsDoc Reference - Index][Pot_JSDoc]
       * [PotLite.js - JsDoc Reference - Index][PotLite_JSDoc]
@@ -252,9 +251,7 @@ Refer document if you want to need more example and usage.
 
 [PotLite_JSDoc]: http://polygonplanet.github.com/Pot.js/jsdoc/potlite/index.html "PotLite.js - JsDoc Reference - Index"
 
-[Documentation_TEST]: http://polygonplanet.github.com/Pot.js/test-for-new-design/index.html "Pot.js + PotLite.js - Document and Reference - (Test for new design)"
-
-[Documentation_JA]: http://polygonplanet.github.com/Pot.js/index.html "Pot.js + PotLite.js - Document and Reference (Japanese)"
+[Reference]: http://polygonplanet.github.com/Pot.js/ "Pot.js + PotLite.js - Document and Reference"
 
 [Pot.js_TestRun]: http://polygonplanet.github.com/Pot.js/pot.test.html "Pot.js - Test Run - JavaScript Utility Library"
 
