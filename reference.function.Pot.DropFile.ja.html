@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.DropFile</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.DropFile';
+</script>
+</head>
+<body>
+<h1>Pot.DropFile</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.DropFile}</em>
+    <em>new</em>
+    <dfn id="definition.reference.function.Pot.DropFile"><em>Pot.</em>DropFile</dfn>
+    (<em>{Element|String|jQuery|*}</em> target [, <em>{Object}</em> options])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      コンストラクタ。ブラウザにファイルがドラッグ＆ドロップされた時の動作を設定します。
+    </p>
+    <div>
+      <p>
+ 引数 target には、対象の DOM 要素、もしくは id を文字列で指定します。
+ <br>
+ target に jQuery オブジェクトが渡されると、 get(0) によって最初の要素が対象になります。
+ <br>
+ 引数 options には、ドロップされた時や ファイルが読み込めた時などのイベントを設定します。
+ <br>
+ options はオブジェクトで指定し、以下のキーが有効です。
+</p>
+<div style="margin: 1.5em;">
+ <dl>
+  <dt><em>{Function}</em> <dfn>onShow</dfn></dt>
+  <dd>
+   ドロップ可能であることをユーザーに示すべき時に呼ばれます。
+   <br>
+   例えば、ユーザーがデスクトップからファイルをドラッグし、ブラウザ内に入った時などです。
+   <pre>onShow : function() {
+    this : Pot.DropFile インスタンス自身。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onHide</dfn></dt>
+  <dd>
+   ドロップ不可なことをユーザーに示すべき時に呼ばれます。
+   <br>
+   例えば、ユーザーがファイルをドラッグしたまま、マウスがブラウザ外に出た時などです。
+   <pre>onHide : function() {
+    this : Pot.DropFile インスタンス自身。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onDrop</dfn></dt>
+  <dd>
+   ファイルがドロップされた時に呼ばれます。
+   <pre>onDrop : function(files) {
+    this  : Pot.DropFile インスタンス自身。
+    files : <em class="var-type">{Array|*}</em> : ドロップされたファイルの配列 (event.dataTransfer.files)。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onLoadImage</dfn></dt>
+  <dd>
+   画像ファイルがドロップされ、読み込みが完了した時に呼ばれます。
+   <pre>onLoadImage : function(data, name, size, type) {
+    this   : Pot.DropFile インスタンス自身。
+    result : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
+    name   : <em class="var-type">{String}</em> : ファイル名。
+    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onLoadText</dfn></dt>
+  <dd>
+   テキストファイルがドロップされ、読み込み完了した時に呼ばれます。
+   <pre>onLoadText : function(data, name, size, type) {
+    this   : Pot.DropFile インスタンス自身。
+    result : <em class="var-type">{String}</em> : ファイルのデータ。
+    name   : <em class="var-type">{String}</em> : ファイル名。
+    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onLoadUnknown</dfn></dt>
+  <dd>
+   不明なファイル (画像、テキスト以外のファイル) がドロップされ、読み込み完了した時に呼ばれます。
+   <pre>onLoadUnknown : function(data, name, size, type) {
+    this   : Pot.DropFile インスタンス自身。
+    result : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
+    name   : <em class="var-type">{String}</em> : ファイル名。
+    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onLoadEnd</dfn></dt>
+  <dd>
+   ファイルがドロップされ、すべての読み込みが完了した時に呼ばれます。
+   <br>
+   例えば、upload() が実行可能になった時などです。
+   <pre>onLoadEnd : function(files) {
+    this  : Pot.DropFile インスタンス自身。
+    files : <em class="var-type">{Array}</em> : 読み込んだファイルデータの配列。
+}</pre>
+  </dd>
+  <dt><em>{String}</em> <dfn>encoding</dfn> = 'UTF-8'</dt>
+  <dd>
+   テキストファイルを読み込むときの文字コードが指定できます。
+   <br>
+   デフォルトは、'UTF-8' です。
+  </dd>
+ </dl>
+</div>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、new Pot.DropFile() が new DropFile() で実行できます。
+</p>
+<p>
+ Pot.DropFile インスタンスが返ります。
+</p>
+
+<pre>// この例では DOM 要素の操作に jQuery を使用しています
+// この例の実行後にブラウザにファイルをドロップすることができます
+
+// ドロップ用のパネルを生成
+var panel = $('&lt;div/&gt;')
+    .css({
+        position   : 'fixed',
+        left       : '10%',
+        top        : '10%',
+        width      : '80%',
+        height     : '80%',
+        minHeight  : 200,
+        background : '#ccc',
+        border     : '2px solid #999',
+        zIndex     : 9999999
+    })
+    .hide()
+    .text('Drop here')
+    .appendTo('body');
+
+// 設定と共に Pot.DropFile インスタンスを生成
+var dropFile = new Pot.DropFile(panel, {
+
+    // ドロップ可能な時 (パネルを表示)
+    onShow : function() { panel.show() },
+
+    // ドロップ不可の時 (パネルを非表示)
+    onHide : function() { panel.hide() },
+
+    // ファイルがドロップされた時
+    onDrop : function(files) {
+        panel.text('dropped');
+    },
+
+    // 画像がドロップされた時
+    onLoadImage : function(data, name, size, type) {
+        $('&lt;img/&gt;').attr('src', data).appendTo('body');
+    },
+
+    // テキストがドロップされた時
+    onLoadText : function(data, name, size, type) {
+        $('&lt;textarea/&gt;').val(data).appendTo('body');
+    },
+
+    // それ以外のファイルがドロップされた時
+    onLoadUnknown : function(data, name, size) {
+        $('&lt;textarea/&gt;').val(data).appendTo('body');
+    },
+
+    // ファイルがドロップされてロード完了した時
+    onLoadEnd : function(files) {
+        // このタイミングでアップロードが可能
+        this.upload(
+            'http://www.example.com/uplaod',
+            'dropfiles'
+        ).then(function() {
+            alert('アップロード完了');
+        });
+    }
+});
+
+// ドロップイベントをクリアする場合
+$('#clear-drop-events').click(function() {
+    dropFile.clearDropEvents();
+});</pre>
+
+<p>
+ 動作については、サンプルを含む記事があるので参照ください。
+</p>
+<div>
+ <ul>
+  <li>
+    <a href="http://polygon-planet.blogspot.com/2012/01/html5-file-api-potjspotlitejs.html" title="HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子精神音楽浮遊構造体">HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子精神音楽浮遊構造体</a>
+  </li>
+ </ul>
+</div>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

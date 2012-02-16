@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.DropFile.prototype.upload</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.DropFile.prototype.upload';
+</script>
+</head>
+<body>
+<h1>Pot.DropFile.prototype.upload</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.DropFile.prototype.upload"><em>Pot.DropFile.prototype.</em>upload</dfn>
+    (<em>{String}</em> url [, <em>{String|Object}</em> options])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      ドロップされたファイルをアップロードします。
+    </p>
+    <div>
+      <p>
+ <a href="#reference.function.Pot.DropFile">Pot.DropFile</a> により、ドロップされたファイルを 引数 url の URL にアップロードします。
+ <br>
+ アップロードは、<a href="#reference.function.Pot.Net.request">Pot.request()</a> により実行されます。
+ <br>
+ 引数 url には、アップロードする URL を指定します。
+ <br>
+ 引数 options が文字列で渡されると、それをキー名としてアップロードします。
+ <br>
+ options がオブジェクトで渡された場合、以下のキーが設定できます。
+</p>
+<div style="margin: 1.5em;">
+ <dl>
+  <dt><em>{String}</em> <dfn>key</dfn> = 'file'</dt>
+  <dd>
+   アップロードするキー名。
+   <br>
+   省略すると、'file' になります。
+  </dd>
+ </dl>
+</div>
+<p>
+ これ以外の有効なキーは、<a href="#reference.function.Pot.Net.request">Pot.request()</a> を参照ください。
+</p>
+
+<p>
+ アップロード完了後に開始される Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>// この例では DOM 要素の操作に jQuery を使用しています
+// この例の実行後にブラウザにファイルをドロップすることができます
+
+// ドロップ用のパネルを生成
+var panel = $('&lt;div/&gt;')
+    .css({
+        position   : 'fixed',
+        left       : '10%',
+        top        : '10%',
+        width      : '80%',
+        height     : '80%',
+        minHeight  : 200,
+        background : '#ccc',
+        border     : '2px solid #999',
+        zIndex     : 9999999
+    })
+    .hide()
+    .text('Drop here')
+    .appendTo('body');
+
+// 設定と共に Pot.DropFile インスタンスを生成
+var dropFile = new Pot.DropFile(panel, {
+
+    // ドロップ可能な時 (パネルを表示)
+    onShow : function() { panel.show() },
+
+    // ドロップ不可の時 (パネルを非表示)
+    onHide : function() { panel.hide() },
+
+    // ファイルがドロップされた時
+    onDrop : function(files) {
+        panel.text('dropped');
+    },
+
+    // 画像がドロップされた時
+    onLoadImage : function(data, name, size, type) {
+        $('&lt;img/&gt;').attr('src', data).appendTo('body');
+    },
+
+    // テキストがドロップされた時
+    onLoadText : function(data, name, size, type) {
+        $('&lt;textarea/&gt;').val(data).appendTo('body');
+    },
+
+    // それ以外のファイルがドロップされた時
+    onLoadUnknown : function(data, name, size) {
+        $('&lt;textarea/&gt;').val(data).appendTo('body');
+    },
+
+    // ファイルがドロップされてロード完了した時
+    onLoadEnd : function(files) {
+        // このタイミングでアップロードが可能
+        this.<strong>upload</strong>(
+            'http://www.example.com/uplaod', {
+                key         : 'dropfiles',
+                sendContent : {
+                    id : 'hoge'
+                }
+            }
+        ).then(function() {
+            alert('アップロード完了');
+        }).rescue(function(err) {
+            alert('エラー: ' + err);
+        });
+    }
+});
+
+// ドロップイベントをクリアする場合
+$('#clear-drop-events').click(function() {
+    dropFile.clearDropEvents();
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

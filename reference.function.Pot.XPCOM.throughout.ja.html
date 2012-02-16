@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.XPCOM.throughout</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.XPCOM.throughout';
+</script>
+</head>
+<body>
+<h1>Pot.XPCOM.throughout</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Void}</em>
+    <dfn id="definition.reference.function.Pot.XPCOM.throughout"><em>Pot.XPCOM.</em>throughout</dfn>
+    (<em>{Function|*}</em> cond)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 cond の戻り値が 真 (true) になるまで待機します。
+    </p>
+    <div>
+      <p>
+ 引数 cond が 真 (true) を返すまでスレッドを待機させます。
+ <br>
+ 処理は、同期で行われるため sleep のように待機することができます。
+ <br>
+ スレッドの詳細は、<a href="https://developer.mozilla.org/ja/XPCOM_Interface_Reference/nsIThread" title="nsIThread - MDN">nsIThread - MDN</a> を参照ください。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.throughout() が throughout() で実行できます。
+</p>
+<p>
+ 返り値はありません。
+</p>
+<pre>// XPCOM が有効な環境での例
+
+function sleep(seconds) {
+    var time = Pot.now(), msec = seconds * 1000;
+    Pot.throughout(function() {
+        return Pot.now() - time >= msec;
+    });
+}
+
+var x = 1;
+Pot.debug(x); // 1
+
+// 5 秒 待機する
+sleep(5);
+
+// 5 秒後に以下のコードが実行される
+x += 1;
+
+Pot.debug(x); // 2</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

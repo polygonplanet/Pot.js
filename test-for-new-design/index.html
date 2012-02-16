@@ -2,6 +2,7 @@
 <html dir="ltr">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="refresh" content="0; URL=../">
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="max-age=0">
 <meta http-equiv="cache-control" content="no-cache">
@@ -12,6 +13,7 @@
 <meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
 <meta name="description" lang="ja" content="Pot.js/PotLite.jsはCPUに負荷をかけることなくJavaScriptの実行を可能とするユーティリティライブラリ.">
 <meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
+<script type="text/javascript">location.href = '../';</script>
 <link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
 <link rel="Pot.js Develop Blog - CPU Benchmark with jQuery" href="http://polygon-planet.blogspot.com/2011/11/javascript.html">
 <link rel="Pot.js Develop Blog - Deferred" href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html">
@@ -34,7 +36,7 @@ setTimeout(function() {
   var MENU_URI = 'menu.json';
 
   var done, lang, tree, changed, isMouseInMenu,
-      currentPage, currentId, initHash, initPage, scrolling;
+      currentPage, currentId, initHash, initPage, scrolling, loading;
 
   var scrollToHash = function(page, hash) {
     var d = new Pot.Deferred();
@@ -87,7 +89,14 @@ setTimeout(function() {
   }());
 
   var loadPage = function(page, hash, isClick) {
-    var target = $('.content-wrapper');
+    var target;
+
+    if (loading) {
+      return;
+    }
+
+    loading = true;
+    target = $('.content-wrapper');
 
     if (currentPage == page) {
 
@@ -95,11 +104,13 @@ setTimeout(function() {
       // https://news.ycombinator.com/item?id=3566141
       if (!isClick) {
         currentId = hash;
+        loading = false;
         return;
       }
 
       scrollToHash(page, hash);
       currentId = hash;
+      loading = false;
     } else {
       target.empty().addClass(LOADING);
 
@@ -125,6 +136,7 @@ setTimeout(function() {
 
         }).ensure(function(err) {
           target.removeClass(LOADING);
+          loading = false;
 
           scrollToHash(page, hash).ensure(function() {
             currentPage = page;
@@ -148,6 +160,11 @@ setTimeout(function() {
 
         });
 
+      }).ensure(function(err) {
+        loading = false;
+        if (Pot.isError(err)) {
+          throw err;
+        }
       });
 
     }
@@ -1482,6 +1499,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
           <div class="header-desc-container">
             <div class="header-desc-ja">
              Pot.js は CPU に負荷をかけることなく JavaScript の実行を可能とするユーティリティライブラリです。
+             <!--
              <div class="error">
                このリファレンスはまだ作成途中です。
                空白ページはミカンです。
@@ -1490,14 +1508,17 @@ table.gcsc-branding *, table.gcsc-branding td * {
                   title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理+ユーティリティライブラリ">現行のリファレンス</a>
                から参照ください。
              </div>
+             -->
             </div>
             <div class="header-desc-en">
              Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.
              <div class="error">
                This reference translation is still going on...
+               <!--
                Refer 
                <a href="http://polygonplanet.github.com/Pot.js/index.html" 
                   title="Pot.js + PotLite.js - Document and Reference - JavaScript Async+Utility Library">Current Reference(Japanese)</a>.
+               -->
              </div>
             </div>
           </div>
@@ -1546,10 +1567,14 @@ table.gcsc-branding *, table.gcsc-branding td * {
       <a href="manual.reverse.lookup.references.ja.html" lang="ja">manual.reverse.lookup.references.ja.html</a>
       <a href="reference.Pot.Core.functionsAndProperties.en.html" lang="en">reference.Pot.Core.functionsAndProperties.en.html</a>
       <a href="reference.Pot.Core.functionsAndProperties.ja.html" lang="ja">reference.Pot.Core.functionsAndProperties.ja.html</a>
+      <a href="reference.Pot.Crypt.functions.en.html" lang="en">reference.Pot.Crypt.functions.en.html</a>
+      <a href="reference.Pot.Crypt.functions.ja.html" lang="ja">reference.Pot.Crypt.functions.ja.html</a>
       <a href="reference.Pot.Deferred.functions.en.html" lang="en">reference.Pot.Deferred.functions.en.html</a>
       <a href="reference.Pot.Deferred.functions.ja.html" lang="ja">reference.Pot.Deferred.functions.ja.html</a>
       <a href="reference.Pot.Deferred.methods.en.html" lang="en">reference.Pot.Deferred.methods.en.html</a>
       <a href="reference.Pot.Deferred.methods.ja.html" lang="ja">reference.Pot.Deferred.methods.ja.html</a>
+      <a href="reference.Pot.DropFile.prototype.functions.en.html" lang="en">reference.Pot.DropFile.prototype.functions.en.html</a>
+      <a href="reference.Pot.DropFile.prototype.functions.ja.html" lang="ja">reference.Pot.DropFile.prototype.functions.ja.html</a>
       <a href="reference.Pot.Iter.functions.en.html" lang="en">reference.Pot.Iter.functions.en.html</a>
       <a href="reference.Pot.Iter.functions.ja.html" lang="ja">reference.Pot.Iter.functions.ja.html</a>
       <a href="reference.Pot.Net.functions.en.html" lang="en">reference.Pot.Net.functions.en.html</a>
@@ -1560,6 +1585,10 @@ table.gcsc-branding *, table.gcsc-branding td * {
       <a href="reference.Pot.Signal.functions.ja.html" lang="ja">reference.Pot.Signal.functions.ja.html</a>
       <a href="reference.Pot.URI.functions.en.html" lang="en">reference.Pot.URI.functions.en.html</a>
       <a href="reference.Pot.URI.functions.ja.html" lang="ja">reference.Pot.URI.functions.ja.html</a>
+      <a href="reference.Pot.XPCOM.functions.en.html" lang="en">reference.Pot.XPCOM.functions.en.html</a>
+      <a href="reference.Pot.XPCOM.functions.ja.html" lang="ja">reference.Pot.XPCOM.functions.ja.html</a>
+      <a href="reference.function.Pot.Crypt.hashCode.en.html" lang="en">reference.function.Pot.Crypt.hashCode.en.html</a>
+      <a href="reference.function.Pot.Crypt.hashCode.ja.html" lang="ja">reference.function.Pot.Crypt.hashCode.ja.html</a>
       <a href="reference.function.Pot.Deferred.begin.en.html" lang="en">reference.function.Pot.Deferred.begin.en.html</a>
       <a href="reference.function.Pot.Deferred.begin.ja.html" lang="ja">reference.function.Pot.Deferred.begin.ja.html</a>
       <a href="reference.function.Pot.Deferred.callLater.en.html" lang="en">reference.function.Pot.Deferred.callLater.en.html</a>
@@ -1624,6 +1653,12 @@ table.gcsc-branding *, table.gcsc-branding td * {
       <a href="reference.function.Pot.Deferred.unregister.ja.html" lang="ja">reference.function.Pot.Deferred.unregister.ja.html</a>
       <a href="reference.function.Pot.Deferred.wait.en.html" lang="en">reference.function.Pot.Deferred.wait.en.html</a>
       <a href="reference.function.Pot.Deferred.wait.ja.html" lang="ja">reference.function.Pot.Deferred.wait.ja.html</a>
+      <a href="reference.function.Pot.DropFile.en.html" lang="en">reference.function.Pot.DropFile.en.html</a>
+      <a href="reference.function.Pot.DropFile.ja.html" lang="ja">reference.function.Pot.DropFile.ja.html</a>
+      <a href="reference.function.Pot.DropFile.prototype.clearDropEvents.en.html" lang="en">reference.function.Pot.DropFile.prototype.clearDropEvents.en.html</a>
+      <a href="reference.function.Pot.DropFile.prototype.clearDropEvents.ja.html" lang="ja">reference.function.Pot.DropFile.prototype.clearDropEvents.ja.html</a>
+      <a href="reference.function.Pot.DropFile.prototype.upload.en.html" lang="en">reference.function.Pot.DropFile.prototype.upload.en.html</a>
+      <a href="reference.function.Pot.DropFile.prototype.upload.ja.html" lang="ja">reference.function.Pot.DropFile.prototype.upload.ja.html</a>
       <a href="reference.function.Pot.Iter.en.html" lang="en">reference.function.Pot.Iter.en.html</a>
       <a href="reference.function.Pot.Iter.ja.html" lang="ja">reference.function.Pot.Iter.ja.html</a>
       <a href="reference.function.Pot.Net.getJSON.en.html" lang="en">reference.function.Pot.Net.getJSON.en.html</a>
@@ -1664,6 +1699,14 @@ table.gcsc-branding *, table.gcsc-branding td * {
       <a href="reference.function.Pot.URI.urlDecode.ja.html" lang="ja">reference.function.Pot.URI.urlDecode.ja.html</a>
       <a href="reference.function.Pot.URI.urlEncode.en.html" lang="en">reference.function.Pot.URI.urlEncode.en.html</a>
       <a href="reference.function.Pot.URI.urlEncode.ja.html" lang="ja">reference.function.Pot.URI.urlEncode.ja.html</a>
+      <a href="reference.function.Pot.XPCOM.evalInSandbox.en.html" lang="en">reference.function.Pot.XPCOM.evalInSandbox.en.html</a>
+      <a href="reference.function.Pot.XPCOM.evalInSandbox.ja.html" lang="ja">reference.function.Pot.XPCOM.evalInSandbox.ja.html</a>
+      <a href="reference.function.Pot.XPCOM.getChromeWindow.en.html" lang="en">reference.function.Pot.XPCOM.getChromeWindow.en.html</a>
+      <a href="reference.function.Pot.XPCOM.getChromeWindow.ja.html" lang="ja">reference.function.Pot.XPCOM.getChromeWindow.ja.html</a>
+      <a href="reference.function.Pot.XPCOM.getMostRecentWindow.en.html" lang="en">reference.function.Pot.XPCOM.getMostRecentWindow.en.html</a>
+      <a href="reference.function.Pot.XPCOM.getMostRecentWindow.ja.html" lang="ja">reference.function.Pot.XPCOM.getMostRecentWindow.ja.html</a>
+      <a href="reference.function.Pot.XPCOM.throughout.en.html" lang="en">reference.function.Pot.XPCOM.throughout.en.html</a>
+      <a href="reference.function.Pot.XPCOM.throughout.ja.html" lang="ja">reference.function.Pot.XPCOM.throughout.ja.html</a>
       <a href="reference.function.Pot.arrayize.en.html" lang="en">reference.function.Pot.arrayize.en.html</a>
       <a href="reference.function.Pot.arrayize.ja.html" lang="ja">reference.function.Pot.arrayize.ja.html</a>
       <a href="reference.function.Pot.currentDocument.en.html" lang="en">reference.function.Pot.currentDocument.en.html</a>

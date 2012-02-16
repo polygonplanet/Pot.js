@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Crypt.hashCode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Crypt.hashCode';
+</script>
+</head>
+<body>
+<h1>Pot.Crypt.hashCode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.Crypt.hashCode"><em>Pot.Crypt.</em>hashCode</dfn>
+    (<em>{String|*}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数の値をハッシュ化します。
+    </p>
+    <div>
+      <p>
+ 引数の文字列 string を 2^32 でハッシュします。
+ <br>
+ <code>s[0] * 31 ^ (n - 1) + s[1] * 31 ^ (n - 2) + ... + s[n - 1]</code> のように計算します。
+ <br>
+ java.lang.String.hashCode() と似ています。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.hashCode() が hashCode() で実行できます。
+</p>
+<p>
+ ハッシュ化した数値が返ります。
+</p>
+
+<pre>Pot.debug( Pot.hashCode('abc') );         // 96354
+Pot.debug( Pot.hashCode('foo bar baz') ); // 1892173108
+Pot.debug( Pot.hashCode('ほげ') );        // 397111</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
