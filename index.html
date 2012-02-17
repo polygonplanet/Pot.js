@@ -87,7 +87,11 @@ setTimeout(function() {
   }());
 
   var loadPage = function(page, hash, isClick) {
-    var target;
+    var target, endLoading = function() {
+      Pot.callLater(0.12, function() {
+        loading = false;
+      });
+    };
 
     if (loading) {
       return;
@@ -102,13 +106,13 @@ setTimeout(function() {
       // https://news.ycombinator.com/item?id=3566141
       if (!isClick) {
         currentId = hash;
-        loading = false;
+        endLoading();
         return;
       }
 
       scrollToHash(page, hash);
       currentId = hash;
-      loading = false;
+      endLoading();
     } else {
       target.empty().addClass(LOADING);
 
@@ -134,7 +138,7 @@ setTimeout(function() {
 
         }).ensure(function(err) {
           target.removeClass(LOADING);
-          loading = false;
+          endLoading();
 
           scrollToHash(page, hash).ensure(function() {
             currentPage = page;
@@ -159,7 +163,7 @@ setTimeout(function() {
         });
 
       }).ensure(function(err) {
-        loading = false;
+        endLoading();
         if (Pot.isError(err)) {
           throw err;
         }
@@ -1551,7 +1555,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-02-17
+          Last modified: 2012-02-18
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>

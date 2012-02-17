@@ -70,33 +70,33 @@ location.href = './#reference.function.Pot.DropFile';
   <dd>
    画像ファイルがドロップされ、読み込みが完了した時に呼ばれます。
    <pre>onLoadImage : function(data, name, size, type) {
-    this   : Pot.DropFile インスタンス自身。
-    result : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
-    name   : <em class="var-type">{String}</em> : ファイル名。
-    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+    this : Pot.DropFile インスタンス自身。
+    data : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
+    name : <em class="var-type">{String}</em> : ファイル名。
+    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadText</dfn></dt>
   <dd>
    テキストファイルがドロップされ、読み込み完了した時に呼ばれます。
    <pre>onLoadText : function(data, name, size, type) {
-    this   : Pot.DropFile インスタンス自身。
-    result : <em class="var-type">{String}</em> : ファイルのデータ。
-    name   : <em class="var-type">{String}</em> : ファイル名。
-    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+    this : Pot.DropFile インスタンス自身。
+    data : <em class="var-type">{String}</em> : ファイルのデータ。
+    name : <em class="var-type">{String}</em> : ファイル名。
+    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadUnknown</dfn></dt>
   <dd>
    不明なファイル (画像、テキスト以外のファイル) がドロップされ、読み込み完了した時に呼ばれます。
    <pre>onLoadUnknown : function(data, name, size, type) {
-    this   : Pot.DropFile インスタンス自身。
-    result : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
-    name   : <em class="var-type">{String}</em> : ファイル名。
-    size   : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type   : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+    this : Pot.DropFile インスタンス自身。
+    data : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
+    name : <em class="var-type">{String}</em> : ファイル名。
+    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
+    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadEnd</dfn></dt>
