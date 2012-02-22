@@ -999,6 +999,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
           op.onDrop.call(that, files);
         }
         reader = new FileReader();
+        /**@ignore*/
         reader.onloadend = function(evt) {
           i--;
           if (evt && evt.target && evt.target.result != null) {
@@ -1210,11 +1211,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsImage : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadImage;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadImage;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
@@ -1227,11 +1230,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsText : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadText;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadText;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
@@ -1244,11 +1249,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsUnknown : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadUnknown;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadUnknown;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
