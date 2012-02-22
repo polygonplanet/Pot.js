@@ -240,20 +240,13 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   hasValue : function(value) {
-    var result = false, raw = this._rawData, k, val;
-    for (k in raw) {
-      if (k && k.charAt(0) === PREFIX) {
-        try {
-          val = raw[k];
-        } catch (e) {
-          continue;
-        }
-        if (val === value) {
-          result = true;
-          break;
-        }
+    var result = false;
+    each(this._rawData, function(v, k) {
+      if (k && k.charAt(0) === PREFIX && v === value) {
+        result = true;
+        throw Pot.StopIteration;
       }
-    }
+    });
     return result;
   },
   /**
@@ -292,12 +285,12 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   keys : function() {
-    var keys = [], raw = this._rawData, k;
-    for (k in raw) {
+    var keys = [];
+    each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX) {
         keys[keys.length] = k.substring(1);
       }
-    }
+    });
     return keys;
   },
   /**
@@ -308,14 +301,12 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   values : function() {
-    var values = [], raw = this._rawData, k;
-    for (k in raw) {
+    var values = [];
+    each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX) {
-        try {
-          values[values.length] = raw[k];
-        } catch (e) {}
+        values[values.length] = v;
       }
-    }
+    });
     return values;
   },
   /**
@@ -336,16 +327,15 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   toJSON : function() {
-    var results = [], raw = this._rawData, k, key,
-        json = Pot.Serializer.serializeToJSON;
-    for (k in raw) {
+    var results = [], key, json = Pot.Serializer.serializeToJSON;
+    each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX) {
         key = k.substring(1);
         try {
-          results[results.length] = json(key) + ':' + json(raw[k]);
+          results[results.length] = json(key) + ':' + json(v);
         } catch (e) {}
       }
-    }
+    });
     return '{' + results.join(',') + '}';
   },
   /**
@@ -360,15 +350,15 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   toObject : function() {
-    var o = {}, raw = this._rawData, key;
-    for (k in raw) {
+    var o = {}, key;
+    each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX) {
         key = k.substring(1);
         try {
-          o[key] = raw[k];
+          o[key] = v;
         } catch (e) {}
       }
-    }
+    });
     return o;
   },
   /**
@@ -397,15 +387,13 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @public
    */
   toItems : function() {
-    var items = [], raw = this._rawData, k, key;
-    for (k in raw) {
+    var items = [], key;
+    each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX) {
         key = k.substring(1);
-        try {
-          items[items.length] = [key, raw[k]];
-        } catch (e) {}
+        items[items.length] = [key, v];
       }
-    }
+    });
     return items;
   },
   /**
@@ -742,4 +730,4 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
 
 delete Pot.tmp.createHashIterator;
 Pot.Hash.prototype.init.prototype = Pot.Hash.prototype;
-})('.');
+}('.'));
