@@ -47,11 +47,10 @@ Pot.update({
     }
     /**@ignore*/
     function decodeBase64(text) {
-      var r = '', t = [], s, p = -8, a = 0, c, d, n, i, sc;
+      var r = '', t = [], s, p = -8, a = 0, c, d, n, i;
       s = stringify(text, true);
       if (s) {
         n = s.length;
-        sc = String.fromCharCode;
         for (i = 0; i < n; i++) {
           c = BASE64MAPS.indexOf(s.charAt(i));
           if (~c) {
@@ -60,7 +59,7 @@ Pot.update({
             if (p >= 0) {
               d = (a >> p & 255);
               if (c !== 64) {
-                t[t.length] = sc(d);
+                t[t.length] = fromCharCode(d);
               }
               a &= 63;
               p -= 8;
