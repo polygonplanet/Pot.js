@@ -253,7 +253,7 @@ update(Pot.Crypt, {
     return function(string) {
       return calc(string);
     };
-  })(),
+  }()),
   /**
    * Calculate the 32-bit CRC (cyclic redundancy checksum) checksum.
    *
@@ -328,7 +328,7 @@ update(Pot.Crypt, {
       }
       return crc ^ -1;
     };
-  })(),
+  }()),
   /**
    * Calculate the SHA1 hash of a string.
    *
@@ -465,7 +465,7 @@ update(Pot.Crypt, {
     return function(string) {
       return calc(string);
     };
-  })(),
+  }()),
   /**
    * ARC4 symmetric cipher encryption/decryption.
    *
@@ -501,8 +501,7 @@ update(Pot.Crypt, {
      * @ignore
      */
     function arc4Crypt(text, key, table) {
-      var r = [], a, i, j, x, y, t, k, n, sc;
-      sc = String.fromCharCode;
+      var r = [], a, i, j, x, y, t, k, n;
       a = arrayize(table);
       j = 0;
       t = stringify(text, true);
@@ -522,7 +521,7 @@ update(Pot.Crypt, {
         x = a[i];
         a[i] = a[j];
         a[j] = x;
-        r[r.length] = sc(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
+        r[r.length] = fromCharCode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
       }
       return r.join('');
     }
@@ -617,7 +616,7 @@ update(Pot.Crypt, {
     });
     arc4.prototype.init.prototype = arc4.prototype;
     return arc4;
-  })()/*{#endif}*/
+  }())/*{#endif}*/
 });
 
 // Update methods for reference.

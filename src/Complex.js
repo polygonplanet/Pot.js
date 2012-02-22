@@ -159,15 +159,14 @@ update(Pot.Complex, {
       }
     }
     if (forString) {
-      result = String.fromCharCode(result);
+      result = fromCharCode(result);
     } else {
       result = result - 0;
     }
     return result;
   }, (function() {
-    var
-    ALPHAS    = LOWER_ALPHAS + UPPER_ALPHAS,
-    ALPHANUMS = ALPHAS + DIGITS;
+    var ALPHAS    = LOWER_ALPHAS + UPPER_ALPHAS,
+        ALPHANUMS = ALPHAS + DIGITS;
     /**@ignore*/
     function randInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -414,6 +413,9 @@ update(Pot.Complex, {
     };
   })()),
   /**
+   * @lends Pot.Complex
+   */
+  /**
    * Return the value that limited in the range of
    *  maximum value from minimum value.
    *
@@ -553,15 +555,14 @@ update(Pot.Complex, {
    * @public
    */
   convertToBase : function(value, from, to) {
-    var
-    BASE62MAP = DIGITS + UPPER_ALPHAS + LOWER_ALPHAS,
-    result = '', numbers, end, i, pos, div, index,
-    v = stringify(value, true),
-    len = v.length,
-    base = {
-      from : from - 0,
-      to   : to   - 0
-    };
+    var BASE62MAP = DIGITS + UPPER_ALPHAS + LOWER_ALPHAS,
+        result = '', numbers, end, i, pos, div, index,
+        v = stringify(value, true),
+        len = v.length,
+        base = {
+          from : from - 0,
+          to   : to   - 0
+        };
     if (!isNaN(base.from) && base.from > 0 && base.from < 63 &&
         !isNaN(base.to)   && base.to   > 0 && base.to   < 63) {
       numbers = [];

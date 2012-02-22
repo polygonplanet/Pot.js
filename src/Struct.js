@@ -1555,7 +1555,7 @@ update(Pot.Struct, {
    * @public
    */
   flip : function(o) {
-    var result, sc;
+    var result;
     switch (Pot.typeLikeOf(o)) {
       case 'object':
           result = {};
@@ -1573,9 +1573,8 @@ update(Pot.Struct, {
           break;
       case 'string':
           result = '';
-          sc = String.fromCharCode;
           each(o.split(''), function(c) {
-            result += sc(
+            result += fromCharCode(
               c.charCodeAt(0) ^ 0xFFFF
             );
           });
