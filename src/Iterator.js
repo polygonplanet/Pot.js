@@ -245,9 +245,8 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       } else {
         d = this.createDeferred();
         d.then(function() {
-          var d1, d2;
-          d1 = that.createDeferred();
-          d2 = that.createDeferred();
+          var d1 = that.createDeferred(),
+              d2 = that.createDeferred();
           d1.then(function() {
             return that.revolve().then(function() {
               d2.begin();
@@ -275,10 +274,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   setIter : function(object, callback) {
-    var type, types, context;
-    type = this.options.type;
-    types = Pot.Internal.LightIterator.types;
-    context = this.options.context;
+    var type = this.options.type,
+        types = Pot.Internal.LightIterator.types,
+        context = this.options.context;
     if ((type & types.iterate) === types.iterate) {
       this.result = null;
       this.iter = this.iterate(object, callback, context);
@@ -396,9 +394,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   revolve : function() {
-    var that = this, d, de;
-    d  = this.createDeferred();
-    de = this.createDeferred();
+    var that = this,
+        d  = this.createDeferred(),
+        de = this.createDeferred();
     d.then(function() {
       var dd = that.createDeferred();
       that.revDeferred = that.createDeferred();
@@ -879,8 +877,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEach : function(object, callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
+      var result, iter, that = Pot.Internal.LightIterator.fn;
       if (!object) {
         result = {};
       } else {
@@ -899,9 +896,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     repeat : function(max, callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
-      result = {};
+      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
       if (max) {
         iter = that.repeat(max, callback, context);
         Pot.Internal.LightIterator.QuickIteration.resolve(iter);
@@ -913,9 +908,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEver : function(callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
-      result = {};
+      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
       if (callback) {
         iter = that.forEver(callback, context);
         Pot.Internal.LightIterator.QuickIteration.resolve(iter);
@@ -927,8 +920,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     iterate : function(object, callback, context) {
-      var result, that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result, iter, o, that = Pot.Internal.LightIterator.fn;
       if (!object) {
         result = {};
       } else {
@@ -948,8 +940,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     items : function(object, callback, context) {
-      var result = [], that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
@@ -966,8 +957,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     zip : function(object, callback, context) {
-      var result = [], that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
@@ -1641,8 +1631,8 @@ update(Pot.Deferred, {
    *                                        this == `context`.
    * @param  {*}            (context)   (Optional) Object to use
    *                                      as `this` when executing callback.
-   * @return {Deferred}                 Return a new instance of Deferred that has
-   *                                      the collected items as an array.
+   * @return {Deferred}                 Return a new instance of Deferred that
+   *                                      has the collected items as an array.
    *
    * @class
    * @function
@@ -2341,12 +2331,11 @@ update(Pot.Iter, {
    * @public
    */
   range : function(/*[begin,] end[, step]*/) {
-    var args = arguments, arg, result;
-    var begin, end, step, n, string, iter;
-    result = [];
-    begin = 0;
-    end   = 0;
-    step  = 1;
+    var args = arguments, arg, result = [],
+        begin = 0,
+        end   = 0,
+        step  = 1,
+        n, string, iter;
     switch (args.length) {
       case 0:
           return (void 0);
@@ -2408,7 +2397,7 @@ update(Pot.Iter, {
           (step < 0 && begin < end)) {
         throw Pot.StopIteration;
       }
-      result[result.length] = string ? String.fromCharCode(begin) : begin;
+      result[result.length] = string ? fromCharCode(begin) : begin;
       begin += step;
     };
     Pot.iterate(iter);
@@ -2446,16 +2435,14 @@ update(Pot.Iter, {
    * @public
    */
   indexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike,
-        i, len, val, args, argn, passed;
-    args = arguments;
-    argn = args.length;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    var result = -1, i, len, val, passed,
+        args = arguments, argn = args.length,
+        arrayLike = object && Pot.isArrayLike(object),
+        objectLike = object && !arrayLike && Pot.isObject(object);
     if (arrayLike) {
       try {
         if (Pot.System.isBuiltinArrayIndexOf) {
-          i = Array.prototype.indexOf.apply(object, arrayize(args, 1));
+          i = indexOf.apply(object, arrayize(args, 1));
           if (Pot.isNumeric(i)) {
             result = i;
           } else {
@@ -2555,16 +2542,15 @@ update(Pot.Iter, {
    * @public
    */
   lastIndexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike,
-        i, len,  key, val, args, argn, passed, pairs;
-    args = arguments;
-    argn = args.length;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    var result = -1, i, len,  key, val, passed, pairs,
+        args = arguments,
+        argn = args.length,
+        arrayLike  = object && Pot.isArrayLike(object),
+        objectLike = object && !arrayLike && Pot.isObject(object);
     if (arrayLike) {
       try {
         if (Pot.System.isBuiltinArrayLastIndexOf) {
-          i = Array.prototype.lastIndexOf.apply(object, arrayize(args, 1));
+          i = lastIndexOf.apply(object, arrayize(args, 1));
           if (Pot.isNumeric(i)) {
             result = i;
           } else {
