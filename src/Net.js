@@ -478,7 +478,7 @@ update(Pot.Net, {
       return function(url, options) {
         return (new Request(url, options)).deferred;
       };
-    })()
+    }())
   },
   /**
    * @lends Pot.Net
@@ -845,6 +845,9 @@ update(Pot.Net, {
     };
   }()),
   /**
+   * @lends Pot.Net
+   */
+  /**
    * Send request by JSONP.
    *
    *
@@ -883,8 +886,8 @@ update(Pot.Net, {
       DONE : /loaded|complete/
     };
     return function(url, options) {
-      var d, opts, context, id, callback, key;
-      var doc, uri, head, script, done, defaults;
+      var d, opts, context, id, callback, key,
+          doc, uri, head, script, done, defaults;
       defaults = 'callback';
       d = new Pot.Deferred();
       opts    = update({cache : false}, options || {});
@@ -1010,6 +1013,9 @@ update(Pot.Net, {
     };
   }()),
   /**
+   * @lends Pot.Net
+   */
+  /**
    * Get the JSON data by HTTP GET request.
    *
    *
@@ -1032,9 +1038,9 @@ update(Pot.Net, {
     var fixJson = /^[^{]*|[^}]*$/g;
     return function(url, options) {
       return Pot.Net.request(url, update({
-        mimeType : 'text/javascript',
+        mimeType : 'application/json',
         headers  : {
-          'Content-Type' : 'text/javascript'
+          'Content-Type' : 'application/json'
         }
       }, options || {})).then(function(res) {
         var data = trim(res && res.responseText).replace(fixJson, '');
@@ -1042,6 +1048,9 @@ update(Pot.Net, {
       });
     };
   }()),
+  /**
+   * @lends Pot.Net
+   */
   /**
    * Non-blocking script loader.
    *
