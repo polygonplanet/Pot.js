@@ -217,8 +217,7 @@ update(Pot.Archive, {
      * @public
      */
     decode : function(a) {
-      var C = {}, c, i = 0, j, k, l, m, p, s, w, t, sc;
-      sc = String.fromCharCode;
+      var C = {}, c, i = 0, j, k, l, m, p, s, w, t;
       s = '    ';
       t = stringify(a);
       for (; i < 63; i++) {
@@ -231,7 +230,7 @@ update(Pot.Archive, {
         c = C[t.charAt(i++)];
         if (c < 63) {
           if (c < 32) {
-            s += sc(
+            s += fromCharCode(
               m ? l * 32 + c :
                  (l * 32 + c) * 62 + C[t.charAt(i++)]
             );
