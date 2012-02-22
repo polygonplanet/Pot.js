@@ -1595,7 +1595,7 @@ Pot.Deferred.extendSpeeds(Pot, 'Deferred', function(options) {
   return Pot.Deferred(options);
 }, Pot.Deferred.speeds);
 
-})();
+}());
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Deferred utilities.
 (function() {
@@ -2710,51 +2710,53 @@ update(Pot.Deferred, {
    * @static
    * @based  JSDeferred.chain
    */
-  chain : function() {
-    var args = arguments, len = args.length, chains, chain, re;
-    chain = new Pot.Deferred();
-    if (len > 0) {
-      chains = arrayize(len === 1 ? args[0] : args);
-      re = {
-        name   : /^\s*[()]*\s*function\s*([^\s()]+)/,
-        rescue : /rescue|raise|err|fail/i
-      };
-      each(chains, function(o) {
-        var name;
-        if (Pot.isFunction(o)) {
-          try {
-            name = o.toString().match(re.name)[1];
-          } catch (e) {}
-          if (name && re.rescue.test(name)) {
-            chain.rescue(o);
-          } else {
-            chain.then(o);
-          }
-        } else if (Pot.isDeferred(o)) {
-          chain.then(function(v) {
-            if (o.state === Pot.Deferred.states.unfired) {
-              o.begin(v);
+  chain : (function() {
+    var re = {
+      funcName : /^\s*[()]*\s*function\s*([^\s()]+)/,
+      rescue   : /rescue|raise|err|fail/i
+    };
+    return function(/*...args*/) {
+      var args = arguments, len = args.length, chains,
+          chain = new Pot.Deferred();
+      if (len > 0) {
+        chains = arrayize((len === 1) ? args[0] : args);
+        each(chains, function(o) {
+          var name;
+          if (Pot.isFunction(o)) {
+            try {
+              name = o.toString().match(re.funcName)[1];
+            } catch (e) {}
+            if (name && re.rescue.test(name)) {
+              chain.rescue(o);
+            } else {
+              chain.then(o);
             }
-            return o;
-          });
-        } else if (Pot.isObject(o) || Pot.isArray(o)) {
-          chain.then(function() {
-            return Pot.Deferred.parallel(o);
-          });
-        } else if (Pot.isError(o)) {
-          chain.then(function() {
-            throw o;
-          });
-        } else {
-          chain.then(function() {
-            return o;
-          });
-        }
-      });
-    }
-    Pot.Deferred.callLazy(chain);
-    return chain;
-  }
+          } else if (Pot.isDeferred(o)) {
+            chain.then(function(v) {
+              if (o.state === Pot.Deferred.states.unfired) {
+                o.begin(v);
+              }
+              return o;
+            });
+          } else if (Pot.isObject(o) || Pot.isArray(o)) {
+            chain.then(function() {
+              return Pot.Deferred.parallel(o);
+            });
+          } else if (Pot.isError(o)) {
+            chain.then(function() {
+              throw o;
+            });
+          } else {
+            chain.then(function() {
+              return o;
+            });
+          }
+        });
+      }
+      Pot.Deferred.callLazy(chain);
+      return chain;
+    };
+  }())
 });
 
 // Extends the speeds control methods
@@ -2896,4 +2898,4 @@ Pot.update({
   chain         : Pot.Deferred.chain
 });
 
-})();
+}());
