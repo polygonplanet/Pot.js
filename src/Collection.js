@@ -340,7 +340,7 @@ update(Pot.Collection, {
       }
       return results;
     };
-  })(),
+  }()),
   /**
    * Convert to one-dimensional array from multi-dimensional array.
    *
@@ -437,7 +437,7 @@ update(Pot.Collection, {
       }
       return array;
     };
-  })()
+  }())
 });
 
 // Update Pot object,

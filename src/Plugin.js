@@ -103,7 +103,7 @@ Pot.update({
           }
           return d;
         };
-      })(jQuery);
+      }(jQuery));
     };
-  })()
+  }())
 });
