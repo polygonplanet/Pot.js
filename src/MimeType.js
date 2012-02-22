@@ -46,21 +46,23 @@ update(Pot.MimeType, {
         maps = Pot.MimeType.MimeTypeMaps,
         type = trim(mimeType).toLowerCase();
     if (type) {
-      for (ext in maps) {
-        mime = String(maps[ext]).toLowerCase();
+      each(maps, function(v, k) {
+        ext = k;
+        mime = String(v).toLowerCase();
         if (mime === type) {
           result = ext;
-          break;
+          throw Pot.StopIteration;
         }
-      }
+      });
       if (!result) {
-        for (ext in maps) {
-          mime = String(maps[ext]).toLowerCase().split('/').pop();
+        each(maps, function(v, k) {
+          ext = k;
+          mime = String(v).toLowerCase().split('/').pop();
           if (~type.indexOf(mime)) {
             result = ext;
-            break;
+            throw Pot.StopIteration;
           }
-        }
+        });
         if (!result) {
           try {
             // helper if not match.
