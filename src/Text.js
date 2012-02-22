@@ -267,13 +267,12 @@ update(Pot.Text, {
             re = new RegExp('[' +
               rescape(this.reserves.join('')) +
             ']', 'g'),
-            sc = String.fromCharCode,
             uniq, n = 0;
         do {
-          uniq = sc(
+          uniq = fromCharCode(
             n, n, Math.random() * 0xFFFF >>> 0, n, n
           );
-          uniq += uniq + uniq + sc(n, n);
+          uniq += uniq + uniq + fromCharCode(n, n);
           if (~s.indexOf(uniq)) {
             uniq += (+new Date) + uniq;
           }
@@ -443,6 +442,9 @@ update(Pot.Text, {
     return Saver;
   }()),
   /**
+   * @lends Pot.Text
+   */
+  /**
    * Shortcut of String.fromCharCode().
    * This function fixed an error on 'stack overflow' (or RangeError).
    * e.g. String.fromCharCode.apply(null, new Array(100000000));
@@ -467,10 +469,8 @@ update(Pot.Text, {
    * @public
    */
   chr : function(/*[...args]*/) {
-    var args = arrayize(arguments), codes, chars, divs, i, len, limit, sc;
-    chars = [];
-    limit = 0x2000;
-    sc = String.fromCharCode;
+    var args = arrayize(arguments), codes,
+        chars = [], divs, i, len, limit = 0x2000;
     if (args.length > 1) {
       codes = args;
     } else if (args.length === 1) {
@@ -481,11 +481,11 @@ update(Pot.Text, {
     if (codes) {
       len = codes.length;
       if (len === 1 && codes[0] && codes[0].length < limit) {
-        return sc.apply(null, codes);
+        return fromCharCode.apply(null, codes);
       } else {
         for (i = 0; i < len; i += limit) {
           divs = codes.slice(i, i + limit);
-          chars[chars.length] = sc.apply(null, divs);
+          chars[chars.length] = fromCharCode.apply(null, divs);
         }
       }
     }
@@ -657,6 +657,109 @@ update(Pot.Text, {
     return stringify(s, true).replace(re, '');
   },
   /**
+   * Indent a string.
+   *
+   *
+   * @example
+   *   var s = 'foo bar baz';
+   *   debug(indent(s));          // '  foo bar baz'
+   *   debug(indent(s, 4));       // '    foo bar baz'
+   *   debug(indent(s, 1, '\t')); // '\tfoo bar baz'
+   *
+   *
+   * @example
+   *   var s = 'foo\nbar\nbaz';
+   *   debug(indent(s, 1, '\t')); // '\tfoo\n\tbar\n\tbaz'
+   *
+   *
+   * @param  {String}  string  A target string.
+   * @param  {Number}  (size)  (Optional) A length of indent (default=2).
+   * @param  {String}  (ch)    (Optional) A character to indent (default=' ').
+   * @return {String}          A result string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  indent : function(string, size, ch) {
+    var s = stringify(string),
+        c, sz, unsz, i, j, len, line, lines, nl, m, space;
+    if (s) {
+      if (Pot.isString(size)) {
+        c = size;
+        sz = ch;
+      } else {
+        c = ch;
+        sz = size;
+      }
+      c = stringify(c) || ' ';
+      sz = Pot.isNumeric(sz) ? ((sz - 0) || 2) : 2;
+      if (sz < 0) {
+        unsz = -sz;
+        space = new Array(unsz + 1).join(c);
+      }
+      m = s.match(RE_NL_GROUP);
+      nl = (m && m[1]) ? m[1] : '\n';
+      lines = s.split(RE_NL);
+      len = lines.length;
+      for (i = 0; i < len; i++) {
+        line = lines[i];
+        if (unsz) {
+          if (line.substr(0, unsz) === space) {
+            line = line.substring(unsz);
+          }
+        } else {
+          j = 0;
+          while (j++ < sz) {
+            line = c + line;
+          }
+        }
+        lines[i] = line;
+      }
+      s = lines.join(nl);
+    }
+    return s;
+  },
+  /**
+   * Unindent a string.
+   *
+   *
+   * @example
+   *   var s = '  foo bar baz';
+   *   debug(unindent(s));          // 'foo bar baz'
+   *   debug(unindent(s, 4));       // '  foo bar baz'
+   *   debug(unindent(s, 1, '\t')); // '  foo bar baz'
+   *
+   *
+   * @example
+   *   var s = '\tfoo\n\tbar\n\tbaz';
+   *   debug(unindent(s, 1, '\t')); // 'foo\nbar\nbaz'
+   *
+   *
+   * @param  {String}  string  A target string.
+   * @param  {Number}  (size)  (Optional) A length of indent (default=2).
+   * @param  {String}  (ch)    (Optional) A character to indent (default=' ').
+   * @return {String}          A result string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  unindent : function(string, size, ch) {
+    var sz, c;
+    if (Pot.isString(size)) {
+      c = size;
+      sz = ch;
+    } else {
+      c = ch;
+      sz = size;
+    }
+    if (sz > 0) {
+      sz = -sz;
+    }
+    return Pot.Text.indent.call(null, string, sz || -2, c);
+  },
+  /**
    * Normalize whitespaces.
    * One or more whitespaces will be converted into one space.
    * If passed any character to the second argument then
@@ -792,6 +895,9 @@ update(Pot.Text, {
     }
   }),
   /**
+   * @lends Pot.Text
+   */
+  /**
    * Unwraps a string by specific character.
    * Unwrapper string can specify an array.
    * That must has 2 or more items.
@@ -879,9 +985,8 @@ update(Pot.Text, {
    * @public
    */
   startsWith : function(string, prefix, ignoreCase) {
-    var
-    s = stringify(string, true),
-    p = stringify(prefix, true);
+    var s = stringify(string, true),
+        p = stringify(prefix, true);
     if (ignoreCase) {
       s = s.toLowerCase();
       p = p.toLowerCase();
@@ -922,8 +1027,8 @@ update(Pot.Text, {
    */
   endsWith : function(string, suffix, ignoreCase) {
     var n,
-    s = stringify(string, true),
-    x = stringify(suffix, true);
+        s = stringify(string, true),
+        x = stringify(suffix, true);
     if (ignoreCase) {
       s = s.toLowerCase();
       x = x.toLowerCase();
@@ -1152,7 +1257,7 @@ update(Pot.Text, {
     carry = false;
     /**@ignore*/
     add = function(val) {
-      return String.fromCharCode(val.charCodeAt(0) + 1);
+      return fromCharCode(val.charCodeAt(0) + 1);
     };
     s = value.toString().split('');
     if (s.length === 0) {
@@ -1338,7 +1443,7 @@ update(Pot.Text, {
     if (i >= len) {
       i--;
     }
-    s[i] = String.fromCharCode(s[i].charCodeAt(0) - 1);
+    s[i] = fromCharCode(s[i].charCodeAt(0) - 1);
     s = s.reverse();
     if (borrow) {
       s.shift();
@@ -1549,6 +1654,9 @@ update(Pot.Text, {
     }
   }),
   /**
+   * @lends Pot.Text
+   */
+  /**
    * Remove the HTML/XML tags from string.
    *
    *
@@ -1608,6 +1716,9 @@ update(Pot.Text, {
       to : ' '
     }]
   }),
+  /**
+   * @lends Pot.Text
+   */
   /**
    * Truncates a string to a certain length and
    *   adds ellipsis (e.g., '...') if necessary.
@@ -1963,7 +2074,10 @@ update(Pot.Text, {
       }
       return Pot.Text.chr(r);
     };
-  })(),
+  }()),
+  /**
+   * @lends Pot.Text
+   */
   /**
    * 半角ｶﾀｶﾅを全角カタカナに変換 (濁音含む)
    * Convert the hankaku katakana to
@@ -2030,7 +2144,7 @@ update(Pot.Text, {
       }
       return Pot.Text.chr(codes);
     };
-  })()
+  }())
 });
 
 // Update Pot object.
@@ -2043,6 +2157,8 @@ Pot.update({
   ltrim          : Pot.Text.ltrim,
   rtrim          : Pot.Text.rtrim,
   strip          : Pot.Text.strip,
+  indent         : Pot.Text.indent,
+  unindent       : Pot.Text.unindent,
   normalizeSpace : Pot.Text.normalizeSpace,
   splitBySpace   : Pot.Text.splitBySpace,
   canonicalizeNL : Pot.Text.canonicalizeNL,

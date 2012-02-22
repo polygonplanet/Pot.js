@@ -102,6 +102,9 @@ Pot.update({
 // Define the export method.
 update(Pot.Internal, {
   /**
+   * @lends Pot.Internal
+   */
+  /**
    * Export the Pot properties.
    *
    * @private
@@ -366,6 +369,8 @@ update(Pot.Internal, {
     ltrim                   : Pot.Text.ltrim,
     rtrim                   : Pot.Text.rtrim,
     strip                   : Pot.Text.strip,
+    indent                  : Pot.Text.indent,
+    unindent                : Pot.Text.unindent,
     normalizeSpace          : Pot.Text.normalizeSpace,
     splitBySpace            : Pot.Text.splitBySpace,
     canonicalizeNL          : Pot.Text.canonicalizeNL,
