@@ -94,6 +94,9 @@ update(Pot.URI, {
     }
   }),
   /**
+   * @lends Pot.URI
+   */
+  /**
    * Decode the URI string.
    *
    * @param  {String}  string  The subject string.
@@ -174,6 +177,9 @@ update(Pot.URI, {
       }
     }
   })/*{#if Pot}*/,
+  /**
+   * @lends Pot.URI
+   */
   /**
    * Parse the URI string to an object that has keys like "location" object.
    *
@@ -371,6 +377,9 @@ update(Pot.URI, {
       }
     }
   }),
+  /**
+   * @lends Pot.URI
+   */
   /**
    * Build to the URI from a string or an object with query-string.
    * Object key names can treat like "window.location" object keys.
@@ -611,6 +620,9 @@ update(Pot.URI, {
     };
   }()),
   /**
+   * @lends Pot.URI
+   */
+  /**
    * Resolves the incomplete URI.
    * Then, fix the invalid symbols for ".." and "./" etc hierarchies.
    *
@@ -739,6 +751,9 @@ update(Pot.URI, {
     }
   }),
   /**
+   * @lends Pot.URI
+   */
+  /**
    * Get the file extension name.
    * This method enabled for URI or URL string etc.
    *
@@ -839,6 +854,9 @@ update(Pot.URI, {
       STRIP : /[\s\u00A0\u3000]+/g
     }
   }),
+  /**
+   * @lends Pot.URI
+   */
   /**
    * Create Data Scheme (data:...).
    *

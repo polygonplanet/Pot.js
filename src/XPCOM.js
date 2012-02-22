@@ -1,6 +1,10 @@
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
+
 Pot.update({
+  /**
+   * @lends Pot
+   */
   /**
    * XPCOM utilities.
    *

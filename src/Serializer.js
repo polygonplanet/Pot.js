@@ -291,9 +291,9 @@ Pot.update({
      *   // @results {key1:'12345',key2:null}
      *
      *
-     * @param  {*}         text      A target JSON string object.
+     * @param  {String}    text      A target JSON string object.
      * @param  {*}        (reviver)  (Optional) Unimplemented.
-     * @return {String}              Return the parsed object.
+     * @return {*}                   Return the parsed object.
      * @type   Function
      * @function
      * @static
@@ -337,7 +337,7 @@ Pot.update({
       }
     })
   });
-})();
+}());
 
 update(Pot.Serializer, {
   /**

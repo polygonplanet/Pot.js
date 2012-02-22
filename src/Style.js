@@ -110,7 +110,10 @@ update(Pot.Style, {
       }
     };
     return maps;
-  })(),
+  }()),
+  /**
+   * @lends Pot.Style
+   */
   /**
    * Get or set the element's style.
    *

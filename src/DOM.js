@@ -100,7 +100,7 @@ update(DOM, {
    * @const
    */
   AttrMaps : (function() {
-    var maps = {}, p;
+    var maps = {};
     maps.dir = {
       'for'         : 'htmlFor',
       'class'       : 'className',
@@ -118,11 +118,14 @@ update(DOM, {
       'bgcolor'     : 'bgColor'
     };
     maps.raw = {};
-    for (p in maps.dir) {
-      maps.raw[maps.dir[p]] = p;
-    }
+    each(maps.dir, function(v, p) {
+      maps.raw[v] = p;
+    });
     return maps;
-  })(),
+  }()),
+  /**
+   * @lends Pot.DOM
+   */
   /**
    * Detect Window object.
    *
@@ -164,7 +167,10 @@ update(DOM, {
       }
       return win;
     };
-  })(),
+  }()),
+  /**
+   * @lends Pot.DOM
+   */
   /**
    * Detect Document object.
    *
@@ -382,7 +388,7 @@ update(DOM, {
           RELATIVE : 7
         }
       };
-    })();
+    }());
     /**@ignore*/
     function normalizeElements(elems) {
       var r = [], i, j, len, dups = [];
@@ -1106,7 +1112,10 @@ update(DOM, {
         return getElementsBySelector(selector, context, multi, options);
       }
     })
-  })(),
+  }()),
+  /**
+   * @lends Pot.DOM
+   */
   /**
    * A shortcut of getElement() method as multiple mode.
    * Get the elements by simple CSS selector expression.
@@ -1541,6 +1550,9 @@ update(DOM, {
       }
     }
   }),
+  /**
+   * @lends Pot.DOM
+   */
   /**
    * Set the Text content string to the element.
    *
@@ -2412,6 +2424,9 @@ update(DOM, {
     }
   }),
   /**
+   * @lends Pot.DOM
+   */
+  /**
    * Convert HTML string to HTML Document object.
    *
    * @param  {String}  htmlString   A subject HTML string.
@@ -2534,6 +2549,9 @@ update(DOM, {
       return doc;
     }
   }),
+  /**
+   * @lends Pot.DOM
+   */
   /**
    * Convert to a HTML string from DOM document object.
    *
@@ -2658,6 +2676,9 @@ update(DOM, {
     })({})
   }),
   /**
+   * @lends Pot.DOM
+   */
+  /**
    * Get the MSXML Document object.
    *
    * @private
@@ -2703,9 +2724,9 @@ update(DOM, {
     return result;
   }
 });
-})(Pot.DOM,
-   Pot.isWindow, Pot.isDocument, Pot.isString,
-   Pot.isObject, Pot.isArray, Pot.isArrayLike);
+}(Pot.DOM,
+  Pot.isWindow, Pot.isDocument, Pot.isString,
+  Pot.isObject, Pot.isArray, Pot.isArrayLike));
 
 // Update Pot object.
 Pot.update({

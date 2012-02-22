@@ -2,6 +2,9 @@
 // Definition of Debug.
 Pot.update({
   /**
+   * @lends Pot.Debug
+   */
+  /**
    * Debugging utilities.
    *
    * @name Pot.Debug
