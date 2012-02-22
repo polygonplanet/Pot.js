@@ -132,8 +132,8 @@ update(Pot.Format, {
     if (!me.formatProcedure) {
       /**@ignore*/
       me.formatProcedure = (function() {
-        var re, args;
-        re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi;
+        var args,
+            re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi;
         /**@ignore*/
         function utf8(s) {
           return Pot.UTF8 && Pot.UTF8.encode(s) || stringify(s);
@@ -198,7 +198,7 @@ update(Pot.Format, {
               mark = '';
             }
             sign = value.charAt(0);
-            if ('+-'.indexOf(sign) === -1) {
+            if (!~'+-'.indexOf(sign)) {
               sign = null;
             } else {
               orgn = value.substring(1);
@@ -222,7 +222,7 @@ update(Pot.Format, {
               prevIdx = index;
               index = value.indexOf(sign + orgn.slice(0, i));
             } while (index > 0 && ++i < value.length);
-            if (index === -1) {
+            if (!~index) {
               index = prevIdx;
             }
             if (index > 0) {
@@ -257,7 +257,7 @@ update(Pot.Format, {
                   break;
               case 'c':
                   try {
-                    v = Pot.isNumeric(v) ? String.fromCharCode(v) : '';
+                    v = Pot.isNumeric(v) ? fromCharCode(v) : '';
                   } catch (e) {
                     v = '';
                   }
@@ -282,7 +282,7 @@ update(Pot.Format, {
                   }
                   /**@ignore*/
                   numeric = function(n) {
-                    return Number(n).toExponential(point);
+                    return (+n).toExponential(point);
                   };
                   v = numeric(v);
                   break;
@@ -331,7 +331,7 @@ update(Pot.Format, {
           args = arrayize(arguments, 1);
           return stringify(format).replace(re, rep);
         };
-      })();
+      }());
     }
     return me.formatProcedure.apply(me, arguments);
   }
