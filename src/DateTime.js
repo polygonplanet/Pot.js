@@ -18,7 +18,7 @@ Pot.update({
    * @public
    */
   DateTime : function(x) {
-    return (new Date(x)).getTime();
+    return +new Date(x);
   }
 });
 
@@ -520,7 +520,7 @@ update(Pot.DateTime, {
        */
       W3C : 'Y-m-d\\TH:i:sP'
     });
-  })()
+  }())
 });
 
 // Update Pot object.
