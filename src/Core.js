@@ -10,14 +10,16 @@
 var Pot = {VERSION : '{#$version}', TYPE : /*{#if Pot}'full'{#else}*/'lite'/*{#endif}*/},
 
 // A shortcut of prototype methods.
-push = Array.prototype.push,
-slice = Array.prototype.slice,/*{#if Pot}*/
-splice = Array.prototype.splice,/*{#endif}*/
-concat = Array.prototype.concat,/*{#if Pot}*/
-unshift = Array.prototype.unshift,
-indexOf = Array.prototype.indexOf,/*{#endif}*/
-toString = Object.prototype.toString,
+push           = Array.prototype.push,
+slice          = Array.prototype.slice,
+splice         = Array.prototype.splice,
+concat         = Array.prototype.concat,
+unshift        = Array.prototype.unshift,
+indexOf        = Array.prototype.indexOf,
+lastIndexOf    = Array.prototype.lastIndexOf,
+toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
+fromCharCode   = String.fromCharCode,
 /*{#if Pot}*/
 // Namespace URIs.
 XML_NS_URI   = 'http://www.w3.org/XML/1998/namespace',
@@ -42,6 +44,8 @@ RE_TRIM            = /^[\s\u00A0\u3000]+|[\s\u00A0\u3000]+$/g,/*{#if Pot}*/
 RE_LTRIM           = /^[\s\u00A0\u3000]+/g,
 RE_RTRIM           = /[\s\u00A0\u3000]+$/g,
 RE_STRIP           = /[\s\u00A0\u3000]+/g,
+RE_NL              = /\r\n|\r|\n/,
+RE_NL_GROUP        = /(\r\n|\r|\n)/,
 RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,
 RE_JS_ESCAPED      = /^(?:[\w!#$()*+,.:;=?@[\]^`|~-]|\\[ux][0-9a-f]+)*$/i,
 RE_HTML_ESCAPED    =
@@ -213,7 +217,7 @@ update(Pot, {
     return ((n && (n.language || n.userLanguage     ||
             n.browserLanguage || n.systemLanguage)) ||
             'en').split(/[^a-zA-Z0-9]+/).shift().toLowerCase();
-  })(nv),
+  }(nv)),
   /**
    * Detect the user operating system.
    *
@@ -280,7 +284,7 @@ update(Pot, {
       return s.join('/');
     };
     return r;
-  })(nv),
+  }(nv)),
   /**
    * Global object. (e.g. window)
    *
@@ -621,13 +625,13 @@ update(Pot.System, (function() {
     /**@ignore*/
     g = (function() {
       yield (0);
-    })();
+    }());
     if (g && typeof g.next === 'function') {
       o.isYieldable = true;
     }
   } catch (e) {}
   return o;
-})());
+}()));
 
 /**
  * Creates methods to detect the type definition.
@@ -687,8 +691,8 @@ update(Pot.System, (function() {
                 return Pot.typeOf(o) === low;
               };
         }
-      })();
-    })();
+      }());
+    }());
   }
   Pot.update({
     /**
@@ -752,7 +756,7 @@ update(Pot.System, (function() {
       return type;
     }
   });
-})('Boolean Number String Function Array Date RegExp Object Error'.split(' '));
+}('Boolean Number String Function Array Date RegExp Object Error'.split(' ')));
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 (function(SI) {
 // Aggregate in this obejct for global functions. (HTML5 Task)
@@ -839,7 +843,7 @@ update(Pot.Internal, {
           this.byEvent = this.byTimer;
         }
       };
-    })(),
+    }()),
     /**
      * @private
      * @ignore
@@ -853,7 +857,7 @@ update(Pot.Internal, {
       return function(callback) {
         process.nextTick(callback);
       };
-    })(),
+    }()),
     /**
      * @private
      * @ignore
@@ -994,7 +998,7 @@ Pot.update({
     };
     f.prototype.constructor.prototype = f.constructor.prototype;
     return new f;
-  })(),
+  }()),
   /**
    * Return whether the argument is StopIteration or not.
    *
@@ -1774,9 +1778,9 @@ Pot.update({
         re.test(toString.call(x))
       );
     };
-  })()/*{#endif}*/
+  }())/*{#endif}*/
 });
-})('StopIteration');
+}('StopIteration'));
 
 // Define StopIteration (this scope only)
 if (typeof StopIteration === 'undefined') {
@@ -1946,7 +1950,7 @@ if (typeof StopIteration === 'undefined') {
       return Pot.System.currentURI;
     }
   });
-})();
+}());
 
 // Definition of builtin method states.
 update(Pot.System, {
@@ -2579,7 +2583,7 @@ Pot.update({
       }
       return result;
     };
-  })(),
+  }()),
   /**
    * Override the method of the object.
    * That enable replace the return value and the arguments variables.
