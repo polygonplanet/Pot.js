@@ -4145,6 +4145,1273 @@ Pot.update({
   }
 });
 
+update(Pot.Internal, {
+  defineDeferrater : Pot.tmp.createSyncIterator
+});
+
+// Definition of deferreed function.
+(function() {
+  /**@ignore*/
+  var Deferrizer = function(func) {
+    return new Deferrizer.prototype.init(func);
+  },
+  SPEED = buildSerial({NAME : '.\u0000[~`{{*@:SPEED:@*}}`~]\u0001'});
+  Deferrizer.prototype = update(Deferrizer.prototype, {
+    /**
+     * @private
+     * @ignore
+     * @internal
+     */
+    constructor : Deferrizer,
+    /**
+     * @private
+     * @ignore
+     */
+    id : Pot.Internal.getMagicNumber(),
+    /**
+     * @ignore
+     * @private
+     */
+    code : null,
+    /**
+     * @ignore
+     * @private
+     */
+    tokens : [],
+    /**
+     * @ignore
+     * @private
+     */
+    uniqs : {},
+    /**
+     * @ignore
+     * @private
+     */
+    tails : [],
+    /**
+     * @ignore
+     * @private
+     */
+    iteration : {},
+    /**
+     * Initialize properties.
+     *
+     * @private
+     * @ignore
+     */
+    init : function(func) {
+      this.code = this.toCode(func);
+      this.tokens = [];
+      this.iteration = {};
+      this.tails = [];
+      return this;
+    },
+    /**
+     * Execute.
+     *
+     * @private
+     * @ignore
+     */
+    execute : function() {
+      var that = this, result = '';
+      if (this.code) {
+        this.uniqs = {};
+        each('key val ret rev err nxt'.split(' '), function(v) {
+          that.uniqs[v] = that.generateUniqName({
+            NAME : '$_' + v + '_'
+          });
+        });
+        this.tokens = this.tokenize(this.code);
+        this.parseLoop();
+        result = this.deferrizeFunction();
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    toCode : function(func) {
+      return stringify(
+        (func && func.toString) ? func.toString() :
+                         (func  ? ('' + func)     : '')
+      );
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    isWord : (function() {
+      var RE = {
+        SPACE : /\s/,
+        WORDS : /[$\w\u0100-\uFFFF]/
+      };
+      return function(c) {
+        return c != null && !RE.SPACE.test(c) && RE.WORDS.test(c);
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    isNL : (function() {
+      var RE = /\r\n|\r|\n/;
+      return function(c) {
+        return c != null && RE.test(c);
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    format : function(/*format[, ...args]*/) {
+      var args = arrayize(arguments);
+      return args[0].replace(/#(\d+)/g, function(a, i) {
+        return args[+i];
+      });
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    joinTokens : function(tokens) {
+      var result = [], len = tokens.length,
+          prev, prevSuf, pre, suf, i, token;
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        if (!prev) {
+          result[result.length] = token;
+        } else {
+          pre = '';
+          suf = '';
+          if (token === '+'  || token === '-'  ||
+              token === '++' || token === '--' ||
+              token === 'in'
+          ) {
+            pre = ' ';
+            suf = ' ';
+          } else if (this.isWord(prev.slice(-1)) &&
+                     this.isWord(token.charAt(0))) {
+            pre = ' ';
+          }
+          if (prevSuf === ' ') {
+            pre = '';
+          }
+          result[result.length] = pre + token + suf;
+        }
+        prev = token;
+        prevSuf = suf;
+      }
+      return result.join('');
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    toEnd : function(code) {
+      var s;
+      if (Pot.isArray(code)) {
+        s = this.joinTokens(code);
+      } else {
+        s = stringify(code);
+      }
+      if (trim(s).slice(-1) === ';') {
+        return s;
+      }
+      return s ? s + ';' : s;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    generateUniqName : function(prefix) {
+      var result;
+      do {
+        result = buildSerial(prefix || Pot, '');
+      } while (~Pot.indexOf(this.tokens, result));
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    tokenize : (function() {
+      var RE = {
+        TOKEN : new RegExp(
+          '(' + '^\\s*function\\b[^{]*[{]' +            // function prefix
+          '|' + '[}][^}]*$' +                           // function suffix
+          '|' + '/[*][\\s\\S]*?[*]/' +                  // multiline comment
+          '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +  // single line comment
+          '|' + '"(?:\\\\[\\s\\S]|[^"\\r\\n\\\\])*"' +  // string literal
+          '|' + "'(?:\\\\[\\s\\S]|[^'\\r\\n\\\\])*'" +  // string literal
+          '|' + '/(?![*])(?:\\\\.|[^/\\r\\n\\\\])+/' +
+                '[gimy]{0,4}' +
+          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +     // e4x
+          '|' + '>>>=?|<<=|===|!==|>>=|[=!<>*+/&|^-]=' +  // operators
+                '|[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
+                '|[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +
+          '|' + '\\s+' +                                      // white space
+          '|' + '[^\\s+/%*=&|^~<>!?:,;@()\\\\[\\].{}\'"-]+' + // token
+          ')',
+          'g'
+        ),
+        NOTSPACE : /[\S\r\n]/,
+        COMMENTS : /^\/{2,}[\s\S]*$|^\/[*][\s\S]*?[*]\/$/
+      };
+      return function(func) {
+        var r = [], m, token, s = this.toCode(func);
+        if (s) {
+          RE.TOKEN.lastIndex = 0;
+          while ((m = RE.TOKEN.exec(s)) != null) {
+            token = m[1];
+            if (!RE.NOTSPACE.test(token) || RE.COMMENTS.test(token)) {
+              continue;
+            } else {
+              r[r.length] = token;
+            }
+          }
+        }
+        return r;
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseLoop : function() {
+      var result, max = 0, loops = [], offsets = [], index = 0, nest = 0,
+          level = 0, inLoop, i, token, len = this.tokens.length;
+      for (i = 0; i < len; i++) {
+        token = this.tokens[i];
+        switch (token) {
+          case 'for':
+          case 'while':
+          case 'do':
+              if (!inLoop) {
+                inLoop = {
+                  token : token,
+                  org : {
+                    level : level,
+                    nest  : nest
+                  },
+                  cur : {
+                    level : level,
+                    nest  : nest
+                  }
+                };
+              }
+              break;
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop.last = true;
+                }
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop.last = true;
+                }
+              }
+              break;
+        }
+        if (inLoop) {
+          if (!(index in loops)) {
+            loops[index] = [];
+            offsets[index] = {
+              start : i
+            };
+          }
+          loops[index][loops[index].length] = token;
+          if (inLoop.last) {
+            offsets[index].end = i;
+            inLoop = null;
+            index++;
+          }
+        }
+      }
+      len = loops.length;
+      for (i = 0; i < len; i++) {
+        if (loops[i].length > max) {
+          max = i;
+        }
+      }
+      this.iteration = {
+        loops : loops[max],
+        start : offsets[max].start,
+        end   : offsets[max].end
+      };
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    deferrizeLoop : function() {
+      var result, tokens = this.iteration.loops,
+          state = tokens.shift();
+      switch (state) {
+        case 'for':
+            result = this.parseFor(tokens);
+            break;
+        case 'while':
+            result = this.parseWhile(tokens);
+            break;
+        case 'do':
+            result = this.parseDoWhile(tokens);
+            break;
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    deferrizeFunction : function() {
+      var result, next, looped, token, i, len = this.tokens.length,
+          key = 'before', enclose,
+          states = {
+            level : 0,
+            block : 0
+          },
+          parts = {
+            before : [],
+            loop   : [],
+            after  : [],
+            result : []
+          },
+          /**@ignore*/
+          openBlock = function(k) {
+            if (!states[k]) {
+              states[k] = {
+                block : states.block,
+                level : states.level
+              };
+            }
+          },
+          /**@ignore*/
+          closeBlock = function(kv) {
+            each(kv ? arrayize(kv) : ['func', 'cond'], function(k) {
+              if (states[k] &&
+                  states[k].block === states.block &&
+                  states[k].level === states.level) {
+                states[k] = null;
+              }
+            });
+          };
+      for (i = 1; i < len - 1; i++) {
+        if (i >= this.iteration.start &&
+            i <= this.iteration.end
+        ) {
+          if (!looped) {
+            looped = true;
+            i = this.iteration.end - 1;
+            parts.loop = arrayize(this.deferrizeLoop());
+            key = 'after';
+            if (states.cond) {
+              enclose = true;
+            }
+          }
+          continue;
+        }
+        token = this.tokens[i];
+        next = this.tokens[i + 1];
+        switch (token) {
+          case '{':
+              states.block++;
+              break;
+          case '}':
+              states.block--;
+              closeBlock();
+              break;
+          case '(':
+              states.level++;
+              break;
+          case ')':
+              states.level--;
+              if (states.cond && states.cond.expr && next === '{') {
+                states.cond.expr = null;
+                closeBlock('func');
+              } else {
+                closeBlock();
+              }
+              break;
+          case ';':
+              closeBlock('result');
+              break;
+          case 'function':
+              openBlock('func');
+              break;
+          case 'if':
+              openBlock('cond');
+              states.cond.expr = true;
+              break;
+          case 'return':
+              if (!states.func && !states.result) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1(#2!==#3)?#2:#2=',
+                    token,
+                    this.uniqs.ret,
+                    this.uniqs.rev
+                  );
+                }
+                parts.result = [];
+                openBlock('result');
+              }
+              break;
+          default:
+              if (states.result && this.isNL(token)) {
+                closeBlock('result');
+              }
+              break;
+        }
+        parts[key][parts[key].length] = token;
+        if (states.result) {
+          parts.result[parts.result.length] = token;
+        }
+      }
+      result = this.format(
+        '#1' +
+        'var #2={},#3=#2,#4={};' +
+        'return Pot.Deferred.begin(function(){' +
+            '#5' +
+            '#6' +
+            '#9' +
+          '});' +
+          '#7' +
+          '#8' +
+        '}).then(function(r){' +
+          'return(#2===#3)?r:#2;' +
+        '});' +
+        '#10',
+        this.tokens.shift(),
+        this.uniqs.ret,
+        this.uniqs.rev,
+        this.uniqs.nxt,
+        this.toEnd(this.joinTokens(parts.before)),
+        this.joinTokens(parts.loop),
+        this.joinTokens(this.tails),
+        this.joinTokens(enclose ? parts.after  : []),
+        this.joinTokens(enclose ? parts.result : parts.after),
+        this.tokens.pop()
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseWhile : function(tokens) {
+      var result = '', level = 0, nest = 0, started = false,
+          prev, next, skip, key = 'cond', inLoop, token, i,
+          len = tokens.length, isEnd = false,
+          states = {
+            cond : [],
+            body : []
+          };
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (i === 0 && nest === 1) {
+                skip = true;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (!started && nest === 0 &&
+                  level === 0 && next === '{') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (level === 1 && nest === 0 && prev === ')') {
+                skip = true;
+                started = true;
+                key = 'body';
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (started && nest === 0 && level === 0) {
+                states.body.unshift(this.format(
+                  'if(#1!==#2||!(#3)){' +
+                    'throw Pot.StopIteration;' +
+                  '}' +
+                  'try{',
+                  this.uniqs.ret,
+                  this.uniqs.rev,
+                  this.joinTokens(states.cond) || 'false'
+                ));
+                states.body.push(this.format(
+                  '}catch(#1){' +
+                    'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+                      'throw #1;' +
+                    '}' +
+                    'if(#1!==#2){' +
+                      'throw #1;' +
+                    '}' +
+                  '}',
+                  this.uniqs.err,
+                  this.uniqs.nxt
+                ));
+                token += ').then(function(){';
+                isEnd = true;
+              }
+              break;
+          case 'for':
+          case 'while':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (started) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1 #2=',
+                    token,
+                    this.uniqs.ret
+                  );
+                }
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'while(...)'");
+      }
+      result = this.format(
+        'return Pot.Deferred.forEver.#1(function(){' +
+        '#2',
+        SPEED,
+        this.joinTokens(states.body)
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseDoWhile : function(tokens) {
+      var result = '', level = 0, nest = 0, prev, next, skip,
+          key = 'body', inLoop, token, i, len = tokens.length, isEnd = false,
+          states = {
+            cond  : [],
+            body  : [],
+            after : []
+          };
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (level === 0 && nest === 1 && prev === 'while') {
+                skip = true;
+                key = 'cond';
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (nest === 0 && level === 0 && key === 'cond') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (i === 0 && level === 1) {
+                skip = true;
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (nest === 0 && level === 0 && next === 'while') {
+                isEnd = true;
+                skip = true;
+              }
+              break;
+          case 'while':
+              if (level === 0 && nest === 0) {
+                skip = true;
+                break;
+              }
+              // FALLTHROUGH
+          case 'for':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (!next || next === ';' || this.isNL(next)) {
+                token = this.format('#1 #2=void 0#3',
+                  token,
+                  this.uniqs.ret,
+                  (next === ';' || this.isNL(next)) ? '' : ';'
+                );
+              } else {
+                token = this.format('#1 #2=',
+                  token,
+                  this.uniqs.ret
+                );
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'do...while()'");
+      }
+      states.body.unshift(this.format(
+        'if(#1!==#2){' +
+          'throw Pot.StopIteration;' +
+        '}' +
+        'try{',
+        this.uniqs.ret,
+        this.uniqs.rev
+      ));
+      states.body.push(this.format(
+        '}catch(#1){' +
+          'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+            'throw #1;' +
+          '}' +
+          'if(#1!==#2){' +
+            'throw #1;' +
+          '}' +
+        '}finally{' +
+          'if(!(#3)){' +
+            'throw Pot.StopIteration;' +
+          '}' +
+        '}' +
+        '}).then(function(){',
+        this.uniqs.err,
+        this.uniqs.nxt,
+        this.joinTokens(states.cond) || 'false'
+      ));
+      result = this.format(
+        'return Pot.Deferred.forEver.#1(function(){' +
+        '#2',
+        SPEED,
+        this.joinTokens(states.body)
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseFor : function(tokens) {
+      var result = '', level = 0, nest = 0, isInOrOf = null, started = false,
+          prev, next, skip, key = 'before', varType, inLoop, i, len, token,
+          isEnd = false,
+          states = {
+            prefix : [],
+            suffix : [],
+            before : [],
+            cond   : [],
+            after  : [],
+            key    : [],
+            target : [],
+            body   : []
+          };
+      len = tokens.length;
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (i === 0 && nest === 1) {
+                skip = true;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (!started && nest === 0 &&
+                  level === 0 && next === '{') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (level === 1 && nest === 0 && prev === ')') {
+                skip = true;
+                started = true;
+                key = 'body';
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (started && nest === 0 && level === 0) {
+                states.body.unshift(this.format(
+                  'if(#1!==#2){' +
+                    'throw Pot.StopIteration;' +
+                  '}' +
+                  'try{',
+                  this.uniqs.ret,
+                  this.uniqs.rev
+                ));
+                if (states.suffix.length) {
+                  states.body.push(
+                    this.toEnd(this.joinTokens(states.suffix))
+                  );
+                }
+                states.body.push(this.format(
+                  '}catch(#1){' +
+                    'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+                      'throw #1;' +
+                    '}' +
+                    'if(#1!==#2){' +
+                      'throw #1;' +
+                    '}' +
+                  '}finally{' +
+                    '#3' +
+                  '}',
+                  this.uniqs.err,
+                  this.uniqs.nxt,
+                  this.toEnd(this.joinTokens(states.after))
+                ));
+                token += ').then(function(){';
+                isEnd = true;
+              }
+              break;
+          case 'in':
+          case 'of':
+              if (!started && isInOrOf === null &&
+                  nest === 1 && level === 0
+              ) {
+                skip = true;
+                isInOrOf = true;
+                if (states.before.length > 2) {
+                  throw new Error(
+                    "Invalid keys, expect 'for(var [...] in ...);'"
+                  );
+                }
+                if (varType) {
+                  states.before.push(';');
+                  unshift.apply(states.prefix, states.before);
+                  states.before.shift();
+                  states.before.pop();
+                  if (varType === 'let') {
+                    states.prefix.unshift('{');
+                    this.tails.push('}');
+                  }
+                }
+                states.before.push('=' + this.uniqs.key);
+                states.before.push(';');
+                states.key = states.before;
+                unshift.apply(states.body, states.key);
+                key = 'target';
+              }
+              break;
+          case 'var':
+          case 'let':
+              if (!varType && i === 1 && nest === 1) {
+                varType = token;
+              }
+              break;
+          case ',':
+              if (!started && nest === 1 && level === 0 &&
+                  !varType &&
+                  (key === 'before' || key === 'after')
+              ) {
+                token = ';';
+              }
+              break;
+          case ';':
+              if (!started && nest === 1 && level === 0) {
+                skip = true;
+                if (isInOrOf === null) {
+                  isInOrOf = false;
+                }
+                if (key === 'before') {
+                  key = 'cond';
+                  states.prefix.push(
+                    this.toEnd(this.joinTokens(states.before))
+                  );
+                  if (varType === 'let') {
+                    states.prefix.unshift('{');
+                    this.tails.push('}');
+                  }
+                } else if (key === 'cond') {
+                  key = 'after';
+                  if (states.cond.length) {
+                    states.cond.unshift('if(');
+                    states.cond.push('){');
+                    states.suffix.push('}else{throw Pot.StopIteration;}');
+                  }
+                  push.apply(states.body, states.cond);
+                }
+              }
+              break;
+          case 'for':
+          case 'while':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (started) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1 #2=',
+                    token,
+                    this.uniqs.ret
+                  );
+                }
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'for(...)'");
+      }
+      if (isInOrOf) {
+        result = this.format(
+          '#1return Pot.Deferred.forEach.#2(#3,function(#4,#5){' +
+          '#6',
+          this.toEnd(this.joinTokens(states.prefix)),
+          SPEED,
+          this.joinTokens(states.target),
+          this.uniqs.val,
+          this.uniqs.key,
+          this.joinTokens(states.body)
+        );
+      } else {
+        result = this.format(
+          '#1return Pot.Deferred.forEver.#2(function(){' +
+          '#3',
+          this.toEnd(this.joinTokens(states.prefix)),
+          SPEED,
+          this.joinTokens(states.body)
+        );
+      }
+      return result;
+    }
+  });
+  Deferrizer.prototype.init.prototype = Deferrizer.prototype;
+  update(Pot.Internal, {
+    /**
+     * @lends Pot.Internal
+     */
+    /**
+     * @type Function
+     * @internal
+     * @ignore
+     */
+    deferrate : function(func) {
+      return (new Deferrizer(func)).execute();
+    }
+  });
+  // Update Pot/Pot.Deferred.
+  update(Pot.Deferred, {
+    /**
+     * @lends Pot.Deferred
+     */
+    /**
+     * Create new defer function with speeds from static function.
+     * That returns a new instance of Pot.Deferred that
+     *  has already ".begin()" called.
+     * This function works like 'deferrize'.
+     * This function will redefine the function that converts the
+     *  synchronous loop block (i.e. for, for-in, do, while) to the
+     *  asynchronous iteration by Pot.Deferred.xxx.
+     *
+     *
+     * @example
+     *   var toCharCode = function(string) {
+     *     var result = [];
+     *     for (var i = 0; i < string.length; i++) {
+     *       result.push(string.charCodeAt(i));
+     *     }
+     *     return result;
+     *   };
+     *   var toCharCodeDefer = Pot.deferreed(toCharCode);
+     *   // Note:
+     *   //  toCharCodeDefer like below.
+     *   //
+     *   //  function(string) {
+     *   //    var result = [];
+     *   //    return Pot.Deferred.repeat(string.length, function(i) {
+     *   //      result.push(string.charCodeAt(i));
+     *   //    }).then(function() {
+     *   //      return result;
+     *   //    });
+     *   //  };
+     *   //
+     *   toCharCodeDefer('abc').then(function(res) {
+     *     Pot.debug(res); // @results [97, 98, 99]
+     *   });
+     *   // Large string.
+     *   var largeString = new Array(100000).join('abcdef');
+     *   // Specify speed 'slow'.
+     *   toCharCodeDefer.slow(largeString).then(function(res) {
+     *     Pot.debug(res.length); // @results  599994
+     *   });
+     *
+     *
+     * @example
+     *   // Compress/Decompress string by LZ77 algorithm.
+     *   // http://polygon-planet.blogspot.com/2011/02/lz77javascript.html
+     *   var TinyLz77 = {
+     *     // compress (synchronous)
+     *     compress : function(s) {
+     *       var a = 53300, b, c, d, e, f, g = -1,
+     *           h, i, r = [], x = String.fromCharCode;
+     *       if (!s) {
+     *         return '';
+     *       }
+     *       s = new Array(a--).join(' ') + s;
+     *       while ((b = s.substr(a, 256))) {
+     *         for (c = 2, i = b.length; c <= i; ++c) {
+     *           d = s.substring(
+     *               a - 52275,
+     *               a + c - 1
+     *           ).lastIndexOf(b.substring(0, c));
+     *           if (!~d) {
+     *             break;
+     *           }
+     *           e = d;
+     *         }
+     *         if (c === 2 || c === 3 && f === g) {
+     *           f = g;
+     *           h = s.charCodeAt(a++);
+     *           r.push(
+     *               x(h >> 8 & 255),
+     *               x(h & 255)
+     *           );
+     *         } else {
+     *           r.push(
+     *               x((e >> 8 & 255) | 65280),
+     *               x(e & 255),
+     *               x(c - 3)
+     *           );
+     *           a += c - 1;
+     *         }
+     *       }
+     *       return r.join('');
+     *     },
+     *     // decompress (synchronous)
+     *     decompress : function(s) {
+     *       var a = 53300, b = 0, c, d, e, f, g,
+     *           h, r = new Array(a--).join(' '),
+     *           x = String.fromCharCode;
+     *       if (s && s.length) {
+     *         do {
+     *           c = s.charCodeAt(b++);
+     *           if (c <= 255) {
+     *             r += x((c << 8) | s.charCodeAt(b++));
+     *           } else {
+     *             e = ((c & 255) << 8) | s.charCodeAt(b++);
+     *             f = e + s.charCodeAt(b++) + 2;
+     *             h = r.slice(-52275);
+     *             g = h.substring(e, f);
+     *             if (g) {
+     *               while (h.length < f) {
+     *                 h += g;
+     *               }
+     *               r += h.substring(e, f);
+     *             }
+     *           }
+     *         } while (b < s.length);
+     *       }
+     *       return r.slice(a);
+     *     }
+     *   };
+     *   // create asynchronous iteration functions.
+     *   var compressDefer   = Pot.deferreed(TinyLz77, 'compress');
+     *   var decompressDefer = Pot.deferreed(TinyLz77, 'decompress');
+     *   // original string.
+     *   var string = 'foooooooooo baaaaaaaaaaaaar baaaaaaazzzzzzzzzzzz';
+     *   Pot.debug(string.length); // 48
+     *   // execute compress with asynchronous iterator.
+     *   compressDefer(string).then(function(res) {
+     *     Pot.debug(res.length); // 26
+     *     return decompressDefer(res).then(function(res) {
+     *       Pot.debug(res.length); // 48
+     *     });
+     *   });
+     *
+     *
+     * @param  {Object|Function}   object   The context object.
+     *                                        or the target function.
+     * @param  {String|Function}  (method)  The target function name.
+     *                                        or the target function.
+     * @return {Function}                   The defer function that
+     *                                        returns Deferred object.
+     *                                      Returns new asynchronous
+     *                                        function that has
+     *                                        each speeds below.
+     *                                      <pre>
+     *                                      ----------------------------------
+     *                                       method name |  speed
+     *                                      ----------------------------------
+     *                                       limp        :  slowest
+     *                                       doze        :  slower
+     *                                       slow        :  slow
+     *                                       normal      :  normal (default)
+     *                                       fast        :  fast
+     *                                       rapid       :  faster
+     *                                       ninja       :  fastest
+     *                                      ----------------------------------
+     *                                      You can control speed by
+     *                                        specify key.
+     *                                      e.g.
+     *                                        var f = deferreed(func);
+     *                                        f();      // normal
+     *                                        f.slow(); // slow
+     *                                      </pre>
+     * @type   Function
+     * @function
+     * @public
+     * @static
+     */
+    deferreed : function(object, method) {
+      var args = arguments, func, context, err, code, fn,
+          isFired = Pot.Deferred.isFired;
+      try {
+        switch (args.length) {
+          case 0:
+              throw false;
+          case 1:
+              func = object;
+              break;
+          case 2:
+          default:
+              if (Pot.isObject(method)) {
+                context = method;
+                func    = object;
+              } else {
+                func    = method;
+                context = object;
+              }
+              break;
+        }
+        if (!func || (context &&
+            (!(func in context) || Pot.isBuiltinMethod(context[func])))) {
+          throw func;
+        }
+        code = Pot.Internal.deferrate(context && context[func] || func);
+        if (!code) {
+          throw code;
+        }
+        fn = Pot.Internal.defineDeferrater(function(speedKey) {
+          var c = code.replace(SPEED, speedKey),
+              f = Pot.localEval(c, context);
+          return function() {
+            return f.apply(context, arguments);
+          };
+        });
+        if (!fn || !Pot.isFunction(fn)) {
+          throw fn;
+        }
+      } catch (e) {
+        err = e;
+        throw (Pot.isError(err) ? err : new Error(err));
+      }
+      return fn;
+    }
+  });
+  // Refer Pot object.
+  Pot.update({
+    deferreed : Pot.Deferred.deferreed
+  });
+}());
+
 delete Pot.tmp.createIterators;
 delete Pot.tmp.createProtoIterators;
 delete Pot.tmp.createSyncIterator;

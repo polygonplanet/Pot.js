@@ -236,6 +236,7 @@ update(Pot.Internal, {
     register                : Pot.Deferred.register,
     unregister              : Pot.Deferred.unregister,
     deferrize               : Pot.Deferred.deferrize,
+    deferreed               : Pot.Deferred.deferreed,
     begin                   : Pot.Deferred.begin,
     flush                   : Pot.Deferred.flush,
     till                    : Pot.Deferred.till,
