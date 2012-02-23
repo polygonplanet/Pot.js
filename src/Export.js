@@ -459,6 +459,10 @@ update(Pot.Internal, {
     trim                    : trim,
     now                     : now,
     globalize               : Pot.globalize,
-    debug                   : Pot.Debug.debug
+    debug                   : Pot.Debug.debug,
+    addPlugin               : Pot.Plugin.add,
+    hasPlugin               : Pot.Plugin.has,
+    removePlugin            : Pot.Plugin.remove,
+    listPlugin              : Pot.Plugin.list
   }
 });

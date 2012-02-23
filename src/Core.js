@@ -114,6 +114,61 @@ update(Pot, {
    */
   System : {},
   /**
+   * Pot plugin object.
+   *
+   *
+   * @example
+   *   // Register my plugin function.
+   *   Pot.addPlugin('myFunc', function(msg) {
+   *     alert('myFunc: ' + msg);
+   *   });
+   *   // Call function that is able to refer from the Pot object.
+   *   Pot.myFunc('Hello!'); // 'myFunc: Hello!'
+   *   // Check exists.
+   *   debug( Pot.hasPlugin('myFunc') ); // true
+   *   // Register other plugin function.
+   *   Pot.addPlugin('myFunc2', function(a, b) {
+   *     return a + b;
+   *   });
+   *   // Call other function.
+   *   debug( Pot.myFunc2(1, 2) ); // 3
+   *   // addPlugin does not overwrite function on default.
+   *   debug( Pot.addPlugin('myFunc', function() {}) ); // false
+   *   // View list of plugins.
+   *   debug( Pot.listPlugin() ); // ['myFunc', 'myFunc2']
+   *   // Remove my plugin.
+   *   Pot.removePlugin('myFunc');
+   *   debug( Pot.hasPlugin('myFunc') ); // false
+   *   debug( Pot.listPlugin() ); // ['myFunc2']
+   *
+   *
+   * @example
+   *   Pot.addPlugin({
+   *     foo : function() { return 'foo!'; },
+   *     bar : function() { return 'bar!'; },
+   *     baz : function() { return 'baz!'; }
+   *   });
+   *   debug(Pot.foo() + Pot.bar() + Pot.baz()); // 'foo!bar!baz!'
+   *
+   *
+   * @example
+   *   // Register function.
+   *   Pot.addPlugin('foo', function() { return 'foo!'; });
+   *   // Try change function.
+   *   var newFoo = function() { return 'NewFoo!' };
+   *   debug( Pot.addPlugin('foo', newFoo) ); // false
+   *   // Overwrite plugin function.
+   *   debug( Pot.addPlugin('foo', newFoo, true) ); // true
+   *   debug( Pot.foo() ); // 'NewFoo!'
+   *
+   *
+   * @type  Object
+   * @class
+   * @static
+   * @public
+   */
+  Plugin : {},
+  /**
    * toString.
    *
    * @return  Return formatted string of object.

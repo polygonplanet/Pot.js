@@ -107,3 +107,235 @@ Pot.update({
     };
   }())
 });
+
+// Update Pot.Plugin object methods.
+(function(Plugin, Internal) {
+update(Plugin, {
+  /**
+   * @lends Pot.Plugin
+   */
+  /**
+   * @private
+   * @ignore
+   */
+  storage : {},
+  /**
+   * Add plugin function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.foo(); // 'foo!'
+   *
+   *
+   * @param  {String|Object}  name     A name of Plugin function. or object.
+   * @param  {Function}      (method)  A plugin function.
+   * @param  {Boolean}       (force)   Whether overwrite plugin.
+   *                                     (default=false).
+   * @return {Boolean}                 Return success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  add : function(name, method, force) {
+    var result = true, pairs, overwrite;
+    if (Pot.isObject(name)) {
+      pairs = name;
+      overwrite = !!(force || method);
+    } else {
+      pairs = {};
+      pairs[stringify(name, true)] = method;
+      overwrite = !!force;
+    }
+    each(pairs, function(func, k) {
+      var key = stringify(k, true);
+      if (key && (overwrite || !Plugin.has(key))) {
+        Pot[key] = Plugin.storage[key] = Internal.PotExportProps[key] = func;
+      } else {
+        result = false;
+      }
+    });
+    return result;
+  },
+  /**
+   * Check whether Pot.Plugin has already specific name.
+   *
+   *
+   * @example
+   *   debug( Pot.hasPlugin('hoge') ); // false
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.hasPlugin('hoge') ); // true
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns whether Pot.Plugin has
+   *                                  already specific name.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  has : function(name) {
+    var result = true;
+    each(arrayize(name), function(k) {
+      var key = stringify(k, true);
+      if (!(key in Plugin.storage)) {
+        result = false;
+        throw Pot.StopIteration;
+      }
+    });
+    return result;
+  },
+  /**
+   * Removes Pot.Plugin's function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.removePlugin('hoge') ); // true
+   *   Pot.hoge(); // (Error: hoge is undefined)
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  remove : function(name) {
+    var result = true;
+    each(arrayize(name), function(k) {
+      var key = stringify(k, true);
+      if (Pot.Plugin.has(key)) {
+        try {
+          if (key in Internal.PotExportProps) {
+            delete Internal.PotExportProps[key];
+          }
+          if (key in Pot) {
+            delete Pot[key];
+          }
+          delete Plugin.storage[key];
+          if (Plugin.has(key)) {
+            throw false;
+          }
+        } catch (e) {
+          result = false;
+        }
+      }
+    });
+    return result;
+  },
+  /**
+   * List the Pot.Plugin function names.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.addPlugin('bar', function() { alert('bar!') });
+   *   debug( Pot.listPlugin() ); // ['foo', 'bar']
+   *
+   *
+   * @return {Array} Returns an array of function names.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  list : function() {
+    var result = Pot.keys(Plugin.storage);
+    return result;
+  }
+});
+
+// Update Pot object.
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Add plugin function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.foo(); // 'foo!'
+   *
+   *
+   * @param  {String|Object}  name     A name of Plugin function. or object.
+   * @param  {Function}      (method)  A plugin function.
+   * @param  {Boolean}       (force)   Whether overwrite plugin.
+   *                                     (default=false).
+   * @return {Boolean}                 Return success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  addPlugin : Plugin.add,
+  /**
+   * Check whether Pot.Plugin has already specific name.
+   *
+   *
+   * @example
+   *   debug( Pot.hasPlugin('hoge') ); // false
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.hasPlugin('hoge') ); // true
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns whether Pot.Plugin has
+   *                                  already specific name.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  hasPlugin : Plugin.has,
+  /**
+   * Removes Pot.Plugin's function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.removePlugin('hoge') ); // true
+   *   Pot.hoge(); // (Error: hoge is undefined)
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  removePlugin : Plugin.remove,
+  /**
+   * List the Pot.Plugin function names.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.addPlugin('bar', function() { alert('bar!') });
+   *   debug( Pot.listPlugin() ); // ['foo', 'bar']
+   *
+   *
+   * @return {Array} Returns an array of function names.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  listPlugin : Plugin.list
+});
+
+}(Pot.Plugin, Pot.Internal));
