@@ -2544,7 +2544,6 @@ update(Pot.Iter, {
   lastIndexOf : function(object, subject, from) {
     var result = -1, i, len,  key, val, passed, pairs,
         args = arguments,
-        argn = args.length,
         arrayLike  = object && Pot.isArrayLike(object),
         objectLike = object && !arrayLike && Pot.isObject(object);
     if (arrayLike) {
@@ -4155,7 +4154,10 @@ update(Pot.Internal, {
   var Deferrizer = function(func) {
     return new Deferrizer.prototype.init(func);
   },
-  SPEED = buildSerial({NAME : '.\u0000[~`{{*@:SPEED:@*}}`~]\u0001'});
+  SPEED = buildSerial({NAME : '.\u0000[~`{{*@:SPEED:@*}}`~]\u0001'}),
+  CACHE = {},
+  CACHE_COUNT = 0,
+  CACHE_LIMIT = 0x2000;
   Deferrizer.prototype = update(Deferrizer.prototype, {
     /**
      * @private
@@ -4168,6 +4170,11 @@ update(Pot.Internal, {
      * @ignore
      */
     id : Pot.Internal.getMagicNumber(),
+    /**
+     * @ignore
+     * @private
+     */
+    func : null,
     /**
      * @ignore
      * @private
@@ -4200,7 +4207,8 @@ update(Pot.Internal, {
      * @ignore
      */
     init : function(func) {
-      this.code = this.toCode(func);
+      this.func = func;
+      this.code = this.toCode(this.func);
       this.tokens = [];
       this.iteration = {};
       this.tails = [];
@@ -4215,15 +4223,48 @@ update(Pot.Internal, {
     execute : function() {
       var that = this, result = '';
       if (this.code) {
-        this.uniqs = {};
-        each('key val ret rev err nxt'.split(' '), function(v) {
-          that.uniqs[v] = that.generateUniqName({
-            NAME : '$_' + v + '_'
+        if (this.code in CACHE) {
+          result = CACHE[this.code];
+        } else {
+          this.uniqs = {};
+          each('key val ret rev err nxt'.split(' '), function(v) {
+            that.uniqs[v] = that.generateUniqName({
+              NAME : '$_' + v + '_'
+            });
           });
-        });
-        this.tokens = this.tokenize(this.code);
-        this.parseLoop();
-        result = this.deferrizeFunction();
+          this.tokens = this.tokenize(this.code);
+          if (!this.hasIteration(this.tokens)) {
+            result = this.func;
+          } else {
+            this.parseLoop();
+            result = this.deferrizeFunction();
+            if (result) {
+              if (CACHE_COUNT < CACHE_LIMIT) {
+                CACHE[this.code] = result;
+                CACHE_COUNT++;
+              }
+            }
+          }
+        }
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    hasIteration : function(tokens) {
+      var result = false, i, len, token;
+      if (tokens) {
+        len = tokens.length;
+        for (i = 0; i < len; i++) {
+          token = tokens[i];
+          if (token === 'for' || token === 'while' || token === 'do') {
+            result = true;
+            break;
+          }
+        }
       }
       return result;
     },
@@ -5040,6 +5081,11 @@ update(Pot.Internal, {
                 isEnd = true;
               }
               break;
+          case 'each':
+              if (i === 0) {
+                throw new Error("Not supported 'for each'");
+              }
+              break;
           case 'in':
           case 'of':
               if (!started && isInOrOf === null &&
@@ -5361,14 +5407,17 @@ update(Pot.Internal, {
      * @static
      */
     deferreed : function(object, method) {
-      var args = arguments, func, context, err, code, fn,
-          isFired = Pot.Deferred.isFired;
+      var result, func, context, err, code, proc;
       try {
-        switch (args.length) {
+        switch (arguments.length) {
           case 0:
               throw false;
           case 1:
               func = object;
+              if (!Pot.isFunction(func)) {
+                throw func;
+              }
+              proc = func;
               break;
           case 2:
           default:
@@ -5379,31 +5428,41 @@ update(Pot.Internal, {
                 func    = method;
                 context = object;
               }
+              if (!Pot.isFunction(context[func])) {
+                throw func;
+              }
+              proc = context[func];
               break;
         }
-        if (!func || (context &&
-            (!(func in context) || Pot.isBuiltinMethod(context[func])))) {
-          throw func;
+        if (!proc || !Pot.isFunction(proc) || Pot.isBuiltinMethod(proc)) {
+          throw proc;
         }
-        code = Pot.Internal.deferrate(context && context[func] || func);
+        code = Pot.Internal.deferrate(proc);
         if (!code) {
           throw code;
         }
-        fn = Pot.Internal.defineDeferrater(function(speedKey) {
-          var c = code.replace(SPEED, speedKey),
-              f = Pot.localEval(c, context);
-          return function() {
-            return f.apply(context, arguments);
-          };
-        });
-        if (!fn || !Pot.isFunction(fn)) {
-          throw fn;
+        if (code === proc) {
+          result = Pot.Deferred.deferrize(proc);
+        } else {
+          if (!Pot.isString(code)) {
+            throw code;
+          }
+          result = Pot.Internal.defineDeferrater(function(speedKey) {
+            var c = code.replace(SPEED, speedKey),
+                f = Pot.localEval(c, context);
+            return function() {
+              return f.apply(context, arguments);
+            };
+          });
+        }
+        if (!result || !Pot.isFunction(result)) {
+          throw result;
         }
       } catch (e) {
         err = e;
-        throw (Pot.isError(err) ? err : new Error(err));
+        throw Pot.isError(err) ? err : new Error(err);
       }
-      return fn;
+      return result;
     }
   });
   // Refer Pot object.
