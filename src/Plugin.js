@@ -120,6 +120,11 @@ update(Plugin, {
    */
   storage : {},
   /**
+   * @private
+   * @ignore
+   */
+  shelter : {},
+  /**
    * Add plugin function.
    *
    *
@@ -149,9 +154,29 @@ update(Plugin, {
       pairs[stringify(name, true)] = method;
       overwrite = !!force;
     }
-    each(pairs, function(func, k) {
-      var key = stringify(k, true);
+    each(pairs, function(v, k) {
+      var key = stringify(k, true), func;
+      if (Pot.isFunction(v)) {
+        /**@ignore*/
+        func = function() {
+          return v.apply(v, arguments);
+        };
+        update(func, {
+          deferred : (function() {
+            try {
+              return Pot.Deferred.deferreed(func);
+            } catch (e) {
+              return Pot.Deferred.deferrize(func);
+            }
+          }())
+        });
+      } else {
+        func = v;
+      }
       if (key && (overwrite || !Plugin.has(key))) {
+        if (key in Pot) {
+          Plugin.shelter[key] = Pot[key];
+        }
         Pot[key] = Plugin.storage[key] = Internal.PotExportProps[key] = func;
       } else {
         result = false;
@@ -213,11 +238,16 @@ update(Plugin, {
       var key = stringify(k, true);
       if (Pot.Plugin.has(key)) {
         try {
-          if (key in Internal.PotExportProps) {
-            delete Internal.PotExportProps[key];
-          }
-          if (key in Pot) {
-            delete Pot[key];
+          if (key in Plugin.shelter) {
+            Pot[key] = Internal.PotExportProps[key] = Plugin.shelter[key];
+            delete Plugin.shelter[key];
+          } else {
+            if (key in Pot) {
+              delete Pot[key];
+            }
+            if (key in Internal.PotExportProps) {
+              delete Internal.PotExportProps[key];
+            }
           }
           delete Plugin.storage[key];
           if (Plugin.has(key)) {

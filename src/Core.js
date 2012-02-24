@@ -162,6 +162,36 @@ update(Pot, {
    *   debug( Pot.foo() ); // 'NewFoo!'
    *
    *
+   * @example
+   *   var toArray = function(string) {
+   *     return string.split('');
+   *   };
+   *   // Plugin function has 'deferred' method.
+   *   Pot.addPlugin('toArray', toArray);
+   *   // Synchronous
+   *   debug( Pot.toArray('abc') ); // ['a', 'b', 'c']
+   *   // Asynchronous
+   *   Pot.toArray.deferred('abc').then(function(res) {
+   *     debug(res); // ['a', 'b', 'c']
+   *   });
+   *
+   *
+   * @example
+   *   var string = '\t abc\n \t ';
+   *   // Original Pot.trim().
+   *   debug(Pot.trim(string)); // 'abc'
+   *   // Overwrite Pot.trim().
+   *   Pot.addPlugin('trim', function(s) {
+   *     return s.replace(/^ +| +$/g, '');
+   *   });
+   *   // New Pot.trim().
+   *   debug(Pot.trim(string)); // '\t abc\n \t'
+   *   // Removes new Pot.trim().
+   *   Pot.removePlugin('trim');
+   *   // Back to the original.
+   *   debug(Pot.trim(string)); // 'abc'
+   *
+   *
    * @type  Object
    * @class
    * @static
