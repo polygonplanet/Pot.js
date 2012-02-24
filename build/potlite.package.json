@@ -1,7 +1,7 @@
 {
   "fileName": "potlite.js",
   "debug": false,
-  "version": "1.30",
+  "version": "1.31",
   "files": [
     "Core.js",
     "Deferred.js",
@@ -13,8 +13,8 @@
     "XPCOM.js",
     "Signal.js",
     "Debug.js",
-    "Export.js",
     "Plugin.js",
+    "Export.js",
     "Done.js"
   ],
   "enclosure": "Enclosure.js"

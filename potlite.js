@@ -1,12 +1,10 @@
 /*!
- * PotLite.js - JavaScript utility library
+ * PotLite.js - JavaScript library
  *
- * Pot.js implements practical tendency as a substitution utility library.
- * That includes asynchronous methods as "Deferred"
- *  for solution to heavy process.
- * That is fully ECMAScript compliant.
+ * PotLite.js is an implemental utility library
+ *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.30, 2012-02-06
+ * Version 1.31, 2012-02-24
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -16,24 +14,61 @@
  *
  * @description
  *  <p>
- *  PotLite.js implements practical tendency as a substitution utility library.
- *  That includes asynchronous methods as "Deferred"
- *   for solution to heavy process.
- *  That is fully ECMAScript compliant.
+ *  Pot.js is a JavaScript library that can be performed without causing
+ *   stress to the UI and the CPU load by using easy loop iteration functions.
+ *  With respect to load, you can implement a particular application without
+ *   requiring the programmer to be aware of.
+ *  Pot.js is built around the asynchronous processing
+ *   and iterator with Deferred.
+ *  Pot.Deferred is a Deferred object like MochiKit (or JSDeferred like).
+ *  That makes it possible to various iterations (forEach, filter, map,
+ *   reduce, zip, repeat, some etc.).
+ *  Moreover, Pot.js is an utility library that handles string processes with
+ *   various algorithms,
+ *   and it has the Signal object that can write like aspect-oriented (AOP),
+ *   and it has the Event object for DOM listener,
+ *   and treats it the File API for HTML5. etc.
+ *  And, Pot.js never pollute the prototype of the global objects.
+ *  We only define the 'Pot' object in the global scope basically.
+ *  You can use Pot.js with other available libraries without fear of conflict.
+ *  Pot.js is a cross-browser library that works on a Web browser, Node.js,
+ *   userscript (Greasemonkey, Scriptish) XUL, or (Firefox Add-ons) etc.
+ *  PotLite.js is a light version that extracts only the part of asynchronous
+ *   processing (Deferred etc.) has been implemented in Pot.js.
  *  </p>
  *
  * @description
  *  <p>
- *  非ブロックでの非同期処理を直列的に書けるようにし、
- *  UI や CPU への負担を軽減する
- *  ループ処理を中心に実装された JavaScript ライブラリ。
+ *  Pot.js は、
+ *   JavaScript のループ処理における CPU 負荷を抑え、
+ *   UI にストレスを与えることなく実行できるライブラリです。
+ *  負荷に関して、とくにプログラマが意識する必要なく
+ *   アプリケーションを実装することができます。
+ *  Pot.js は、Deferred による非同期処理や、
+ *   非同期イテレータを中心に作られています。
+ *  MochiKit ライク (または JSDeferred ライク) な Pot.Deferred によって、
+ *   多様なイテレート (forEach, filter, map, reduce, zip, repeat, some など)
+ *   を可能とします。
+ *  また、様々なアルゴリズムを扱った文字列処理や、
+ *   アスペクト指向 (AOP) で書ける シグナルやイベント処理、
+ *   HTML5 に関する File API などを扱うことができる
+ *   汎用ユーティリティライブラリです。
+ *  そして、グローバルオブジェクトの prototype を汚染しません。
+ *  基本的にグローバルに定義されるのは 'Pot' オブジェクトだけなので
+ *   コンフリクトの心配なく、他の JavaScript ライブラリと共に利用できます。
+ *  Pot.js は、クロスブラウザであり、Web ブラウザ上や Node.js、
+ *   userscript (Greasemonkey, Scriptish) や
+ *   XUL (Firefox アドオン) 上などで動きます。
+ *  PotLite.js は、
+ *   Pot.js で実装されている Deferred などの
+ *   非同期処理の部分だけを抽出したライトバージョンです。
  *  </p>
  *
  *
- * @fileoverview   PotLite.js utility library
+ * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.30
- * @date           2012-02-06
+ * @version        1.31
+ * @date           2012-02-24
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -67,14 +102,19 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.30', TYPE : 'lite'},
+var Pot = {VERSION : '1.31', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
-push = Array.prototype.push,
-slice = Array.prototype.slice,
-concat = Array.prototype.concat,
-toString = Object.prototype.toString,
+push           = Array.prototype.push,
+slice          = Array.prototype.slice,
+splice         = Array.prototype.splice,
+concat         = Array.prototype.concat,
+unshift        = Array.prototype.unshift,
+indexOf        = Array.prototype.indexOf,
+lastIndexOf    = Array.prototype.lastIndexOf,
+toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
+fromCharCode   = String.fromCharCode,
 
 // Regular expression patterns.
 RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
@@ -144,6 +184,91 @@ update(Pot, {
    *           Whether the environment is running on non browser-extension.
    */
   System : {},
+  /**
+   * Pot plugin object.
+   *
+   *
+   * @example
+   *   // Register my plugin function.
+   *   Pot.addPlugin('myFunc', function(msg) {
+   *     alert('myFunc: ' + msg);
+   *   });
+   *   // Call function that is able to refer from the Pot object.
+   *   Pot.myFunc('Hello!'); // 'myFunc: Hello!'
+   *   // Check exists.
+   *   debug( Pot.hasPlugin('myFunc') ); // true
+   *   // Register other plugin function.
+   *   Pot.addPlugin('myFunc2', function(a, b) {
+   *     return a + b;
+   *   });
+   *   // Call other function.
+   *   debug( Pot.myFunc2(1, 2) ); // 3
+   *   // addPlugin does not overwrite function on default.
+   *   debug( Pot.addPlugin('myFunc', function() {}) ); // false
+   *   // View list of plugins.
+   *   debug( Pot.listPlugin() ); // ['myFunc', 'myFunc2']
+   *   // Remove my plugin.
+   *   Pot.removePlugin('myFunc');
+   *   debug( Pot.hasPlugin('myFunc') ); // false
+   *   debug( Pot.listPlugin() ); // ['myFunc2']
+   *
+   *
+   * @example
+   *   Pot.addPlugin({
+   *     foo : function() { return 'foo!'; },
+   *     bar : function() { return 'bar!'; },
+   *     baz : function() { return 'baz!'; }
+   *   });
+   *   debug(Pot.foo() + Pot.bar() + Pot.baz()); // 'foo!bar!baz!'
+   *
+   *
+   * @example
+   *   // Register function.
+   *   Pot.addPlugin('foo', function() { return 'foo!'; });
+   *   // Try change function.
+   *   var newFoo = function() { return 'NewFoo!' };
+   *   debug( Pot.addPlugin('foo', newFoo) ); // false
+   *   // Overwrite plugin function.
+   *   debug( Pot.addPlugin('foo', newFoo, true) ); // true
+   *   debug( Pot.foo() ); // 'NewFoo!'
+   *
+   *
+   * @example
+   *   var toArray = function(string) {
+   *     return string.split('');
+   *   };
+   *   // Plugin function has 'deferred' method.
+   *   Pot.addPlugin('toArray', toArray);
+   *   // Synchronous
+   *   debug( Pot.toArray('abc') ); // ['a', 'b', 'c']
+   *   // Asynchronous
+   *   Pot.toArray.deferred('abc').then(function(res) {
+   *     debug(res); // ['a', 'b', 'c']
+   *   });
+   *
+   *
+   * @example
+   *   var string = '\t abc\n \t ';
+   *   // Original Pot.trim().
+   *   debug(Pot.trim(string)); // 'abc'
+   *   // Overwrite Pot.trim().
+   *   Pot.addPlugin('trim', function(s) {
+   *     return s.replace(/^ +| +$/g, '');
+   *   });
+   *   // New Pot.trim().
+   *   debug(Pot.trim(string)); // '\t abc\n \t'
+   *   // Removes new Pot.trim().
+   *   Pot.removePlugin('trim');
+   *   // Back to the original.
+   *   debug(Pot.trim(string)); // 'abc'
+   *
+   *
+   * @type  Object
+   * @class
+   * @static
+   * @public
+   */
+  Plugin : {},
   /**
    * toString.
    *
@@ -248,7 +373,7 @@ update(Pot, {
     return ((n && (n.language || n.userLanguage     ||
             n.browserLanguage || n.systemLanguage)) ||
             'en').split(/[^a-zA-Z0-9]+/).shift().toLowerCase();
-  })(nv),
+  }(nv)),
   /**
    * Detect the user operating system.
    *
@@ -315,7 +440,7 @@ update(Pot, {
       return s.join('/');
     };
     return r;
-  })(nv),
+  }(nv)),
   /**
    * Global object. (e.g. window)
    *
@@ -546,13 +671,13 @@ update(Pot.System, (function() {
     /**@ignore*/
     g = (function() {
       yield (0);
-    })();
+    }());
     if (g && typeof g.next === 'function') {
       o.isYieldable = true;
     }
   } catch (e) {}
   return o;
-})());
+}()));
 
 /**
  * Creates methods to detect the type definition.
@@ -612,8 +737,8 @@ update(Pot.System, (function() {
                 return Pot.typeOf(o) === low;
               };
         }
-      })();
-    })();
+      }());
+    }());
   }
   Pot.update({
     /**
@@ -677,7 +802,7 @@ update(Pot.System, (function() {
       return type;
     }
   });
-})('Boolean Number String Function Array Date RegExp Object Error'.split(' '));
+}('Boolean Number String Function Array Date RegExp Object Error'.split(' ')));
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 (function(SI) {
 // Aggregate in this obejct for global functions. (HTML5 Task)
@@ -764,7 +889,7 @@ update(Pot.Internal, {
           this.byEvent = this.byTimer;
         }
       };
-    })(),
+    }()),
     /**
      * @private
      * @ignore
@@ -778,7 +903,7 @@ update(Pot.Internal, {
       return function(callback) {
         process.nextTick(callback);
       };
-    })(),
+    }()),
     /**
      * @private
      * @ignore
@@ -919,7 +1044,7 @@ Pot.update({
     };
     f.prototype.constructor.prototype = f.constructor.prototype;
     return new f;
-  })(),
+  }()),
   /**
    * Return whether the argument is StopIteration or not.
    *
@@ -1445,7 +1570,7 @@ Pot.update({
     return false;
   }
 });
-})('StopIteration');
+}('StopIteration'));
 
 // Define StopIteration (this scope only)
 if (typeof StopIteration === 'undefined') {
@@ -1615,7 +1740,7 @@ if (typeof StopIteration === 'undefined') {
       return Pot.System.currentURI;
     }
   });
-})();
+}());
 
 // Definition of builtin method states.
 update(Pot.System, {
@@ -2248,7 +2373,7 @@ Pot.update({
       }
       return result;
     };
-  })(),
+  }()),
   /**
    * Override the method of the object.
    * That enable replace the return value and the arguments variables.
@@ -4985,7 +5110,7 @@ Pot.Deferred.extendSpeeds(Pot, 'Deferred', function(options) {
   return Pot.Deferred(options);
 }, Pot.Deferred.speeds);
 
-})();
+}());
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Deferred utilities.
 (function() {
@@ -5644,8 +5769,8 @@ update(Pot.Deferred, {
     return function() {
       var that = this, args = arrayize(arguments), d = new Pot.Deferred();
       d.then(function() {
-        var dd, result, params = [], done = false, error, isFired;
-        isFired = Pot.Deferred.isFired;
+        var dd, result, params = [], done = false, error,
+            isFired = Pot.Deferred.isFired;
         dd = new Pot.Deferred();
         each(args, function(val) {
           if (Pot.isFunction(val)) {
@@ -6100,51 +6225,53 @@ update(Pot.Deferred, {
    * @static
    * @based  JSDeferred.chain
    */
-  chain : function() {
-    var args = arguments, len = args.length, chains, chain, re;
-    chain = new Pot.Deferred();
-    if (len > 0) {
-      chains = arrayize(len === 1 ? args[0] : args);
-      re = {
-        name   : /^\s*[()]*\s*function\s*([^\s()]+)/,
-        rescue : /rescue|raise|err|fail/i
-      };
-      each(chains, function(o) {
-        var name;
-        if (Pot.isFunction(o)) {
-          try {
-            name = o.toString().match(re.name)[1];
-          } catch (e) {}
-          if (name && re.rescue.test(name)) {
-            chain.rescue(o);
-          } else {
-            chain.then(o);
-          }
-        } else if (Pot.isDeferred(o)) {
-          chain.then(function(v) {
-            if (o.state === Pot.Deferred.states.unfired) {
-              o.begin(v);
+  chain : (function() {
+    var re = {
+      funcName : /^\s*[()]*\s*function\s*([^\s()]+)/,
+      rescue   : /rescue|raise|err|fail/i
+    };
+    return function(/*...args*/) {
+      var args = arguments, len = args.length, chains,
+          chain = new Pot.Deferred();
+      if (len > 0) {
+        chains = arrayize((len === 1) ? args[0] : args);
+        each(chains, function(o) {
+          var name;
+          if (Pot.isFunction(o)) {
+            try {
+              name = o.toString().match(re.funcName)[1];
+            } catch (e) {}
+            if (name && re.rescue.test(name)) {
+              chain.rescue(o);
+            } else {
+              chain.then(o);
             }
-            return o;
-          });
-        } else if (Pot.isObject(o) || Pot.isArray(o)) {
-          chain.then(function() {
-            return Pot.Deferred.parallel(o);
-          });
-        } else if (Pot.isError(o)) {
-          chain.then(function() {
-            throw o;
-          });
-        } else {
-          chain.then(function() {
-            return o;
-          });
-        }
-      });
-    }
-    Pot.Deferred.callLazy(chain);
-    return chain;
-  }
+          } else if (Pot.isDeferred(o)) {
+            chain.then(function(v) {
+              if (o.state === Pot.Deferred.states.unfired) {
+                o.begin(v);
+              }
+              return o;
+            });
+          } else if (Pot.isObject(o) || Pot.isArray(o)) {
+            chain.then(function() {
+              return Pot.Deferred.parallel(o);
+            });
+          } else if (Pot.isError(o)) {
+            chain.then(function() {
+              throw o;
+            });
+          } else {
+            chain.then(function() {
+              return o;
+            });
+          }
+        });
+      }
+      Pot.Deferred.callLazy(chain);
+      return chain;
+    };
+  }())
 });
 
 // Extends the speeds control methods
@@ -6286,7 +6413,7 @@ Pot.update({
   chain         : Pot.Deferred.chain
 });
 
-})();
+}());
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Define iteration methods. (internal)
@@ -6535,9 +6662,8 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       } else {
         d = this.createDeferred();
         d.then(function() {
-          var d1, d2;
-          d1 = that.createDeferred();
-          d2 = that.createDeferred();
+          var d1 = that.createDeferred(),
+              d2 = that.createDeferred();
           d1.then(function() {
             return that.revolve().then(function() {
               d2.begin();
@@ -6565,10 +6691,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   setIter : function(object, callback) {
-    var type, types, context;
-    type = this.options.type;
-    types = Pot.Internal.LightIterator.types;
-    context = this.options.context;
+    var type = this.options.type,
+        types = Pot.Internal.LightIterator.types,
+        context = this.options.context;
     if ((type & types.iterate) === types.iterate) {
       this.result = null;
       this.iter = this.iterate(object, callback, context);
@@ -6686,9 +6811,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   revolve : function() {
-    var that = this, d, de;
-    d  = this.createDeferred();
-    de = this.createDeferred();
+    var that = this,
+        d  = this.createDeferred(),
+        de = this.createDeferred();
     d.then(function() {
       var dd = that.createDeferred();
       that.revDeferred = that.createDeferred();
@@ -7169,8 +7294,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEach : function(object, callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
+      var result, iter, that = Pot.Internal.LightIterator.fn;
       if (!object) {
         result = {};
       } else {
@@ -7189,9 +7313,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     repeat : function(max, callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
-      result = {};
+      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
       if (max) {
         iter = that.repeat(max, callback, context);
         Pot.Internal.LightIterator.QuickIteration.resolve(iter);
@@ -7203,9 +7325,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEver : function(callback, context) {
-      var result, that, iter;
-      that = Pot.Internal.LightIterator.fn;
-      result = {};
+      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
       if (callback) {
         iter = that.forEver(callback, context);
         Pot.Internal.LightIterator.QuickIteration.resolve(iter);
@@ -7217,8 +7337,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     iterate : function(object, callback, context) {
-      var result, that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result, iter, o, that = Pot.Internal.LightIterator.fn;
       if (!object) {
         result = {};
       } else {
@@ -7238,8 +7357,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     items : function(object, callback, context) {
-      var result = [], that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
@@ -7256,8 +7374,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     zip : function(object, callback, context) {
-      var result = [], that, iter, o;
-      that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
@@ -7931,8 +8048,8 @@ update(Pot.Deferred, {
    *                                        this == `context`.
    * @param  {*}            (context)   (Optional) Object to use
    *                                      as `this` when executing callback.
-   * @return {Deferred}                 Return a new instance of Deferred that has
-   *                                      the collected items as an array.
+   * @return {Deferred}                 Return a new instance of Deferred that
+   *                                      has the collected items as an array.
    *
    * @class
    * @function
@@ -8344,26 +8461,41 @@ update(Pot.Iter, {
    * @static
    * @public
    */
-  filter : function(object, callback, context) {
-    var result, arrayLike, objectLike, iterateDefer, it, iterable;
-    iterateDefer = this && this.iterateSpeed;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
-    if (arrayLike) {
-      result = [];
-    } else if (objectLike) {
-      result = {};
-    } else {
-      result = null;
-    }
-    iterable = iterateDefer || this && this.iterateSpeedSync || Pot.iterate;
+  filter : (function() {
     /**@ignore*/
-    it = function() {
-      return iterable(object, function(val, key, obj) {
-        var res = callback.call(context, val, key, obj);
-        if (Pot.isDeferred(res)) {
-          return res.then(function(rv) {
-            if (rv) {
+    var emptyFilter = function(a) { return a; };
+    return function(object, callback, context) {
+      var result, arrayLike, objectLike, iterateDefer, it, iterable, cb;
+      cb = callback || emptyFilter;
+      iterateDefer = this && this.iterateSpeed;
+      arrayLike  = object && Pot.isArrayLike(object);
+      objectLike = object && !arrayLike && Pot.isObject(object);
+      if (arrayLike) {
+        result = [];
+      } else if (objectLike) {
+        result = {};
+      } else {
+        result = null;
+      }
+      iterable = iterateDefer || this && this.iterateSpeedSync || Pot.iterate;
+      /**@ignore*/
+      it = function() {
+        return iterable(object, function(val, key, obj) {
+          var res = cb.call(context, val, key, obj);
+          if (Pot.isDeferred(res)) {
+            return res.then(function(rv) {
+              if (rv) {
+                if (arrayLike) {
+                  result[result.length] = val;
+                } else if (objectLike) {
+                  result[key] = val;
+                } else {
+                  result = val;
+                }
+              }
+            });
+          } else {
+            if (res) {
               if (arrayLike) {
                 result[result.length] = val;
               } else if (objectLike) {
@@ -8372,29 +8504,19 @@ update(Pot.Iter, {
                 result = val;
               }
             }
-          });
-        } else {
-          if (res) {
-            if (arrayLike) {
-              result[result.length] = val;
-            } else if (objectLike) {
-              result[key] = val;
-            } else {
-              result = val;
-            }
           }
-        }
-      }, context);
-    };
-    if (iterateDefer) {
-      return it().then(function() {
+        }, context);
+      };
+      if (iterateDefer) {
+        return it().then(function() {
+          return result;
+        });
+      } else {
+        it();
         return result;
-      });
-    } else {
-      it();
-      return result;
-    }
-  },
+      }
+    };
+  }()),
   /**
    * Apply a function against an accumulator and each value of
    *  the object (from left-to-right) as to reduce it to a single value.
@@ -8626,12 +8748,11 @@ update(Pot.Iter, {
    * @public
    */
   range : function(/*[begin,] end[, step]*/) {
-    var args = arguments, arg, result;
-    var begin, end, step, n, string, iter;
-    result = [];
-    begin = 0;
-    end   = 0;
-    step  = 1;
+    var args = arguments, arg, result = [],
+        begin = 0,
+        end   = 0,
+        step  = 1,
+        n, string, iter;
     switch (args.length) {
       case 0:
           return (void 0);
@@ -8693,7 +8814,7 @@ update(Pot.Iter, {
           (step < 0 && begin < end)) {
         throw Pot.StopIteration;
       }
-      result[result.length] = string ? String.fromCharCode(begin) : begin;
+      result[result.length] = string ? fromCharCode(begin) : begin;
       begin += step;
     };
     Pot.iterate(iter);
@@ -8724,23 +8845,21 @@ update(Pot.Iter, {
    * @param  {*}              (from)  (Optional) The index at
    *                                    which to begin the search.
    *                                  Defaults to 0.
-   * @return {Number}                 Return the index of result, or -1.
+   * @return {Number|String}          Return the index of result, or -1.
    * @type Function
    * @function
    * @static
    * @public
    */
   indexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike;
-    var i, len,  key, val, args, argn, passed;
-    args = arguments;
-    argn = args.length;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    var result = -1, i, len, val, passed,
+        args = arguments, argn = args.length,
+        arrayLike = object && Pot.isArrayLike(object),
+        objectLike = object && !arrayLike && Pot.isObject(object);
     if (arrayLike) {
       try {
         if (Pot.System.isBuiltinArrayIndexOf) {
-          i = Array.prototype.indexOf.apply(object, arrayize(args, 1));
+          i = indexOf.apply(object, arrayize(args, 1));
           if (Pot.isNumeric(i)) {
             result = i;
           } else {
@@ -8751,7 +8870,7 @@ update(Pot.Iter, {
         }
       } catch (err) {
         len = (object && object.length) || 0;
-        i = Number(from) || 0;
+        i = (+from) || 0;
         i = (i < 0) ? Math.ceil(i) : Math.floor(i);
         if (i < 0) {
           i += len;
@@ -8773,7 +8892,7 @@ update(Pot.Iter, {
     } else if (objectLike) {
       passed = false;
       each(object, function(ov, op) {
-        if (!passed && argn >= 3 && from !== key) {
+        if (!passed && argn >= 3 && from !== op) {
           return;
         } else {
           passed = true;
@@ -8833,23 +8952,21 @@ update(Pot.Iter, {
    * @param  {*}             (from)   (Optional) The index at which to
    *                                    start searching backwards.
    *                                  Defaults to the array's length.
-   * @return {Number}                 Return the index of result, or -1.
+   * @return {Number|String}          Return the index of result, or -1.
    * @type Function
    * @function
    * @static
    * @public
    */
   lastIndexOf : function(object, subject, from) {
-    var result = -1, arrayLike, objectLike;
-    var i, len,  key, val, args, argn, passed, pairs;
-    args = arguments;
-    argn = args.length;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    var result = -1, i, len,  key, val, passed, pairs,
+        args = arguments,
+        arrayLike  = object && Pot.isArrayLike(object),
+        objectLike = object && !arrayLike && Pot.isObject(object);
     if (arrayLike) {
       try {
         if (Pot.System.isBuiltinArrayLastIndexOf) {
-          i = Array.prototype.lastIndexOf.apply(object, arrayize(args, 1));
+          i = lastIndexOf.apply(object, arrayize(args, 1));
           if (Pot.isNumeric(i)) {
             result = i;
           } else {
@@ -8860,7 +8977,7 @@ update(Pot.Iter, {
         }
       } catch (err) {
         len = (object && object.length) || 0;
-        i = Number(from);
+        i = (+from);
         if (isNaN(i)) {
           i = len - 1;
         } else {
@@ -10444,6 +10561,1333 @@ Pot.update({
   }
 });
 
+update(Pot.Internal, {
+  defineDeferrater : Pot.tmp.createSyncIterator
+});
+
+// Definition of deferreed function.
+(function() {
+  /**@ignore*/
+  var Deferrizer = function(func) {
+    return new Deferrizer.prototype.init(func);
+  },
+  SPEED = buildSerial({NAME : '.\u0000[~`{{*@:SPEED:@*}}`~]\u0001'}),
+  CACHE = {},
+  CACHE_COUNT = 0,
+  CACHE_LIMIT = 0x2000;
+  Deferrizer.prototype = update(Deferrizer.prototype, {
+    /**
+     * @private
+     * @ignore
+     * @internal
+     */
+    constructor : Deferrizer,
+    /**
+     * @private
+     * @ignore
+     */
+    id : Pot.Internal.getMagicNumber(),
+    /**
+     * @ignore
+     * @private
+     */
+    func : null,
+    /**
+     * @ignore
+     * @private
+     */
+    code : null,
+    /**
+     * @ignore
+     * @private
+     */
+    tokens : [],
+    /**
+     * @ignore
+     * @private
+     */
+    uniqs : {},
+    /**
+     * @ignore
+     * @private
+     */
+    tails : [],
+    /**
+     * @ignore
+     * @private
+     */
+    iteration : {},
+    /**
+     * Initialize properties.
+     *
+     * @private
+     * @ignore
+     */
+    init : function(func) {
+      this.func = func;
+      this.code = this.toCode(this.func);
+      this.tokens = [];
+      this.iteration = {};
+      this.tails = [];
+      return this;
+    },
+    /**
+     * Execute.
+     *
+     * @private
+     * @ignore
+     */
+    execute : function() {
+      var that = this, result = '';
+      if (this.code) {
+        if (this.code in CACHE) {
+          result = CACHE[this.code];
+        } else {
+          this.uniqs = {};
+          each('key val ret rev err nxt'.split(' '), function(v) {
+            that.uniqs[v] = that.generateUniqName({
+              NAME : '$_' + v + '_'
+            });
+          });
+          this.tokens = this.tokenize(this.code);
+          if (!this.hasIteration(this.tokens)) {
+            result = this.func;
+          } else {
+            this.parseLoop();
+            result = this.deferrizeFunction();
+            if (result) {
+              if (CACHE_COUNT < CACHE_LIMIT) {
+                CACHE[this.code] = result;
+                CACHE_COUNT++;
+              }
+            }
+          }
+        }
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    hasIteration : function(tokens) {
+      var result = false, i, len, token;
+      if (tokens) {
+        len = tokens.length;
+        for (i = 0; i < len; i++) {
+          token = tokens[i];
+          if (token === 'for' || token === 'while' || token === 'do') {
+            result = true;
+            break;
+          }
+        }
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    toCode : function(func) {
+      return stringify(
+        (func && func.toString) ? func.toString() :
+                         (func  ? ('' + func)     : '')
+      );
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    isWord : (function() {
+      var RE = {
+        SPACE : /\s/,
+        WORDS : /[$\w\u0100-\uFFFF]/
+      };
+      return function(c) {
+        return c != null && !RE.SPACE.test(c) && RE.WORDS.test(c);
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    isNL : (function() {
+      var RE = /\r\n|\r|\n/;
+      return function(c) {
+        return c != null && RE.test(c);
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    format : function(/*format[, ...args]*/) {
+      var args = arrayize(arguments);
+      return args[0].replace(/#(\d+)/g, function(a, i) {
+        return args[+i];
+      });
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    joinTokens : function(tokens) {
+      var result = [], len = tokens.length,
+          prev, prevSuf, pre, suf, i, token;
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        if (!prev) {
+          result[result.length] = token;
+        } else {
+          pre = '';
+          suf = '';
+          if (token === '+'  || token === '-'  ||
+              token === '++' || token === '--' ||
+              token === 'in'
+          ) {
+            pre = ' ';
+            suf = ' ';
+          } else if (this.isWord(prev.slice(-1)) &&
+                     this.isWord(token.charAt(0))) {
+            pre = ' ';
+          }
+          if (prevSuf === ' ') {
+            pre = '';
+          }
+          result[result.length] = pre + token + suf;
+        }
+        prev = token;
+        prevSuf = suf;
+      }
+      return result.join('');
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    toEnd : function(code) {
+      var s;
+      if (Pot.isArray(code)) {
+        s = this.joinTokens(code);
+      } else {
+        s = stringify(code);
+      }
+      if (trim(s).slice(-1) === ';') {
+        return s;
+      }
+      return s ? s + ';' : s;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    generateUniqName : function(prefix) {
+      var result;
+      do {
+        result = buildSerial(prefix || Pot, '');
+      } while (~Pot.indexOf(this.tokens, result));
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    tokenize : (function() {
+      var RE = {
+        TOKEN : new RegExp(
+          '(' + '^\\s*function\\b[^{]*[{]' +            // function prefix
+          '|' + '[}][^}]*$' +                           // function suffix
+          '|' + '/[*][\\s\\S]*?[*]/' +                  // multiline comment
+          '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +  // single line comment
+          '|' + '"(?:\\\\[\\s\\S]|[^"\\r\\n\\\\])*"' +  // string literal
+          '|' + "'(?:\\\\[\\s\\S]|[^'\\r\\n\\\\])*'" +  // string literal
+          '|' + '/(?![*])(?:\\\\.|[^/\\r\\n\\\\])+/' +
+                '[gimy]{0,4}' +
+          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +     // e4x
+          '|' + '>>>=?|<<=|===|!==|>>=|[=!<>*+/&|^-]=' +  // operators
+                '|[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
+                '|[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +
+          '|' + '\\s+' +                                      // white space
+          '|' + '[^\\s+/%*=&|^~<>!?:,;@()\\\\[\\].{}\'"-]+' + // token
+          ')',
+          'g'
+        ),
+        NOTSPACE : /[\S\r\n]/,
+        COMMENTS : /^\/{2,}[\s\S]*$|^\/[*][\s\S]*?[*]\/$/
+      };
+      return function(func) {
+        var r = [], m, token, s = this.toCode(func);
+        if (s) {
+          RE.TOKEN.lastIndex = 0;
+          while ((m = RE.TOKEN.exec(s)) != null) {
+            token = m[1];
+            if (!RE.NOTSPACE.test(token) || RE.COMMENTS.test(token)) {
+              continue;
+            } else {
+              r[r.length] = token;
+            }
+          }
+        }
+        return r;
+      };
+    }()),
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseLoop : function() {
+      var result, max = 0, loops = [], offsets = [], index = 0, nest = 0,
+          level = 0, inLoop, i, token, len = this.tokens.length;
+      for (i = 0; i < len; i++) {
+        token = this.tokens[i];
+        switch (token) {
+          case 'for':
+          case 'while':
+          case 'do':
+              if (!inLoop) {
+                inLoop = {
+                  token : token,
+                  org : {
+                    level : level,
+                    nest  : nest
+                  },
+                  cur : {
+                    level : level,
+                    nest  : nest
+                  }
+                };
+              }
+              break;
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop.last = true;
+                }
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop.last = true;
+                }
+              }
+              break;
+        }
+        if (inLoop) {
+          if (!(index in loops)) {
+            loops[index] = [];
+            offsets[index] = {
+              start : i
+            };
+          }
+          loops[index][loops[index].length] = token;
+          if (inLoop.last) {
+            offsets[index].end = i;
+            inLoop = null;
+            index++;
+          }
+        }
+      }
+      len = loops.length;
+      for (i = 0; i < len; i++) {
+        if (loops[i].length > max) {
+          max = i;
+        }
+      }
+      this.iteration = {
+        loops : loops[max],
+        start : offsets[max].start,
+        end   : offsets[max].end
+      };
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    deferrizeLoop : function() {
+      var result, tokens = this.iteration.loops,
+          state = tokens.shift();
+      switch (state) {
+        case 'for':
+            result = this.parseFor(tokens);
+            break;
+        case 'while':
+            result = this.parseWhile(tokens);
+            break;
+        case 'do':
+            result = this.parseDoWhile(tokens);
+            break;
+      }
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    deferrizeFunction : function() {
+      var result, next, looped, token, i, len = this.tokens.length,
+          key = 'before', enclose,
+          states = {
+            level : 0,
+            block : 0
+          },
+          parts = {
+            before : [],
+            loop   : [],
+            after  : [],
+            result : []
+          },
+          /**@ignore*/
+          openBlock = function(k) {
+            if (!states[k]) {
+              states[k] = {
+                block : states.block,
+                level : states.level
+              };
+            }
+          },
+          /**@ignore*/
+          closeBlock = function(kv) {
+            each(kv ? arrayize(kv) : ['func', 'cond'], function(k) {
+              if (states[k] &&
+                  states[k].block === states.block &&
+                  states[k].level === states.level) {
+                states[k] = null;
+              }
+            });
+          };
+      for (i = 1; i < len - 1; i++) {
+        if (i >= this.iteration.start &&
+            i <= this.iteration.end
+        ) {
+          if (!looped) {
+            looped = true;
+            i = this.iteration.end - 1;
+            parts.loop = arrayize(this.deferrizeLoop());
+            key = 'after';
+            if (states.cond) {
+              enclose = true;
+            }
+          }
+          continue;
+        }
+        token = this.tokens[i];
+        next = this.tokens[i + 1];
+        switch (token) {
+          case '{':
+              states.block++;
+              break;
+          case '}':
+              states.block--;
+              closeBlock();
+              break;
+          case '(':
+              states.level++;
+              break;
+          case ')':
+              states.level--;
+              if (states.cond && states.cond.expr && next === '{') {
+                states.cond.expr = null;
+                closeBlock('func');
+              } else {
+                closeBlock();
+              }
+              break;
+          case ';':
+              closeBlock('result');
+              break;
+          case 'function':
+              openBlock('func');
+              break;
+          case 'if':
+              openBlock('cond');
+              states.cond.expr = true;
+              break;
+          case 'return':
+              if (!states.func && !states.result) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1(#2!==#3)?#2:#2=',
+                    token,
+                    this.uniqs.ret,
+                    this.uniqs.rev
+                  );
+                }
+                parts.result = [];
+                openBlock('result');
+              }
+              break;
+          default:
+              if (states.result && this.isNL(token)) {
+                closeBlock('result');
+              }
+              break;
+        }
+        parts[key][parts[key].length] = token;
+        if (states.result) {
+          parts.result[parts.result.length] = token;
+        }
+      }
+      result = this.format(
+        '#1' +
+        'var #2={},#3=#2,#4={};' +
+        'return Pot.Deferred.begin(function(){' +
+            '#5' +
+            '#6' +
+            '#9' +
+          '});' +
+          '#7' +
+          '#8' +
+        '}).then(function(r){' +
+          'return(#2===#3)?r:#2;' +
+        '});' +
+        '#10',
+        this.tokens.shift(),
+        this.uniqs.ret,
+        this.uniqs.rev,
+        this.uniqs.nxt,
+        this.toEnd(this.joinTokens(parts.before)),
+        this.joinTokens(parts.loop),
+        this.joinTokens(this.tails),
+        this.joinTokens(enclose ? parts.after  : []),
+        this.joinTokens(enclose ? parts.result : parts.after),
+        this.tokens.pop()
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseWhile : function(tokens) {
+      var result = '', level = 0, nest = 0, started = false,
+          prev, next, skip, key = 'cond', inLoop, token, i,
+          len = tokens.length, isEnd = false,
+          states = {
+            cond : [],
+            body : []
+          };
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (i === 0 && nest === 1) {
+                skip = true;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (!started && nest === 0 &&
+                  level === 0 && next === '{') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (level === 1 && nest === 0 && prev === ')') {
+                skip = true;
+                started = true;
+                key = 'body';
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (started && nest === 0 && level === 0) {
+                states.body.unshift(this.format(
+                  'if(#1!==#2||!(#3)){' +
+                    'throw Pot.StopIteration;' +
+                  '}' +
+                  'try{',
+                  this.uniqs.ret,
+                  this.uniqs.rev,
+                  this.joinTokens(states.cond) || 'false'
+                ));
+                states.body.push(this.format(
+                  '}catch(#1){' +
+                    'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+                      'throw #1;' +
+                    '}' +
+                    'if(#1!==#2){' +
+                      'throw #1;' +
+                    '}' +
+                  '}',
+                  this.uniqs.err,
+                  this.uniqs.nxt
+                ));
+                token += ').then(function(){';
+                isEnd = true;
+              }
+              break;
+          case 'for':
+          case 'while':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (started) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1 #2=',
+                    token,
+                    this.uniqs.ret
+                  );
+                }
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'while(...)'");
+      }
+      result = this.format(
+        'return Pot.Deferred.forEver.#1(function(){' +
+        '#2',
+        SPEED,
+        this.joinTokens(states.body)
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseDoWhile : function(tokens) {
+      var result = '', level = 0, nest = 0, prev, next, skip,
+          key = 'body', inLoop, token, i, len = tokens.length, isEnd = false,
+          states = {
+            cond  : [],
+            body  : [],
+            after : []
+          };
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (level === 0 && nest === 1 && prev === 'while') {
+                skip = true;
+                key = 'cond';
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (nest === 0 && level === 0 && key === 'cond') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (i === 0 && level === 1) {
+                skip = true;
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (nest === 0 && level === 0 && next === 'while') {
+                isEnd = true;
+                skip = true;
+              }
+              break;
+          case 'while':
+              if (level === 0 && nest === 0) {
+                skip = true;
+                break;
+              }
+              // FALLTHROUGH
+          case 'for':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (!next || next === ';' || this.isNL(next)) {
+                token = this.format('#1 #2=void 0#3',
+                  token,
+                  this.uniqs.ret,
+                  (next === ';' || this.isNL(next)) ? '' : ';'
+                );
+              } else {
+                token = this.format('#1 #2=',
+                  token,
+                  this.uniqs.ret
+                );
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'do...while()'");
+      }
+      states.body.unshift(this.format(
+        'if(#1!==#2){' +
+          'throw Pot.StopIteration;' +
+        '}' +
+        'try{',
+        this.uniqs.ret,
+        this.uniqs.rev
+      ));
+      states.body.push(this.format(
+        '}catch(#1){' +
+          'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+            'throw #1;' +
+          '}' +
+          'if(#1!==#2){' +
+            'throw #1;' +
+          '}' +
+        '}finally{' +
+          'if(!(#3)){' +
+            'throw Pot.StopIteration;' +
+          '}' +
+        '}' +
+        '}).then(function(){',
+        this.uniqs.err,
+        this.uniqs.nxt,
+        this.joinTokens(states.cond) || 'false'
+      ));
+      result = this.format(
+        'return Pot.Deferred.forEver.#1(function(){' +
+        '#2',
+        SPEED,
+        this.joinTokens(states.body)
+      );
+      return result;
+    },
+    /**
+     * @internal
+     * @private
+     * @ignore
+     */
+    parseFor : function(tokens) {
+      var result = '', level = 0, nest = 0, isInOrOf = null, started = false,
+          prev, next, skip, key = 'before', varType, inLoop, i, len, token,
+          isEnd = false,
+          states = {
+            prefix : [],
+            suffix : [],
+            before : [],
+            cond   : [],
+            after  : [],
+            key    : [],
+            target : [],
+            body   : []
+          };
+      len = tokens.length;
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = tokens[i + 1];
+        skip = false;
+        switch (token) {
+          case '(':
+              nest++;
+              if (inLoop) {
+                inLoop.cur.nest++;
+              }
+              if (i === 0 && nest === 1) {
+                skip = true;
+              }
+              break;
+          case ')':
+              nest--;
+              if (inLoop) {
+                if (--inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.cur.level === inLoop.org.level &&
+                    inLoop.token === 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (!started && nest === 0 &&
+                  level === 0 && next === '{') {
+                skip = true;
+              }
+              break;
+          case '{':
+              level++;
+              if (inLoop) {
+                inLoop.cur.level++;
+              }
+              if (level === 1 && nest === 0 && prev === ')') {
+                skip = true;
+                started = true;
+                key = 'body';
+              }
+              break;
+          case '}':
+              level--;
+              if (inLoop) {
+                if (--inLoop.cur.level === inLoop.org.level &&
+                    inLoop.cur.nest === inLoop.org.nest &&
+                    inLoop.token !== 'do'
+                ) {
+                  inLoop = null;
+                }
+              }
+              if (started && nest === 0 && level === 0) {
+                states.body.unshift(this.format(
+                  'if(#1!==#2){' +
+                    'throw Pot.StopIteration;' +
+                  '}' +
+                  'try{',
+                  this.uniqs.ret,
+                  this.uniqs.rev
+                ));
+                if (states.suffix.length) {
+                  states.body.push(
+                    this.toEnd(this.joinTokens(states.suffix))
+                  );
+                }
+                states.body.push(this.format(
+                  '}catch(#1){' +
+                    'if(Pot.isError(#1)||Pot.isStopIter(#1)){' +
+                      'throw #1;' +
+                    '}' +
+                    'if(#1!==#2){' +
+                      'throw #1;' +
+                    '}' +
+                  '}finally{' +
+                    '#3' +
+                  '}',
+                  this.uniqs.err,
+                  this.uniqs.nxt,
+                  this.toEnd(this.joinTokens(states.after))
+                ));
+                token += ').then(function(){';
+                isEnd = true;
+              }
+              break;
+          case 'each':
+              if (i === 0) {
+                throw new Error("Not supported 'for each'");
+              }
+              break;
+          case 'in':
+          case 'of':
+              if (!started && isInOrOf === null &&
+                  nest === 1 && level === 0
+              ) {
+                skip = true;
+                isInOrOf = true;
+                if (states.before.length > 2) {
+                  throw new Error(
+                    "Invalid keys, expect 'for(var [...] in ...);'"
+                  );
+                }
+                if (varType) {
+                  states.before.push(';');
+                  unshift.apply(states.prefix, states.before);
+                  states.before.shift();
+                  states.before.pop();
+                  if (varType === 'let') {
+                    states.prefix.unshift('{');
+                    this.tails.push('}');
+                  }
+                }
+                states.before.push('=' + this.uniqs.key);
+                states.before.push(';');
+                states.key = states.before;
+                unshift.apply(states.body, states.key);
+                key = 'target';
+              }
+              break;
+          case 'var':
+          case 'let':
+              if (!varType && i === 1 && nest === 1) {
+                varType = token;
+              }
+              break;
+          case ',':
+              if (!started && nest === 1 && level === 0 &&
+                  !varType &&
+                  (key === 'before' || key === 'after')
+              ) {
+                token = ';';
+              }
+              break;
+          case ';':
+              if (!started && nest === 1 && level === 0) {
+                skip = true;
+                if (isInOrOf === null) {
+                  isInOrOf = false;
+                }
+                if (key === 'before') {
+                  key = 'cond';
+                  states.prefix.push(
+                    this.toEnd(this.joinTokens(states.before))
+                  );
+                  if (varType === 'let') {
+                    states.prefix.unshift('{');
+                    this.tails.push('}');
+                  }
+                } else if (key === 'cond') {
+                  key = 'after';
+                  if (states.cond.length) {
+                    states.cond.unshift('if(');
+                    states.cond.push('){');
+                    states.suffix.push('}else{throw Pot.StopIteration;}');
+                  }
+                  push.apply(states.body, states.cond);
+                }
+              }
+              break;
+          case 'for':
+          case 'while':
+          case 'do':
+              inLoop = {
+                token : token,
+                org : {
+                  level : level,
+                  nest  : nest
+                },
+                cur : {
+                  level : level,
+                  nest  : nest
+                }
+              };
+              break;
+          case 'break':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw Pot.StopIteration';
+              }
+              break;
+          case 'continue':
+              if (!inLoop && started && !this.isWord(next)) {
+                token = 'throw ' + this.uniqs.nxt;
+              }
+              break;
+          case 'return':
+              if (started) {
+                if (!next || next === ';' || this.isNL(next)) {
+                  token = this.format('#1 #2=void 0#3',
+                    token,
+                    this.uniqs.ret,
+                    (next === ';' || this.isNL(next)) ? '' : ';'
+                  );
+                } else {
+                  token = this.format('#1 #2=',
+                    token,
+                    this.uniqs.ret
+                  );
+                }
+              }
+              break;
+        }
+        if (!skip) {
+          states[key][states[key].length] = token;
+        }
+        prev = token;
+      }
+      result = '';
+      if (!isEnd) {
+        throw new Error("Parse error, expect 'for(...)'");
+      }
+      if (isInOrOf) {
+        result = this.format(
+          '#1return Pot.Deferred.forEach.#2(#3,function(#4,#5){' +
+          '#6',
+          this.toEnd(this.joinTokens(states.prefix)),
+          SPEED,
+          this.joinTokens(states.target),
+          this.uniqs.val,
+          this.uniqs.key,
+          this.joinTokens(states.body)
+        );
+      } else {
+        result = this.format(
+          '#1return Pot.Deferred.forEver.#2(function(){' +
+          '#3',
+          this.toEnd(this.joinTokens(states.prefix)),
+          SPEED,
+          this.joinTokens(states.body)
+        );
+      }
+      return result;
+    }
+  });
+  Deferrizer.prototype.init.prototype = Deferrizer.prototype;
+  update(Pot.Internal, {
+    /**
+     * @lends Pot.Internal
+     */
+    /**
+     * @type Function
+     * @internal
+     * @ignore
+     */
+    deferrate : function(func) {
+      return (new Deferrizer(func)).execute();
+    }
+  });
+  // Update Pot/Pot.Deferred.
+  update(Pot.Deferred, {
+    /**
+     * @lends Pot.Deferred
+     */
+    /**
+     * Create new defer function with speeds from static function.
+     * That returns a new instance of Pot.Deferred that
+     *  has already ".begin()" called.
+     * This function works like 'deferrize'.
+     * This function will redefine the function that converts the
+     *  synchronous loop block (i.e. for, for-in, do, while) to the
+     *  asynchronous iteration by Pot.Deferred.xxx.
+     *
+     *
+     * @example
+     *   var toCharCode = function(string) {
+     *     var result = [];
+     *     for (var i = 0; i < string.length; i++) {
+     *       result.push(string.charCodeAt(i));
+     *     }
+     *     return result;
+     *   };
+     *   var toCharCodeDefer = Pot.deferreed(toCharCode);
+     *   // Note:
+     *   //  toCharCodeDefer like below.
+     *   //
+     *   //  function(string) {
+     *   //    var result = [];
+     *   //    return Pot.Deferred.repeat(string.length, function(i) {
+     *   //      result.push(string.charCodeAt(i));
+     *   //    }).then(function() {
+     *   //      return result;
+     *   //    });
+     *   //  };
+     *   //
+     *   toCharCodeDefer('abc').then(function(res) {
+     *     Pot.debug(res); // @results [97, 98, 99]
+     *   });
+     *   // Large string.
+     *   var largeString = new Array(100000).join('abcdef');
+     *   // Specify speed 'slow'.
+     *   toCharCodeDefer.slow(largeString).then(function(res) {
+     *     Pot.debug(res.length); // @results  599994
+     *   });
+     *
+     *
+     * @example
+     *   // Compress/Decompress string by LZ77 algorithm.
+     *   // http://polygon-planet.blogspot.com/2011/02/lz77javascript.html
+     *   var TinyLz77 = {
+     *     // compress (synchronous)
+     *     compress : function(s) {
+     *       var a = 53300, b, c, d, e, f, g = -1,
+     *           h, i, r = [], x = String.fromCharCode;
+     *       if (!s) {
+     *         return '';
+     *       }
+     *       s = new Array(a--).join(' ') + s;
+     *       while ((b = s.substr(a, 256))) {
+     *         for (c = 2, i = b.length; c <= i; ++c) {
+     *           d = s.substring(
+     *               a - 52275,
+     *               a + c - 1
+     *           ).lastIndexOf(b.substring(0, c));
+     *           if (!~d) {
+     *             break;
+     *           }
+     *           e = d;
+     *         }
+     *         if (c === 2 || c === 3 && f === g) {
+     *           f = g;
+     *           h = s.charCodeAt(a++);
+     *           r.push(
+     *               x(h >> 8 & 255),
+     *               x(h & 255)
+     *           );
+     *         } else {
+     *           r.push(
+     *               x((e >> 8 & 255) | 65280),
+     *               x(e & 255),
+     *               x(c - 3)
+     *           );
+     *           a += c - 1;
+     *         }
+     *       }
+     *       return r.join('');
+     *     },
+     *     // decompress (synchronous)
+     *     decompress : function(s) {
+     *       var a = 53300, b = 0, c, d, e, f, g,
+     *           h, r = new Array(a--).join(' '),
+     *           x = String.fromCharCode;
+     *       if (s && s.length) {
+     *         do {
+     *           c = s.charCodeAt(b++);
+     *           if (c <= 255) {
+     *             r += x((c << 8) | s.charCodeAt(b++));
+     *           } else {
+     *             e = ((c & 255) << 8) | s.charCodeAt(b++);
+     *             f = e + s.charCodeAt(b++) + 2;
+     *             h = r.slice(-52275);
+     *             g = h.substring(e, f);
+     *             if (g) {
+     *               while (h.length < f) {
+     *                 h += g;
+     *               }
+     *               r += h.substring(e, f);
+     *             }
+     *           }
+     *         } while (b < s.length);
+     *       }
+     *       return r.slice(a);
+     *     }
+     *   };
+     *   // create asynchronous iteration functions.
+     *   var compressDefer   = Pot.deferreed(TinyLz77, 'compress');
+     *   var decompressDefer = Pot.deferreed(TinyLz77, 'decompress');
+     *   // original string.
+     *   var string = 'foooooooooo baaaaaaaaaaaaar baaaaaaazzzzzzzzzzzz';
+     *   Pot.debug(string.length); // 48
+     *   // execute compress with asynchronous iterator.
+     *   compressDefer(string).then(function(res) {
+     *     Pot.debug(res.length); // 26
+     *     return decompressDefer(res).then(function(res) {
+     *       Pot.debug(res.length); // 48
+     *     });
+     *   });
+     *
+     *
+     * @param  {Object|Function}   object   The context object.
+     *                                        or the target function.
+     * @param  {String|Function}  (method)  The target function name.
+     *                                        or the target function.
+     * @return {Function}                   The defer function that
+     *                                        returns Deferred object.
+     *                                      Returns new asynchronous
+     *                                        function that has
+     *                                        each speeds below.
+     *                                      <pre>
+     *                                      ----------------------------------
+     *                                       method name |  speed
+     *                                      ----------------------------------
+     *                                       limp        :  slowest
+     *                                       doze        :  slower
+     *                                       slow        :  slow
+     *                                       normal      :  normal (default)
+     *                                       fast        :  fast
+     *                                       rapid       :  faster
+     *                                       ninja       :  fastest
+     *                                      ----------------------------------
+     *                                      You can control speed by
+     *                                        specify key.
+     *                                      e.g.
+     *                                        var f = deferreed(func);
+     *                                        f();      // normal
+     *                                        f.slow(); // slow
+     *                                      </pre>
+     * @type   Function
+     * @function
+     * @public
+     * @static
+     */
+    deferreed : function(object, method) {
+      var result, func, context, err, code, proc;
+      try {
+        switch (arguments.length) {
+          case 0:
+              throw false;
+          case 1:
+              func = object;
+              if (!Pot.isFunction(func)) {
+                throw func;
+              }
+              proc = func;
+              break;
+          case 2:
+          default:
+              if (Pot.isObject(method)) {
+                context = method;
+                func    = object;
+              } else {
+                func    = method;
+                context = object;
+              }
+              if (!Pot.isFunction(context[func])) {
+                throw func;
+              }
+              proc = context[func];
+              break;
+        }
+        if (!proc || !Pot.isFunction(proc) || Pot.isBuiltinMethod(proc)) {
+          throw proc;
+        }
+        code = Pot.Internal.deferrate(proc);
+        if (!code) {
+          throw code;
+        }
+        if (code === proc) {
+          result = Pot.Deferred.deferrize(proc);
+        } else {
+          if (!Pot.isString(code)) {
+            throw code;
+          }
+          result = Pot.Internal.defineDeferrater(function(speedKey) {
+            var c = code.replace(SPEED, speedKey),
+                f = Pot.localEval(c, context);
+            return function() {
+              return f.apply(context, arguments);
+            };
+          });
+        }
+        if (!result || !Pot.isFunction(result)) {
+          throw result;
+        }
+      } catch (e) {
+        err = e;
+        throw Pot.isError(err) ? err : new Error(err);
+      }
+      return result;
+    }
+  });
+  // Refer Pot object.
+  Pot.update({
+    deferreed : Pot.Deferred.deferreed
+  });
+}());
+
 delete Pot.tmp.createIterators;
 delete Pot.tmp.createProtoIterators;
 delete Pot.tmp.createSyncIterator;
@@ -10741,9 +12185,9 @@ Pot.update({
      *   // @results {key1:'12345',key2:null}
      *
      *
-     * @param  {*}         text      A target JSON string object.
+     * @param  {String}    text      A target JSON string object.
      * @param  {*}        (reviver)  (Optional) Unimplemented.
-     * @return {String}              Return the parsed object.
+     * @return {*}                   Return the parsed object.
      * @type   Function
      * @function
      * @static
@@ -10787,7 +12231,7 @@ Pot.update({
       }
     })
   });
-})();
+}());
 
 update(Pot.Serializer, {
   /**
@@ -11117,6 +12561,9 @@ update(Pot.URI, {
       }
     }
   }),
+  /**
+   * @lends Pot.URI
+   */
   /**
    * Decode the URI string.
    *
@@ -11751,7 +13198,7 @@ update(Pot.Net, {
       return function(url, options) {
         return (new Request(url, options)).deferred;
       };
-    })()
+    }())
   },
   /**
    * @lends Pot.Net
@@ -12118,6 +13565,9 @@ update(Pot.Net, {
     };
   }()),
   /**
+   * @lends Pot.Net
+   */
+  /**
    * Send request by JSONP.
    *
    *
@@ -12156,8 +13606,8 @@ update(Pot.Net, {
       DONE : /loaded|complete/
     };
     return function(url, options) {
-      var d, opts, context, id, callback, key;
-      var doc, uri, head, script, done, defaults;
+      var d, opts, context, id, callback, key,
+          doc, uri, head, script, done, defaults;
       defaults = 'callback';
       d = new Pot.Deferred();
       opts    = update({cache : false}, options || {});
@@ -12283,6 +13733,9 @@ update(Pot.Net, {
     };
   }()),
   /**
+   * @lends Pot.Net
+   */
+  /**
    * Get the JSON data by HTTP GET request.
    *
    *
@@ -12305,9 +13758,9 @@ update(Pot.Net, {
     var fixJson = /^[^{]*|[^}]*$/g;
     return function(url, options) {
       return Pot.Net.request(url, update({
-        mimeType : 'text/javascript',
+        mimeType : 'application/json',
         headers  : {
-          'Content-Type' : 'text/javascript'
+          'Content-Type' : 'application/json'
         }
       }, options || {})).then(function(res) {
         var data = trim(res && res.responseText).replace(fixJson, '');
@@ -12315,6 +13768,9 @@ update(Pot.Net, {
       });
     };
   }()),
+  /**
+   * @lends Pot.Net
+   */
   /**
    * Non-blocking script loader.
    *
@@ -12521,7 +13977,11 @@ Pot.update({
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Mozilla XPCOM interfaces/methods.
+
 Pot.update({
+  /**
+   * @lends Pot
+   */
   /**
    * XPCOM utilities.
    *
@@ -13662,6 +15122,7 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
           op.onDrop.call(that, files);
         }
         reader = new FileReader();
+        /**@ignore*/
         reader.onloadend = function(evt) {
           i--;
           if (evt && evt.target && evt.target.result != null) {
@@ -13873,11 +15334,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsImage : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadImage;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadImage;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
@@ -13890,11 +15353,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsText : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadText;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadText;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
@@ -13907,11 +15372,13 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
    * @ignore
    */
   loadAsUnknown : function(file, name, size, type) {
-    var reader = new FileReader(), callback = this.options.onLoadUnknown;
+    var that = this, reader = new FileReader(),
+        callback = this.options.onLoadUnknown;
+    /**@ignore*/
     reader.onload = function(ev) {
       if (callback) {
         callback.call(
-          this,
+          that,
           ev && ev.target && ev.target.result,
           name, size, type
         );
@@ -14959,6 +16426,9 @@ Pot.update({
 // Definition of Debug.
 Pot.update({
   /**
+   * @lends Pot.Debug
+   */
+  /**
    * Debugging utilities.
    *
    * @name Pot.Debug
@@ -14991,6 +16461,378 @@ update(Pot.Debug, {
    */
   debug : debug
 });
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of jQuery plugin and convert Ajax function to deferred.
+
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Definition of jQuery plugin and convert Ajax function to deferred.
+   *
+   * <pre>
+   *   - $.pot
+   *       {Object}    Pot object.
+   *
+   *   - $.fn.deferred
+   *       {Function}  Deferrize jQuery method.
+   *                     function(method, (original arguments))
+   *                       - method :
+   *                           {String} method name.
+   *                       - (...)  :
+   *                           {*}      original arguments.
+   *  </pre>
+   *
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  deferrizejQueryAjax : (function() {
+    if (typeof jQuery !== 'function' || !jQuery.fn) {
+      return Pot.noop;
+    }
+    return function() {
+      return (function($) {
+        var orgAjax = $.ajax;
+        $.pot = Pot;
+        $.fn.extend({
+          /**@ignore*/
+          deferred : function(method) {
+            var func, args = arrayize(arguments, 1), exists = false;
+            each(args, function(arg) {
+              if (Pot.isFunction(arg)) {
+                exists = true;
+                throw Pot.StopIteration;
+              }
+            });
+            if (!exists) {
+              args.push(function() {
+                return arrayize(arguments);
+              });
+            }
+            func = Pot.Deferred.deferrize(method, this);
+            return func.apply(this, args);
+          }
+        });
+        /**@ignore*/
+        $.ajax = function(options) {
+          var d = new Pot.Deferred(), opts, orgs, er;
+          opts = update({}, options || {});
+          orgs = update({}, opts);
+          update(opts, {
+            /**@ignore*/
+            success : function() {
+              var args = arrayize(arguments), err, done;
+              try {
+                if (orgs.success) {
+                  orgs.success.apply(this, args);
+                }
+              } catch (e) {
+                done = true;
+                err = e || new Error(e);
+                args.push(err);
+                d.raise.apply(d, args);
+              }
+              if (!done) {
+                d.destAssign = true;
+                d.begin.apply(d, args);
+              }
+            },
+            /**@ignore*/
+            error : function() {
+              var args = arrayize(arguments), err;
+              try {
+                if (orgs.error) {
+                  orgs.error.apply(this, args);
+                }
+              } catch (e) {
+                err = e || new Error(e);
+                args.unshift(err);
+              } finally {
+                d.raise.apply(d, args);
+              }
+            }
+          });
+          try {
+            d.data({
+              result : orgAjax(opts)
+            });
+          } catch (e) {
+            er = e;
+            d.raise(er);
+          }
+          return d;
+        };
+      }(jQuery));
+    };
+  }())
+});
+
+// Update Pot.Plugin object methods.
+(function(Plugin, Internal) {
+update(Plugin, {
+  /**
+   * @lends Pot.Plugin
+   */
+  /**
+   * @private
+   * @ignore
+   */
+  storage : {},
+  /**
+   * @private
+   * @ignore
+   */
+  shelter : {},
+  /**
+   * Add plugin function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.foo(); // 'foo!'
+   *
+   *
+   * @param  {String|Object}  name     A name of Plugin function. or object.
+   * @param  {Function}      (method)  A plugin function.
+   * @param  {Boolean}       (force)   Whether overwrite plugin.
+   *                                     (default=false).
+   * @return {Boolean}                 Return success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  add : function(name, method, force) {
+    var result = true, pairs, overwrite;
+    if (Pot.isObject(name)) {
+      pairs = name;
+      overwrite = !!(force || method);
+    } else {
+      pairs = {};
+      pairs[stringify(name, true)] = method;
+      overwrite = !!force;
+    }
+    each(pairs, function(v, k) {
+      var key = stringify(k, true), func;
+      if (Pot.isFunction(v)) {
+        /**@ignore*/
+        func = function() {
+          return v.apply(v, arguments);
+        };
+        update(func, {
+          deferred : (function() {
+            try {
+              return Pot.Deferred.deferreed(func);
+            } catch (e) {
+              return Pot.Deferred.deferrize(func);
+            }
+          }())
+        });
+      } else {
+        func = v;
+      }
+      if (key && (overwrite || !Plugin.has(key))) {
+        if (key in Pot) {
+          Plugin.shelter[key] = Pot[key];
+        }
+        Pot[key] = Plugin.storage[key] = Internal.PotExportProps[key] = func;
+      } else {
+        result = false;
+      }
+    });
+    return result;
+  },
+  /**
+   * Check whether Pot.Plugin has already specific name.
+   *
+   *
+   * @example
+   *   debug( Pot.hasPlugin('hoge') ); // false
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.hasPlugin('hoge') ); // true
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns whether Pot.Plugin has
+   *                                  already specific name.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  has : function(name) {
+    var result = true;
+    each(arrayize(name), function(k) {
+      var key = stringify(k, true);
+      if (!(key in Plugin.storage)) {
+        result = false;
+        throw Pot.StopIteration;
+      }
+    });
+    return result;
+  },
+  /**
+   * Removes Pot.Plugin's function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.removePlugin('hoge') ); // true
+   *   Pot.hoge(); // (Error: hoge is undefined)
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  remove : function(name) {
+    var result = true;
+    each(arrayize(name), function(k) {
+      var key = stringify(k, true);
+      if (Pot.Plugin.has(key)) {
+        try {
+          if (key in Plugin.shelter) {
+            Pot[key] = Internal.PotExportProps[key] = Plugin.shelter[key];
+            delete Plugin.shelter[key];
+          } else {
+            if (key in Pot) {
+              delete Pot[key];
+            }
+            if (key in Internal.PotExportProps) {
+              delete Internal.PotExportProps[key];
+            }
+          }
+          delete Plugin.storage[key];
+          if (Plugin.has(key)) {
+            throw false;
+          }
+        } catch (e) {
+          result = false;
+        }
+      }
+    });
+    return result;
+  },
+  /**
+   * List the Pot.Plugin function names.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.addPlugin('bar', function() { alert('bar!') });
+   *   debug( Pot.listPlugin() ); // ['foo', 'bar']
+   *
+   *
+   * @return {Array} Returns an array of function names.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  list : function() {
+    var result = Pot.keys(Plugin.storage);
+    return result;
+  }
+});
+
+// Update Pot object.
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Add plugin function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.foo(); // 'foo!'
+   *
+   *
+   * @param  {String|Object}  name     A name of Plugin function. or object.
+   * @param  {Function}      (method)  A plugin function.
+   * @param  {Boolean}       (force)   Whether overwrite plugin.
+   *                                     (default=false).
+   * @return {Boolean}                 Return success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  addPlugin : Plugin.add,
+  /**
+   * Check whether Pot.Plugin has already specific name.
+   *
+   *
+   * @example
+   *   debug( Pot.hasPlugin('hoge') ); // false
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.hasPlugin('hoge') ); // true
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns whether Pot.Plugin has
+   *                                  already specific name.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  hasPlugin : Plugin.has,
+  /**
+   * Removes Pot.Plugin's function.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('hoge', function() {});
+   *   debug( Pot.removePlugin('hoge') ); // true
+   *   Pot.hoge(); // (Error: hoge is undefined)
+   *
+   *
+   * @param  {String|Array}  name   A name of Plugin function. or Array.
+   * @return {Boolean}              Returns success or failure.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  removePlugin : Plugin.remove,
+  /**
+   * List the Pot.Plugin function names.
+   *
+   *
+   * @example
+   *   Pot.addPlugin('foo', function() { alert('foo!') });
+   *   Pot.addPlugin('bar', function() { alert('bar!') });
+   *   debug( Pot.listPlugin() ); // ['foo', 'bar']
+   *
+   *
+   * @return {Array} Returns an array of function names.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  listPlugin : Plugin.list
+});
+
+}(Pot.Plugin, Pot.Internal));
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of globalize method.
@@ -15095,6 +16937,9 @@ Pot.update({
 
 // Define the export method.
 update(Pot.Internal, {
+  /**
+   * @lends Pot.Internal
+   */
   /**
    * Export the Pot properties.
    *
@@ -15211,6 +17056,7 @@ update(Pot.Internal, {
     register                : Pot.Deferred.register,
     unregister              : Pot.Deferred.unregister,
     deferrize               : Pot.Deferred.deferrize,
+    deferreed               : Pot.Deferred.deferreed,
     begin                   : Pot.Deferred.begin,
     flush                   : Pot.Deferred.flush,
     till                    : Pot.Deferred.till,
@@ -15272,127 +17118,20 @@ update(Pot.Internal, {
     trim                    : trim,
     now                     : now,
     globalize               : Pot.globalize,
-    debug                   : Pot.Debug.debug
+    debug                   : Pot.Debug.debug,
+    addPlugin               : Pot.Plugin.add,
+    hasPlugin               : Pot.Plugin.has,
+    removePlugin            : Pot.Plugin.remove,
+    listPlugin              : Pot.Plugin.list
   }
-});
-
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-// Definition of jQuery plugin and convert Ajax function to deferred.
-
-Pot.update({
-  /**
-   * @lends Pot
-   */
-  /**
-   * Definition of jQuery plugin and convert Ajax function to deferred.
-   *
-   * <pre>
-   *   - $.pot
-   *       {Object}    Pot object.
-   *
-   *   - $.fn.deferred
-   *       {Function}  Deferrize jQuery method.
-   *                     function(method, (original arguments))
-   *                       - method :
-   *                           {String} method name.
-   *                       - (...)  :
-   *                           {*}      original arguments.
-   *  </pre>
-   *
-   *
-   * @type Function
-   * @function
-   * @public
-   * @static
-   */
-  deferrizejQueryAjax : (function() {
-    if (typeof jQuery !== 'function' || !jQuery.fn) {
-      return Pot.noop;
-    }
-    return function() {
-      return (function($) {
-        var orgAjax = $.ajax;
-        $.pot = Pot;
-        $.fn.extend({
-          /**@ignore*/
-          deferred : function(method) {
-            var func, args = arrayize(arguments, 1), exists = false;
-            each(args, function(arg) {
-              if (Pot.isFunction(arg)) {
-                exists = true;
-                throw Pot.StopIteration;
-              }
-            });
-            if (!exists) {
-              args.push(function() {
-                return arrayize(arguments);
-              });
-            }
-            func = Pot.Deferred.deferrize(method, this);
-            return func.apply(this, args);
-          }
-        });
-        /**@ignore*/
-        $.ajax = function(options) {
-          var d = new Pot.Deferred(), opts, orgs, er;
-          opts = update({}, options || {});
-          orgs = update({}, opts);
-          update(opts, {
-            /**@ignore*/
-            success : function() {
-              var args = arrayize(arguments), err, done;
-              try {
-                if (orgs.success) {
-                  orgs.success.apply(this, args);
-                }
-              } catch (e) {
-                done = true;
-                err = e || new Error(e);
-                args.push(err);
-                d.raise.apply(d, args);
-              }
-              if (!done) {
-                d.destAssign = true;
-                d.begin.apply(d, args);
-              }
-            },
-            /**@ignore*/
-            error : function() {
-              var args = arrayize(arguments), err;
-              try {
-                if (orgs.error) {
-                  orgs.error.apply(this, args);
-                }
-              } catch (e) {
-                err = e || new Error(e);
-                args.unshift(err);
-              } finally {
-                d.raise.apply(d, args);
-              }
-            }
-          });
-          try {
-            d.data({
-              result : orgAjax(opts)
-            });
-          } catch (e) {
-            er = e;
-            d.raise(er);
-          }
-          return d;
-        };
-      })(jQuery);
-    };
-  })()
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Register the Pot object into global.
 
-
 // Export the Pot object.
 Pot.Internal.exportPot(false, false, false, true);
 
 
-})(this || {});
+}(this || {}));
 

@@ -1,7 +1,7 @@
 {
   "fileName": "pot.js",
   "debug": false,
-  "version": "1.13",
+  "version": "1.14",
   "files": [
     "Core.js",
     "Deferred.js",
@@ -27,8 +27,8 @@
     "DOM.js",
     "Style.js",
     "Debug.js",
-    "Export.js",
     "Plugin.js",
+    "Export.js",
     "Done.js"
   ],
   "enclosure": "Enclosure.js"
