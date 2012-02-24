@@ -2254,8 +2254,8 @@ update(Pot.Deferred, {
     return function() {
       var that = this, args = arrayize(arguments), d = new Pot.Deferred();
       d.then(function() {
-        var dd, result, params = [], done = false, error, isFired;
-        isFired = Pot.Deferred.isFired;
+        var dd, result, params = [], done = false, error,
+            isFired = Pot.Deferred.isFired;
         dd = new Pot.Deferred();
         each(args, function(val) {
           if (Pot.isFunction(val)) {
