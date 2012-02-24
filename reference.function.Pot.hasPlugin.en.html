@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.hasPlugin</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.hasPlugin';
+</script>
+</head>
+<body>
+<h1>Pot.hasPlugin</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.hasPlugin"><em>Pot.</em>hasPlugin</dfn>
+    (<em>{String|Array}</em> name)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      プラグインが存在するか調べます。
+    </p>
+    <div>
+      <p>
+ プラグイン関数またはプロパティが存在するか調べ、あれば true を返し、なければ false を返します。
+ <br>
+ 引数 name は、調べるプラグイン名を文字列で指定します。
+ <br>
+ name が文字列からなる配列で渡されると、すべて存在するか調べます。
+ <br>
+ プラグインについての詳細は <a href="#reference.function.Pot.addPlugin">addPlugin()</a> を参照ください。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.hasPlugin() が hasPlugin() で実行できます。
+</p>
+<p>
+ プラグインが存在すれば true が返り、なければ false が返ります。
+</p>
+
+
+<pre>// プラグインが登録されているか調べる
+Pot.hasPlugin('foo'); // false
+
+// プラグインを追加
+Pot.addPlugin('foo', function() { alert('foo!') });
+
+Pot.hasPlugin('foo'); // true</pre>
+
+<pre>// プラグインを登録
+Pot.addPlugin('myFunc', function(msg) {
+  alert('myFunc: ' + msg);
+});
+
+// 登録した関数は Pot からアクセスできる
+Pot.myFunc('Hello!'); // 'myFunc: Hello!'
+
+// プラグインが存在してるか確認
+debug( Pot.hasPlugin('myFunc') ); // true
+
+// 他のプラグイン関数を追加
+Pot.addPlugin('myFunc2', function(a, b) {
+  return a + b;
+});
+
+debug( Pot.myFunc2(1, 2) ); // 3
+
+// addPlugin は、デフォルトで他のプラグインを上書きしません
+debug( Pot.addPlugin('myFunc', function() {}) ); // false
+
+// すべてのプラグイン名を表示
+debug( Pot.listPlugin() ); // ['myFunc', 'myFunc2']
+
+// プラグインを削除
+Pot.removePlugin('myFunc');
+
+debug( Pot.hasPlugin('myFunc') ); // false
+debug( Pot.listPlugin() ); // ['myFunc2']</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

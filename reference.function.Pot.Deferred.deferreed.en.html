@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Deferred.deferreed</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#Pot.Deferred.deferreed';
+</script>
+</head>
+<body>
+<h1>Pot.Deferred.deferreed</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Function}</em>
+    <dfn id="definition.Pot.Deferred.deferreed"><em>Pot.Deferred.</em>deferreed</dfn>
+    (<em>{Object|Function}</em> object [, <em>{String|Function}</em> method])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      関数内の同期ループ処理を非同期イテレータに置き換え Deferred 化して返します。
+    </p>
+    <div>
+      <p>
+ 与えられた関数の中で実行される同期ループ (for, for-in, for-of, do, while 等) を
+ <br>
+ 非同期イテレーション (例えば <a href="#reference.function.Pot.forEach">Pot.Deferred.forEach()</a> など) に変換し、再定義した関数を返します。
+ <br>
+ 生成した関数は、<a href="#reference.function.Pot.Deferred">Pot.Deferred</a> インスタンスを返します。
+ <br>
+ deferreed は、一見 <a href="#reference.function.Pot.Deferred.deferrize">deferrize()</a> と似ていますが動作は異なります。
+ <br>
+ 引数 object は、変換する関数の親オブジェクトを指定します。
+ <br>
+ 引数 method は、変換する対象の関数名を文字列で指定します。
+ <br>
+ object に関数オブジェクトを渡した場合、method は省略できます。
+ <br>
+ 戻り値は 関数オブジェクトになり、<a href="#reference.function.Pot.forEach">Pot.Deferred.forEach()</a> などと同じく 速度の指定が可能です。
+</p>
+<pre>var deferfunc = Pot.deferreed(func);
+deferfunc(); // 通常の速度で実行
+deferfunc.slow(); // 遅めで実行</pre>
+<p>
+ 上の例のように <code>func.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+<p>
+ deferreed は、確実に for 文などを変換できるわけではありません。
+ <br>
+ 想定内の複雑でないコードが対象です。
+ <br>
+ 変換に失敗などエラーが起きると、その error インスタンスを throw します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.deferreed() が deferreed() で実行できます。
+</p>
+<p>
+ 非同期イテレータに置き換えられた関数オブジェクトが返ります。
+ <br>
+ 失敗すると、error インスタンスを throw します。
+</p>
+
+<pre>// 文字列を charCode からなる配列にして返す関数
+var toCharCode = function(string) {
+    var result = [];
+    for (var i = 0; i &lt; string.length; i++) {
+        result.push(string.charCodeAt(i));
+    }
+    return result;
+};
+
+// deferreed により for 文を非同期イテレータにした関数を生成
+var toCharCodeDefer = Pot.deferreed(toCharCode);
+
+// 例えば toCharCodeDefer は内部で以下のように変換されます
+//
+//  function(string) {
+//      var result = [];
+//      return Pot.Deferred.repeat(string.length, function(i) {
+//          result.push(string.charCodeAt(i));
+//      }).then(function() {
+//          return result;
+//      });
+//  };
+//
+
+// Pot.Deferred インスタンスが返るため then() などで繋げられる
+toCharCodeDefer('abc').then(function(res) {
+    Pot.debug(res); // [97, 98, 99]
+});
+
+// この変化により、巨大な文字列でも負荷を分散させ実行できる
+var largeString = new Array(100000).join('abcdef');
+
+// 'slow' などの指定が可能
+toCharCodeDefer.slow(largeString).then(function(res) {
+    Pot.debug(res.length); // 599994
+});</pre>
+
+
+
+<pre>// 文字列を圧縮/解凍するオブジェクト (LZ77)
+// <a href="http://polygon-planet.blogspot.com/2011/02/lz77javascript.html">http://polygon-planet.blogspot.com/2011/02/lz77javascript.html</a>
+var TinyLz77 = {
+  // 同期処理で圧縮
+  compress : function(s) {
+    var a = 53300, b, c, d, e, f, g = -1,
+        h, i, r = [], x = String.fromCharCode;
+    if (!s) {
+      return &#039;&#039;;
+    }
+    s = new Array(a--).join(&#039; &#039;) + s;
+    while ((b = s.substr(a, 256))) {
+      for (c = 2, i = b.length; c &lt;= i; ++c) {
+        d = s.substring(
+            a - 52275,
+            a + c - 1
+        ).lastIndexOf(b.substring(0, c));
+        if (!~d) {
+          break;
+        }
+        e = d;
+      }
+      if (c === 2 || c === 3 &amp;&amp; f === g) {
+        f = g;
+        h = s.charCodeAt(a++);
+        r.push(
+            x(h &gt;&gt; 8 &amp; 255),
+            x(h &amp; 255)
+        );
+      } else {
+        r.push(
+            x((e &gt;&gt; 8 &amp; 255) | 65280),
+            x(e &amp; 255),
+            x(c - 3)
+        );
+        a += c - 1;
+      }
+    }
+    return r.join(&#039;&#039;);
+  },
+  // 同期処理で解凍
+  decompress : function(s) {
+    var a = 53300, b = 0, c, d, e, f, g,
+        h, r = new Array(a--).join(&#039; &#039;),
+        x = String.fromCharCode;
+    if (s &amp;&amp; s.length) {
+      do {
+        c = s.charCodeAt(b++);
+        if (c &lt;= 255) {
+          r += x((c &lt;&lt; 8) | s.charCodeAt(b++));
+        } else {
+          e = ((c &amp; 255) &lt;&lt; 8) | s.charCodeAt(b++);
+          f = e + s.charCodeAt(b++) + 2;
+          h = r.slice(-52275);
+          g = h.substring(e, f);
+          if (g) {
+            while (h.length &lt; f) {
+              h += g;
+            }
+            r += h.substring(e, f);
+          }
+        }
+      } while (b &lt; s.length);
+    }
+    return r.slice(a);
+  }
+};
+// これを非同期ループに変換
+var compressDefer   = Pot.deferreed(TinyLz77, &#039;compress&#039;);
+var decompressDefer = Pot.deferreed(TinyLz77, &#039;decompress&#039;);
+
+var string = &#039;foooooooooo baaaaaaaaaaaaar baaaaaaazzzzzzzzzzzz&#039;;
+
+Pot.debug(string.length); // 48
+
+// 圧縮
+compressDefer(string).then(function(compressedString) {
+  Pot.debug(compressedString.length); // 26
+
+  // 解凍
+  return decompressDefer(compressedString).then(function(decompressedString) {
+    Pot.debug(decompressedString.length); // 48
+  });
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

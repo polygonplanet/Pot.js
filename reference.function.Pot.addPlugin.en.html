@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.addPlugin</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.addPlugin';
+</script>
+</head>
+<body>
+<h1>Pot.addPlugin</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.addPlugin"><em>Pot.</em>addPlugin</dfn>
+    (<em>{String|Object}</em> name [, <em>{Function}</em> method [, <em>{Boolean}</em> force = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      プラグインを追加します。
+    </p>
+    <div>
+      <p>
+ Pot オブジェクトに プラグイン関数またはプロパティを追加します。
+ <br>
+ 追加した関数は、Pot.xxx としてアクセスできます。
+ <br>
+ 引数 name は、追加する関数名を文字列で指定します。
+ <br>
+ 引数 method は、追加する関数オブジェクトを指定します。
+ <br>
+ 引数 force が 真 (true) として渡されると、既に存在しているプラグイン名だった場合でも上書きします。
+ <br>
+ force のデフォルトは false で、上書きしません。
+ <br>
+ 引数 name がオブジェクトで渡されると、キー名をプラグイン名としてすべて追加する動作になります。
+ <br>
+ name をオブジェクトで渡した場合、force の扱いが第二引数に移ります。
+ <br>
+ プラグイン名を Pot オブジェクト本体の関数名として指定することで、
+ <br>
+ 本体の関数を上書きし Pot オブジェクト自身の挙動を変えることができます。
+ <br>
+ 本体を変更した場合の他の関数についての影響は保証されません。
+ <br>
+ また、Pot オブジェクト本体の関数を プラグイン関数で上書きした後に
+ <br>
+ <a href="#reference.function.Pot.removePlugin">removePlugin()</a> によりプラグイン関数を削除すると、本来の Pot オブジェクトの関数に戻ります。
+</p>
+<p>
+ 登録したプラグイン関数は、'<strong>deferred</strong>' というメソッドを持ちます。
+ <br>
+ deferred は、基本的に Pot.Deferred.deferrize() により非同期 (Deferred) 化 した関数です。
+</p>
+<pre>// プラグインを登録
+Pot.addPlugin('foo', function() { return 'foo!'; });
+
+// 同期で実行
+debug( Pot.foo() ); // 'foo!'
+
+// 非同期で実行
+Pot.foo.deferred().then(function(res) {
+    debug(res); // 'foo!'
+});</pre>
+<p>
+ 上のように 同期/非同期 を使い分けることができます。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.addPlugin() が addPlugin() で実行できます。
+</p>
+<p>
+ 登録に成功すると true が返り、失敗すると false が返ります。
+</p>
+
+<pre>// プラグインを追加
+Pot.addPlugin('foo', function() { alert('foo!') });
+
+Pot.foo(); // 'foo!'</pre>
+
+<pre>// プラグインを登録
+Pot.addPlugin('myFunc', function(msg) {
+  alert('myFunc: ' + msg);
+});
+
+// 登録した関数は Pot からアクセスできる
+Pot.myFunc('Hello!'); // 'myFunc: Hello!'
+
+// プラグインが存在してるか確認
+debug( Pot.hasPlugin('myFunc') ); // true
+
+// 他のプラグイン関数を追加
+Pot.addPlugin('myFunc2', function(a, b) {
+  return a + b;
+});
+
+debug( Pot.myFunc2(1, 2) ); // 3
+
+// addPlugin は、デフォルトで他のプラグインを上書きしません
+debug( Pot.addPlugin('myFunc', function() {}) ); // false
+
+// すべてのプラグイン名を表示
+debug( Pot.listPlugin() ); // ['myFunc', 'myFunc2']
+
+// プラグインを削除
+Pot.removePlugin('myFunc');
+
+debug( Pot.hasPlugin('myFunc') ); // false
+debug( Pot.listPlugin() ); // ['myFunc2']</pre>
+
+<pre>// オブジェクトで指定する例
+Pot.addPlugin({
+  foo : function() { return 'foo!'; },
+  bar : function() { return 'bar!'; },
+  baz : function() { return 'baz!'; }
+});
+
+debug(Pot.foo() + Pot.bar() + Pot.baz()); // 'foo!bar!baz!'</pre>
+
+<pre>// プラグインを追加
+Pot.addPlugin('foo', function() { return 'foo!'; });
+
+// 変更しようと試みる
+var newFoo = function() { return 'NewFoo!' };
+
+// デフォルトでは上書きされない
+debug( Pot.addPlugin('foo', newFoo) ); // false
+
+// 第三引数に true を渡すと上書きする
+debug( Pot.addPlugin('foo', newFoo, true) ); // true
+
+debug( Pot.foo() ); // 'NewFoo!'</pre>
+
+<pre>var toArray = function(string) {
+    return string.split('');
+};
+// プラグイン関数は 'deferred' メソッドを持つ
+Pot.addPlugin('toArray', toArray);
+
+// 同期で実行
+debug( Pot.toArray('abc') ); // ['a', 'b', 'c']
+
+// 非同期で実行
+Pot.toArray.deferred('abc').then(function(res) {
+    debug(res); // ['a', 'b', 'c']
+});</pre>
+
+
+<pre>var string = '\t abc\n \t ';
+
+// オリジナルの Pot.trim()
+debug(Pot.trim(string)); // 'abc'
+
+// プラグイン関数の登録により Pot.trim() を上書き
+Pot.addPlugin('trim', function(s) {
+    return s.replace(/^ +| +$/g, ''); // スペース (U+0020) だけ削除するようにする
+});
+
+// 登録した Pot.trim()
+debug(Pot.trim(string)); // '\t abc\n \t'
+
+// プラグインの trim を削除
+Pot.removePlugin('trim');
+
+// 元に戻る
+debug(Pot.trim(string)); // 'abc'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

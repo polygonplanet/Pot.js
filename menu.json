@@ -82,7 +82,11 @@
         "reference.function.Pot.currentDocument":{"ja":"currentDocument","en":"currentDocument"},
         "reference.function.Pot.currentURI":{"ja":"currentURI","en":"currentURI"},
         "reference.function.Pot.globalize":{"ja":"globalize","en":"globalize"},
-        "reference.function.Pot.deferrizejQueryAjax":{"ja":"deferrizejQueryAjax","en":"deferrizejQueryAjax"}
+        "reference.function.Pot.deferrizejQueryAjax":{"ja":"deferrizejQueryAjax","en":"deferrizejQueryAjax"},
+        "reference.function.Pot.addPlugin":{"ja":"addPlugin","en":"addPlugin"},
+        "reference.function.Pot.hasPlugin":{"ja":"hasPlugin","en":"hasPlugin"},
+        "reference.function.Pot.removePlugin":{"ja":"removePlugin","en":"removePlugin"},
+        "reference.function.Pot.listPlugin":{"ja":"listPlugin","en":"listPlugin"}
       }
     },
     "reference.Pot.Iter.functions":{
@@ -144,6 +148,7 @@
         "reference.function.Pot.Deferred.register":{"ja":"register","en":"register"},
         "reference.function.Pot.Deferred.unregister":{"ja":"unregister","en":"unregister"},
         "reference.function.Pot.Deferred.deferrize":{"ja":"deferrize","en":"deferrize"},
+        "reference.function.Pot.Deferred.deferreed":{"ja":"deferreed","en":"deferreed"},
         "reference.function.Pot.Deferred.parallel":{"ja":"parallel","en":"parallel"},
         "reference.function.Pot.Deferred.chain":{"ja":"chain","en":"chain"}
       }

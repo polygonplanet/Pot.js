@@ -291,6 +291,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.OS.html">Pot.OS</a></li>
 	
+	<li><a href="../symbols/Pot.Plugin.html">Pot.Plugin</a></li>
+	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
 	<li><a href="../symbols/Pot.repeat.html">Pot.repeat</a></li>
@@ -679,6 +681,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.addPlugin">addPlugin</a></b>(name, (method), (force))
+								</div>
+								<div class="description">Add plugin function.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.arrayize">arrayize</a></b>(object, (index))
 								</div>
 								<div class="description">Treated as an array of arguments given then
@@ -756,6 +767,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.globalize">globalize</a></b>((target), (advised))
 								</div>
 								<div class="description">Globalizes the Pot object properties.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.hasPlugin">hasPlugin</a></b>(name)
+								</div>
+								<div class="description">Check whether Pot.Plugin has already specific name.</div>
 							</td>
 						</tr>
 					
@@ -1008,6 +1028,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.listPlugin">listPlugin</a></b>()
+								</div>
+								<div class="description">List the Pot.Plugin function names.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.localEval">localEval</a></b>(code, (scope))
 								</div>
 								<div class="description">Evaluates a script in a anonymous context.</div>
@@ -1057,6 +1086,15 @@ ul.inheritsList
 								</div>
 								<div class="description">Create continuously array that
  has numbers between start number and end number.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.removePlugin">removePlugin</a></b>(name)
+								</div>
+								<div class="description">Removes Pot.Plugin's function.</div>
 							</td>
 						</tr>
 					
@@ -1763,6 +1801,67 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
+					<a name=".addPlugin"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>addPlugin</b>(name, (method), (force))
+					
+					</div>
+					<div class="description">
+						Add plugin function.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.addPlugin('foo', function() { alert('foo!') });
+  Pot.foo(); // 'foo!'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Object}</span> <b>name</b>
+									
+								</dt>
+								<dd>A name of Plugin function. or object.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Function}</span> <b>(method)</b>
+									
+								</dt>
+								<dd>A plugin function.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Boolean}</span> <b>(force)</b>
+									
+								</dt>
+								<dd>Whether overwrite plugin.
+                                    (default=false).</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return success or failure.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".arrayize"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2231,6 +2330,56 @@ ul.inheritsList
 							
 								<dd><span class="light fixedFont">{Array}</span> The property name(s) that not defined by
                                  conflict as an array.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".hasPlugin"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>hasPlugin</b>(name)
+					
+					</div>
+					<div class="description">
+						Check whether Pot.Plugin has already specific name.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug( Pot.hasPlugin('hoge') ); // false
+  Pot.addPlugin('hoge', function() {});
+  debug( Pot.hasPlugin('hoge') ); // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Array}</span> <b>name</b>
+									
+								</dt>
+								<dd>A name of Plugin function. or Array.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Returns whether Pot.Plugin has
+                                 already specific name.</dd>
 							
 							</dl>
 						
@@ -3878,6 +4027,44 @@ This method like Array.prototype.lastIndexOf
 
 					<hr />
 				
+					<a name=".listPlugin"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>listPlugin</b>()
+					
+					</div>
+					<div class="description">
+						List the Pot.Plugin function names.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.addPlugin('foo', function() { alert('foo!') });
+  Pot.addPlugin('bar', function() { alert('bar!') });
+  debug( Pot.listPlugin() ); // ['foo', 'bar']</pre>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Array}</span> Returns an array of function names.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".localEval"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -4263,6 +4450,55 @@ This function can be a letter rather than just numbers.
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Array}</span> Return an array result.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".removePlugin"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>removePlugin</b>(name)
+					
+					</div>
+					<div class="description">
+						Removes Pot.Plugin's function.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.addPlugin('hoge', function() {});
+  debug( Pot.removePlugin('hoge') ); // true
+  Pot.hoge(); // (Error: hoge is undefined)</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Array}</span> <b>name</b>
+									
+								</dt>
+								<dd>A name of Plugin function. or Array.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Returns success or failure.</dd>
 							
 							</dl>
 						
@@ -4688,7 +4924,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Feb 06 2012 22:10:40 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 24 2012 17:18:08 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

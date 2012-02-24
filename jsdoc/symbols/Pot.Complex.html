@@ -291,6 +291,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.OS.html">Pot.OS</a></li>
 	
+	<li><a href="../symbols/Pot.Plugin.html">Pot.Plugin</a></li>
+	
 	<li><a href="../symbols/Pot.reduce.html">Pot.reduce</a></li>
 	
 	<li><a href="../symbols/Pot.repeat.html">Pot.repeat</a></li>
@@ -401,6 +403,34 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.Complex.<b><a href="../symbols/Pot.Complex.html#.compareVersions">compareVersions</a></b>(ver1, ver2, (operator))
+								</div>
+								<div class="description">Compare two version strings.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Complex.<b><a href="../symbols/Pot.Complex.html#.convertToBase">convertToBase</a></b>(value, from, to)
+								</div>
+								<div class="description">Convert to the base 2 to 62 string from the base x string.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Complex.<b><a href="../symbols/Pot.Complex.html#.limit">limit</a></b>(x, min, max)
+								</div>
+								<div class="description">Return the value that limited in the range of
+ maximum value from minimum value.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.Complex.<b><a href="../symbols/Pot.Complex.html#.numeric">numeric</a></b>(value, (defaults))
 								</div>
 								<div class="description">Cast the value to numerical value.</div>
@@ -456,6 +486,276 @@ Math and Numeric, lexical compare utilities.
 				<div class="sectionTitle">
 					Method Detail
 				</div>
+				
+					<a name=".compareVersions"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Complex.</span><b>compareVersions</b>(ver1, ver2, (operator))
+					
+					</div>
+					<div class="description">
+						Compare two version strings.
+Version strings are dot-separated sequences of
+ version-parts.
+Numbers are base-10, and are zero if left out.
+Strings are compared basic
+ textual versions (e.g., "beta" and "alpha" etc.).
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  function compareVersionsRepr(a, b) {
+    var x = compareVersions(a, b);
+    if (x == 0) {
+      return a + ' == ' + b;
+    } else if (x &gt; 0) {
+      return a + ' &gt; '  + b;
+    } else {
+      return a + ' &lt; '  + b;
+    }
+  }
+  debug(compareVersionsRepr('1.0pre', '1.0'));
+  // @results '1.0pre &lt; 1.0'</pre>
+					
+					<pre class="code">  debug(compareVersions('8.2.5rc', '8.2.5a'));
+  // @results 1
+  debug(compareVersions('8.2.50', '8.2.52'));
+  // @results -1
+  debug(compareVersions('5.3.0-dev', '5.3.0'));
+  // @results -1
+  debug(compareVersions('4.1.0.52', '4.01.0.51'));
+  // @results 1
+  debug(compareVersions('1.01a', '1.01'));
+  // @results -1
+  debug(compareVersions('1.0.0', '1.0.00'));
+  // @results 0
+  debug(compareVersions('2.1.0', '2.0.0', '&lt;'));
+  // @results false
+  debug(compareVersions('2.1.0', '2.0.0', '&gt;'));
+  // @results true
+  debug(compareVersions('2.1.0a', '2.1.0a', '=='));
+  // @results true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String|Number}</span> <b>ver1</b>
+									
+								</dt>
+								<dd>The first version.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String|Number}</span> <b>ver2</b>
+									
+								</dt>
+								<dd>The second version.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>(operator)</b>
+									
+								</dt>
+								<dd>(Optional) Comparison operator.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number}</span> If `ver1` and `ver2` are two version
+                                  being compared, and the return value:
+                                  - is smaller than 0, then A < B.
+                                  - equals 0 then Version, then A == B.
+                                  - is bigger than 0, then A > B.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".convertToBase"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Complex.</span><b>convertToBase</b>(value, from, to)
+					
+					</div>
+					<div class="description">
+						Convert to the base 2 to 62 string from the base x string.
+That can work for big scale integers.
+The maximum base number is 62.
+The base number '0' will be not converted.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var value = 'FFFFFFFF';
+  var result = convertToBase(value, 16, 10);
+  debug(result);
+  // @results  result = '4294967295'</pre>
+					
+					<pre class="code">  var value = '9223372036854775807';
+  var result = convertToBase(value, 10, 16);
+  debug(result);
+  // @results  result = '7FFFFFFFFFFFFFFF'</pre>
+					
+					<pre class="code">  var value = '11010100010011011010011101111' +
+              '10110011001101101100111001101';
+  var result = convertToBase(value, 2, 62);
+  debug(result);
+  // @results  result = 'HelloWorld'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number|String}</span> <b>value</b>
+									
+								</dt>
+								<dd>the numeric or alphameric value.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>from</b>
+									
+								</dt>
+								<dd>the base number is in.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number}</span> <b>to</b>
+									
+								</dt>
+								<dd>the base to convert number to.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> the numbers of result which was
+                                   converted to base to base.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".limit"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Complex.</span><b>limit</b>(x, min, max)
+					
+					</div>
+					<div class="description">
+						Return the value that limited in the range of
+ maximum value from minimum value.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var result = limit(5, 10, 50);
+  debug(result);
+  // @results 10</pre>
+					
+					<pre class="code">  var result = limit(80, 10, 50);
+  debug(result);
+  // @results 50</pre>
+					
+					<pre class="code">  var result = limit(5, 2, 8);
+  debug(result);
+  // @results 5</pre>
+					
+					<pre class="code">  var result = limit(-5, -10, -50);
+  debug(result);
+  // @results -10</pre>
+					
+					<pre class="code">  var result = limit(-80, -10, -50);
+  debug(result);
+  // @results -50</pre>
+					
+					<pre class="code">  var result = limit('F', 'A', 'C');
+  debug(result);
+  // @results 'C'</pre>
+					
+					<pre class="code">  var result = limit('b', 'a', 'z');
+  debug(result);
+  // @results 'b'</pre>
+					
+					<pre class="code">  var result = limit(1, 2, 4, 5, 10, 20);
+  debug(result);
+  // @results 2</pre>
+					
+					<pre class="code">  var result = limit(100, 2, 4, 5, 10, 20);
+  debug(result);
+  // @results 20</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Number|String|*}</span> <b>x</b>
+									
+								</dt>
+								<dd>A target value.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number|String|*}</span> <b>min</b>
+									
+								</dt>
+								<dd>The minimum value, or maximum value.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Number|String|*}</span> <b>max</b>
+									
+								</dt>
+								<dd>The maximum value, or minimum value.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Number|String|*}</span> The value in the range of
+                                  `max` from `min`.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
 				
 					<a name=".numeric"> </a>
 					<div class="fixedFont">&lt;static&gt; 
@@ -538,7 +838,7 @@ All type of object can be convert.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Feb 06 2012 22:10:40 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 24 2012 17:18:08 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
