@@ -9,8 +9,8 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.07
- * @date           2012-02-06
+ * @version        1.08
+ * @date           2012-02-24
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -940,6 +940,96 @@ $(function() {
         return getErrorMessage(new Error('ErrorMessage'));
       },
       expect : 'ErrorMessage'
+    }, {
+      title  : 'Pot.Plugin methods',
+      code   : function() {
+        var results = [];
+        addPlugin('myFunc', function(msg) {
+          return 'myFunc: ' + msg;
+        });
+        results.push(Pot.myFunc('Hello!'));
+        results.push(hasPlugin('myFunc'));
+        addPlugin('myFunc2', function(a, b) {
+          return a + b;
+        });
+        results.push(Pot.myFunc2(1, 2));
+        results.push(addPlugin('myFunc', function() {}));
+        results.push(listPlugin());
+        results.push(removePlugin('myFunc'));
+        results.push(hasPlugin('myFunc'));
+        results.push(listPlugin());
+        return results;
+      },
+      expect : [
+        'myFunc: Hello!',
+        true,
+        3,
+        false,
+        ['myFunc', 'myFunc2'],
+        true,
+        false,
+        ['myFunc2']
+      ]
+    }, {
+      title  : 'Pot.addPlugin() overwrite',
+      code   : function() {
+        var results = [];
+        addPlugin({
+          foo : function() { return 'foo!'; },
+          bar : function() { return 'bar!'; },
+          baz : function() { return 'baz!'; }
+        });
+        results.push(Pot.foo() + Pot.bar() + Pot.baz());
+        addPlugin('hoge', function() { return 'hoge!'; });
+        var newHoge = function() { return 'NewHoge!' };
+        results.push(addPlugin('hoge', newHoge));
+        results.push(addPlugin('hoge', newHoge, true));
+        results.push(Pot.hoge());
+        return results;
+      },
+      expect : [
+        'foo!bar!baz!',
+        false,
+        true,
+        'NewHoge!'
+      ]
+    }, {
+      title  : 'Pot.addPlugin() using deferred method',
+      code   : function() {
+        var toArray = function(string) {
+          return string.split('');
+        };
+        Pot.addPlugin('myToArray', toArray);
+        var results = [];
+        results.push(Pot.myToArray('abc'));
+        return Pot.myToArray.deferred('abc').then(function(res) {
+          results.push(res);
+          return results;
+        });
+      },
+      expect : [
+        ['a', 'b', 'c'],
+        ['a', 'b', 'c']
+      ]
+    }, {
+      title  : 'Pot.addPlugin() and Pot.removePlugin()',
+      code   : function() {
+        var results = [];
+        var string = '\t abc\n \t ';
+        results.push(Pot.trim(string));
+        addPlugin('trim', function(s) {
+          return s.replace(/^ +| +$/g, '');
+        });
+        results.push(Pot.trim(string));
+        removePlugin('trim');
+        results.push(Pot.trim(string));
+        return results;
+      },
+      expect : [
+        'abc',
+        '\t abc\n \t',
+        'abc'
+      ]
     }, {
       title  : 'Pot.range()',
       code   : function() {
@@ -2349,6 +2439,102 @@ $(function() {
         });
       },
       expect : [97, 98, 99, 100, 101, 102]
+    }, {
+      title  : 'Pot.Deferred.deferreed() with for statement',
+      code   : function() {
+        var toCharCode = function(string) {
+          var result = [];
+          for (var i = 0; i < string.length; i++) {
+            result.push(string.charCodeAt(i));
+          }
+          return result;
+        };
+        var toCharCodeDefer = deferreed(toCharCode);
+        return toCharCodeDefer.fast('abc').then(function(res) {
+          return res;
+        });
+      },
+      expect : [97, 98, 99]
+    }, {
+      title  : 'Pot.Deferred.deferreed() with do-while statement',
+      code   : function() {
+        var TinyLz77 = {
+          compress : function(s) {
+            var a = 53300, b, c, d, e, f, g = -1,
+                h, i, r = [], x = String.fromCharCode;
+            if (!s) {
+              return '';
+            }
+            s = new Array(a--).join(' ') + s;
+            while ((b = s.substr(a, 256))) {
+              for (c = 2, i = b.length; c <= i; ++c) {
+                d = s.substring(
+                    a - 52275,
+                    a + c - 1
+                ).lastIndexOf(b.substring(0, c));
+                if (!~d) {
+                  break;
+                }
+                e = d;
+              }
+              if (c === 2 || c === 3 && f === g) {
+                f = g;
+                h = s.charCodeAt(a++);
+                r.push(
+                    x(h >> 8 & 255),
+                    x(h & 255)
+                );
+              } else {
+                r.push(
+                    x((e >> 8 & 255) | 65280),
+                    x(e & 255),
+                    x(c - 3)
+                );
+                a += c - 1;
+              }
+            }
+            return r.join('');
+          },
+          decompress : function(s) {
+            var a = 53300, b = 0, c, d, e, f, g,
+                h, r = new Array(a--).join(' '),
+                x = String.fromCharCode;
+            if (s && s.length) {
+              do {
+                c = s.charCodeAt(b++);
+                if (c <= 255) {
+                  r += x((c << 8) | s.charCodeAt(b++));
+                } else {
+                  e = ((c & 255) << 8) | s.charCodeAt(b++);
+                  f = e + s.charCodeAt(b++) + 2;
+                  h = r.slice(-52275);
+                  g = h.substring(e, f);
+                  if (g) {
+                    while (h.length < f) {
+                      h += g;
+                    }
+                    r += h.substring(e, f);
+                  }
+                }
+              } while (b < s.length);
+            }
+            return r.slice(a);
+          }
+        };
+        var compressDefer   = deferreed(TinyLz77, 'compress');
+        var decompressDefer = deferreed(TinyLz77, 'decompress');
+        var string = 'foooooooooo baaaaaaaaaaaaar baaaaaaazzzzzzzzzzzz';
+        var results = [];
+        results.push(string.length);
+        return compressDefer(string).then(function(res) {
+          results.push(res.length);
+          return decompressDefer(res).then(function(res) {
+            results.push(res.length);
+            return results;
+          });
+        });
+      },
+      expect : [48, 26, 48]
     }, {
       title  : 'Pot.Deferred.parallel() with Array',
       code   : function() {
@@ -4187,6 +4373,42 @@ $(function() {
       },
       expect : ['HelloWorld!.', 'f ll']
     }, {
+      title  : 'Pot.indent()',
+      code   : function() {
+        var s1 = 'foo bar baz';
+        var s2 = 'foo\nbar\nbaz';
+        return [
+          indent(s1),
+          indent(s1, 4),
+          indent(s1, 1, '\t'),
+          indent(s2, 1, '\t')
+        ];
+      },
+      expect : [
+        '  foo bar baz',
+        '    foo bar baz',
+        '\tfoo bar baz',
+        '\tfoo\n\tbar\n\tbaz'
+      ]
+    }, {
+      title  : 'Pot.unindent()',
+      code   : function() {
+        var s1 = '  foo bar baz';
+        var s2 = '\tfoo\n\tbar\n\tbaz';
+        return [
+          unindent(s1),
+          unindent(s1, 4),
+          unindent(s1, 1, '\t'),
+          unindent(s2, 1, '\t')
+        ];
+      },
+      expect : [
+        'foo bar baz',
+        '  foo bar baz',
+        '  foo bar baz',
+        'foo\nbar\nbaz'
+      ]
+    }, {
       title  : 'Pot.normalizeSpace()',
       code   : function() {
         return [
@@ -4280,6 +4502,24 @@ $(function() {
         return underscore('rawInput');
       },
       expect : 'raw_input'
+    }, {
+      title  : 'Pot.extract()',
+      code   : function() {
+        return [
+          extract('foo:bar', /:(\w+)$/),
+          extract('foo:bar', /^:(\w+)/),
+          extract('foo.html', /(foo|bar)\.([^.]+)$/, 2),
+          extract('foobar', 'foo'),
+          extract('foobar', 'fo+')
+        ];
+      },
+      expect : [
+        'bar',
+        '',
+        'html',
+        'foo',
+        ''
+      ]
     }, {
       title  : 'Pot.inc()',
       code   : function() {
