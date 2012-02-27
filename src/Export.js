@@ -223,6 +223,10 @@ update(Pot.Internal, {
     isNodeLike              : Pot.isNodeLike,
     isNodeList              : Pot.isNodeList,/*{#if Pot}*/
     isDOMLike               : Pot.isDOMLike,/*{#endif}*/
+    Cc                      : Pot.Cc,
+    Ci                      : Pot.Ci,
+    Cr                      : Pot.Cr,
+    Cu                      : Pot.Cu,
     Deferred                : Pot.Deferred,
     succeed                 : Pot.Deferred.succeed,
     failure                 : Pot.Deferred.failure,
