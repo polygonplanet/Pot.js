@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.System.isYieldable</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.property.Pot.System.isYieldable';
+</script>
+</head>
+<body>
+<h1>Pot.System.isYieldable</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <dfn id="definition.reference.property.Pot.System.isYieldable">Pot.System.isYieldable</dfn>
+    <em>{Boolean|Void}</em>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      yield 演算子 が利用可能かどうか。
+    </p>
+    <div>
+<p>
+ yield 演算子 が利用可能な場合、Pot.System.isYieldable が true になります。
+ <br>
+ それ以外の環境では false になります。
+ <br>
+ yield による ジェネレータ/イテレータで <a href="#reference.function.Pot.iterate">Pot.iterate()</a> などの利用価値が上昇します。
+ <br>
+ yield 演算子 は、JavaScript 1.7 以降で利用可能です。詳細は <a href="https://developer.mozilla.org/ja/New_in_JavaScript_1.7#.E3.82.B8.E3.82.A7.E3.83.8D.E3.83.AC.E3.83.BC.E3.82.BF.E3.81.A8.E3.82.A4.E3.83.86.E3.83.AC.E3.83.BC.E3.82.BF">JavaScript 1.7 の新機能 - MDN</a> などから参照ください。
+</p>
+<pre>if (Pot.System.isYieldable) {
+
+    // yield によるフィボナッチ数を計算するアルゴリズム
+    // <a href="https://developer.mozilla.org/ja/New_in_JavaScript_1.7">https://developer.mozilla.org/ja/New_in_JavaScript_1.7</a>
+
+    function fib() {
+        var i = 0, j = 1;
+        while (true) {
+            yield i;
+            var t = i;
+            i = j;
+            j += t;
+        }
+    }
+
+    var g = fib();
+    for (var i = 0; i &lt; 10; i++) {
+        debug(g.next());
+    }
+
+}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

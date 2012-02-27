@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Complex.compareVersions</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Complex.compareVersions';
+</script>
+</head>
+<body>
+<h1>Pot.Complex.compareVersions</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number|Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Complex.compareVersions"><em>Pot.Complex.</em>compareVersions</dfn>
+    (<em>{String|Number}</em> ver1, <em>{String|Number}</em> ver2 [, <em>{String}</em> operator])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      2 つのバージョン番号を比較します。
+    </p>
+    <div>
+      <p>
+ 'beta' や 'alpha' のような表記も含め、2 つのバージョン番号を比較します。
+ <br>
+ 引数 ver1 と ver2 には、比較する 2 つのバージョン番号を指定します。
+ <br>
+ ver1 が ver2 より上なら 1 が返ります。
+ <br>
+ ver2 が ver1 より上なら -1 が返ります。
+ <br>
+ ver1 と ver2 が等しい場合は 0 が返ります。
+ <br>
+ 引数 operator を指定すると、<code>(ver1 operator ver2)</code> の条件式の結果が返ります。
+ <br>
+ 比較は、ドット '.' で分解され順に評価されます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.compareVersions() が compareVersions() で実行できます。
+</p>
+<p>
+ ver1 が ver2 より上なら 1、ver2 が ver1 より上なら -1、同じ場合は 0 が返ります。
+ <br>
+ operator を指定した場合は、その条件式が 真 (true) なら true、そうでない場合 false が返ります。
+</p>
+
+<pre>function compareVersionsRepr(a, b) {
+    var x = Pot.compareVersions(a, b);
+    if (x == 0) {
+        return a + ' == ' + b;
+    } else if (x &gt; 0) {
+        return a + ' &gt; '  + b;
+    } else {
+        return a + ' &lt; '  + b;
+    }
+}
+Pot.debug(compareVersionsRepr('1.0pre', '1.0')); // '1.0pre &lt; 1.0'</pre>
+
+<pre>debug(compareVersions('8.2.5rc',   '8.2.5a'));        // 1
+debug(compareVersions('8.2.50',    '8.2.52'));        // -1
+debug(compareVersions('5.3.0-dev', '5.3.0'));         // -1
+debug(compareVersions('4.1.0.52',  '4.01.0.51'));     // 1
+debug(compareVersions('1.01a',     '1.01'));          // -1
+debug(compareVersions('1.0.0',     '1.0.00'));        // 0
+debug(compareVersions('2.1.0',     '2.0.0',   '&lt;'));  // false
+debug(compareVersions('2.1.0',     '2.0.0',   '&gt;'));  // true
+debug(compareVersions('2.1.0a',    '2.1.0a',  '==')); // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

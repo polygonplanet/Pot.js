@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Complex.limit</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Complex.limit';
+</script>
+</head>
+<body>
+<h1>Pot.Complex.limit</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number|String|*}</em>
+    <dfn id="definition.reference.function.Pot.Complex.limit"><em>Pot.Complex.</em>limit</dfn>
+    (<em>{Number|String|*}</em> x [, <em>{Number|String|*}</em> min [, <em>{Number|String|*}</em> max [, ...]]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x を min から max の範囲に収まる値にして返します。
+    </p>
+    <div>
+      <p>
+ 引数 x は、対象の値を 数値または文字列で指定します。
+ <br>
+ 引数 min は、範囲のうちの最小値を 数値または文字列で指定します。
+ <br>
+ 引数 max は、範囲のうちの最大値を 数値または文字列で指定します。
+ <br>
+ min と max が逆に指定されると min が最大値、max が最小値とみなされます。
+ <br>
+ 第三引数以降に更に値を渡すと、すべての引数のうち最小値と最大値が検出され計算されます。
+</p>
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.limit() が limit() で実行できます。
+</p>
+<p>
+ x を min から max までの範囲に収まるよう丸められた値が返ります。
+</p>
+<pre>debug( limit(5, 10, 50) );            // 10
+debug( limit(80, 10, 50) );           // 50
+debug( limit(5, 2, 8) );              // 5
+debug( limit(-5, -10, -50) );         // -10
+debug( limit(-80, -10, -50) );        // -50
+debug( limit('F', 'A', 'C') );        // 'C'
+debug( limit('b', 'a', 'z') );        // 'b'
+debug( limit(1, 2, 4, 5, 10, 20) );   // 2
+debug( limit(100, 2, 4, 5, 10, 20) ); // 20</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

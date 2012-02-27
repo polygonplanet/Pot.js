@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.System.isWaitable</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.property.Pot.System.isWaitable';
+</script>
+</head>
+<body>
+<h1>Pot.System.isWaitable</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <dfn id="definition.reference.property.Pot.System.isWaitable">Pot.System.isWaitable</dfn>
+    <em>{Boolean|Void}</em>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      同期処理で wait が可能かどうか。
+    </p>
+    <div>
+<p>
+ 同期処理で wait できる環境の場合、 Pot.System.isWaitable が true になります。
+ <br>
+ それ以外の環境では false になります。
+ <br>
+ 同期処理で wait 可能な場合、同期処理の <a href="#reference.function.Pot.forEach">Pot.forEach()</a> などのイテレータで速度の指定が有効になります。
+ <br>
+ 通常、非同期処理の Pot.Deferred.forEach() などのイテレータによって速度の指定が可能なところ、
+ <br>
+ Pot.forEach() のような同期ループで負荷分散ループが可能になります。
+ <br>
+ 利用できる環境は、主に <a href="#reference.property.Pot.System.hasComponents">Components</a> が利用可能な実行環境になります。
+</p>
+<pre>if (Pot.System.isWaitable) {
+
+    // 同期ループで負荷分散/速度指定が可能
+
+    var result = 0;
+    Pot.forEach([1, 2, 3], function(val) {
+        result += val;
+    });
+    debug(result); // 6
+
+    // 速度指定する場合
+    result = 0;
+    Pot.forEach.slow([1, 2, 3], function(val) {
+        result += val;
+    });
+    debug(result); // 6
+
+    result = 0;
+    Pot.repeat.limp(5, function(i) {
+        result += i;
+        debug(i); // ゆっくり表示される
+    });
+    // 同期処理のため結果が取得できる
+    debug(result); // 10
+
+}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Complex.rand</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Complex.rand';
+</script>
+</head>
+<body>
+<h1>Pot.Complex.rand</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number|String}</em>
+    <dfn id="definition.reference.function.Pot.Complex.rand"><em>Pot.Complex.</em>rand</dfn>
+    ([<em>{Number|String}</em> min [, <em>{Number|String}</em> max]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。 
+    </p>
+    <p class="potjs-reference-description">
+      引数 min から max までの乱数を返します。
+    </p>
+    <div>
+      <p>
+ 引数 min は、最小値を渡します。
+ <br>
+ 引数 max は、最大値を渡します。
+ <br>
+ min から max の間の数からランダムに抽出した数が返ります。
+ <br>
+ min が max より大きい場合、min が max、max が min とみなされます。
+ <br>
+ min と max が同じ値の場合はその値が返ります。
+ <br>
+ min と max が文字で渡された場合、その間の文字からランダムに抽出した文字が返ります。
+ <br>
+ max が省略された場合、min は max として扱われ、
+ <br>
+ 最小値は 0 になり 0 ～ max の乱数が返ります。
+ <br>
+ 引数が全て省略された場合、0x7FFFFFFF ～ ~0x7FFFFFFF の乱数が返ります。
+ <br>
+ 引数のうちいずれかが浮動小数点値の場合、小数点以下の数は多いほうに合わされます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.rand() が rand() で実行できます。
+</p>
+<p>
+ min から max までの乱数が返ります。
+ min と max が文字の場合、その間のランダムな文字が返ります。
+</p>
+
+<pre>debug(rand(0, 1));      // e.g. 1
+debug(rand(5, 5));      // 5
+debug(rand(10, 1));     // e.g. 7
+debug(rand(2.5, 5.75)); // e.g. 4.64
+debug(rand(1, 1.8765)); // e.g. 1.5087
+debug(rand('a', 'z'));  // e.g. 'x'</pre>
+<p>
+ Pot.rand は、いくつか種別の関数を持ちます。
+</p>
+<div style="margin: 1.5em;">
+ <dl>
+  <dt><em>{String}</em> Pot.rand.<dfn>alpha</dfn> ([<em>{Number}</em> length = 1])</dt>
+  <dd>
+   <p>
+    ランダムな英字 [a-zA-Z] を返します。
+    <br>
+    引数 length が数値で渡されると、その長さのランダムな英文字列を返します。
+    <br>
+    また、以下の関数を持ちます。
+   </p>
+   <div>
+    <ul>
+     <li>Pot.rand.alpha.<strong>lower</strong>() : 結果をすべて小文字で返します。</li>
+     <li>Pot.rand.alpha.<strong>upper</strong>() : 結果をすべて大文字で返します。</li>
+    </ul>
+   </div>
+   <pre>debug( Pot.rand.alpha() );        // e.g. 'F'
+debug( Pot.rand.alpha(5) );       // e.g. 'IsgSm'
+debug( Pot.rand.alpha.lower() );  // e.g. 'm'
+debug( Pot.rand.alpha.lower(5) ); // e.g. 'pzqkt'
+debug( Pot.rand.alpha.upper() );  // e.g. 'H'
+debug( Pot.rand.alpha.upper(5) ); // e.g. 'UBTWP'</pre>
+  </dd>
+  <dt><em>{String}</em> Pot.rand.<dfn>alnum</dfn> ([<em>{Number}</em> length = 1 [, <em>{Boolean}</em> valid = false]])</dt>
+  <dd>
+   <p>
+    ランダムな英数字 [a-zA-Z0-9] を返します。
+    <br>
+    引数 length が数値で渡されると、その長さのランダムな英数字を返します。
+    <br>
+    引数 valid が 真 (true) で渡されると、
+    <br>
+    先頭の文字をかならず英字 [a-zA-Z] になるようにして返します。
+    <br>
+    また、以下の関数を持ちます。
+   </p>
+   <div>
+    <ul>
+     <li>Pot.rand.alnum.<strong>lower</strong>() : 結果をすべて小文字で返します。</li>
+     <li>Pot.rand.alnum.<strong>upper</strong>() : 結果をすべて大文字で返します。</li>
+    </ul>
+   </div>
+   <pre>debug( Pot.rand.alnum() );              // e.g. 'Q'
+debug( Pot.rand.alnum(5) );             // e.g. '8ehW1'
+debug( Pot.rand.alnum(6, true) );       // e.g. 't68JsZ'
+debug( Pot.rand.alnum.lower() );        // e.g. 'b'
+debug( Pot.rand.alnum.lower(5) );       // e.g. 'j43h0'
+debug( Pot.rand.alnum.lower(6, true) ); // e.g. 'qt5ax8'
+debug( Pot.rand.alnum.upper() );        // e.g. 'T'
+debug( Pot.rand.alnum.upper(5) );       // e.g. '0GEG7'
+debug( Pot.rand.alnum.upper(6, true) ); // e.g. 'F5HKX7'</pre>
+  </dd>
+  <dt><em>{String}</em> Pot.rand.<dfn>color</dfn> ([<em>{Boolean}</em> addSharp = false])</dt>
+  <dd>
+   <p>
+    CSS などのカラーで使用できる 16 進数 のランダムな値を返します。
+    <br>
+    引数 addSharp が 真 (true) で渡されると、先頭にシャープ '#' をつけて返します。
+    <br>
+    また、以下の関数を持ちます。
+   </p>
+   <div>
+    <ul>
+     <li>Pot.rand.color.<strong>lower</strong>() : 結果をすべて小文字で返します。</li>
+     <li>Pot.rand.color.<strong>upper</strong>() : 結果をすべて大文字で返します。</li>
+    </ul>
+   </div>
+   <pre>debug( Pot.rand.color() );           // e.g. '1afbea'
+debug( Pot.rand.color(true) );       // e.g. '#4c6dc7'
+debug( Pot.rand.color.lower() );     // e.g. '25f0ba'
+debug( Pot.rand.color.lower(true) ); // e.g. '#2dd416'
+debug( Pot.rand.color.upper() );     // e.g. '4FD42A'
+debug( Pot.rand.color.upper(true) ); // e.g. '#D7E7A0'</pre>
+  </dd>
+  <dt><em>{String}</em> Pot.rand.<dfn>caseOf</dfn> (<em>{String}</em> string)</dt>
+  <dd>
+   <p>
+    引数の文字列 string の英字 [a-zA-Z] の大文字小文字をランダムに変換して返します。
+   </p>
+   <pre>var s = 'd41d8cd98f00b204e9800998ecf8427e';
+debug(Pot.rand.caseOf(s));
+// e.g. 'D41D8Cd98F00b204E9800998Ecf8427e'</pre>
+  </dd>
+ </dl>
+</div>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

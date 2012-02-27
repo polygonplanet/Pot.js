@@ -86,7 +86,11 @@
         "reference.function.Pot.addPlugin":{"ja":"addPlugin","en":"addPlugin"},
         "reference.function.Pot.hasPlugin":{"ja":"hasPlugin","en":"hasPlugin"},
         "reference.function.Pot.removePlugin":{"ja":"removePlugin","en":"removePlugin"},
-        "reference.function.Pot.listPlugin":{"ja":"listPlugin","en":"listPlugin"}
+        "reference.function.Pot.listPlugin":{"ja":"listPlugin","en":"listPlugin"},
+        "reference.property.Pot.Ci":{"ja":"Ci","en":"Ci"},
+        "reference.property.Pot.Cc":{"ja":"Cc","en":"Cc"},
+        "reference.property.Pot.Cr":{"ja":"Cr","en":"Cr"},
+        "reference.property.Pot.Cu":{"ja":"Cu","en":"Cu"}
       }
     },
     "reference.Pot.Iter.functions":{
@@ -206,6 +210,15 @@
         "reference.function.Pot.Crypt.hashCode":{"ja":"hashCode","en":"hashCode"}
       }
     },
+    "reference.Pot.Complex.functions":{
+      "title":{"ja":"Pot.Complex","en":"Pot.Complex"},
+      "items":{
+        "reference.function.Pot.Complex.rand":{"ja":"rand","en":"rand"},
+        "reference.function.Pot.Complex.limit":{"ja":"limit","en":"limit"},
+        "reference.function.Pot.Complex.convertToBase":{"ja":"convertToBase","en":"convertToBase"},
+        "reference.function.Pot.Complex.compareVersions":{"ja":"compareVersions","en":"compareVersions"}
+      }
+    },
     "reference.Pot.XPCOM.functions":{
       "title":{"ja":"Pot.XPCOM","en":"Pot.XPCOM"},
       "items":{
@@ -213,6 +226,45 @@
         "reference.function.Pot.XPCOM.throughout":{"ja":"throughout","en":"throughout"},
         "reference.function.Pot.XPCOM.getMostRecentWindow":{"ja":"getMostRecentWindow","en":"getMostRecentWindow"},
         "reference.function.Pot.XPCOM.getChromeWindow":{"ja":"getChromeWindow","en":"getChromeWindow"}
+      }
+    },
+    "reference.Pot.Browser.properties":{
+      "title":{"ja":"Pot.Browser","en":"Pot.Browser"},
+      "items":{
+        "reference.property.Pot.Browser.mozilla":{"ja":"mozilla","en":"mozilla"},
+        "reference.property.Pot.Browser.webkit":{"ja":"webkit","en":"webkit"},
+        "reference.property.Pot.Browser.firefox":{"ja":"firefox","en":"firefox"},
+        "reference.property.Pot.Browser.chrome":{"ja":"chrome","en":"chrome"},
+        "reference.property.Pot.Browser.opera":{"ja":"opera","en":"opera"},
+        "reference.property.Pot.Browser.safari":{"ja":"safari","en":"safari"},
+        "reference.property.Pot.Browser.msie":{"ja":"msie","en":"msie"},
+        "reference.property.Pot.Browser.iphone":{"ja":"iphone","en":"iphone"},
+        "reference.property.Pot.Browser.android":{"ja":"android","en":"android"},
+        "reference.property.Pot.Browser.blackberry":{"ja":"blackberry","en":"blackberry"},
+        "reference.property.Pot.Browser.ipad":{"ja":"ipad","en":"ipad"},
+        "reference.property.Pot.Browser.ipod":{"ja":"ipod","en":"ipod"}
+      }
+    },
+    "reference.Pot.System.properties":{
+      "title":{"ja":"Pot.System","en":"Pot.System"},
+      "items":{
+        "reference.property.Pot.System.isWebBrowser":{"ja":"isWebBrowser","en":"isWebBrowser"},
+        "reference.property.Pot.System.isNonBrowser":{"ja":"isNonBrowser","en":"isNonBrowser"},
+        "reference.property.Pot.System.isNodeJS":{"ja":"isNodeJS","en":"isNodeJS"},
+        "reference.property.Pot.System.isGreasemonkey":{"ja":"isGreasemonkey","en":"isGreasemonkey"},
+        "reference.property.Pot.System.isJetpack":{"ja":"isJetpack","en":"isJetpack"},
+        "reference.property.Pot.System.isChromeExtension":{"ja":"isChromeExtension","en":"isChromeExtension"},
+        "reference.property.Pot.System.isSafariExtension":{"ja":"isSafariExtension","en":"isSafariExtension"},
+        "reference.property.Pot.System.isFirefoxExtension":{"ja":"isFirefoxExtension","en":"isFirefoxExtension"},
+        "reference.property.Pot.System.isNotExtension":{"ja":"isNotExtension","en":"isNotExtension"},
+        "reference.property.Pot.System.isBuiltinArrayForEach":{"ja":"isBuiltinArrayForEach","en":"isBuiltinArrayForEach"},
+        "reference.property.Pot.System.isBuiltinArrayIndexOf":{"ja":"isBuiltinArrayIndexOf","en":"isBuiltinArrayIndexOf"},
+        "reference.property.Pot.System.isBuiltinArrayLastIndexOf":{"ja":"isBuiltinArrayLastIndexOf","en":"isBuiltinArrayLastIndexOf"},
+        "reference.property.Pot.System.isBuiltinObjectKeys":{"ja":"isBuiltinObjectKeys","en":"isBuiltinObjectKeys"},
+        "reference.property.Pot.System.hasActiveXObject":{"ja":"hasActiveXObject","en":"hasActiveXObject"},
+        "reference.property.Pot.System.hasComponents":{"ja":"hasComponents","en":"hasComponents"},
+        "reference.property.Pot.System.isWaitable":{"ja":"isWaitable","en":"isWaitable"},
+        "reference.property.Pot.System.isYieldable":{"ja":"isYieldable","en":"isYieldable"}
       }
     }
   }

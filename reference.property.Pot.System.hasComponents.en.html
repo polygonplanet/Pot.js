@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.System.hasComponents</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.property.Pot.System.hasComponents';
+</script>
+</head>
+<body>
+<h1>Pot.System.hasComponents</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <dfn id="definition.reference.property.Pot.System.hasComponents">Pot.System.hasComponents</dfn>
+    <em>{Boolean|Void}</em>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Components が利用できるかどうか。
+    </p>
+    <div>
+<p>
+ Components が利用できる場合 Pot.System.hasComponents が true になります。
+ <br>
+ 利用できない場合は、false になります。
+ <br>
+ このプロパティがさす Components は、Mozilla Firefox などで利用できる Components オブジェクトです。
+ <br>
+ <code>Components.interfaces</code> や <code>Components.classes</code> などです。
+ <br>
+ 利用できる環境は、主に Firefox Extension (AddOn) 上、XUL 上での実行環境になります。
+ <br>
+ Pot.System.hasComponents が true の場合、<a href="#reference.property.Pot.Ci">Pot.Ci</a>, <a href="#reference.property.Pot.Cc">Pot.Cc</a>, <a href="#reference.property.Pot.Cr">Pot.Cr</a>, <a href="#reference.property.Pot.Cu">Pot.Cu</a> などが参照可能になります。
+</p>
+<pre>if (Pot.System.hasComponents) {
+
+    // Components が利用できる
+    var consoleService = Pot.Cc['@mozilla.org/consoleservice;1']
+                       .getService(Pot.Ci.nsIConsoleService);
+    var msg = 'Hello!';
+    consoleService.logStringMessage(msg);
+
+}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

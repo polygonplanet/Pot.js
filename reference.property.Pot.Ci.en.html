@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Ci</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.property.Pot.Ci';
+</script>
+</head>
+<body>
+<h1>Pot.Ci</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <dfn id="definition.reference.property.Pot.Ci">Pot.Ci</dfn>
+    <em>{Object|Null|Void}</em>
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Components.interfaces のショートカット。
+    </p>
+    <div>
+<p>
+ <a href="#reference.property.Pot.System.hasComponents">Components</a> が利用可能な場合、
+ <br>
+ Pot.Ci が Components.interfaces のショートカットとして利用できます。
+ <br>
+ Components が利用できない環境では、Pot.Ci は null または undefined になります。
+ <br>
+ Components が利用可能かどうかは、<a href="#reference.property.Pot.System.hasComponents">Pot.System.hasComponents</a> で確認できます。
+ <br>
+ 利用できる環境は、主に Mozilla Firefox Extension (AddOn), XUL 上 を想定しています。
+</p>
+<pre>// Pot.Ci を使った例:
+var consoleService = Pot.Cc['@mozilla.org/consoleservice;1']
+                   .getService(Pot.Ci.nsIConsoleService);
+var msg = 'Hello!';
+consoleService.logStringMessage(msg);</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
