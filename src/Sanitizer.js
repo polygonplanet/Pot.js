@@ -179,7 +179,7 @@ update(Pot.Sanitizer, {
                 } else {
                   c = c - 0;
                 }
-                c = String.fromCharCode(c);
+                c = fromCharCode(c);
               } else {
                 c = '';
               }
@@ -451,7 +451,7 @@ update(Pot.Sanitizer, {
         '\\': '\u005C',
         '/' : '\u002F'
       };
-      me.chr = String.fromCharCode;
+      me.chr = fromCharCode;
       /**@ignore*/
       me.rep = function(m, a) {
         var r, c = me.meta[a];

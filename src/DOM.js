@@ -993,7 +993,7 @@ update(DOM, {
         do {
           cc = (Math.random() * 0x7F) >>> 0;
         } while (cc === 0x2C);
-        mark += String.fromCharCode(0, cc, 1);
+        mark += fromCharCode(0, cc, 1);
       } while (~s.indexOf(mark));
       /**@ignore*/
       rep = function(m) {

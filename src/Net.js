@@ -425,17 +425,16 @@ update(Pot.Net, {
          * @ignore
          */
         assignResponseText : function() {
-          var i, len, bytes, chars, sc, c, s;
+          var i, len, bytes, chars, c, s;
           if (this.options.binary) {
             bytes = [];
             chars = [];
             s = this.xhr.responseText || '';
             len = s.length;
-            sc = String.fromCharCode;
             for (i = 0; i < len; i++) {
               c = s.charCodeAt(i) & 0xFF;
               bytes[i] = c;
-              chars[i] = sc(c);
+              chars[i] = fromCharCode(c);
             }
             try {
               this.xhr.originalText  = s;
