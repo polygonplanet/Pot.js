@@ -1,6 +1,6 @@
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Archive.
-(function(ALPHAMERIC_BASE63TBL) {
+(function(ALPHAMERIC_BASE63MAPS) {
 
 Pot.update({
   /**
@@ -89,78 +89,340 @@ update(Pot.Archive, {
      *   //
      *
      *
-     * @param  {String}  s  An input string.
-     * @return {String}     A result string.
+     * @param  {String}  string  An input string.
+     * @return {String}          A result string.
      * @type  Function
      * @function
      * @static
      * @public
      */
-    encode : function(s) {
-      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x;
-      A = ALPHAMERIC_BASE63TBL.split('');
-      for (; i < 1024; i++) {
-        t += t;
-      }
-      t += stringify(s);
-      while ((p = t.substr(i, 64))) {
-        n = p.length;
-        for (j = 2; j <= n; j++) {
-          k = t.substring(i - 819, i + j - 1).lastIndexOf(p.substring(0, j));
-          if (!~k) {
-            break;
+    encode : (function() {
+      /**@ignore*/
+      var AlphamericStringEncoder = function(string) {
+        return new AlphamericStringEncoder.prototype.init(string);
+      },
+      encodeMaps = ALPHAMERIC_BASE63MAPS.split('');
+      AlphamericStringEncoder.prototype =
+        update(AlphamericStringEncoder.prototype, {
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        constructor : AlphamericStringEncoder,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        string : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        dic : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        maps : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        index : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pos : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        size : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        point : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        last : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        results : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        max : null,
+        /**
+         * Initialize properties.
+         *
+         * @private
+         * @ignore
+         */
+        init : function(string) {
+          this.index = 0x03F6;
+          this.maps = encodeMaps;
+          this.string = this.createDic() + stringify(string);
+          this.results = [];
+          this.point = -1;
+          this.max = 0x40;
+          return this;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        execute : function() {
+          var buffer, max = this.max;
+          while (true) {
+            buffer = this.string.substr(this.index, max);
+            if (!buffer) {
+              break;
+            }
+            this.searchSlidingWindow(buffer);
+            if (this.size === 2 ||
+                this.size === 3 && this.last === this.point) {
+              this.pushLite();
+            } else {
+              this.pushStep();
+            }
           }
-          K = k;
-        }
-        if (j === 2 || j === 3 && L === l) {
-          L = l;
-          c = t.charCodeAt(i++);
-          if (c < 128) {
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 64;
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+          return this.results.join('');
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        deferred : function(speed) {
+          var that = this, max = this.max;
+          return Pot.Deferred.forEver[speed](function() {
+            var buffer = that.string.substr(that.index, max);
+            if (!buffer) {
+              throw Pot.StopIteration;
             }
-            r[r.length] = A[c];
-          } else if (12288 <= c && c < 12544) {
-            c -= 12288;
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 68;
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+            that.searchSlidingWindow(buffer);
+            if (that.size === 2 ||
+                that.size === 3 && that.last === that.point) {
+              that.pushLite();
+            } else {
+              that.pushStep();
             }
-            r[r.length] = A[c];
-          } else if (65280 <= c && c < 65440) {
-            c -= 65280;
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 76
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+          }).then(function() {
+            return that.results.join('');
+          });
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        createDic : function() {
+          var dic = ' ';
+          for (; this.index < 0x400; this.index++) {
+            dic += dic;
+          }
+          return dic;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        searchSlidingWindow : function(buffer) {
+          var pos, len = buffer.length;
+          for (this.size = 2; this.size <= len; this.size++) {
+            pos = this.string.substring(
+              this.index - 0x333,
+              this.index + this.size - 1
+            ).lastIndexOf(buffer.substring(0, this.size));
+            if (!~pos) {
+              break;
             }
-            r[r.length] = A[c];
+            this.pos = pos;
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pushLite : function() {
+          var c, x, r = this.results, m = this.maps;
+          this.last = this.point;
+          c = this.string.charCodeAt(this.index++);
+          if (c < 0x80) {
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x40;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
+          } else if (0x3000 <= c && c < 0x3100) {
+            c -= 0x3000;
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x44;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
+          } else if (0xFF00 <= c && c < 0xFFA0) {
+            c -= 0xFF00;
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x4C;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
           } else {
             x = c;
-            c %= 1984;
-            l = (x - c) / 1984;
-            if (L !== l) {
-              r[r.length] = A[49] + A[l];
+            c %= 0x7C0;
+            this.point = (x - c) / 0x7C0;
+            if (this.last !== this.point) {
+              r[r.length] = m[0x31] + m[this.point];
             }
             x = c;
-            c %= 62;
-            r[r.length] = A[(x - c) / 62] + A[c];
+            c %= 0x3E;
+            r[r.length] = m[(x - c) / 0x3E] + m[c];
           }
-        } else {
-          x = K;
-          K %= 63;
-          r[r.length] = A[(x - K) / 63 + 50] + A[K] + A[j - 3];
-          i += j - 1;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pushStep : function() {
+          var x = this.pos, m = this.maps, r = this.results;
+          this.pos %= 0x3F;
+          r[r.length] = m[(x - this.pos) / 0x3F + 0x32] +
+                        m[this.pos] +
+                        m[this.size - 3];
+          this.index += this.size - 1;
         }
-      }
-      return r.join('');
-    },
+      });
+      AlphamericStringEncoder.prototype.init.prototype =
+        AlphamericStringEncoder.prototype;
+      return update(function(string) {
+        return (new AlphamericStringEncoder(string)).execute();
+      }, {
+        /**
+         * @lends Pot.Archive.AlphamericString.encode
+         */
+        /**
+         * Compress with encode a string to
+         *   the base 63 [a-zA-Z0-9_] format string with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello Hello foooooooo baaaaaaaar';
+         *   var encoded, decoded;
+         *   // Execute deferred.
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     return Pot.alphamericStringDecode.deferred(encoded);
+         *   }).then(function(res) {
+         *     decoded = res;
+         *     debug('string = ' + string  + ' : length = ' + string.length);
+         *     debug('result = ' + encoded + ' : length = ' + encoded.length);
+         *     debug('decode = ' + decoded + ' : length = ' + decoded.length);
+         *     // @results
+         *     //   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *     //   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+         *     //   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *   });
+         *
+         *
+         * @example
+         *   // Example of compression that is include multibyte string.
+         *   var string, encoded, decoded;
+         *   string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     Pot.alphamericStringDecode.deferred(res).then(function(res) {
+         *       decoded = res;
+         *       // Note the change of byte size.
+         *       var bytesString  = utf8ByteOf(string);
+         *       var bytesEncoded = utf8ByteOf(encoded);
+         *       var bytesDecoded = utf8ByteOf(decoded);
+         *       debug(
+         *         'string=' + string +
+         *         ', length=' + string.length +
+         *         ', ' + bytesString + ' bytes'
+         *       );
+         *       debug(
+         *         'result=' + encoded +
+         *         ', length=' + encoded.length +
+         *         ', ' + bytesEncoded + ' bytes'
+         *       );
+         *       debug(
+         *         'decode=' + decoded +
+         *         ', length=' + decoded.length +
+         *         ', ' + bytesDecoded + ' bytes'
+         *       );
+         *       // @results
+         *       // string='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *       //
+         *       // result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+         *       //   length = 32,
+         *       //   32 bytes
+         *       //
+         *       // decode='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  An input string.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with
+         *                                   a result string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new AlphamericStringEncoder(string)).deferred(speed);
+          }
+        })
+      });
+    }()),
+    /**
+     * @lends Pot.Archive.AlphamericString
+     */
     /**
      * Decompress with decode a string from
      *   the AlphamericString (base 63 [a-zA-Z0-9_] format string).
@@ -216,49 +478,258 @@ update(Pot.Archive, {
      * @static
      * @public
      */
-    decode : function(a) {
-      var C = {}, c, i = 0, j, k, l, m, p, s, w, t;
-      s = '    ';
-      t = stringify(a);
-      for (; i < 63; i++) {
-        C[ALPHAMERIC_BASE63TBL.charAt(i)] = i;
-      }
-      while ((i -= 7)) {
-        s += s;
-      }
-      while (true) {
-        c = C[t.charAt(i++)];
-        if (c < 63) {
-          if (c < 32) {
-            s += fromCharCode(
-              m ? l * 32 + c :
-                 (l * 32 + c) * 62 + C[t.charAt(i++)]
-            );
-          } else if (c < 49) {
-            l = (c < 36) ? c - 32  :
-                (c < 44) ? c + 348 : c + 1996;
-            m = true;
-          } else if (c < 50) {
-            l = C[t.charAt(i++)];
-            m = false;
+    decode : (function() {
+      /**@ignore*/
+      var AlphamericStringDecoder = function(string) {
+        return new AlphamericStringDecoder.prototype.init(string);
+      };
+      AlphamericStringDecoder.prototype =
+        update(AlphamericStringDecoder.prototype, {
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        constructor : AlphamericStringDecoder,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        string : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        dics : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        result : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        isCentral : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        code : null,
+        /**
+         * Initialize properties.
+         *
+         * @private
+         * @ignore
+         */
+        init : function(string) {
+          this.string = stringify(string);
+          this.index = 0;
+          this.dics = {};
+          this.result = (new Array(5)).join(' ');
+          this.createDic();
+          return this;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        execute : function() {
+          var c;
+          while (true) {
+            c = this.peek();
+            if (c < 0x3F) {
+              this.decode(c);
+            } else {
+              break;
+            }
+          }
+          return this.result.slice(0x400);
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        deferred : function(speed) {
+          var that = this;
+          return Pot.Deferred.forEver[speed](function() {
+            var c = that.peek();
+            if (c < 0x3F) {
+              that.decode(c);
+            } else {
+              throw Pot.StopIteration;
+            }
+          }).then(function() {
+            return that.result.slice(0x400);
+          });
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        createDic : function() {
+          for (; this.index < 0x3F; this.index++) {
+            this.dics[ALPHAMERIC_BASE63MAPS.charAt(this.index)] = this.index;
+          }
+          while ((this.index -= 7)) {
+            this.result += this.result;
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        peek : function() {
+          return this.dics[this.string.charAt(this.index++)];
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        decode : function(c) {
+          var code, pos, size, bounds, buffer;
+          if (c < 0x20) {
+            code = this.code * 0x20 + c;
+            if (!this.isCentral) {
+              code = code * 0x3E + this.peek();
+            }
+            this.result += fromCharCode(code);
+          } else if (c < 0x31) {
+            if (c < 0x24) {
+              this.code = c - 0x20;
+            } else if (c < 0x2C) {
+              this.code = c + 0x15C;
+            } else {
+              this.code = c + 0x7CC;
+            }
+            this.isCentral = true;
+          } else if (c < 0x32) {
+            this.code = this.peek();
+            this.isCentral = false;
           } else {
-            w = s.slice(-819);
-            k = (c - 50) * 63 + C[t.charAt(i++)];
-            j = k + C[t.charAt(i++)] + 2;
-            p = w.substring(k, j);
-            if (p) {
-              while (w.length < j) {
-                w += p;
+            buffer = this.result.slice(-0x333);
+            pos = (c - 0x32) * 0x3F + this.peek();
+            size = pos + this.peek() + 2;
+            bounds = buffer.substring(pos, size);
+            if (bounds) {
+              while (buffer.length < size) {
+                buffer += bounds;
               }
             }
-            s += w.substring(k, j);
+            this.result += buffer.substring(pos, size);
           }
-        } else {
-          break;
         }
-      }
-      return s.slice(1024);
-    }
+      });
+      AlphamericStringDecoder.prototype.init.prototype =
+        AlphamericStringDecoder.prototype;
+      return update(function(string) {
+        return (new AlphamericStringDecoder(string)).execute();
+      }, {
+        /**
+         * @lends Pot.Archive.AlphamericString.decode
+         */
+        /**
+         * Decompress with decode a string from
+         *   the AlphamericString (base 63 [a-zA-Z0-9_] format string)
+         *   with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello Hello foooooooo baaaaaaaar';
+         *   var encoded, decoded;
+         *   // Execute deferred.
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     return Pot.alphamericStringDecode.deferred(encoded);
+         *   }).then(function(res) {
+         *     decoded = res;
+         *     debug('string = ' + string  + ' : length = ' + string.length);
+         *     debug('result = ' + encoded + ' : length = ' + encoded.length);
+         *     debug('decode = ' + decoded + ' : length = ' + decoded.length);
+         *     // @results
+         *     //   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *     //   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+         *     //   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *   });
+         *
+         *
+         * @example
+         *   // Example of compression that is include multibyte string.
+         *   var string, encoded, decoded;
+         *   string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     Pot.alphamericStringDecode.deferred(res).then(function(res) {
+         *       decoded = res;
+         *       // Note the change of byte size.
+         *       var bytesString  = utf8ByteOf(string);
+         *       var bytesEncoded = utf8ByteOf(encoded);
+         *       var bytesDecoded = utf8ByteOf(decoded);
+         *       debug(
+         *         'string=' + string +
+         *         ', length=' + string.length +
+         *         ', ' + bytesString + ' bytes'
+         *       );
+         *       debug(
+         *         'result=' + encoded +
+         *         ', length=' + encoded.length +
+         *         ', ' + bytesEncoded + ' bytes'
+         *       );
+         *       debug(
+         *         'decode=' + decoded +
+         *         ', length=' + decoded.length +
+         *         ', ' + bytesDecoded + ' bytes'
+         *       );
+         *       // @results
+         *       // string='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *       //
+         *       // result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+         *       //   length = 32,
+         *       //   32 bytes
+         *       //
+         *       // decode='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  An input string.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with
+         *                                   a result string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new AlphamericStringDecoder(string)).deferred(speed);
+          }
+        })
+      });
+    }())
   }
 });
 
@@ -268,4 +739,4 @@ Pot.update({
   alphamericStringDecode : Pot.Archive.AlphamericString.decode
 });
 
-})(DIGITS + UPPER_ALPHAS + LOWER_ALPHAS + '_');
+}(DIGITS + UPPER_ALPHAS + LOWER_ALPHAS + '_'));
