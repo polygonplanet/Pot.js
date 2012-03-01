@@ -361,6 +361,8 @@ update(Pot.Internal, {
     utf8ByteOf              : Pot.UTF8.byteOf,
     base64Encode            : Pot.Base64.encode,
     base64Decode            : Pot.Base64.decode,
+    base64URLEncode         : Pot.Base64.urlEncode,
+    base64URLDecode         : Pot.Base64.urlDecode,
     alphamericStringEncode  : Pot.Archive.AlphamericString.encode,
     alphamericStringDecode  : Pot.Archive.AlphamericString.decode,
     sprintf                 : Pot.Format.sprintf,
