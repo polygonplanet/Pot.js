@@ -342,6 +342,9 @@ update(Pot.Collection, {
     };
   }()),
   /**
+   * @lends Pot.Collection
+   */
+  /**
    * Convert to one-dimensional array from multi-dimensional array.
    *
    *
