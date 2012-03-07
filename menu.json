@@ -217,6 +217,12 @@
         "reference.function.Pot.DateTime.format":{"ja":"format","en":"format"}
       }
     },
+    "reference.Pot.Format.functions":{
+      "title":{"ja":"Pot.Format","en":"Pot.Format"},
+      "items":{
+        "reference.function.Pot.Format.sprintf":{"ja":"sprintf","en":"sprintf"}
+      }
+    },
     "reference.Pot.Complex.functions":{
       "title":{"ja":"Pot.Complex","en":"Pot.Complex"},
       "items":{
