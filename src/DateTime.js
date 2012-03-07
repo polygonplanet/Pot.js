@@ -35,7 +35,7 @@ update(Pot.DateTime, {
    *   debug(time); // 1323446177282
    *
    *
-   * @return    Return the current time as milliseconds.
+   * @return {Number} Return the current time as milliseconds.
    *
    * @type  Function
    * @function
@@ -46,7 +46,7 @@ update(Pot.DateTime, {
   /**
    * Get the current UNIX timestamp.
    *
-   * @return      Return the current UNIX timestamp.
+   * @return {Number} Return the current UNIX timestamp.
    *
    * @type  Function
    * @function
