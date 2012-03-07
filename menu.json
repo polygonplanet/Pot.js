@@ -210,6 +210,13 @@
         "reference.function.Pot.Crypt.hashCode":{"ja":"hashCode","en":"hashCode"}
       }
     },
+    "reference.Pot.DateTime.functions":{
+      "title":{"ja":"Pot.DateTime","en":"Pot.DateTime"},
+      "items":{
+        "reference.function.Pot.DateTime.time":{"ja":"time","en":"time"},
+        "reference.function.Pot.DateTime.format":{"ja":"format","en":"format"}
+      }
+    },
     "reference.Pot.Complex.functions":{
       "title":{"ja":"Pot.Complex","en":"Pot.Complex"},
       "items":{

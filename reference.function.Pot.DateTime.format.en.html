@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.DateTime.format</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.DateTime.format';
+</script>
+</head>
+<body>
+<h1>Pot.DateTime.format</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.DateTime.format"><em>Pot.DateTime.</em>format</dfn>
+    (<em>{String}</em> dateFormat [, <em>{Date|Number|*}</em> timestamp])
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>date</dfn>
+    (<em>{String}</em> dateFormat [, <em>{Date|Number|*}</em> timestamp])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      日時を書式化して返します。
+    </p>
+    <div>
+      <p>
+ 指定されたタイムスタンプを表す引数 timestamp を、
+ <br>
+ 引数のフォーマット文字列 dateFormat により書式化し、日付文字列を返します。
+ <br>
+ 引数 timestamp が与えられると、timestamp の日時で返します。
+ <br>
+ timestamp が省略されると 現在の時刻が使用されます。
+</p>
+<p>
+ この関数は、<a href="http://php.net/function.date" title="PHP: date - Manual">PHP の date() 関数</a> とほぼ同じに動作します。
+ <br>
+ 以下の表は引用も含まれています。以下の文字が dateFormat パラメータ文字列として認識されます。
+</p>
+
+<table class="grid">
+  <tr>
+   <td class="marker row-head"><strong>dateFormat 文字</strong></td>
+   <td class="marker row-head"><strong>説明</strong></td>
+   <td class="marker row-head"><strong>戻り値の例</strong></td>
+  </tr>
+  <tr>
+   <td class="marker row-head">日</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>d</em></td>
+   <td>日。二桁の数字 (先頭にゼロがつく場合も)</td>
+   <td><em>01</em> から <em>31</em></td>
+  </tr>
+  <tr>
+   <td><em>D</em></td>
+   <td>曜日。3 文字のテキスト形式。</td>
+   <td><em>Mon</em> から <em>Sun</em></td>
+  </tr>
+  <tr>
+   <td><em>j</em></td>
+   <td>日。先頭にゼロをつけない。</td>
+   <td><em>1</em> から <em>31</em></td>
+  </tr>
+  <tr>
+   <td><em>l</em> (小文字の 'L')</td>
+   <td>曜日。フルスペル形式。</td>
+   <td><em>Sunday</em> から <em>Saturday</em></td>
+  </tr>
+  <tr>
+   <td><em>N</em></td>
+   <td>ISO-8601 形式の、曜日の数値表現</td>
+   <td><em>1</em> (月曜日) から <em>7</em> (日曜日)</td>
+  </tr>
+  <tr>
+   <td><em>S</em></td>
+   <td>英語形式の序数を表すサフィックス。2 文字。</td>
+   <td>
+    <em>st</em>, <em>nd</em>, <em>rd</em>
+    または   <em>th</em> など。
+    <em>j</em> と一緒に使用することができる。
+   </td>
+  </tr>
+  <tr>
+   <td><em>w</em></td>
+   <td>曜日。数値。</td>
+   <td><em>0</em> (日曜)から <em>6</em> (土曜)</td>
+  </tr>
+  <tr>
+   <td><em>J</em></td>
+   <td>曜日。日本の曜日。文字列。</td>
+   <td><em>日</em> (日曜) から <em>土</em> (土曜)</td>
+  </tr>
+  <tr>
+   <td><em>z</em></td>
+   <td>年間の通算日。数字。(0 から開始)</td>
+   <td><em>0</em> から <em>365</em></td>
+  </tr>
+  <tr>
+   <td class="marker row-head">月</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>F</em></td>
+   <td>月。フルスペルの文字。</td>
+   <td><em>January</em> から <em>December</em></td>
+  </tr>
+  <tr>
+   <td><em>m</em></td>
+   <td>月。数字。先頭にゼロをつける。</td>
+   <td><em>01</em> から <em>12</em></td>
+  </tr>
+  <tr>
+   <td><em>M</em></td>
+   <td>月。3 文字形式。</td>
+   <td><em>Jan</em> から <em>Dec</em></td>
+  </tr>
+  <tr>
+   <td><em>n</em></td>
+   <td>月。数字。先頭にゼロをつけない。</td>
+   <td><em>1</em> から <em>12</em></td>
+  </tr>
+  <tr>
+   <td><em>o</em></td>
+   <td>月。文字列。日本の旧月名。</td>
+   <td><em>霜月</em>, <em>水無月</em> など</td>
+  </tr>
+  <tr>
+   <td><em>t</em></td>
+   <td>指定した月の日数。</td>
+   <td><em>28</em> から <em>31</em></td>
+  </tr>
+  <tr>
+   <td class="marker row-head">年</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>L</em></td>
+   <td>閏年かどうか。</td>
+   <td><em>1</em> なら閏年。<em>0</em> なら閏年でない。</td>
+  </tr>
+  <tr>
+   <td><em>Y</em></td>
+   <td>年。4 桁の数字。</td>
+   <td>例: <em>1999</em>, <em>2003</em> など</td>
+  </tr>
+  <tr>
+   <td><em>y</em></td>
+   <td>年。2 桁の数字。</td>
+   <td>例: <em>99</em>, <em>03</em> など</td>
+  </tr>
+  <tr>
+   <td class="marker row-head">時</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>a</em></td>
+   <td>午前または午後 (小文字)</td>
+   <td><em>am</em> または <em>pm</em></td>
+  </tr>
+  <tr>
+   <td><em>A</em></td>
+   <td>午前または午後 (大文字)</td>
+   <td><em>AM</em> または <em>PM</em></td>
+  </tr>
+  <tr>
+   <td><em>g</em></td>
+   <td>時。12時間単位。先頭にゼロを付けない。</td>
+   <td><em>1</em> から <em>12</em></td>
+  </tr>
+  <tr>
+   <td><em>G</em></td>
+   <td>時。24時間単位。先頭にゼロを付けない。</td>
+   <td><em>0</em> から <em>23</em></td>
+  </tr>
+  <tr>
+   <td><em>h</em></td>
+   <td>時。数字。12 時間単位。</td>
+   <td><em>01</em> から <em>12</em></td>
+  </tr>
+  <tr>
+   <td><em>H</em></td>
+   <td>時。数字。24 時間単位。</td>
+   <td><em>00</em> から <em>23</em></td>
+  </tr>
+  <tr>
+   <td><em>i</em></td>
+   <td>分。先頭にゼロをつける。</td>
+   <td><em>00</em> から <em>59</em></td>
+  </tr>
+  <tr>
+   <td><em>s</em></td>
+   <td>秒。先頭にゼロをつける。</td>
+   <td><em>00</em> から <em>59</em></td>
+  </tr>
+  <tr>
+   <td><em>u</em></td>
+   <td>マイクロ秒。(0 でパディングして桁合わせするだけ)</td>
+   <td>例: <em>654000</em> など</td>
+  </tr>
+  <tr>
+   <td class="marker row-head">タイムゾーン</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>O</em></td>
+   <td>グリニッジ標準時 (GMT) との時差</td>
+   <td>例: <em>+0900</em></td>
+  </tr>
+  <tr>
+   <td><em>P</em></td>
+   <td>グリニッジ標準時 (GMT) との時差。時間と分をコロンで区切った形式。</td>
+   <td>例: <em>+09:00</em></td>
+  </tr>
+  <tr>
+   <td><em>T</em></td>
+   <td>タイムゾーンの略称</td>
+   <td>例: <em>EST</em>, <em>MDT</em> ...</td>
+  </tr>
+  <tr>
+   <td><em>Z</em></td>
+   <td>タイムゾーンのオフセット秒数。
+    UTC の西側のタイムゾーン用のオフセットは常に負です。
+    そして、UTC の東側のオフセットは常に正です。</td>
+   <td><em>-43200</em> から <em>50400</em></td>
+  </tr>
+  <tr>
+   <td class="marker row-head">全ての日付/時刻</td>
+   <td class="marker row-head">---</td>
+   <td class="marker row-head">---</td>
+  </tr>
+  <tr>
+   <td><em>c</em></td>
+   <td>ISO 8601 日付</td>
+   <td>例: 2004-02-12T15:19:21+00:00</td>
+  </tr>
+  <tr>
+   <td><em>r</em></td>
+   <td><a href="http://www.faqs.org/rfcs/rfc2822" title="RFC 2822">≫ RFC 2822</a> フォーマットされた日付</td>
+   <td>例: <em>Thu, 21 Dec 2000 16:01:07 +0200</em></td>
+  </tr>
+  <tr>
+   <td><em>U</em></td>
+   <td>Unix Epoch (1970 年 1 月 1 日 0 時 0 分 0 秒) からの秒数</td>
+   <td><a href="#reference.function.Pot.DateTime.time">Pot.time()</a> も参照</td>
+  </tr>
+</table>
+
+<p>
+ フォーマット文字は、バックスラッシュ \ によってエスケープすることができます。
+</p>
+<pre>var result = Pot.date('Y/m/d (J) H:i [\\o=o]');
+
+debug(result); // e.g. '2011/06/08 (水) 11:30 [o=水無月]'</pre>
+
+<p>
+ また、以下の定義済みの定数が用意されています。以下のように使用できます。
+</p>
+<pre>debug( Pot.date.RSS );           // 'D, d M Y H:i:s O'
+debug( Pot.date(Pot.date.RSS) ); // e.g. 'Mon, 15 Aug 2005 15:52:01 +0000'</pre>
+<p>
+ 定義済み定数:
+</p>
+<div style="margin: 1.5em;">
+<dl>
+ <dt><dfn><em>Pot.DateTime.format.</em>ATOM</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>ATOM</dt>
+ <dd>Atom (例: 2005-08-15T15:52:01+00:00)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>COOKIE</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>COOKIE</dfn></dt>
+ <dd>HTTP Cookies (例: Monday, 15-Aug-05 15:52:01 UTC)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>ISO8601</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>ISO8601</dfn></dt>
+ <dd>ISO-8601 (例: 2005-08-15T15:52:01+0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC822</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC822</dfn></dt>
+ <dd>RFC 822 (例: Mon, 15 Aug 05 15:52:01 +0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC850</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC850</dfn></dt>
+ <dd>RFC 850 (例: Monday, 15-Aug-05 15:52:01 UTC)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC1036</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC1036</dfn></dt>
+ <dd>RFC 1036 (例: Mon, 15 Aug 05 15:52:01 +0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC1123</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC1123</dfn></dt>
+ <dd>RFC 1123 (例: Mon, 15 Aug 2005 15:52:01 +0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC2822</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC2822</dfn></dt>
+ <dd>RFC 2822 (Mon, 15 Aug 2005 15:52:01 +0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RFC3339</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RFC3339</dfn></dt>
+ <dd>ATOM と同じ</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>RSS</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>RSS</dfn></dt>
+ <dd>RSS (Mon, 15 Aug 2005 15:52:01 +0000)</dd>
+ <dt><dfn><em>Pot.DateTime.format.</em>W3C</dfn></dt>
+ <dt><dfn><em>Pot.date.</em>W3C</dfn></dt>
+ <dd>World Wide Web Consortium (例: 2005-08-15T15:52:01+00:00)</dd>
+</dl>
+</div>
+
+<p>
+ Pot.DateTime.format() は、Pot.<strong>date</strong>() としてアクセスできます。
+ <br>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.date() が date() で実行できます。
+</p>
+<p>
+ 書式化した日時が文字列で返ります。
+</p>
+
+<pre>debug( Pot.date('Y-m-d H:i:s') );           // e.g. '2011-06-07 01:25:17'
+debug( Pot.date('Y/m/d (J) H:i [\\o=o]') ); // e.g. '2011/06/08 (水) 11:30 [o=水無月]'
+debug( Pot.date(Pot.date.RFC2822);          // e.g. 'Wed, 08 Jun 2011 02:34:21 +0900'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
