@@ -393,8 +393,56 @@ setTimeout(function() {
           .insertBefore(
             $('.header-title').css({marginTop : 2})
           )
-          .css({margin : '4px 6px'})
+          .addClass('clearfix')
+          .css({
+            'float' : 'right',
+            margin  : '4px 6px'
+          })
       );
+
+    // Translation panel by Google.
+    Pot.callLazy(function() {
+      var transBar = $('.header-translate-container'),
+          defaultLang = 'ja';
+
+      transBar
+        .remove()
+        .insertBefore('.header-lang-container')
+        .css({
+          margin    : '4px 6px 2px 6px',
+          maxHeight : 50
+        });
+
+      if (/*lang !== defaultLang*/true/*Debugging...*/) {
+        Pot.update(Pot.Reference, {
+          googleTranslateElementInit : function() {
+            try {
+              new google.translate.TranslateElement({
+                pageLanguage      : defaultLang,
+                multilanguagePage : true,
+                layout            : google.translate
+                                          .TranslateElement
+                                          .InlineLayout.HORIZONTAL
+              }, transBar.get(0));
+            } catch (e) {}
+          }
+        });
+
+        Pot.till(function() {
+          return Pot.Reference.isCustomSearchLoaded;
+        }).then(function() {
+
+          $('<script/>')
+            .attr({
+              async : 'async',
+              type  : 'text/javascript',
+              src   : 'http://translate.google.com/translate_a/element.js' +
+                          '?cb=Pot.Reference.googleTranslateElementInit'
+            })
+            .appendTo('head');
+        });
+      }
+    });
 
     (function() {
       var isDown = false, icon = {
@@ -925,6 +973,10 @@ body > .layout-liquid-container {
   text-align: right;
 }
 
+.header-translate-container {
+  text-align: right;
+}
+
 .content-sitemap {
   height: 10px;
   max-height: 12px;
@@ -1143,6 +1195,9 @@ setTimeout(function() {
       return;
     }
     loaded = true;
+
+    Pot.Reference = Pot.Reference || {};
+    Pot.Reference.isCustomSearchLoaded = true;
 
     container = $('#cse-search-result-container');
     customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y', {
@@ -1498,29 +1553,15 @@ table.gcsc-branding *, table.gcsc-branding td * {
                title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library">Pot.js + PotLite.js</a>
           </h1>
           <div class="header-lang-container"></div>
+          <div class="header-translate-container"></div>
           <div class="header-desc-container">
             <div class="header-desc-ja">
              Pot.js は CPU に負荷をかけることなく JavaScript の実行を可能とするユーティリティライブラリです。
-             <!--
-             <div class="error">
-               このリファレンスはまだ作成途中です。
-               空白ページはミカンです。
-               足りない情報は
-               <a href="http://polygonplanet.github.com/Pot.js/index.html" 
-                  title="Pot.js + PotLite.js - ドキュメントリファレンス - JavaScript非同期処理+ユーティリティライブラリ">現行のリファレンス</a>
-               から参照ください。
-             </div>
-             -->
             </div>
             <div class="header-desc-en">
              Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.
              <div class="error">
                This reference translation is still going on...
-               <!--
-               Refer 
-               <a href="http://polygonplanet.github.com/Pot.js/index.html" 
-                  title="Pot.js + PotLite.js - Document and Reference - JavaScript Async+Utility Library">Current Reference(Japanese)</a>.
-               -->
              </div>
             </div>
           </div>
