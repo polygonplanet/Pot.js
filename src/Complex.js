@@ -159,7 +159,7 @@ update(Pot.Complex, {
       }
     }
     if (forString) {
-      result = fromCharCode(result);
+      result = fromUnicode(result);
     } else {
       result = result - 0;
     }

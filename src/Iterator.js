@@ -2397,7 +2397,7 @@ update(Pot.Iter, {
           (step < 0 && begin < end)) {
         throw Pot.StopIteration;
       }
-      result[result.length] = string ? fromCharCode(begin) : begin;
+      result[result.length] = string ? fromUnicode(begin) : begin;
       begin += step;
     };
     Pot.iterate(iter);

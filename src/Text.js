@@ -1257,7 +1257,7 @@ update(Pot.Text, {
     carry = false;
     /**@ignore*/
     add = function(val) {
-      return fromCharCode(val.charCodeAt(0) + 1);
+      return fromUnicode(val.charCodeAt(0) + 1);
     };
     s = value.toString().split('');
     if (s.length === 0) {
@@ -1443,7 +1443,7 @@ update(Pot.Text, {
     if (i >= len) {
       i--;
     }
-    s[i] = fromCharCode(s[i].charCodeAt(0) - 1);
+    s[i] = fromUnicode(s[i].charCodeAt(0) - 1);
     s = s.reverse();
     if (borrow) {
       s.shift();

@@ -603,7 +603,7 @@ update(Pot.Archive, {
             if (!this.isCentral) {
               code = code * 0x3E + this.peek();
             }
-            this.result += fromCharCode(code);
+            this.result += fromUnicode(code);
           } else if (c < 0x31) {
             if (c < 0x24) {
               this.code = c - 0x20;

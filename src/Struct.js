@@ -1574,7 +1574,7 @@ update(Pot.Struct, {
       case 'string':
           result = '';
           each(o.split(''), function(c) {
-            result += fromCharCode(
+            result += fromUnicode(
               c.charCodeAt(0) ^ 0xFFFF
             );
           });

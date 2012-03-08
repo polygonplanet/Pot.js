@@ -20,6 +20,18 @@ lastIndexOf    = Array.prototype.lastIndexOf,
 toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 fromCharCode   = String.fromCharCode,
+
+// faster way of String.fromCharCode(c).
+fromUnicode = (function() {
+  var i, maps = [];
+  for (i = 0; i < 0xFFFF; i++) {
+    maps[i] = fromCharCode(i);
+  }
+  return function(c) {
+    return maps[c & 0xFFFF];
+  };
+}()),
+
 /*{#if Pot}*/
 // Namespace URIs.
 XML_NS_URI   = 'http://www.w3.org/XML/1998/namespace',
@@ -285,7 +297,7 @@ update(Pot, {
       }
     }
     return r;
-  })(nv),
+  }(nv)),
   /**
    * Detect the browser/user language.
    *
@@ -383,7 +395,7 @@ update(Pot, {
       globals = this || {};
     }
     return this || {};
-  })(),
+  }()),
   /**
    * Noop function.
    *
@@ -517,7 +529,7 @@ update(Pot, {
    */
   Pot : Pot
 });
-})(typeof navigator !== 'undefined' && navigator || {});
+}(typeof navigator !== 'undefined' && navigator || {}));
 /*{#if Pot}*/
 // Path/Directory Delimiter
 Pot.update({

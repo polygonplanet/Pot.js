@@ -63,7 +63,7 @@ update(Pot.UTF8, {
     var result = '', chars = [], len, i, c, s, sc;
     s = stringify(string);
     if (s) {
-      sc = fromCharCode;
+      sc = fromUnicode;
       len = s.length;
       for (i = 0; i < len; i++) {
         c = s.charCodeAt(i);
@@ -96,7 +96,7 @@ update(Pot.UTF8, {
     var result = '', chars = [], i, len, s, n, c, c2, c3, sc;
     s = stringify(string);
     if (s) {
-      sc = fromCharCode;
+      sc = fromUnicode;
       i = 0;
       len = s.length;
       while (i < len) {

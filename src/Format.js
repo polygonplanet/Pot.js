@@ -257,7 +257,7 @@ update(Pot.Format, {
                   break;
               case 'c':
                   try {
-                    v = Pot.isNumeric(v) ? fromCharCode(v) : '';
+                    v = Pot.isNumeric(v) ? fromUnicode(v) : '';
                   } catch (e) {
                     v = '';
                   }

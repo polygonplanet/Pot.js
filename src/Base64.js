@@ -271,7 +271,7 @@ Pot.update({
         if (this.pos >= 0) {
           code = this.att >> this.pos & 0xFF;
           if (c !== 64) {
-            r[r.length] = fromCharCode(code);
+            r[r.length] = fromUnicode(code);
           }
           this.att &= 63;
           this.pos -= 8;

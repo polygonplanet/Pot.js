@@ -179,7 +179,7 @@ update(Pot.Sanitizer, {
                 } else {
                   c = c - 0;
                 }
-                c = fromCharCode(c);
+                c = fromUnicode(c);
               } else {
                 c = '';
               }
@@ -451,16 +451,15 @@ update(Pot.Sanitizer, {
         '\\': '\u005C',
         '/' : '\u002F'
       };
-      me.chr = fromCharCode;
       /**@ignore*/
       me.rep = function(m, a) {
         var r, c = me.meta[a];
         if (typeof c === 'string') {
           r = c;
         } else if (a.length === 3 && a.charAt(0) === 'x') {
-          r = me.chr('0' + a);
+          r = fromUnicode('0' + a);
         } else if (a.length === 5 && a.charAt(0) === 'u') {
-          r = me.chr('0x' + a.substring(1));
+          r = fromUnicode('0x' + a.substring(1));
         } else {
           r = a;
         }

@@ -434,7 +434,7 @@ update(Pot.Net, {
             for (i = 0; i < len; i++) {
               c = s.charCodeAt(i) & 0xFF;
               bytes[i] = c;
-              chars[i] = fromCharCode(c);
+              chars[i] = fromUnicode(c);
             }
             try {
               this.xhr.originalText  = s;

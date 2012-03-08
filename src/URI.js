@@ -169,7 +169,7 @@ update(Pot.URI, {
               r = (((c & 0x0F) << 6 | parseInt(s.substring(4), 16) & 0x3F)
                                << 6 | parseInt(s.substring(7), 16) & 0x3F);
             }
-            return fromCharCode(r);
+            return fromUnicode(r);
           };
           result = s.replace(re, rep);
         }
