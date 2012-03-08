@@ -160,18 +160,27 @@ update(Pot.Crypt, {
       return whv;
     }
     /**@ignore*/
+    function hex(a, b, c, d) {
+      return [
+        wordToHex(a), wordToHex(b), wordToHex(c), wordToHex(d)
+      ].join('').toLowerCase();
+    }
+    /**@ignore*/
     function calc(s) {
-      var x, xl, k, AA, BB, CC, DD, a, b, c, d,   S11 = 7,
-          S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
-          S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
-          S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21;
-      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true)));
-      a = 0x67452301;
-      b = 0xEFCDAB89;
-      c = 0x98BADCFE;
-      d = 0x10325476;
-      xl = x.length;
-      for (k = 0; k < xl; k += 16) {
+      var
+      S11 = 7,
+      S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
+      S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
+      S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21,
+      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true))),
+      xl = x.length,
+      a = 0x67452301,
+      b = 0xEFCDAB89,
+      c = 0x98BADCFE,
+      d = 0x10325476,
+      AA, BB, CC, DD,
+      /**@ignore*/
+      calculate = function() {
         AA = a;
         BB = b;
         CC = c;
@@ -244,16 +253,78 @@ update(Pot.Crypt, {
         b = au(b, BB);
         c = au(c, CC);
         d = au(d, DD);
-      }
-      return [
-        wordToHex(a), wordToHex(b), wordToHex(c), wordToHex(d)
-      ].join('').toLowerCase();
+      };
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (k = 0; k < xl; k += 16) {
+            calculate();
+          }
+          return hex(a, b, c, d);
+        },
+        /**@ignore*/
+        async : function(speed) {
+          k = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (k < xl) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            k += 16;
+          }).then(function() {
+            return hex(a, b, c, d);
+          });
+        }
+      };
     }
     /**@ignore*/
-    return function(string) {
-      return calc(string);
-    };
+    return update(function(string) {
+      return calc(string).sync();
+    }, {
+      /**
+       * @lends Pot.Crypt.md5
+       */
+      /**
+       * Calculate the MD5 hash of a string with Deferred.
+       *
+       * RFC 1321 - The MD5 Message-Digest Algorithm
+       * @link http://www.faqs.org/rfcs/rfc1321
+       *
+       *
+       * @example
+       *   md5.deferred('apple').then(function(res) {
+       *     debug(res);
+       *     // @results '1f3870be274f6c49b3e31a0c6728957f'
+       *   });
+       *
+       *
+       * @param  {String}        string  The target string.
+       * @return {Pot.Deferred}          Return new instance of Pot.Deferred
+       *                                   with a result string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       *
+       * @property {Function} limp   Run with slowest speed.
+       * @property {Function} doze   Run with slower speed.
+       * @property {Function} slow   Run with slow speed.
+       * @property {Function} normal Run with default speed.
+       * @property {Function} fast   Run with fast speed.
+       * @property {Function} rapid  Run with faster speed.
+       * @property {Function} ninja  Run fastest speed.
+       */
+      deferred : Pot.Internal.defineDeferrater(function(speed) {
+        return function(string) {
+          return calc(string).async(speed);
+        }
+      })
+    });
   }()),
+  /**
+   * @lends Pot.Crypt
+   */
   /**
    * Calculate the 32-bit CRC (cyclic redundancy checksum) checksum.
    *
@@ -329,6 +400,9 @@ update(Pot.Crypt, {
       return crc ^ -1;
     };
   }()),
+  /**
+   * @lends Pot.Crypt
+   */
   /**
    * Calculate the SHA1 hash of a string.
    *
@@ -467,6 +541,9 @@ update(Pot.Crypt, {
     };
   }()),
   /**
+   * @lends Pot.Crypt
+   */
+  /**
    * ARC4 symmetric cipher encryption/decryption.
    *
    * Original algorithm:
@@ -521,7 +598,7 @@ update(Pot.Crypt, {
         x = a[i];
         a[i] = a[j];
         a[j] = x;
-        r[r.length] = fromCharCode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
+        r[r.length] = fromUnicode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
       }
       return r.join('');
     }
