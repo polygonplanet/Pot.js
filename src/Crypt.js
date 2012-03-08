@@ -42,8 +42,7 @@ update(Pot.Crypt, {
    * @static
    */
   hashCode : function(string) {
-    var result = 0, s, i, len, max;
-    max = 0x100000000; // 2^32
+    var result = 0, s, i, len, max = 0x100000000; // 2^32
     if (string == null) {
       s = String(string);
     } else {
@@ -438,46 +437,25 @@ update(Pot.Crypt, {
       return s;
     }
     /**@ignore*/
+    function hexLower(a, b, c, d, e) {
+      return (hex(a) + hex(b) + hex(c) + hex(d) + hex(e)).toLowerCase();
+    }
+    /**@ignore*/
     function calc(string) {
-      var bs, i, j, A, B, C, D, E, W = new Array(80),
-          H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE,
-          H3 = 0x10325476, H4 = 0xC3D2E1F0,
-          wa = [], s, sl, tp;
-      s = Pot.UTF8.encode(stringify(string, true));
-      sl = s.length;
-      for (i = 0; i < sl - 3; i += 4) {
-        j = s.charCodeAt(i)     << 24 |
-            s.charCodeAt(i + 1) << 16 |
-            s.charCodeAt(i + 2) <<  8 |
-            s.charCodeAt(i + 3);
-        wa[wa.length] = j;
-      }
-      switch (sl % 4) {
-        case 0:
-            i = 0x080000000;
-            break;
-        case 1:
-            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
-            break;
-        case 2:
-            i = s.charCodeAt(sl - 2) << 24 |
-                s.charCodeAt(sl - 1) << 16 | 0x08000;
-            break;
-        case 3:
-            i = s.charCodeAt(sl - 3) << 24 |
-                s.charCodeAt(sl - 2) << 16 |
-                s.charCodeAt(sl - 1) <<  8 | 0x80;
-            break;
-        default:
-            break;
-      }
-      wa[wa.length] = i;
-      while ((wa.length % 16) != 14) {
-        wa[wa.length] = 0;
-      }
-      wa[wa.length] = (sl >>> 29);
-      wa[wa.length] = ((sl << 3) & 0x0FFFFFFFF);
-      for (bs = 0; bs < wa.length; bs += 16) {
+      var
+      bs, i, j,
+      A, B, C, D, E, W = new Array(80),
+      H0 = 0x67452301,
+      H1 = 0xEFCDAB89,
+      H2 = 0x98BADCFE,
+      H3 = 0x10325476,
+      H4 = 0xC3D2E1F0,
+      wa = [],
+      wal,
+      s = Pot.UTF8.encode(stringify(string, true)),
+      sl = s.length,
+      tp,
+      calculate = function() {
         for (i = 0; i < 16; i++) {
           W[i] = wa[bs + i];
         }
@@ -531,14 +509,105 @@ update(Pot.Crypt, {
         H2 = (H2 + C) & 0x0FFFFFFFF;
         H3 = (H3 + D) & 0x0FFFFFFFF;
         H4 = (H4 + E) & 0x0FFFFFFFF;
+      };
+      for (i = 0; i < sl - 3; i += 4) {
+        j = s.charCodeAt(i)     << 24 |
+            s.charCodeAt(i + 1) << 16 |
+            s.charCodeAt(i + 2) <<  8 |
+            s.charCodeAt(i + 3);
+        wa[wa.length] = j;
       }
-      tp = hex(H0) + hex(H1) + hex(H2) + hex(H3) + hex(H4);
-      return tp.toLowerCase();
+      switch (sl % 4) {
+        case 0:
+            i = 0x080000000;
+            break;
+        case 1:
+            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
+            break;
+        case 2:
+            i = s.charCodeAt(sl - 2) << 24 |
+                s.charCodeAt(sl - 1) << 16 | 0x08000;
+            break;
+        case 3:
+            i = s.charCodeAt(sl - 3) << 24 |
+                s.charCodeAt(sl - 2) << 16 |
+                s.charCodeAt(sl - 1) <<  8 | 0x80;
+            break;
+      }
+      wa[wa.length] = i;
+      while ((wa.length % 16) != 14) {
+        wa[wa.length] = 0;
+      }
+      wa[wa.length] = (sl >>> 29);
+      wa[wa.length] = ((sl << 3) & 0x0FFFFFFFF);
+      wal = wa.length;
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (bs = 0; bs < wal; bs += 16) {
+            calculate();
+          }
+          return hexLower(H0, H1, H2, H3, H4);
+        },
+        /**@ignore*/
+        async : function(speed) {
+          bs = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (bs < wal) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            bs += 16;
+          }).then(function() {
+            return hexLower(H0, H1, H2, H3, H4);
+          });
+        }
+      };
     }
     /**@ignore*/
-    return function(string) {
-      return calc(string);
-    };
+    return update(function(string) {
+      return calc(string).sync();
+    }, {
+      /**
+       * @lends Pot.Crypt.sha1
+       */
+      /**
+       * Calculate the SHA1 hash of a string with Deferred.
+       *
+       * RFC 3174 - US Secure Hash Algorithm 1 (SHA1)
+       * @link http://www.faqs.org/rfcs/rfc3174
+       *
+       *
+       * @example
+       *   sha1.deferred('apple').then(function(res) {
+       *     debug(res);
+       *     // @results 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
+       *   });
+       *
+       *
+       * @param  {String}        string  The input string.
+       * @return {Pot.Deferred}          Returns new instance of Pot.Deferred
+       *                                   with the sha1 hash as a string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       *
+       * @property {Function} limp   Run with slowest speed.
+       * @property {Function} doze   Run with slower speed.
+       * @property {Function} slow   Run with slow speed.
+       * @property {Function} normal Run with default speed.
+       * @property {Function} fast   Run with fast speed.
+       * @property {Function} rapid  Run with faster speed.
+       * @property {Function} ninja  Run fastest speed.
+       */
+      deferred : Pot.Internal.defineDeferrater(function(speed) {
+        return function(string) {
+          return calc(string).async(speed);
+        }
+      })
+    });
   }()),
   /**
    * @lends Pot.Crypt
