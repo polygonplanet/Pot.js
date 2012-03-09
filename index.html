@@ -373,6 +373,40 @@ setTimeout(function() {
     $('.header-search').css({marginTop : 6});
     $('a[href="#"]').attr({href : Pot.parseURI(Pot.currentURI()).filename});
 
+    // Twitter Tweet Button.
+    Pot.callLazy(function() {
+      var tweet = {
+        id   : 'twitter-wjs',
+        src  : '//platform.twitter.com/widgets.js',
+        elem : null,
+        url  : (Pot.currentURI() + ':').split('/').slice(0, -1).join('/'),
+        via  : 'polygon_planet',
+        tags : 'Potjs'
+      };
+      if ($('#' + tweet.id).length === 0) {
+
+        $('<a/>')
+          .addClass('twitter-share-button')
+          .attr({
+            href            : 'https://twitter.com/share',
+            //'data-count'    : 'none',
+            'data-url'      : tweet.url,
+            'data-via'      : tweet.via,
+            'data-hashtags' : tweet.tags
+          })
+          .text('Tweet')
+          .appendTo('.twitter-tweet-button-container');
+
+        $('<script/>')
+          .attr({
+            async : 'async',
+            id    : tweet.id,
+            src   : tweet.src
+          })
+          .appendTo('head');
+      }
+    });
+
     $('<a/>')
       .attr({
         href  : NULL_URI,
@@ -973,6 +1007,24 @@ body > .layout-liquid-container {
 
 .header-translate-container {
   text-align: right;
+}
+
+.footer-buttons-container {}
+
+.footer-buttons-container iframe {
+  border: 0 none;
+}
+
+.footer-buttons-wrapper {
+  float: right;
+  margin: 1em 1em 1em 0.2em;
+}
+
+.footer-buttons-wrapper .github-button-follow-grid {
+  border-right: 1px solid #ccc;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 
 .content-sitemap {
@@ -1601,10 +1653,27 @@ body #goog-gt-tt {
     </div>
     <div class="footer">
       <div class="footer-wrapper">
-        <p>
-          Last modified: 2012-03-09
-          Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
-        </p>
+        <div class="footer-buttons-container clearfix">
+          <p class="footer-buttons-wrapper">
+            Last modified: 2012-03-09
+            Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
+          </p>
+          <div class="footer-buttons-wrapper">
+            <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=fork"
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
+                    title="fork - polygonplanet/Pot.js - GitHub"></iframe>
+          </div>
+          <div class="footer-buttons-wrapper">
+            <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=follow"
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
+                    title="follow - polygonplanet/Pot.js - GitHub" class="github-button-follow-grid"></iframe>
+          </div>
+          <div class="footer-buttons-wrapper">
+            <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=watch"
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
+                    title="watch - polygonplanet/Pot.js - GitHub"></iframe>
+          </div>
+          <div class="footer-buttons-wrapper twitter-tweet-button-container"></div>
       </div>
     </div>
     <div class="content-sitemap">
