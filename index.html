@@ -381,6 +381,7 @@ setTimeout(function() {
         id   : 'twitter-wjs',
         src  : '//platform.twitter.com/widgets.js',
         elem : null,
+        text : 'Pot.js + PotLite.js - Reference - JavaScript Library',
         url  : Pot.rtrim((Pot.currentURI() + ':').split('/').slice(0, -1).join('/'), '/') + '/',
         via  : 'polygon_planet',
         tags : 'Potjs'
@@ -392,8 +393,9 @@ setTimeout(function() {
           .attr({
             href            : 'https://twitter.com/share',
             //'data-count'    : 'none',
+            'data-text'     : tweet.text,
             'data-url'      : tweet.url,
-            'data-via'      : tweet.via,
+            //'data-via'      : tweet.via,
             'data-hashtags' : tweet.tags
           })
           .text('Tweet')
