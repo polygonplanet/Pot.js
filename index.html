@@ -285,6 +285,8 @@ setTimeout(function() {
         ) - $('.header-expand-container').outerHeight() - Math.min(
           50,
           $('.footer').outerHeight()
+        ) - (
+          parseInt($('body').css('top')) || 0
         );
 
       if (!initLayout) {
@@ -661,6 +663,8 @@ setTimeout(function() {
               forInViewClass = 'potjs-manual-item-for-in-view',
               accordion = $('.menu-accordion-container'),
               leftSide  = $('.leftside-wrapper'),
+              header = $('.header'),
+              body   = $('body'),
               isLang = /:(?:en|ja)/i,
               prevItem, processing, initHighlightProcess;
 
@@ -710,7 +714,7 @@ setTimeout(function() {
             var item = tree.get(currentId),
                 itemId = currentId,
                 curHash = Pot.stringify(location.hash).substring(1),
-                backPage, backId, backItem, curPager;
+                backPage, backId, backItem, curPager, bodyTop;
 
             if (processing || scrolling) {
               return;
@@ -729,13 +733,21 @@ setTimeout(function() {
               if (Pot.Reference.currentPager != curPager && Pot.isNumeric(curPager)) {
                 Pot.Reference.currentPager = curPager;
                 Pot.callLazy(function() {
-                  adjustContainerLayout(!Pot.isShown($('.header').get(0)));
+                  adjustContainerLayout(!Pot.isShown(header.get(0)));
                   processing = false;
                 });
               } else {
                 processing = false;
               }
               return;
+            }
+
+            if (Pot.isShown(header.get(0))) {
+              bodyTop = body.css('top');
+              if (!Pot.Reference.googleTransbarTop !== bodyTop) {
+                Pot.Reference.googleTransbarTop = bodyTop;
+                adjustContainerLayout();
+              }
             }
 
             if (Pot.Reference.doRelayout) {
