@@ -420,9 +420,7 @@ setTimeout(function() {
               new google.translate.TranslateElement({
                 pageLanguage      : defaultLang,
                 multilanguagePage : true,
-                layout            : google.translate
-                                          .TranslateElement
-                                          .InlineLayout.HORIZONTAL
+                layout            : google.translate.TranslateElement.InlineLayout.HORIZONTAL
               }, transBar.get(0));
             } catch (e) {}
           }
@@ -1542,6 +1540,14 @@ table.gcsc-branding *, table.gcsc-branding td * {
 
 </style>
 <!--/Google Custom Search-->
+<!--Google Translate-->
+<style type="text/css" media="screen">
+body #goog-gt-tt {
+  color: #333;
+  background-color: #fff;
+}
+</style>
+<!--/Google Translate-->
 </head>
 <body>
   <div class="layout-liquid-container">
@@ -1596,7 +1602,7 @@ table.gcsc-branding *, table.gcsc-branding td * {
     <div class="footer">
       <div class="footer-wrapper">
         <p>
-          Last modified: 2012-03-08
+          Last modified: 2012-03-09
           Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
         </p>
       </div>
