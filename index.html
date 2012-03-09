@@ -379,7 +379,7 @@ setTimeout(function() {
         id   : 'twitter-wjs',
         src  : '//platform.twitter.com/widgets.js',
         elem : null,
-        url  : (Pot.currentURI() + ':').split('/').slice(0, -1).join('/'),
+        url  : Pot.rtrim((Pot.currentURI() + ':').split('/').slice(0, -1).join('/'), '/') + '/',
         via  : 'polygon_planet',
         tags : 'Potjs'
       };
@@ -1658,20 +1658,18 @@ body #goog-gt-tt {
             Last modified: 2012-03-09
             Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
           </p>
-          <div class="footer-buttons-wrapper">
+          <div class="footer-buttons-wrapper" title="fork - polygonplanet/Pot.js - GitHub">
             <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=fork"
-                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
-                    title="fork - polygonplanet/Pot.js - GitHub"></iframe>
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"></iframe>
           </div>
-          <div class="footer-buttons-wrapper">
+          <div class="footer-buttons-wrapper" title="follow - polygonplanet/Pot.js - GitHub">
             <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=follow"
                     allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
-                    title="follow - polygonplanet/Pot.js - GitHub" class="github-button-follow-grid"></iframe>
+                    class="github-button-follow-grid"></iframe>
           </div>
-          <div class="footer-buttons-wrapper">
+          <div class="footer-buttons-wrapper" title="watch - polygonplanet/Pot.js - GitHub">
             <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=watch"
-                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"
-                    title="watch - polygonplanet/Pot.js - GitHub"></iframe>
+                    allowtransparency="true" frameborder="0" scrolling="0" width="62px" height="20px"></iframe>
           </div>
           <div class="footer-buttons-wrapper twitter-tweet-button-container"></div>
       </div>
