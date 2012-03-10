@@ -317,7 +317,7 @@ update(Pot.Crypt, {
       deferred : Pot.Internal.defineDeferrater(function(speed) {
         return function(string) {
           return calc(string).async(speed);
-        }
+        };
       })
     });
   }()),
@@ -605,7 +605,7 @@ update(Pot.Crypt, {
       deferred : Pot.Internal.defineDeferrater(function(speed) {
         return function(string) {
           return calc(string).async(speed);
-        }
+        };
       })
     });
   }()),
@@ -621,13 +621,14 @@ update(Pot.Crypt, {
    *
    *
    * @example
-   *   // usage:
    *   var arc4 = new Pot.Crypt.Arc4();
    *   arc4.setKey('hoge');
    *   var cipherText = arc4.encrypt('Hello World!');
    *   debug('cipherText = ' + cipherText);
+   *   // @results 'cipherText = (...cipherText)'
    *   var origText = arc4.decrypt(cipherText);
    *   debug('origText = ' + origText);
+   *   // @results 'origText = Hello World!'
    *
    *
    * @param  {String}  (key)  Secret key for encryption.
@@ -647,12 +648,22 @@ update(Pot.Crypt, {
      * @ignore
      */
     function arc4Crypt(text, key, table) {
-      var r = [], a, i, j, x, y, t, k, n;
-      a = arrayize(table);
-      j = 0;
-      t = stringify(text, true);
-      k = stringify(key, true);
-      n = k.length;
+      var
+      r = [],
+      a = arrayize(table),
+      i, j = 0, x, y,
+      t = stringify(text, true),
+      k = stringify(key, true),
+      n = k.length,
+      /**@ignore*/
+      calculate = function() {
+        i = (i + 1) % 256;
+        j = (j + a[i]) % 256;
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+        r[r.length] = fromUnicode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
+      };
       for (i = 0; i < 256; i++) {
         j = (j + a[i] + k.charCodeAt(i % n)) % 256;
         x = a[i];
@@ -661,15 +672,29 @@ update(Pot.Crypt, {
       }
       i = j = 0;
       n = t.length;
-      for (y = 0; y < n; y++) {
-        i = (i + 1) % 256;
-        j = (j + a[i]) % 256;
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-        r[r.length] = fromUnicode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
-      }
-      return r.join('');
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (y = 0; y < n; y++) {
+            calculate();
+          }
+          return r.join('');
+        },
+        /**@ignore*/
+        async : function(speed) {
+          y = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (y < n) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            y++;
+          }).then(function() {
+            return r.join('');
+          });
+        }
+      };
     }
     /**
      * Arc4 constructor.
@@ -712,6 +737,8 @@ update(Pot.Crypt, {
           this.setKey(key);
         }
         this.initTable();
+        this.encrypt.deferred.instance =
+          this.decrypt.deferred.instance = this;
         return this;
       },
       /**
@@ -729,6 +756,18 @@ update(Pot.Crypt, {
       /**
        * Set the secret key string for encryption.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  key  Secret key for encryption.
        * @return {Object}       The instance of Arc4 object.
        * @public
@@ -741,24 +780,168 @@ update(Pot.Crypt, {
        * Encrypt given plain text using the key with RC4 algorithm.
        * All parameters and return value are in binary format.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  text  Plain text to be encrypted.
        * @return {String}        The encrypted string.
+       * @type Function
        * @public
        */
-      encrypt : function(text) {
-        return arc4Crypt(Pot.UTF8.encode(text), this.key, this.table);
-      },
+      encrypt : update(function(text) {
+        return arc4Crypt(
+          Pot.UTF8.encode(text),
+          this.key,
+          this.table
+        ).sync();
+      }, {
+        /**
+         * @lends Pot.Crypt.Arc4.encrypt
+         */
+        /**
+         * Encrypt given plain text using the key with RC4 algorithm.
+         * All parameters and return value are in binary format.
+         * Encrypt with asynchronous,
+         *  and returns new instance of Pot.Deferred.
+         *
+         *
+         * @example
+         *   var arc4 = new Pot.Crypt.Arc4();
+         *   arc4.setKey('hoge');
+         *   arc4.encrypt.deferred('Hello World!')
+         *               .then(function(cipherText) {
+         *     debug('cipherText = ' + cipherText);
+         *     // @results 'cipherText = (...cipherText)'
+         *     return arc4.decrypt.deferred(cipherText)
+         *                        .then(function(origText) {
+         *       debug('origText = ' + origText);
+         *       // @results 'origText = Hello World!'
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  Plain text to be encrypted.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with the
+         *                                   encrypted string.
+         * @type  Function
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(text) {
+            var me = arguments.callee, that = me.instance;
+            return arc4Crypt(
+              Pot.UTF8.encode(text),
+              that.key,
+              that.table
+            ).async(speed);
+          };
+        })
+      }),
+      /**
+       * @lends Pot.Crypt.Arc4
+       */
       /**
        * Decrypt given cipher text using the key with RC4 algorithm.
        * All parameters and return value are in binary format.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  text  Cipher text to be decrypted.
        * @return {String}        The decrypted string.
+       *
+       * @type Function
        * @public
        */
-      decrypt : function(text) {
-        return Pot.UTF8.decode(arc4Crypt(text, this.key, this.table));
-      }
+      decrypt : update(function(text) {
+        return Pot.UTF8.decode(
+          arc4Crypt(
+            text,
+            this.key,
+            this.table
+          ).sync()
+        );
+      }, {
+        /**
+         * @lends Pot.Crypt.Arc4.decrypt
+         */
+        /**
+         * Decrypt given cipher text using the key with RC4 algorithm.
+         * All parameters and return value are in binary format.
+         * Decrypt with asynchronous,
+         *  and returns new instance of Pot.Deferred.
+         *
+         *
+         * @example
+         *   var arc4 = new Pot.Crypt.Arc4();
+         *   arc4.setKey('hoge');
+         *   arc4.encrypt.deferred('Hello World!')
+         *               .then(function(cipherText) {
+         *     debug('cipherText = ' + cipherText);
+         *     // @results 'cipherText = (...cipherText)'
+         *     return arc4.decrypt.deferred(cipherText)
+         *                        .then(function(origText) {
+         *       debug('origText = ' + origText);
+         *       // @results 'origText = Hello World!'
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  Cipher text to be decrypted.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with the
+         *                                   decrypted string.
+         * @type  Function
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(text) {
+            var me = arguments.callee, that = me.instance;
+            return arc4Crypt(
+              text,
+              that.key,
+              that.table
+            ).async(speed).then(function(res) {
+              return Pot.UTF8.decode(res);
+            });
+          };
+        })
+      })
     });
     arc4.prototype.init.prototype = arc4.prototype;
     return arc4;
