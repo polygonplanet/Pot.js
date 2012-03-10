@@ -469,15 +469,19 @@ update(Pot.Text, {
    * @public
    */
   chr : function(/*[...args]*/) {
-    var args = arrayize(arguments), codes,
-        chars = [], divs, i, len, limit = 0x2000;
-    if (args.length > 1) {
-      codes = args;
-    } else if (args.length === 1) {
-      codes = arrayize(args[0]);
+    var args = arguments, codes, chars, divs, i, len, limit;
+    if (args.length === 1) {
+      if (Pot.isArrayLike(args[0])) {
+        codes = arrayize(args[0]);
+      } else {
+        return fromUnicode(args[0]);
+      }
+    } else if (args.length > 1) {
+      codes = arrayize(args);
     } else {
       return '';
     }
+    chars = [];
     if (codes) {
       len = codes.length;
       if (len === 1 && codes[0] && codes[0].length < limit) {
@@ -786,9 +790,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  normalizeSpace : function(s, spacer) {
-    return stringify(s, true).replace(/[\s\u00A0\u3000]+/g, spacer || ' ');
-  },
+  normalizeSpace : (function() {
+    var re = /[\s\u00A0\u3000]+/g;
+    return function(s, spacer) {
+      return stringify(s, true).replace(re, spacer || ' ');
+    };
+  }()),
   /**
    * Split a string into an array by whitespace.
    * All empty items will be removed for the result array.
@@ -807,17 +814,20 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  splitBySpace : function(s) {
-    var array = stringify(s, true).split(/[\s\u00A0\u3000]+/),
-        a, i, len = array.length, results = [];
-    for (i = 0; i < len; i++) {
-      a = array[i];
-      if (a && a.length) {
-        results[results.length] = a;
+  splitBySpace : (function() {
+    var re = /[\s\u00A0\u3000]+/;
+    return function(s) {
+      var array = stringify(s, true).split(re),
+          a, i, len = array.length, results = [];
+      for (i = 0; i < len; i++) {
+        a = array[i];
+        if (a && a.length) {
+          results[results.length] = a;
+        }
       }
-    }
-    return results;
-  },
+      return results;
+    };
+  }()),
   /**
    * Replaces new lines with unix style (\n).
    *
@@ -826,7 +836,7 @@ update(Pot.Text, {
    *   var string = 'foo\r\nbar\rbaz\n';
    *   var result = canonicalizeNL(string);
    *   debug(result);
-   *   // @results  'foo\nbar\nbaz\n';
+   *   // @results  'foo\nbar\nbaz\n'
    *
    *
    * @param  {String}    s    The input string.
@@ -836,9 +846,13 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  canonicalizeNL : function(s) {
-    return stringify(s, true).replace(/\r\n|\r|\n/g, '\n');
-  },
+  canonicalizeNL : (function() {
+    // Includes U+2028 (Line Separator) and U+2029 (Paragraph Separator).
+    var re = /\r\n|\r|\n|[\u2028\u2029]/g, nl = '\u000A';
+    return function(s) {
+      return stringify(s, true).replace(re, nl);
+    };
+  }()),
   /**
    * Wraps a string by specific character.
    * Wrapper string can specify an array.
@@ -865,15 +879,19 @@ update(Pot.Text, {
    *
    * @param  {String}         string   The target string.
    * @param  {String|Array}   wrapper  The wrapper character.
+   * @param  {String}         right    (optional) The right wrapper.
    * @return {String}                  The result string.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  wrap : update(function(string, wrapper) {
+  wrap : update(function(string, wrapper, right) {
     var w, s = stringify(string),
         me = arguments.callee, maps = me.PairMaps;
+    if (right != null) {
+      wrapper = [wrapper, right];
+    }
     if (wrapper && wrapper.shift && wrapper.pop) {
       s = stringify(wrapper.shift()) + s + stringify(wrapper.pop());
     } else {
@@ -923,15 +941,19 @@ update(Pot.Text, {
    *
    * @param  {String}        string     The target string.
    * @param  {String|Array}  unwrapper  The unwrapper character.
+   * @param  {String}        rightWrap  (optional) The right unwrapper.
    * @return {String}                   The result string.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  unwrap : function(string, unwrapper) {
+  unwrap : function(string, unwrapper, rightWrap) {
     var s = stringify(string), w, left, right,
         Text = Pot.Text, maps = Text.wrap.PairMaps;
+    if (rightWrap != null) {
+      unwrapper = [unwrapper, rightWrap];
+    }
     if (unwrapper && unwrapper.shift && unwrapper.pop) {
       left  = stringify(unwrapper.shift());
       right = stringify(unwrapper.pop());
