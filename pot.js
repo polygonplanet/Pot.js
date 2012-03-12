@@ -4,7 +4,7 @@
  * Pot.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.14, 2012-02-24
+ * Version 1.15, 2012-03-12
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -67,8 +67,8 @@
  *
  * @fileoverview   Pot.js library
  * @author         polygon planet
- * @version        1.14
- * @date           2012-02-24
+ * @version        1.15
+ * @date           2012-03-12
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -102,7 +102,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.14', TYPE : 'full'},
+var Pot = {VERSION : '1.15', TYPE : 'full'},
 
 // A shortcut of prototype methods.
 push           = Array.prototype.push,
@@ -115,6 +115,21 @@ lastIndexOf    = Array.prototype.lastIndexOf,
 toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 fromCharCode   = String.fromCharCode,
+
+/**
+ * faster way of String.fromCharCode(c).
+ * @ignore
+ */
+fromUnicode = (function() {
+  var i, maps = [];
+  for (i = 0; i < 0xFFFF; i++) {
+    maps[i] = fromCharCode(i);
+  }
+  return function(c) {
+    return maps[c & 0xFFFF];
+  };
+}()),
+
 
 // Namespace URIs.
 XML_NS_URI   = 'http://www.w3.org/XML/1998/namespace',
@@ -380,7 +395,7 @@ update(Pot, {
       }
     }
     return r;
-  })(nv),
+  }(nv)),
   /**
    * Detect the browser/user language.
    *
@@ -478,7 +493,7 @@ update(Pot, {
       globals = this || {};
     }
     return this || {};
-  })(),
+  }()),
   /**
    * Noop function.
    *
@@ -612,7 +627,7 @@ update(Pot, {
    */
   Pot : Pot
 });
-})(typeof navigator !== 'undefined' && navigator || {});
+}(typeof navigator !== 'undefined' && navigator || {}));
 
 // Path/Directory Delimiter
 Pot.update({
@@ -9366,7 +9381,7 @@ update(Pot.Iter, {
           (step < 0 && begin < end)) {
         throw Pot.StopIteration;
       }
-      result[result.length] = string ? fromCharCode(begin) : begin;
+      result[result.length] = string ? fromUnicode(begin) : begin;
       begin += step;
     };
     Pot.iterate(iter);
@@ -11364,11 +11379,17 @@ update(Pot.Internal, {
           '|' + "'(?:\\\\[\\s\\S]|[^'\\r\\n\\\\])*'" +  // string literal
           '|' + '/(?![*])(?:\\\\.|[^/\\r\\n\\\\])+/' +
                 '[gimy]{0,4}' +
-          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +     // e4x
-          '|' + '>>>=?|<<=|===|!==|>>=|[=!<>*+/&|^-]=' +  // operators
-                '|[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
-                '|[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +
-          '|' + '\\s+' +                                      // white space
+          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +   // e4x
+          '|' + '>>>=?|<<=|===|!==|>>=' +               // operators
+          '|' + '[+][+](?=[+])|[-][-](?=[-])' +
+          '|' + '[=!<>*+/&|^-]=' +
+          '|' + '[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
+          '|' + '0(?:[xX][0-9a-fA-F]+|[0-7]+)' +        // number literal
+          '|' + '\\d+(?:[.]\\d+)?(?:[eE][+-]?\\d+)?' +
+          '|' + '[1-9]\\d*' +
+          '|' + '[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +   // operator
+          '|' + '(?![\\r\\n])\\s+' +                    // white space
+          '|' + '(?:\\r\\n|\\r|\\n)' +                  // nl
           '|' + '[^\\s+/%*=&|^~<>!?:,;@()\\\\[\\].{}\'"-]+' + // token
           ')',
           'g'
@@ -13189,7 +13210,7 @@ update(Pot.URI, {
               r = (((c & 0x0F) << 6 | parseInt(s.substring(4), 16) & 0x3F)
                                << 6 | parseInt(s.substring(7), 16) & 0x3F);
             }
-            return String.fromCharCode(r);
+            return fromUnicode(r);
           };
           result = s.replace(re, rep);
         }
@@ -14080,8 +14101,7 @@ update(Pot.Crypt, {
    * @static
    */
   hashCode : function(string) {
-    var result = 0, s, i, len, max;
-    max = 0x100000000; // 2^32
+    var result = 0, s, i, len, max = 0x100000000; // 2^32
     if (string == null) {
       s = String(string);
     } else {
@@ -14198,18 +14218,28 @@ update(Pot.Crypt, {
       return whv;
     }
     /**@ignore*/
+    function hex(a, b, c, d) {
+      return [
+        wordToHex(a), wordToHex(b), wordToHex(c), wordToHex(d)
+      ].join('').toLowerCase();
+    }
+    /**@ignore*/
     function calc(s) {
-      var x, xl, k, AA, BB, CC, DD, a, b, c, d,   S11 = 7,
-          S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
-          S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
-          S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21;
-      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true)));
-      a = 0x67452301;
-      b = 0xEFCDAB89;
-      c = 0x98BADCFE;
-      d = 0x10325476;
-      xl = x.length;
-      for (k = 0; k < xl; k += 16) {
+      var
+      S11 = 7,
+      S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
+      S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
+      S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21,
+      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true))),
+      xl = x.length,
+      a = 0x67452301,
+      b = 0xEFCDAB89,
+      c = 0x98BADCFE,
+      d = 0x10325476,
+      AA, BB, CC, DD,
+      k,
+      /**@ignore*/
+      calculate = function() {
         AA = a;
         BB = b;
         CC = c;
@@ -14282,16 +14312,78 @@ update(Pot.Crypt, {
         b = au(b, BB);
         c = au(c, CC);
         d = au(d, DD);
-      }
-      return [
-        wordToHex(a), wordToHex(b), wordToHex(c), wordToHex(d)
-      ].join('').toLowerCase();
+      };
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (k = 0; k < xl; k += 16) {
+            calculate();
+          }
+          return hex(a, b, c, d);
+        },
+        /**@ignore*/
+        async : function(speed) {
+          k = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (k < xl) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            k += 16;
+          }).then(function() {
+            return hex(a, b, c, d);
+          });
+        }
+      };
     }
     /**@ignore*/
-    return function(string) {
-      return calc(string);
-    };
+    return update(function(string) {
+      return calc(string).sync();
+    }, {
+      /**
+       * @lends Pot.Crypt.md5
+       */
+      /**
+       * Calculate the MD5 hash of a string with Deferred.
+       *
+       * RFC 1321 - The MD5 Message-Digest Algorithm
+       * @link http://www.faqs.org/rfcs/rfc1321
+       *
+       *
+       * @example
+       *   md5.deferred('apple').then(function(res) {
+       *     debug(res);
+       *     // @results '1f3870be274f6c49b3e31a0c6728957f'
+       *   });
+       *
+       *
+       * @param  {String}        string  The target string.
+       * @return {Pot.Deferred}          Return new instance of Pot.Deferred
+       *                                   with a result string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       *
+       * @property {Function} limp   Run with slowest speed.
+       * @property {Function} doze   Run with slower speed.
+       * @property {Function} slow   Run with slow speed.
+       * @property {Function} normal Run with default speed.
+       * @property {Function} fast   Run with fast speed.
+       * @property {Function} rapid  Run with faster speed.
+       * @property {Function} ninja  Run fastest speed.
+       */
+      deferred : Pot.Internal.defineDeferrater(function(speed) {
+        return function(string) {
+          return calc(string).async(speed);
+        };
+      })
+    });
   }()),
+  /**
+   * @lends Pot.Crypt
+   */
   /**
    * Calculate the 32-bit CRC (cyclic redundancy checksum) checksum.
    *
@@ -14368,6 +14460,9 @@ update(Pot.Crypt, {
     };
   }()),
   /**
+   * @lends Pot.Crypt
+   */
+  /**
    * Calculate the SHA1 hash of a string.
    *
    * RFC 3174 - US Secure Hash Algorithm 1 (SHA1)
@@ -14402,46 +14497,26 @@ update(Pot.Crypt, {
       return s;
     }
     /**@ignore*/
+    function hexLower(a, b, c, d, e) {
+      return (hex(a) + hex(b) + hex(c) + hex(d) + hex(e)).toLowerCase();
+    }
+    /**@ignore*/
     function calc(string) {
-      var bs, i, j, A, B, C, D, E, W = new Array(80),
-          H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE,
-          H3 = 0x10325476, H4 = 0xC3D2E1F0,
-          wa = [], s, sl, tp;
-      s = Pot.UTF8.encode(stringify(string, true));
-      sl = s.length;
-      for (i = 0; i < sl - 3; i += 4) {
-        j = s.charCodeAt(i)     << 24 |
-            s.charCodeAt(i + 1) << 16 |
-            s.charCodeAt(i + 2) <<  8 |
-            s.charCodeAt(i + 3);
-        wa[wa.length] = j;
-      }
-      switch (sl % 4) {
-        case 0:
-            i = 0x080000000;
-            break;
-        case 1:
-            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
-            break;
-        case 2:
-            i = s.charCodeAt(sl - 2) << 24 |
-                s.charCodeAt(sl - 1) << 16 | 0x08000;
-            break;
-        case 3:
-            i = s.charCodeAt(sl - 3) << 24 |
-                s.charCodeAt(sl - 2) << 16 |
-                s.charCodeAt(sl - 1) <<  8 | 0x80;
-            break;
-        default:
-            break;
-      }
-      wa[wa.length] = i;
-      while ((wa.length % 16) != 14) {
-        wa[wa.length] = 0;
-      }
-      wa[wa.length] = (sl >>> 29);
-      wa[wa.length] = ((sl << 3) & 0x0FFFFFFFF);
-      for (bs = 0; bs < wa.length; bs += 16) {
+      var
+      bs, i, j,
+      A, B, C, D, E, W = new Array(80),
+      H0 = 0x67452301,
+      H1 = 0xEFCDAB89,
+      H2 = 0x98BADCFE,
+      H3 = 0x10325476,
+      H4 = 0xC3D2E1F0,
+      wa = [],
+      wal,
+      s = Pot.UTF8.encode(stringify(string, true)),
+      sl = s.length,
+      tp,
+      /**@ignore*/
+      calculate = function() {
         for (i = 0; i < 16; i++) {
           W[i] = wa[bs + i];
         }
@@ -14495,15 +14570,109 @@ update(Pot.Crypt, {
         H2 = (H2 + C) & 0x0FFFFFFFF;
         H3 = (H3 + D) & 0x0FFFFFFFF;
         H4 = (H4 + E) & 0x0FFFFFFFF;
+      };
+      for (i = 0; i < sl - 3; i += 4) {
+        j = s.charCodeAt(i)     << 24 |
+            s.charCodeAt(i + 1) << 16 |
+            s.charCodeAt(i + 2) <<  8 |
+            s.charCodeAt(i + 3);
+        wa[wa.length] = j;
       }
-      tp = hex(H0) + hex(H1) + hex(H2) + hex(H3) + hex(H4);
-      return tp.toLowerCase();
+      switch (sl % 4) {
+        case 0:
+            i = 0x080000000;
+            break;
+        case 1:
+            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
+            break;
+        case 2:
+            i = s.charCodeAt(sl - 2) << 24 |
+                s.charCodeAt(sl - 1) << 16 | 0x08000;
+            break;
+        case 3:
+            i = s.charCodeAt(sl - 3) << 24 |
+                s.charCodeAt(sl - 2) << 16 |
+                s.charCodeAt(sl - 1) <<  8 | 0x80;
+            break;
+      }
+      wa[wa.length] = i;
+      while ((wa.length % 16) != 14) {
+        wa[wa.length] = 0;
+      }
+      wa[wa.length] = (sl >>> 29);
+      wa[wa.length] = ((sl << 3) & 0x0FFFFFFFF);
+      wal = wa.length;
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (bs = 0; bs < wal; bs += 16) {
+            calculate();
+          }
+          return hexLower(H0, H1, H2, H3, H4);
+        },
+        /**@ignore*/
+        async : function(speed) {
+          bs = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (bs < wal) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            bs += 16;
+          }).then(function() {
+            return hexLower(H0, H1, H2, H3, H4);
+          });
+        }
+      };
     }
     /**@ignore*/
-    return function(string) {
-      return calc(string);
-    };
+    return update(function(string) {
+      return calc(string).sync();
+    }, {
+      /**
+       * @lends Pot.Crypt.sha1
+       */
+      /**
+       * Calculate the SHA1 hash of a string with Deferred.
+       *
+       * RFC 3174 - US Secure Hash Algorithm 1 (SHA1)
+       * @link http://www.faqs.org/rfcs/rfc3174
+       *
+       *
+       * @example
+       *   sha1.deferred('apple').then(function(res) {
+       *     debug(res);
+       *     // @results 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
+       *   });
+       *
+       *
+       * @param  {String}        string  The input string.
+       * @return {Pot.Deferred}          Returns new instance of Pot.Deferred
+       *                                   with the sha1 hash as a string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       *
+       * @property {Function} limp   Run with slowest speed.
+       * @property {Function} doze   Run with slower speed.
+       * @property {Function} slow   Run with slow speed.
+       * @property {Function} normal Run with default speed.
+       * @property {Function} fast   Run with fast speed.
+       * @property {Function} rapid  Run with faster speed.
+       * @property {Function} ninja  Run fastest speed.
+       */
+      deferred : Pot.Internal.defineDeferrater(function(speed) {
+        return function(string) {
+          return calc(string).async(speed);
+        };
+      })
+    });
   }()),
+  /**
+   * @lends Pot.Crypt
+   */
   /**
    * ARC4 symmetric cipher encryption/decryption.
    *
@@ -14513,13 +14682,14 @@ update(Pot.Crypt, {
    *
    *
    * @example
-   *   // usage:
    *   var arc4 = new Pot.Crypt.Arc4();
    *   arc4.setKey('hoge');
    *   var cipherText = arc4.encrypt('Hello World!');
    *   debug('cipherText = ' + cipherText);
+   *   // @results 'cipherText = (...cipherText)'
    *   var origText = arc4.decrypt(cipherText);
    *   debug('origText = ' + origText);
+   *   // @results 'origText = Hello World!'
    *
    *
    * @param  {String}  (key)  Secret key for encryption.
@@ -14539,12 +14709,22 @@ update(Pot.Crypt, {
      * @ignore
      */
     function arc4Crypt(text, key, table) {
-      var r = [], a, i, j, x, y, t, k, n;
-      a = arrayize(table);
-      j = 0;
-      t = stringify(text, true);
-      k = stringify(key, true);
-      n = k.length;
+      var
+      r = [],
+      a = arrayize(table),
+      i, j = 0, x, y,
+      t = stringify(text, true),
+      k = stringify(key, true),
+      n = k.length,
+      /**@ignore*/
+      calculate = function() {
+        i = (i + 1) % 256;
+        j = (j + a[i]) % 256;
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+        r[r.length] = fromUnicode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
+      };
       for (i = 0; i < 256; i++) {
         j = (j + a[i] + k.charCodeAt(i % n)) % 256;
         x = a[i];
@@ -14553,15 +14733,29 @@ update(Pot.Crypt, {
       }
       i = j = 0;
       n = t.length;
-      for (y = 0; y < n; y++) {
-        i = (i + 1) % 256;
-        j = (j + a[i]) % 256;
-        x = a[i];
-        a[i] = a[j];
-        a[j] = x;
-        r[r.length] = fromCharCode(t.charCodeAt(y) ^ a[(a[i] + a[j]) % 256]);
-      }
-      return r.join('');
+      return {
+        /**@ignore*/
+        sync : function() {
+          for (y = 0; y < n; y++) {
+            calculate();
+          }
+          return r.join('');
+        },
+        /**@ignore*/
+        async : function(speed) {
+          y = 0;
+          return Pot.Deferred.forEver[speed](function() {
+            if (y < n) {
+              calculate();
+            } else {
+              throw Pot.StopIteration;
+            }
+            y++;
+          }).then(function() {
+            return r.join('');
+          });
+        }
+      };
     }
     /**
      * Arc4 constructor.
@@ -14600,10 +14794,17 @@ update(Pot.Crypt, {
        * @ignore
        */
       init : function(key) {
+        var that = this, ed, dd;
         if (key != null) {
           this.setKey(key);
         }
         this.initTable();
+        ed = this.encrypt.deferred;
+        dd = this.decrypt.deferred;
+        ed.instance = dd.instance = this;
+        each(Pot.Internal.LightIterator.speeds, function(v, k) {
+          ed[k].instance = dd[k].instance = that;
+        });
         return this;
       },
       /**
@@ -14621,6 +14822,18 @@ update(Pot.Crypt, {
       /**
        * Set the secret key string for encryption.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  key  Secret key for encryption.
        * @return {Object}       The instance of Arc4 object.
        * @public
@@ -14633,24 +14846,168 @@ update(Pot.Crypt, {
        * Encrypt given plain text using the key with RC4 algorithm.
        * All parameters and return value are in binary format.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  text  Plain text to be encrypted.
        * @return {String}        The encrypted string.
+       * @type Function
        * @public
        */
-      encrypt : function(text) {
-        return arc4Crypt(Pot.UTF8.encode(text), this.key, this.table);
-      },
+      encrypt : update(function(text) {
+        return arc4Crypt(
+          Pot.UTF8.encode(text),
+          this.key,
+          this.table
+        ).sync();
+      }, {
+        /**
+         * @lends Pot.Crypt.Arc4.encrypt
+         */
+        /**
+         * Encrypt given plain text using the key with RC4 algorithm.
+         * All parameters and return value are in binary format.
+         * Encrypt with asynchronous,
+         *  and returns new instance of Pot.Deferred.
+         *
+         *
+         * @example
+         *   var arc4 = new Pot.Crypt.Arc4();
+         *   arc4.setKey('hoge');
+         *   arc4.encrypt.deferred('Hello World!')
+         *               .then(function(cipherText) {
+         *     debug('cipherText = ' + cipherText);
+         *     // @results 'cipherText = (...cipherText)'
+         *     return arc4.decrypt.deferred(cipherText)
+         *                        .then(function(origText) {
+         *       debug('origText = ' + origText);
+         *       // @results 'origText = Hello World!'
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  Plain text to be encrypted.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with the
+         *                                   encrypted string.
+         * @type  Function
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(text) {
+            var me = arguments.callee, that = me.instance;
+            return arc4Crypt(
+              Pot.UTF8.encode(text),
+              that.key,
+              that.table
+            ).async(speed);
+          };
+        })
+      }),
+      /**
+       * @lends Pot.Crypt.Arc4
+       */
       /**
        * Decrypt given cipher text using the key with RC4 algorithm.
        * All parameters and return value are in binary format.
        *
+       *
+       * @example
+       *   var arc4 = new Pot.Crypt.Arc4();
+       *   arc4.setKey('hoge');
+       *   var cipherText = arc4.encrypt('Hello World!');
+       *   debug('cipherText = ' + cipherText);
+       *   // @results 'cipherText = (...cipherText)'
+       *   var origText = arc4.decrypt(cipherText);
+       *   debug('origText = ' + origText);
+       *   // @results 'origText = Hello World!'
+       *
+       *
        * @param  {String}  text  Cipher text to be decrypted.
        * @return {String}        The decrypted string.
+       *
+       * @type Function
        * @public
        */
-      decrypt : function(text) {
-        return Pot.UTF8.decode(arc4Crypt(text, this.key, this.table));
-      }
+      decrypt : update(function(text) {
+        return Pot.UTF8.decode(
+          arc4Crypt(
+            text,
+            this.key,
+            this.table
+          ).sync()
+        );
+      }, {
+        /**
+         * @lends Pot.Crypt.Arc4.decrypt
+         */
+        /**
+         * Decrypt given cipher text using the key with RC4 algorithm.
+         * All parameters and return value are in binary format.
+         * Decrypt with asynchronous,
+         *  and returns new instance of Pot.Deferred.
+         *
+         *
+         * @example
+         *   var arc4 = new Pot.Crypt.Arc4();
+         *   arc4.setKey('hoge');
+         *   arc4.encrypt.deferred('Hello World!')
+         *               .then(function(cipherText) {
+         *     debug('cipherText = ' + cipherText);
+         *     // @results 'cipherText = (...cipherText)'
+         *     return arc4.decrypt.deferred(cipherText)
+         *                        .then(function(origText) {
+         *       debug('origText = ' + origText);
+         *       // @results 'origText = Hello World!'
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  Cipher text to be decrypted.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with the
+         *                                   decrypted string.
+         * @type  Function
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(text) {
+            var me = arguments.callee, that = me.instance;
+            return arc4Crypt(
+              text,
+              that.key,
+              that.table
+            ).async(speed).then(function(res) {
+              return Pot.UTF8.decode(res);
+            });
+          };
+        })
+      })
     });
     arc4.prototype.init.prototype = arc4.prototype;
     return arc4;
@@ -15093,17 +15450,16 @@ update(Pot.Net, {
          * @ignore
          */
         assignResponseText : function() {
-          var i, len, bytes, chars, sc, c, s;
+          var i, len, bytes, chars, c, s;
           if (this.options.binary) {
             bytes = [];
             chars = [];
             s = this.xhr.responseText || '';
             len = s.length;
-            sc = String.fromCharCode;
             for (i = 0; i < len; i++) {
               c = s.charCodeAt(i) & 0xFF;
               bytes[i] = c;
-              chars[i] = sc(c);
+              chars[i] = fromUnicode(c);
             }
             try {
               this.xhr.originalText  = s;
@@ -19448,6 +19804,9 @@ update(Pot.Collection, {
     };
   }()),
   /**
+   * @lends Pot.Collection
+   */
+  /**
    * Convert to one-dimensional array from multi-dimensional array.
    *
    *
@@ -21131,7 +21490,7 @@ update(Pot.Struct, {
       case 'string':
           result = '';
           each(o.split(''), function(c) {
-            result += fromCharCode(
+            result += fromUnicode(
               c.charCodeAt(0) ^ 0xFFFF
             );
           });
@@ -21672,7 +22031,7 @@ update(Pot.DateTime, {
    *   debug(time); // 1323446177282
    *
    *
-   * @return    Return the current time as milliseconds.
+   * @return {Number} Return the current time as milliseconds.
    *
    * @type  Function
    * @function
@@ -21683,7 +22042,7 @@ update(Pot.DateTime, {
   /**
    * Get the current UNIX timestamp.
    *
-   * @return      Return the current UNIX timestamp.
+   * @return {Number} Return the current UNIX timestamp.
    *
    * @type  Function
    * @function
@@ -22327,7 +22686,7 @@ update(Pot.Complex, {
       }
     }
     if (forString) {
-      result = fromCharCode(result);
+      result = fromUnicode(result);
     } else {
       result = result - 0;
     }
@@ -23138,7 +23497,7 @@ update(Pot.Sanitizer, {
                 } else {
                   c = c - 0;
                 }
-                c = String.fromCharCode(c);
+                c = fromUnicode(c);
               } else {
                 c = '';
               }
@@ -23410,16 +23769,15 @@ update(Pot.Sanitizer, {
         '\\': '\u005C',
         '/' : '\u002F'
       };
-      me.chr = String.fromCharCode;
       /**@ignore*/
       me.rep = function(m, a) {
         var r, c = me.meta[a];
         if (typeof c === 'string') {
           r = c;
         } else if (a.length === 3 && a.charAt(0) === 'x') {
-          r = me.chr('0' + a);
+          r = fromUnicode('0' + a);
         } else if (a.length === 5 && a.charAt(0) === 'u') {
-          r = me.chr('0x' + a.substring(1));
+          r = fromUnicode('0x' + a.substring(1));
         } else {
           r = a;
         }
@@ -23516,7 +23874,7 @@ update(Pot.UTF8, {
     var result = '', chars = [], len, i, c, s, sc;
     s = stringify(string);
     if (s) {
-      sc = fromCharCode;
+      sc = fromUnicode;
       len = s.length;
       for (i = 0; i < len; i++) {
         c = s.charCodeAt(i);
@@ -23549,7 +23907,7 @@ update(Pot.UTF8, {
     var result = '', chars = [], i, len, s, n, c, c2, c3, sc;
     s = stringify(string);
     if (s) {
-      sc = fromCharCode;
+      sc = fromUnicode;
       i = 0;
       len = s.length;
       while (i < len) {
@@ -23647,57 +24005,266 @@ Pot.update({
    */
   Base64 : (function() {
     // Base64 from: http://feel.happy.nu/test/base64.html
-    var BASE64MAPS = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '+/=';
-    /**@ignore*/
-    function encodeBase64(text) {
-      var r = '', t = [], s, p = -6, a = 0, i = 0, v = 0, c, n;
-      s = Pot.UTF8.encode(stringify(text, true));
-      if (s) {
-        n = s.length;
-        while (i < n || p > -6) {
-          if (p < 0) {
-            if (i < n) {
-              c = s.charCodeAt(i++);
-              v += 8;
-            } else {
-              c = 0;
+    var BASE64MAPS    = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '+/=',
+        BASE64URLMAPS = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '-_=',
+        /**@ignore*/
+        Encoder = function(string, maps) {
+          return new Encoder.prototype.init(string, maps);
+        },
+        /**@ignore*/
+        Decoder = function(string, maps) {
+          return new Decoder.prototype.init(string, maps);
+        };
+    Encoder.prototype = update(Encoder.prototype, {
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      constructor : Encoder,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      string : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      len : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      results : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      pos : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      att : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      index : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      vol : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      maps : null,
+      /**
+       * Initialize properties.
+       *
+       * @private
+       * @ignore
+       */
+      init : function(string, maps) {
+        this.maps = maps;
+        this.string = stringify(string, true);
+        this.len = this.string.length;
+        this.results = [];
+        this.pos = -6;
+        this.att = 0;
+        this.index = 0;
+        this.vol = 0;
+        return this;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      execute : function() {
+        var r = this.results, m = this.maps;
+        this.string = Pot.UTF8.encode(this.string);
+        if (this.string) {
+          this.len = this.string.length;
+          while (this.index < this.len || this.pos > -6) {
+            if (this.pos < 0) {
+              this.peek();
             }
-            a = ((a & 255) << 8) | (c & 255);
-            p += 8;
+            r[r.length] = m.charAt(
+              (this.vol > 0) ? (this.att >> this.pos & 63) : 64
+            );
+            this.pos -= 6;
+            this.vol -= 6;
           }
-          t[t.length] = BASE64MAPS.charAt((v > 0) ? (a >> p & 63) : 64);
-          p -= 6;
-          v -= 6;
         }
-        r = t.join('');
+        return r.join('');
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      deferred : function(speed) {
+        var that = this, r = this.results, m = this.maps;
+        this.string = Pot.UTF8.encode(this.string);
+        this.len = this.string.length;
+        return Pot.Deferred.forEver[speed](function() {
+          if (that.index < that.len || that.pos > -6) {
+            if (that.pos < 0) {
+              that.peek();
+            }
+            r[r.length] = m.charAt(
+              (that.vol > 0) ? (that.att >> that.pos & 63) : 64
+            );
+            that.pos -= 6;
+            that.vol -= 6;
+          } else {
+            throw Pot.StopIteration;
+          }
+        }).then(function() {
+          return r.join('');
+        });
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      peek : function() {
+        var c;
+        if (this.index < this.len) {
+          c = this.string.charCodeAt(this.index++);
+          this.vol += 8;
+        } else {
+          c = 0;
+        }
+        this.att = ((this.att & 0xFF) << 8) | (c & 0xFF);
+        this.pos += 8;
       }
-      return r;
-    }
-    /**@ignore*/
-    function decodeBase64(text) {
-      var r = '', t = [], s, p = -8, a = 0, c, d, n, i;
-      s = stringify(text, true);
-      if (s) {
-        n = s.length;
-        for (i = 0; i < n; i++) {
-          c = BASE64MAPS.indexOf(s.charAt(i));
+    });
+    Encoder.prototype.init.prototype = Encoder.prototype;
+    Decoder.prototype = update(Decoder.prototype, {
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      constructor : Decoder,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      string : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      len : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      results : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      pos : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      att : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      vol : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      maps : null,
+      /**
+       * Initialize properties.
+       *
+       * @private
+       * @ignore
+       */
+      init : function(string, maps) {
+        this.maps = maps;
+        this.string = stringify(string, true);
+        this.len = this.string.length;
+        this.results = [];
+        this.pos = -8;
+        this.att = 0;
+        return this;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      execute : function() {
+        var i, n = this.len, c, m = this.maps;
+        if (n) {
+          for (i = 0; i < n; i++) {
+            c = m.indexOf(this.string.charAt(i));
+            if (~c) {
+              this.decode(c);
+            }
+          }
+        }
+        return Pot.UTF8.decode(this.results.join(''));
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      deferred : function(speed) {
+        var that = this, m = this.maps;
+        return Pot.Deferred.repeat[speed](this.len, function(i) {
+          var c = m.indexOf(that.string.charAt(i));
           if (~c) {
-            a = (a << 6) | (c & 63);
-            p += 6;
-            if (p >= 0) {
-              d = (a >> p & 255);
-              if (c !== 64) {
-                t[t.length] = fromCharCode(d);
-              }
-              a &= 63;
-              p -= 8;
-            }
+            that.decode(c);
           }
+        }).then(function() {
+          return Pot.UTF8.decode(that.results.join(''));
+        });
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      decode : function(c) {
+        var code, r = this.results;
+        this.att = (this.att << 6) | (c & 63);
+        this.pos += 6;
+        if (this.pos >= 0) {
+          code = this.att >> this.pos & 0xFF;
+          if (c !== 64) {
+            r[r.length] = fromUnicode(code);
+          }
+          this.att &= 63;
+          this.pos -= 8;
         }
-        r = t.join('');
       }
-      return Pot.UTF8.decode(r);
-    }
+    });
+    Decoder.prototype.init.prototype = Decoder.prototype;
     return {
       /**
        * @lends Pot.Base64
@@ -23708,20 +24275,35 @@ Pot.update({
        *
        * @example
        *   var string = 'Hello World.';
-       *   var result = Pot.Base64.encode(string);
+       *   var result = Pot.base64Encode(string);
        *   debug(result);
        *   // @results 'SGVsbG8gV29ybGQu'
        *
        *
-       * @param  {String}  text   A target string.
-       * @return {String}         A base64 string.
+       * @example
+       *   var string = 'にゃふん!';
+       *   var encoded = Pot.base64Encode(string);
+       *   var decoded = Pot.base64Decode(encoded);
+       *   debug(
+       *     'string  = ' + string + '\n' +
+       *     'encoded = ' + encoded + '\n' +
+       *     'decoded = ' + decoded
+       *   );
+       *   // @results
+       *   //   string  = にゃふん!
+       *   //   encoded = 44Gr44KD44G144KTIQ==
+       *   //   decoded = にゃふん!
+       *
+       *
+       * @param  {String}  string   A target string.
+       * @return {String}           A base64 string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      encode : function(text) {
-        var result = '', s = stringify(text, true);
+      encode : update(function(string) {
+        var result = '', s = stringify(string, true);
         if (s) {
           try {
             if (typeof btoa === 'undefined') {
@@ -23730,32 +24312,111 @@ Pot.update({
             result = btoa(Pot.UTF8.encode(s));
           } catch (e) {
             try {
-              result = encodeBase64(s);
+              result = (new Encoder(s, BASE64MAPS)).execute();
             } catch (e) {}
           }
         }
         return result;
-      },
+      }, {
+        /**
+         * @lends Pot.Base64.encode
+         */
+        /**
+         * Encodes a string to base64 with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello World.';
+         *   Pot.base64Encode.deferred(string).then(function(encoded) {
+         *     debug(encoded);
+         *     // @results 'SGVsbG8gV29ybGQu'
+         *     return Pot.base64Decode.deferred(encoded)
+         *                            .then(function(decoded) {
+         *       debug(decoded);
+         *       // @results 'Hello World.'
+         *     });
+         *   });
+         *
+         *
+         * @example
+         *   var string = 'にゃふん!';
+         *   Pot.base64Encode.deferred(string).then(function(encoded) {
+         *     return Pot.base64Decode.deferred(encoded)
+         *                            .then(function(decoded) {
+         *       debug(
+         *         'string  = ' + string + '\n' +
+         *         'encoded = ' + encoded + '\n' +
+         *         'decoded = ' + decoded
+         *       );
+         *       // @results
+         *       //   string  = にゃふん!
+         *       //   encoded = 44Gr44KD44G144KTIQ==
+         *       //   decoded = にゃふん!
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string   A target string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a
+         *                                    base64 string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new Encoder(string, BASE64MAPS)).deferred(speed);
+          };
+        })
+      }),
+      /**
+       * @lends Pot.Base64
+       */
       /**
        * Decodes a string from base64.
        *
        *
        * @example
        *   var b64string = 'SGVsbG8gV29ybGQu';
-       *   var result = Pot.Base64.decode(b64string);
+       *   var result = Pot.base64Decode(b64string);
        *   debug(result);
        *   // @results 'Hello World.'
        *
        *
-       * @param  {String}  text   A base64 string.
-       * @return {String}         A result string.
+       * @example
+       *   var string = 'にゃふん!';
+       *   var encoded = Pot.base64Encode(string);
+       *   var decoded = Pot.base64Decode(encoded);
+       *   debug(
+       *     'string  = ' + string + '\n' +
+       *     'encoded = ' + encoded + '\n' +
+       *     'decoded = ' + decoded
+       *   );
+       *   // @results
+       *   //   string  = にゃふん!
+       *   //   encoded = 44Gr44KD44G144KTIQ==
+       *   //   decoded = にゃふん!
+       *
+       *
+       * @param  {String}  string   A base64 string.
+       * @return {String}           A result string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      decode : function(text) {
-        var result = '', s = stringify(text, true);
+      decode : update(function(string) {
+        var result = '', s = stringify(string, true);
         if (s) {
           try {
             if (typeof atob === 'undefined') {
@@ -23764,25 +24425,298 @@ Pot.update({
             result = Pot.UTF8.decode(atob(s));
           } catch (e) {
             try {
-              result = decodeBase64(s);
+              result = (new Decoder(s, BASE64MAPS)).execute();
             } catch (e) {}
           }
         }
         return result;
-      }
+      }, {
+        /**
+         * @lends Pot.Base64.decode
+         */
+        /**
+         * Decodes a string from base64 with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello World.';
+         *   Pot.base64Encode.deferred(string).then(function(encoded) {
+         *     debug(encoded);
+         *     // @results 'SGVsbG8gV29ybGQu'
+         *     return Pot.base64Decode.deferred(encoded)
+         *                            .then(function(decoded) {
+         *       debug(decoded);
+         *       // @results 'Hello World.'
+         *     });
+         *   });
+         *
+         *
+         * @example
+         *   var string = 'にゃふん!';
+         *   Pot.base64Encode.deferred(string).then(function(encoded) {
+         *     return Pot.base64Decode.deferred(encoded)
+         *                            .then(function(decoded) {
+         *       debug(
+         *         'string  = ' + string + '\n' +
+         *         'encoded = ' + encoded + '\n' +
+         *         'decoded = ' + decoded
+         *       );
+         *       // @results
+         *       //   string  = にゃふん!
+         *       //   encoded = 44Gr44KD44G144KTIQ==
+         *       //   decoded = にゃふん!
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new Decoder(string, BASE64MAPS)).deferred(speed);
+          };
+        })
+      }),
+      /**
+       * @lends Pot.Base64
+       */
+      /**
+       * Encodes a string to base64 for URL safely.
+       *
+       *
+       * @example
+       *   var string = '(*>_<*)';
+       *   var result = Pot.base64URLEncode(string);
+       *   debug(result);
+       *   // @results 'KCo-XzwqKQ=='
+       *
+       *
+       * @example
+       *   var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+       *   var encoded = Pot.base64URLEncode(string);
+       *   var decoded = Pot.base64URLDecode(encoded);
+       *   debug(
+       *     'string  = ' + string + '\n' +
+       *     'encoded = ' + encoded + '\n' +
+       *     'decoded = ' + decoded
+       *   );
+       *   // @results
+       *   //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･ 
+       *   //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+       *   //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+       *   //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+       *
+       *
+       * @param  {String}  string   A target string.
+       * @return {String}           A base64 string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       */
+      urlEncode : update(function(string) {
+        var result = '', s = stringify(string, true);
+        if (s) {
+          result = (new Encoder(s, BASE64URLMAPS)).execute();
+        }
+        return result;
+      }, {
+        /**
+         * @lends Pot.Base64.urlEncode
+         */
+        /**
+         * Encodes a string to base64 for URL safely with Deferred.
+         *
+         *
+         * @example
+         *   var string = '(*>_<*)';
+         *   Pot.base64URLEncode.deferred(string).then(function(encoded) {
+         *     debug(encoded);
+         *     // @results 'KCo-XzwqKQ=='
+         *     return Pot.base64URLDecode.deferred(encoded)
+         *                               .then(function(decoded) {
+         *       debug(decoded);
+         *       // @results '(*>_<*)'
+         *     });
+         *   });
+         *
+         *
+         * @example
+         *   var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+         *   Pot.base64URLEncode.deferred(string).then(function(encoded) {
+         *     return Pot.base64URLDecode.deferred(encoded)
+         *                               .then(function(decoded) {
+         *       debug(
+         *         'string  = ' + string + '\n' +
+         *         'encoded = ' + encoded + '\n' +
+         *         'decoded = ' + decoded
+         *       );
+         *       // @results
+         *       //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+         *       //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+         *       //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+         *       //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string   A target string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a
+         *                                    base64 string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new Encoder(string, BASE64URLMAPS)).deferred(speed);
+          };
+        })
+      }),
+      /**
+       * @lends Pot.Base64
+       */
+      /**
+       * Decodes a string from base64 for URL safely.
+       *
+       *
+       * @example
+       *   var string = 'KCo-XzwqKQ==';
+       *   var result = Pot.base64URLDecode(string);
+       *   debug(result);
+       *   // @results '(*>_<*)'
+       *
+       *
+       * @example
+       *   var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+       *   var encoded = Pot.base64URLEncode(string);
+       *   var decoded = Pot.base64URLDecode(encoded);
+       *   debug(
+       *     'string  = ' + string + '\n' +
+       *     'encoded = ' + encoded + '\n' +
+       *     'decoded = ' + decoded
+       *   );
+       *   // @results
+       *   //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･ 
+       *   //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+       *   //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+       *   //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+       *
+       *
+       * @param  {String}  string   A base64 string.
+       * @return {String}           A result string.
+       * @type  Function
+       * @function
+       * @static
+       * @public
+       */
+      urlDecode : update(function(string) {
+        var result = '', s = stringify(string, true);
+        if (s) {
+          result = (new Decoder(s, BASE64URLMAPS)).execute();
+        }
+        return result;
+      }, {
+        /**
+         * @lends Pot.Base64.urlDecode
+         */
+        /**
+         * Decodes a string from base64 for URL safely with Deferred.
+         *
+         *
+         * @example
+         *   var string = '(*>_<*)';
+         *   Pot.base64URLEncode.deferred(string).then(function(encoded) {
+         *     debug(encoded);
+         *     // @results 'KCo-XzwqKQ=='
+         *     return Pot.base64URLDecode.deferred(encoded)
+         *                               .then(function(decoded) {
+         *       debug(decoded);
+         *       // @results '(*>_<*)'
+         *     });
+         *   });
+         *
+         *
+         * @example
+         *   var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+         *   Pot.base64URLEncode.deferred(string).then(function(encoded) {
+         *     return Pot.base64URLDecode.deferred(encoded)
+         *                               .then(function(decoded) {
+         *       debug(
+         *         'string  = ' + string + '\n' +
+         *         'encoded = ' + encoded + '\n' +
+         *         'decoded = ' + decoded
+         *       );
+         *       // @results
+         *       //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+         *       //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+         *       //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+         *       //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new Decoder(string, BASE64URLMAPS)).deferred(speed);
+          };
+        })
+      })
     };
-  })()
+  }())
 });
 
 // Update Pot object.
 Pot.update({
-  base64Encode : Pot.Base64.encode,
-  base64Decode : Pot.Base64.decode
+  base64Encode    : Pot.Base64.encode,
+  base64Decode    : Pot.Base64.decode,
+  base64URLEncode : Pot.Base64.urlEncode,
+  base64URLDecode : Pot.Base64.urlDecode
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Archive.
-(function(ALPHAMERIC_BASE63TBL) {
+(function(ALPHAMERIC_BASE63MAPS) {
 
 Pot.update({
   /**
@@ -23871,78 +24805,340 @@ update(Pot.Archive, {
      *   //
      *
      *
-     * @param  {String}  s  An input string.
-     * @return {String}     A result string.
+     * @param  {String}  string  An input string.
+     * @return {String}          A result string.
      * @type  Function
      * @function
      * @static
      * @public
      */
-    encode : function(s) {
-      var r = [], c, i = 1014, j, K, k, L, l = -1, p, t = ' ', A, n, x;
-      A = ALPHAMERIC_BASE63TBL.split('');
-      for (; i < 1024; i++) {
-        t += t;
-      }
-      t += stringify(s);
-      while ((p = t.substr(i, 64))) {
-        n = p.length;
-        for (j = 2; j <= n; j++) {
-          k = t.substring(i - 819, i + j - 1).lastIndexOf(p.substring(0, j));
-          if (!~k) {
-            break;
+    encode : (function() {
+      /**@ignore*/
+      var AlphamericStringEncoder = function(string) {
+        return new AlphamericStringEncoder.prototype.init(string);
+      },
+      encodeMaps = ALPHAMERIC_BASE63MAPS.split('');
+      AlphamericStringEncoder.prototype =
+        update(AlphamericStringEncoder.prototype, {
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        constructor : AlphamericStringEncoder,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        string : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        dic : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        maps : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        index : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pos : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        size : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        point : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        last : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        results : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        max : null,
+        /**
+         * Initialize properties.
+         *
+         * @private
+         * @ignore
+         */
+        init : function(string) {
+          this.index = 0x03F6;
+          this.maps = encodeMaps;
+          this.string = this.createDic() + stringify(string);
+          this.results = [];
+          this.point = -1;
+          this.max = 0x40;
+          return this;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        execute : function() {
+          var buffer, max = this.max;
+          while (true) {
+            buffer = this.string.substr(this.index, max);
+            if (!buffer) {
+              break;
+            }
+            this.searchSlidingWindow(buffer);
+            if (this.size === 2 ||
+                this.size === 3 && this.last === this.point) {
+              this.pushLite();
+            } else {
+              this.pushStep();
+            }
           }
-          K = k;
-        }
-        if (j === 2 || j === 3 && L === l) {
-          L = l;
-          c = t.charCodeAt(i++);
-          if (c < 128) {
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 64;
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+          return this.results.join('');
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        deferred : function(speed) {
+          var that = this, max = this.max;
+          return Pot.Deferred.forEver[speed](function() {
+            var buffer = that.string.substr(that.index, max);
+            if (!buffer) {
+              throw Pot.StopIteration;
             }
-            r[r.length] = A[c];
-          } else if (12288 <= c && c < 12544) {
-            c -= 12288;
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 68;
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+            that.searchSlidingWindow(buffer);
+            if (that.size === 2 ||
+                that.size === 3 && that.last === that.point) {
+              that.pushLite();
+            } else {
+              that.pushStep();
             }
-            r[r.length] = A[c];
-          } else if (65280 <= c && c < 65440) {
-            c -= 65280;
-            x = c;
-            c %= 32;
-            l = (x - c) / 32 + 76
-            if (L !== l) {
-              r[r.length] = A[l - 32];
+          }).then(function() {
+            return that.results.join('');
+          });
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        createDic : function() {
+          var dic = ' ';
+          for (; this.index < 0x400; this.index++) {
+            dic += dic;
+          }
+          return dic;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        searchSlidingWindow : function(buffer) {
+          var pos, len = buffer.length;
+          for (this.size = 2; this.size <= len; this.size++) {
+            pos = this.string.substring(
+              this.index - 0x333,
+              this.index + this.size - 1
+            ).lastIndexOf(buffer.substring(0, this.size));
+            if (!~pos) {
+              break;
             }
-            r[r.length] = A[c];
+            this.pos = pos;
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pushLite : function() {
+          var c, x, r = this.results, m = this.maps;
+          this.last = this.point;
+          c = this.string.charCodeAt(this.index++);
+          if (c < 0x80) {
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x40;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
+          } else if (0x3000 <= c && c < 0x3100) {
+            c -= 0x3000;
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x44;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
+          } else if (0xFF00 <= c && c < 0xFFA0) {
+            c -= 0xFF00;
+            x = c;
+            c %= 0x20;
+            this.point = (x - c) / 0x20 + 0x4C;
+            if (this.last !== this.point) {
+              r[r.length] = m[this.point - 0x20];
+            }
+            r[r.length] = m[c];
           } else {
             x = c;
-            c %= 1984;
-            l = (x - c) / 1984;
-            if (L !== l) {
-              r[r.length] = A[49] + A[l];
+            c %= 0x7C0;
+            this.point = (x - c) / 0x7C0;
+            if (this.last !== this.point) {
+              r[r.length] = m[0x31] + m[this.point];
             }
             x = c;
-            c %= 62;
-            r[r.length] = A[(x - c) / 62] + A[c];
+            c %= 0x3E;
+            r[r.length] = m[(x - c) / 0x3E] + m[c];
           }
-        } else {
-          x = K;
-          K %= 63;
-          r[r.length] = A[(x - K) / 63 + 50] + A[K] + A[j - 3];
-          i += j - 1;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        pushStep : function() {
+          var x = this.pos, m = this.maps, r = this.results;
+          this.pos %= 0x3F;
+          r[r.length] = m[(x - this.pos) / 0x3F + 0x32] +
+                        m[this.pos] +
+                        m[this.size - 3];
+          this.index += this.size - 1;
         }
-      }
-      return r.join('');
-    },
+      });
+      AlphamericStringEncoder.prototype.init.prototype =
+        AlphamericStringEncoder.prototype;
+      return update(function(string) {
+        return (new AlphamericStringEncoder(string)).execute();
+      }, {
+        /**
+         * @lends Pot.Archive.AlphamericString.encode
+         */
+        /**
+         * Compress with encode a string to
+         *   the base 63 [a-zA-Z0-9_] format string with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello Hello foooooooo baaaaaaaar';
+         *   var encoded, decoded;
+         *   // Execute deferred.
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     return Pot.alphamericStringDecode.deferred(encoded);
+         *   }).then(function(res) {
+         *     decoded = res;
+         *     debug('string = ' + string  + ' : length = ' + string.length);
+         *     debug('result = ' + encoded + ' : length = ' + encoded.length);
+         *     debug('decode = ' + decoded + ' : length = ' + decoded.length);
+         *     // @results
+         *     //   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *     //   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+         *     //   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *   });
+         *
+         *
+         * @example
+         *   // Example of compression that is include multibyte string.
+         *   var string, encoded, decoded;
+         *   string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     Pot.alphamericStringDecode.deferred(res).then(function(res) {
+         *       decoded = res;
+         *       // Note the change of byte size.
+         *       var bytesString  = utf8ByteOf(string);
+         *       var bytesEncoded = utf8ByteOf(encoded);
+         *       var bytesDecoded = utf8ByteOf(decoded);
+         *       debug(
+         *         'string=' + string +
+         *         ', length=' + string.length +
+         *         ', ' + bytesString + ' bytes'
+         *       );
+         *       debug(
+         *         'result=' + encoded +
+         *         ', length=' + encoded.length +
+         *         ', ' + bytesEncoded + ' bytes'
+         *       );
+         *       debug(
+         *         'decode=' + decoded +
+         *         ', length=' + decoded.length +
+         *         ', ' + bytesDecoded + ' bytes'
+         *       );
+         *       // @results
+         *       // string='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *       //
+         *       // result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+         *       //   length = 32,
+         *       //   32 bytes
+         *       //
+         *       // decode='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  An input string.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with
+         *                                   a result string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new AlphamericStringEncoder(string)).deferred(speed);
+          }
+        })
+      });
+    }()),
+    /**
+     * @lends Pot.Archive.AlphamericString
+     */
     /**
      * Decompress with decode a string from
      *   the AlphamericString (base 63 [a-zA-Z0-9_] format string).
@@ -23998,49 +25194,258 @@ update(Pot.Archive, {
      * @static
      * @public
      */
-    decode : function(a) {
-      var C = {}, c, i = 0, j, k, l, m, p, s, w, t;
-      s = '    ';
-      t = stringify(a);
-      for (; i < 63; i++) {
-        C[ALPHAMERIC_BASE63TBL.charAt(i)] = i;
-      }
-      while ((i -= 7)) {
-        s += s;
-      }
-      while (true) {
-        c = C[t.charAt(i++)];
-        if (c < 63) {
-          if (c < 32) {
-            s += fromCharCode(
-              m ? l * 32 + c :
-                 (l * 32 + c) * 62 + C[t.charAt(i++)]
-            );
-          } else if (c < 49) {
-            l = (c < 36) ? c - 32  :
-                (c < 44) ? c + 348 : c + 1996;
-            m = true;
-          } else if (c < 50) {
-            l = C[t.charAt(i++)];
-            m = false;
+    decode : (function() {
+      /**@ignore*/
+      var AlphamericStringDecoder = function(string) {
+        return new AlphamericStringDecoder.prototype.init(string);
+      };
+      AlphamericStringDecoder.prototype =
+        update(AlphamericStringDecoder.prototype, {
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        constructor : AlphamericStringDecoder,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        string : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        dics : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        result : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        isCentral : null,
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        code : null,
+        /**
+         * Initialize properties.
+         *
+         * @private
+         * @ignore
+         */
+        init : function(string) {
+          this.string = stringify(string);
+          this.index = 0;
+          this.dics = {};
+          this.result = (new Array(5)).join(' ');
+          this.createDic();
+          return this;
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        execute : function() {
+          var c;
+          while (true) {
+            c = this.peek();
+            if (c < 0x3F) {
+              this.decode(c);
+            } else {
+              break;
+            }
+          }
+          return this.result.slice(0x400);
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        deferred : function(speed) {
+          var that = this;
+          return Pot.Deferred.forEver[speed](function() {
+            var c = that.peek();
+            if (c < 0x3F) {
+              that.decode(c);
+            } else {
+              throw Pot.StopIteration;
+            }
+          }).then(function() {
+            return that.result.slice(0x400);
+          });
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        createDic : function() {
+          for (; this.index < 0x3F; this.index++) {
+            this.dics[ALPHAMERIC_BASE63MAPS.charAt(this.index)] = this.index;
+          }
+          while ((this.index -= 7)) {
+            this.result += this.result;
+          }
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        peek : function() {
+          return this.dics[this.string.charAt(this.index++)];
+        },
+        /**
+         * @private
+         * @ignore
+         * @internal
+         */
+        decode : function(c) {
+          var code, pos, size, bounds, buffer;
+          if (c < 0x20) {
+            code = this.code * 0x20 + c;
+            if (!this.isCentral) {
+              code = code * 0x3E + this.peek();
+            }
+            this.result += fromUnicode(code);
+          } else if (c < 0x31) {
+            if (c < 0x24) {
+              this.code = c - 0x20;
+            } else if (c < 0x2C) {
+              this.code = c + 0x15C;
+            } else {
+              this.code = c + 0x7CC;
+            }
+            this.isCentral = true;
+          } else if (c < 0x32) {
+            this.code = this.peek();
+            this.isCentral = false;
           } else {
-            w = s.slice(-819);
-            k = (c - 50) * 63 + C[t.charAt(i++)];
-            j = k + C[t.charAt(i++)] + 2;
-            p = w.substring(k, j);
-            if (p) {
-              while (w.length < j) {
-                w += p;
+            buffer = this.result.slice(-0x333);
+            pos = (c - 0x32) * 0x3F + this.peek();
+            size = pos + this.peek() + 2;
+            bounds = buffer.substring(pos, size);
+            if (bounds) {
+              while (buffer.length < size) {
+                buffer += bounds;
               }
             }
-            s += w.substring(k, j);
+            this.result += buffer.substring(pos, size);
           }
-        } else {
-          break;
         }
-      }
-      return s.slice(1024);
-    }
+      });
+      AlphamericStringDecoder.prototype.init.prototype =
+        AlphamericStringDecoder.prototype;
+      return update(function(string) {
+        return (new AlphamericStringDecoder(string)).execute();
+      }, {
+        /**
+         * @lends Pot.Archive.AlphamericString.decode
+         */
+        /**
+         * Decompress with decode a string from
+         *   the AlphamericString (base 63 [a-zA-Z0-9_] format string)
+         *   with Deferred.
+         *
+         *
+         * @example
+         *   var string = 'Hello Hello foooooooo baaaaaaaar';
+         *   var encoded, decoded;
+         *   // Execute deferred.
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     return Pot.alphamericStringDecode.deferred(encoded);
+         *   }).then(function(res) {
+         *     decoded = res;
+         *     debug('string = ' + string  + ' : length = ' + string.length);
+         *     debug('result = ' + encoded + ' : length = ' + encoded.length);
+         *     debug('decode = ' + decoded + ' : length = ' + decoded.length);
+         *     // @results
+         *     //   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *     //   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+         *     //   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+         *   });
+         *
+         *
+         * @example
+         *   // Example of compression that is include multibyte string.
+         *   var string, encoded, decoded;
+         *   string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+         *   Pot.alphamericStringEncode.deferred(string).then(function(res) {
+         *     encoded = res;
+         *     Pot.alphamericStringDecode.deferred(res).then(function(res) {
+         *       decoded = res;
+         *       // Note the change of byte size.
+         *       var bytesString  = utf8ByteOf(string);
+         *       var bytesEncoded = utf8ByteOf(encoded);
+         *       var bytesDecoded = utf8ByteOf(decoded);
+         *       debug(
+         *         'string=' + string +
+         *         ', length=' + string.length +
+         *         ', ' + bytesString + ' bytes'
+         *       );
+         *       debug(
+         *         'result=' + encoded +
+         *         ', length=' + encoded.length +
+         *         ', ' + bytesEncoded + ' bytes'
+         *       );
+         *       debug(
+         *         'decode=' + decoded +
+         *         ', length=' + decoded.length +
+         *         ', ' + bytesDecoded + ' bytes'
+         *       );
+         *       // @results
+         *       // string='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *       //
+         *       // result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+         *       //   length = 32,
+         *       //   32 bytes
+         *       //
+         *       // decode='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+         *       //   length = 30,
+         *       //   66 bytes
+         *     });
+         *   });
+         *
+         *
+         * @param  {String}        string  An input string.
+         * @return {Pot.Deferred}          Returns new instance of
+         *                                   Pot.Deferred with
+         *                                   a result string.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferred : Pot.Internal.defineDeferrater(function(speed) {
+          return function(string) {
+            return (new AlphamericStringDecoder(string)).deferred(speed);
+          }
+        })
+      });
+    }())
   }
 });
 
@@ -24050,7 +25455,7 @@ Pot.update({
   alphamericStringDecode : Pot.Archive.AlphamericString.decode
 });
 
-})(DIGITS + UPPER_ALPHAS + LOWER_ALPHAS + '_');
+}(DIGITS + UPPER_ALPHAS + LOWER_ALPHAS + '_'));
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Format.
@@ -24311,7 +25716,7 @@ update(Pot.Format, {
                   break;
               case 'c':
                   try {
-                    v = Pot.isNumeric(v) ? fromCharCode(v) : '';
+                    v = Pot.isNumeric(v) ? fromUnicode(v) : '';
                   } catch (e) {
                     v = '';
                   }
@@ -25123,15 +26528,19 @@ update(Pot.Text, {
    * @public
    */
   chr : function(/*[...args]*/) {
-    var args = arrayize(arguments), codes,
-        chars = [], divs, i, len, limit = 0x2000;
-    if (args.length > 1) {
-      codes = args;
-    } else if (args.length === 1) {
-      codes = arrayize(args[0]);
+    var args = arguments, codes, chars, divs, i, len, limit = 0x2000;
+    if (args.length === 1) {
+      if (Pot.isArray(args[0])) {
+        codes = arrayize(args[0]);
+      } else {
+        return fromUnicode(args[0]);
+      }
+    } else if (args.length > 1) {
+      codes = arrayize(args);
     } else {
       return '';
     }
+    chars = [];
     if (codes) {
       len = codes.length;
       if (len === 1 && codes[0] && codes[0].length < limit) {
@@ -25440,9 +26849,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  normalizeSpace : function(s, spacer) {
-    return stringify(s, true).replace(/[\s\u00A0\u3000]+/g, spacer || ' ');
-  },
+  normalizeSpace : (function() {
+    var re = /[\s\u00A0\u3000]+/g;
+    return function(s, spacer) {
+      return stringify(s, true).replace(re, spacer || ' ');
+    };
+  }()),
   /**
    * Split a string into an array by whitespace.
    * All empty items will be removed for the result array.
@@ -25461,17 +26873,20 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  splitBySpace : function(s) {
-    var array = stringify(s, true).split(/[\s\u00A0\u3000]+/),
-        a, i, len = array.length, results = [];
-    for (i = 0; i < len; i++) {
-      a = array[i];
-      if (a && a.length) {
-        results[results.length] = a;
+  splitBySpace : (function() {
+    var re = /[\s\u00A0\u3000]+/;
+    return function(s) {
+      var array = stringify(s, true).split(re),
+          a, i, len = array.length, results = [];
+      for (i = 0; i < len; i++) {
+        a = array[i];
+        if (a && a.length) {
+          results[results.length] = a;
+        }
       }
-    }
-    return results;
-  },
+      return results;
+    };
+  }()),
   /**
    * Replaces new lines with unix style (\n).
    *
@@ -25480,7 +26895,7 @@ update(Pot.Text, {
    *   var string = 'foo\r\nbar\rbaz\n';
    *   var result = canonicalizeNL(string);
    *   debug(result);
-   *   // @results  'foo\nbar\nbaz\n';
+   *   // @results  'foo\nbar\nbaz\n'
    *
    *
    * @param  {String}    s    The input string.
@@ -25490,9 +26905,13 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  canonicalizeNL : function(s) {
-    return stringify(s, true).replace(/\r\n|\r|\n/g, '\n');
-  },
+  canonicalizeNL : (function() {
+    // Includes U+2028 (Line Separator) and U+2029 (Paragraph Separator).
+    var re = /\r\n|\r|\n|[\u2028\u2029]/g, nl = '\u000A';
+    return function(s) {
+      return stringify(s, true).replace(re, nl);
+    };
+  }()),
   /**
    * Wraps a string by specific character.
    * Wrapper string can specify an array.
@@ -25519,15 +26938,19 @@ update(Pot.Text, {
    *
    * @param  {String}         string   The target string.
    * @param  {String|Array}   wrapper  The wrapper character.
+   * @param  {String}         right    (optional) The right wrapper.
    * @return {String}                  The result string.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  wrap : update(function(string, wrapper) {
+  wrap : update(function(string, wrapper, right) {
     var w, s = stringify(string),
         me = arguments.callee, maps = me.PairMaps;
+    if (right != null) {
+      wrapper = [wrapper, right];
+    }
     if (wrapper && wrapper.shift && wrapper.pop) {
       s = stringify(wrapper.shift()) + s + stringify(wrapper.pop());
     } else {
@@ -25542,10 +26965,23 @@ update(Pot.Text, {
   }, {
     /**@ignore*/
     PairMaps : {
-      '()' : ['(', ')'],
-      '<>' : ['<', '>'],
-      '[]' : ['[', ']'],
-      '{}' : ['{', '}']
+      '()'           : ['(',      ')'],
+      '<>'           : ['<',      '>'],
+      '[]'           : ['[',      ']'],
+      '{}'           : ['{',      '}'],
+      '\u300c\u300d' : ['\u300c', '\u300d'], // 「」
+      '\u201c\u201d' : ['\u201c', '\u201d'], // “”
+      '\u300e\u300f' : ['\u300e', '\u300f'], // 『』
+      '\u2018\u2019' : ['\u2018', '\u2019'], // ‘’
+      '\u226a\u226b' : ['\u226a', '\u226b'], // ≪≫
+      '\uff1c\uff1e' : ['\uff1c', '\uff1e'], // ＜＞
+      '\u3014\u3015' : ['\u3014', '\u3015'], // 〔〕
+      '\uff3b\uff3d' : ['\uff3b', '\uff3d'], // ［］
+      '\uff5b\uff5d' : ['\uff5b', '\uff5d'], // ｛｝
+      '\u3008\u3009' : ['\u3008', '\u3009'], // 〈〉
+      '\uff08\uff09' : ['\uff08', '\uff09'], // （）
+      '\u300a\u300b' : ['\u300a', '\u300b'], // 《》
+      '\u3010\u3011' : ['\u3010', '\u3011']  // 【】
     }
   }),
   /**
@@ -25577,15 +27013,19 @@ update(Pot.Text, {
    *
    * @param  {String}        string     The target string.
    * @param  {String|Array}  unwrapper  The unwrapper character.
+   * @param  {String}        rightWrap  (optional) The right unwrapper.
    * @return {String}                   The result string.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  unwrap : function(string, unwrapper) {
+  unwrap : function(string, unwrapper, rightWrap) {
     var s = stringify(string), w, left, right,
         Text = Pot.Text, maps = Text.wrap.PairMaps;
+    if (rightWrap != null) {
+      unwrapper = [unwrapper, rightWrap];
+    }
     if (unwrapper && unwrapper.shift && unwrapper.pop) {
       left  = stringify(unwrapper.shift());
       right = stringify(unwrapper.pop());
@@ -25596,6 +27036,19 @@ update(Pot.Text, {
         right = maps[w][1];
       } else {
         left = right = w;
+      }
+    }
+    if (!left && !right && s) {
+      left  = s.charAt(0);
+      right = s.slice(-1);
+      w = left + right;
+      if (w in maps) {
+        left  = maps[w][0];
+        right = maps[w][1];
+      } else {
+        if (left !== right) {
+          return s;
+        }
       }
     }
     if (left && Text.startsWith(s, left)) {
@@ -25747,11 +27200,17 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  camelize : function(s) {
-    return stringify(s).replace(/[_-]+(\w)/g, function(a, w) {
+  camelize : (function() {
+    var
+    re = /[_-]+(\w)/g,
+    /**@ignore*/
+    rep = function(a, w) {
       return w.toUpperCase();
-    });
-  },
+    };
+    return function(s) {
+      return stringify(s).replace(re, rep);
+    };
+  }()),
   /**
    * Convert a string to "hyphen-delimited syntax".
    *
@@ -25769,9 +27228,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  hyphenize : function(s) {
-    return stringify(s).replace(/([A-Z]+)/g, '-$1').toLowerCase();
-  },
+  hyphenize : (function() {
+    var re = /([A-Z]+)/g;
+    return function(s) {
+      return stringify(s).replace(re, '-$1').toLowerCase();
+    };
+  }()),
   /**
    * Convert a string to "Underscore-syntax".
    *
@@ -25789,9 +27251,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  underscore : function(s) {
-    return stringify(s).replace(/([A-Z]+)/g, '_$1').toLowerCase();
-  },
+  underscore : (function() {
+    var re = /([A-Z]+)/g;
+    return function(s) {
+      return stringify(s).replace(re, '_$1').toLowerCase();
+    };
+  }()),
   /**
    * Extract a substring from string .
    *
@@ -25911,7 +27376,7 @@ update(Pot.Text, {
     carry = false;
     /**@ignore*/
     add = function(val) {
-      return fromCharCode(val.charCodeAt(0) + 1);
+      return fromUnicode(val.charCodeAt(0) + 1);
     };
     s = value.toString().split('');
     if (s.length === 0) {
@@ -26097,7 +27562,7 @@ update(Pot.Text, {
     if (i >= len) {
       i--;
     }
-    s[i] = fromCharCode(s[i].charCodeAt(0) - 1);
+    s[i] = fromUnicode(s[i].charCodeAt(0) - 1);
     s = s.reverse();
     if (borrow) {
       s.shift();
@@ -26571,9 +28036,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  toHanSpaceCase : function(text) {
-    return stringify(text, true).replace(/[\u3000]/g, ' ');
-  },
+  toHanSpaceCase : (function() {
+    var re = /[\u3000]/g, rep = ' ';
+    return function(text) {
+      return stringify(text, true).replace(re, rep);
+    };
+  }()),
   /**
    * 半角スペースを全角スペースに変換
    * Convert the single space(U+0020) to the em space(U+3000).
@@ -26585,9 +28053,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  toZenSpaceCase : function(text) {
-    return stringify(text, true).replace(/[\u0020]/g, '\u3000');
-  },
+  toZenSpaceCase : (function() {
+    var re = /[\u0020]/g, rep = '\u3000';
+    return function(text) {
+      return stringify(text, true).replace(re, rep);
+    };
+  }()),
   /**
    * 全角カタカナを全角ひらがなに変換
    * Convert the zenkaku katakana to the zenkaku hiragana.
@@ -27837,7 +29308,7 @@ update(DOM, {
         do {
           cc = (Math.random() * 0x7F) >>> 0;
         } while (cc === 0x2C);
-        mark += String.fromCharCode(0, cc, 1);
+        mark += fromCharCode(0, cc, 1);
       } while (~s.indexOf(mark));
       /**@ignore*/
       rep = function(m) {
@@ -30919,6 +32390,10 @@ update(Pot.Internal, {
     isNodeLike              : Pot.isNodeLike,
     isNodeList              : Pot.isNodeList,
     isDOMLike               : Pot.isDOMLike,
+    Cc                      : Pot.Cc,
+    Ci                      : Pot.Ci,
+    Cr                      : Pot.Cr,
+    Cu                      : Pot.Cu,
     Deferred                : Pot.Deferred,
     succeed                 : Pot.Deferred.succeed,
     failure                 : Pot.Deferred.failure,
@@ -31053,6 +32528,8 @@ update(Pot.Internal, {
     utf8ByteOf              : Pot.UTF8.byteOf,
     base64Encode            : Pot.Base64.encode,
     base64Decode            : Pot.Base64.decode,
+    base64URLEncode         : Pot.Base64.urlEncode,
+    base64URLDecode         : Pot.Base64.urlDecode,
     alphamericStringEncode  : Pot.Archive.AlphamericString.encode,
     alphamericStringDecode  : Pot.Archive.AlphamericString.decode,
     sprintf                 : Pot.Format.sprintf,

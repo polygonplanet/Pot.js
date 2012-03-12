@@ -4,7 +4,7 @@
  * PotLite.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.31, 2012-02-24
+ * Version 1.32, 2012-03-12
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -67,8 +67,8 @@
  *
  * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.31
- * @date           2012-02-24
+ * @version        1.32
+ * @date           2012-03-12
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -102,7 +102,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.31', TYPE : 'lite'},
+var Pot = {VERSION : '1.32', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 push           = Array.prototype.push,
@@ -115,6 +115,21 @@ lastIndexOf    = Array.prototype.lastIndexOf,
 toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 fromCharCode   = String.fromCharCode,
+
+/**
+ * faster way of String.fromCharCode(c).
+ * @ignore
+ */
+fromUnicode = (function() {
+  var i, maps = [];
+  for (i = 0; i < 0xFFFF; i++) {
+    maps[i] = fromCharCode(i);
+  }
+  return function(c) {
+    return maps[c & 0xFFFF];
+  };
+}()),
+
 
 // Regular expression patterns.
 RE_RESCAPE         = /([-.*+?^${}()|[\]\/\\])/g,
@@ -356,7 +371,7 @@ update(Pot, {
       }
     }
     return r;
-  })(nv),
+  }(nv)),
   /**
    * Detect the browser/user language.
    *
@@ -454,7 +469,7 @@ update(Pot, {
       globals = this || {};
     }
     return this || {};
-  })(),
+  }()),
   /**
    * Noop function.
    *
@@ -588,7 +603,7 @@ update(Pot, {
    */
   Pot : Pot
 });
-})(typeof navigator !== 'undefined' && navigator || {});
+}(typeof navigator !== 'undefined' && navigator || {}));
 
 // Definition of System.
 update(Pot.System, (function() {
@@ -8814,7 +8829,7 @@ update(Pot.Iter, {
           (step < 0 && begin < end)) {
         throw Pot.StopIteration;
       }
-      result[result.length] = string ? fromCharCode(begin) : begin;
+      result[result.length] = string ? fromUnicode(begin) : begin;
       begin += step;
     };
     Pot.iterate(iter);
@@ -10812,11 +10827,17 @@ update(Pot.Internal, {
           '|' + "'(?:\\\\[\\s\\S]|[^'\\r\\n\\\\])*'" +  // string literal
           '|' + '/(?![*])(?:\\\\.|[^/\\r\\n\\\\])+/' +
                 '[gimy]{0,4}' +
-          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +     // e4x
-          '|' + '>>>=?|<<=|===|!==|>>=|[=!<>*+/&|^-]=' +  // operators
-                '|[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
-                '|[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +
-          '|' + '\\s+' +                                      // white space
+          '|' + '<([^\\s>]*)[^>]*>[\\s\\S]*?</\\2>' +   // e4x
+          '|' + '>>>=?|<<=|===|!==|>>=' +               // operators
+          '|' + '[+][+](?=[+])|[-][-](?=[-])' +
+          '|' + '[=!<>*+/&|^-]=' +
+          '|' + '[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
+          '|' + '0(?:[xX][0-9a-fA-F]+|[0-7]+)' +        // number literal
+          '|' + '\\d+(?:[.]\\d+)?(?:[eE][+-]?\\d+)?' +
+          '|' + '[1-9]\\d*' +
+          '|' + '[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +   // operator
+          '|' + '(?![\\r\\n])\\s+' +                    // white space
+          '|' + '(?:\\r\\n|\\r|\\n)' +                  // nl
           '|' + '[^\\s+/%*=&|^~<>!?:,;@()\\\\[\\].{}\'"-]+' + // token
           ')',
           'g'
@@ -12637,7 +12658,7 @@ update(Pot.URI, {
               r = (((c & 0x0F) << 6 | parseInt(s.substring(4), 16) & 0x3F)
                                << 6 | parseInt(s.substring(7), 16) & 0x3F);
             }
-            return String.fromCharCode(r);
+            return fromUnicode(r);
           };
           result = s.replace(re, rep);
         }
@@ -12697,8 +12718,7 @@ update(Pot.Crypt, {
    * @static
    */
   hashCode : function(string) {
-    var result = 0, s, i, len, max;
-    max = 0x100000000; // 2^32
+    var result = 0, s, i, len, max = 0x100000000; // 2^32
     if (string == null) {
       s = String(string);
     } else {
@@ -13145,17 +13165,16 @@ update(Pot.Net, {
          * @ignore
          */
         assignResponseText : function() {
-          var i, len, bytes, chars, sc, c, s;
+          var i, len, bytes, chars, c, s;
           if (this.options.binary) {
             bytes = [];
             chars = [];
             s = this.xhr.responseText || '';
             len = s.length;
-            sc = String.fromCharCode;
             for (i = 0; i < len; i++) {
               c = s.charCodeAt(i) & 0xFF;
               bytes[i] = c;
-              chars[i] = sc(c);
+              chars[i] = fromUnicode(c);
             }
             try {
               this.xhr.originalText  = s;
@@ -17043,6 +17062,10 @@ update(Pot.Internal, {
     isElement               : Pot.isElement,
     isNodeLike              : Pot.isNodeLike,
     isNodeList              : Pot.isNodeList,
+    Cc                      : Pot.Cc,
+    Ci                      : Pot.Ci,
+    Cr                      : Pot.Cr,
+    Cu                      : Pot.Cu,
     Deferred                : Pot.Deferred,
     succeed                 : Pot.Deferred.succeed,
     failure                 : Pot.Deferred.failure,
