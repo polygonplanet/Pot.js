@@ -21,7 +21,10 @@ toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 fromCharCode   = String.fromCharCode,
 
-// faster way of String.fromCharCode(c).
+/**
+ * faster way of String.fromCharCode(c).
+ * @ignore
+ */
 fromUnicode = (function() {
   var i, maps = [];
   for (i = 0; i < 0xFFFF; i++) {

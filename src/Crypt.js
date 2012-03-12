@@ -456,6 +456,7 @@ update(Pot.Crypt, {
       s = Pot.UTF8.encode(stringify(string, true)),
       sl = s.length,
       tp,
+      /**@ignore*/
       calculate = function() {
         for (i = 0; i < 16; i++) {
           W[i] = wa[bs + i];
