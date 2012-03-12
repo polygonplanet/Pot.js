@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.19
- * @date           2012-02-24
+ * @version        1.20
+ * @date           2012-03-12
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */

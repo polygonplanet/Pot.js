@@ -9,8 +9,8 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.08
- * @date           2012-02-24
+ * @version        1.09
+ * @date           2012-03-12
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -3044,6 +3044,14 @@ $(function() {
       },
       expect : '1f3870be274f6c49b3e31a0c6728957f'
     }, {
+      title  : 'Pot.md5.deferred()',
+      code   : function() {
+        return md5.deferred('apple').then(function(res) {
+          return res;
+        });
+      },
+      expect : '1f3870be274f6c49b3e31a0c6728957f'
+    }, {
       title  : 'Pot.crc32()',
       code   : function() {
         return crc32('abc123');
@@ -3056,6 +3064,14 @@ $(function() {
       },
       expect : 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
     }, {
+      title  : 'Pot.sha1.deferred()',
+      code   : function() {
+        return sha1.deferred('apple').then(function(res) {
+          return res;
+        });
+      },
+      expect : 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
+    }, {
       title  : 'Pot.Arc4',
       code   : function() {
         var arc4 = new Arc4();
@@ -3064,6 +3080,19 @@ $(function() {
         var cipherText = arc4.encrypt(text);
         var origText = arc4.decrypt(cipherText);
         return cipherText != text && text === origText;
+      },
+      expect : true
+    }, {
+      title  : 'Pot.Arc4 with Deferred',
+      code   : function() {
+        var arc4 = new Arc4();
+        arc4.setKey('hoge');
+        var text = 'Hello World!';
+        return arc4.encrypt.deferred(text).then(function(cipherText) {
+          return arc4.decrypt.deferred.slow(cipherText).then(function(origText) {
+            return cipherText != text && text === origText;
+          });
+        });
       },
       expect : true
     }, {
@@ -4183,6 +4212,55 @@ $(function() {
         true
       ]
     }, {
+      title  : 'Pot.base64Encode() and Pot.base64Decode() with Deferred',
+      code   : function() {
+        var string = 'Hello World.';
+        return base64Encode.deferred(string).then(function(encoded) {
+          return base64Decode.deferred.slow(encoded).then(function(decoded) {
+            return [
+              encoded,
+              string === decoded && string !== encoded
+            ];
+          });
+        });
+      },
+      expect : [
+        'SGVsbG8gV29ybGQu',
+        true
+      ]
+    }, {
+      title  : 'Pot.base64URLEncode() and Pot.base64URLDecode()',
+      code   : function() {
+        var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+        var encoded = base64URLEncode(string);
+        var decoded = base64URLDecode(encoded);
+        return [
+          encoded,
+          string === decoded && string !== encoded
+        ];
+      },
+      expect : [
+        '776fK--9oToub--9pe--n--9peKUo8Ko77234pSjwqjvvbfimIbvvaXvvp_vvaU=',
+        true
+      ]
+    }, {
+      title  : 'Pot.base64URLEncode() and Pot.base64URLDecode() with Deferred',
+      code   : function() {
+        var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+        return base64URLEncode.deferred.slow(string).then(function(encoded) {
+          return base64URLDecode.deferred(encoded).then(function(decoded) {
+            return [
+              encoded,
+              string === decoded && string !== encoded
+            ];
+          });
+        });
+      },
+      expect : [
+        '776fK--9oToub--9pe--n--9peKUo8Ko77234pSjwqjvvbfimIbvvaXvvp_vvaU=',
+        true
+      ]
+    }, {
       title  : 'Pot.alphamericStringEncode() and Pot.alphamericStringDecode()',
       code   : function() {
         var string  = 'Hello Hello foooooooo baaaaaaaar';
@@ -4206,6 +4284,26 @@ $(function() {
         true,
         'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
         true
+      ]
+    }, {
+      title  : 'Pot.alphamericStringEncode/Decode() with Deferred',
+      code   : function() {
+        var string = 'Hello Hello foooooooo baaaaaaaar';
+        var encoded, decoded;
+        return alphamericStringEncode.deferred(string).then(function(res) {
+          encoded = res;
+          return alphamericStringDecode.deferred(encoded);
+        }).then(function(res) {
+          decoded = res;
+          return [
+            encoded,
+            decoded
+          ];
+        });
+      },
+      expect : [
+        'Y8Z5CCF_v56F__5X0Z21__5I',
+        'Hello Hello foooooooo baaaaaaaar'
       ]
     }, {
       title  : 'Pot.sprintf()',
