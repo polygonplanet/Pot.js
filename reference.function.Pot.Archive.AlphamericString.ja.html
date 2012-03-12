@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Archive.AlphamericString</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Archive.AlphamericString';
+</script>
+</head>
+<body>
+<h1>Pot.Archive.AlphamericString</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Archive.AlphamericString"><em>Pot.</em>alphamericStringEncode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.Archive.</em>AlphamericString.encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>alphamericStringDecode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.Archive.</em>AlphamericString.decode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 string を AlphamericString で圧縮/解凍します。
+    </p>
+    <div>
+<p>
+ AlphamericString は、LZ77 アルゴリズムをベースに
+ <br>
+ 任意の Unicode 文字列を [0-9A-Za-z_] のみからなる文字列に圧縮するアルゴリズムです。
+ <br>
+ 圧縮/解凍ともにパフォーマンスがよく、結果が [0-9A-Za-z_] の 63 文字だけなので
+ <br>
+ URI や ID などにそのまま使用でき、Base64 より実用的な場合もあります。
+</p>
+<p>
+ Pot.Archive.AlphamericString はコンストラクタではなく、ただのオブジェクトです。
+ <br>
+ 関数 encode, decode で実行できます。
+ <br>
+ encode は、Pot.alphamericStringEncode() として
+ <br>
+ decode は、Pot.alphamericStringDecode() としてアクセスできます。
+</p>
+<div style="margin: 1.5em;">
+ <dl>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>alphamericStringEncode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.Archive.</em>AlphamericString.encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    引数 string を AlphamericString でエンコードして返します。
+    <br>
+    Pot.alphamericStringEncode() で実行できます。
+   </p>
+   <p>
+    [0-9A-Za-z_] のみからなる文字列に圧縮された文字列が返ります。
+   </p>
+  </dd>
+   <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>alphamericStringDecode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.Archive.</em>AlphamericString.decode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    AlphamericString でエンコードされた文字列 string をデコードして返します。
+    <br>
+    Pot.alphamericStringDecode() で実行できます。
+   </p>
+   <p>
+    解凍された文字列が返ります。
+   </p>
+  </dd>
+ </dl>
+</div>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、
+ <br>
+ Pot.AlphamericString.encode() が <strong>alphamericStringEncode</strong>()、
+ <br>
+ Pot.AlphamericString.decode() が <strong>alphamericStringDecode</strong>() で、それぞれ実行できます。
+ <br>
+ 適応されていない場合は、
+ <br>
+ <strong>Pot.alphamericStringEncode</strong>(), <strong>Pot.alphamericStringDecode</strong>() で実行できます。
+</p>
+
+
+<pre>var string = 'Hello Hello foooooooo baaaaaaaar';
+
+var result = Pot.alphamericStringEncode(string);
+var decode = Pot.alphamericStringDecode(result);
+
+debug('string = ' + string + ' : length = ' + string.length);
+debug('result = ' + result + ' : length = ' + result.length);
+debug('decode = ' + decode + ' : length = ' + decode.length);
+//
+//   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+//   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+//   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+//</pre>
+
+
+<pre>var string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+
+var result = Pot.alphamericStringEncode(string);
+var decode = Pot.alphamericStringDecode(result);
+
+// バイト数を取得
+var bytesS = Pot.utf8ByteOf(string);
+var bytesR = Pot.utf8ByteOf(result);
+var bytesD = Pot.utf8ByteOf(decode);
+
+debug(
+    'string='   + string +
+    ', length=' + string.length +
+    ', ' + bytesS + ' bytes'
+);
+debug(
+    'result=' + result +
+    ', length=' + result.length +
+    ', ' + bytesR + ' bytes'
+);
+debug(
+    'decode=' + decode +
+    ', length=' + decode.length +
+    ', ' + bytesD + ' bytes'
+);
+// -- 結果 --
+//
+//   string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー',
+//     length = 30,
+//     66 bytes
+//
+//   result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+//     length = 32,
+//     32 bytes
+//
+//   decode = 'Hello Hello こんにちは、こんにちは、にゃーにゃー',
+//     length = 30,
+//     66 bytes
+//</pre>
+
+
+<p>
+ encode/decode にはそれぞれ deferred というメソッドがあり、非同期で実行することが可能です。
+ <br>
+ 非同期で実行することにより、巨大な文字列に対しても負荷を抑え実行することが可能です。
+</p>
+
+<div style="margin: 1.5em;">
+ <dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.alphamericStringEncode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.Archive.AlphamericString.encode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    引数 string を AlphamericString で非同期でエンコードします。
+    <br>
+    エンコードされた結果を引数に持つ <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> が返ります。
+    <br>
+    Pot.alphamericStringEncode.deferred() で実行できます。
+    <br>
+    結果からは <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などによりチェインを繋げることができます。
+   </p>
+
+<p>
+ <code>Pot.alphamericStringEncode.deferred.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid" style="width:300px;">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+
+  </dd>
+   <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.alphamericStringDecode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.Archive.AlphamericString.decode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    AlphamericString でエンコードされた文字列 string を非同期でデコードします。
+    <br>
+    デコードされた結果を引数に持つ <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> が返ります。
+    <br>
+    Pot.alphamericStringDecode.deferred() で実行できます。
+    <br>
+    結果からは <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などによりチェインを繋げることができます。
+   </p>
+
+<p>
+ <code>Pot.alphamericStringDecode.deferred.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。encode と同じです。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid" style="width:300px;">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+
+  </dd>
+ </dl>
+</div>
+
+
+<pre>var string = 'Hello Hello foooooooo baaaaaaaar';
+var encoded, decoded;
+
+// 非同期で実行
+Pot.alphamericStringEncode.deferred(string).then(function(res) {
+    encoded = res;
+    return Pot.alphamericStringDecode.deferred(encoded);
+}).then(function(res) {
+    decoded = res;
+    debug('string = ' + string  + ' : length = ' + string.length);
+    debug('result = ' + encoded + ' : length = ' + encoded.length);
+    debug('decode = ' + decoded + ' : length = ' + decoded.length);
+    //
+    //   string = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+    //   result = 'Y8Z5CCF_v56F__5X0Z21__5I'         : length = 24
+    //   decode = 'Hello Hello foooooooo baaaaaaaar' : length = 32
+    //
+});</pre>
+
+
+<pre>var string, encoded, decoded;
+
+string = 'Hello Hello こんにちは、こんにちは、にゃーにゃー';
+
+// 非同期で実行
+Pot.alphamericStringEncode.deferred(string).then(function(res) {
+    encoded = res;
+    Pot.alphamericStringDecode.deferred(res).then(function(res) {
+        decoded = res;
+
+        // バイト数を取得
+        var bytesString  = Pot.utf8ByteOf(string);
+        var bytesEncoded = Pot.utf8ByteOf(encoded);
+        var bytesDecoded = Pot.utf8ByteOf(decoded);
+
+        debug(
+            'string=' + string +
+            ', length=' + string.length +
+            ', ' + bytesString + ' bytes'
+        );
+        debug(
+            'result=' + encoded +
+            ', length=' + encoded.length +
+            ', ' + bytesEncoded + ' bytes'
+        );
+        debug(
+            'decode=' + decoded +
+            ', length=' + decoded.length +
+            ', ' + bytesDecoded + ' bytes'
+        );
+        // -- 結果 --
+        //
+        // string='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+        //   length = 30,
+        //   66 bytes
+        //
+        // result = 'Y8Z5CCF_v5cJeJdB1Fa1_v4dBe3hS_y1',
+        //   length = 32,
+        //   32 bytes
+        //
+        // decode='Hello Hello こんにちは、こんにちは、にゃーにゃー',
+        //   length = 30,
+        //   66 bytes
+        //
+    });
+});</pre>
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.unindent</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.unindent';
+</script>
+</head>
+<body>
+<h1>Pot.Text.unindent</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.unindent"><em>Pot.Text.</em>unindent</dfn>
+    (<em>{String}</em> string [, <em>{Number}</em> size = 2 [, <em>{String}</em> ch = ' ']])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string をアンインデントして返します。
+    </p>
+    <div>
+      <p>
+ 引数 string は対象の文字列を指定します。
+ <br>
+ 引数 size は、任意に アンインデントする深さを数値で指定します。
+ <br>
+ size のデフォルトは 2 です。
+ <br>
+ 引数 ch は、任意にインデントする文字を指定します。
+ <br>
+ ch のデフォルトは スペース ' ' です。
+ <br>
+ size と ch は順序が異なっていても認識されます。
+ <br>
+ アンインデントは、改行ごとに行われます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.unindent() が unindent() で実行できます。
+</p>
+<p>
+ string をアンインデントした文字列が返ります。
+</p>
+
+<pre>var s = '  foo bar baz';
+debug(Pot.unindent(s));          // 'foo bar baz'
+debug(Pot.unindent(s, 1));       // ' foo bar baz'
+debug(Pot.unindent(s, 1, '\t')); // '  foo bar baz'</pre>
+
+<pre>var s = '\tfoo\n\tbar\n\tbaz';
+debug(Pot.unindent(s, 1, '\t')); // 'foo\nbar\nbaz'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

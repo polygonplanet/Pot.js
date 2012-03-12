@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.br</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.br';
+</script>
+</head>
+<body>
+<h1>Pot.Text.br</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.br"><em>Pot.Text.</em>br</dfn>
+    (<em>{Object}</em> string [, <em>{Boolean}</em> useXML [, <em>{Boolean}</em> all = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      行末に &lt;br&gt; を挿入して返します。
+    </p>
+    <div>
+      <p>
+ Pot.br() は、HTML 文章として適切な箇所に &lt;br&gt; 要素を挿入して返します。
+ <br>
+ 挿入されるのは、改行文字の前です。
+ <br>
+ デフォルトでは、すべての改行の前に &lt;br&gt; 要素を挿入するのではなく、
+ <br>
+ インライン要素の終わり、テキスト内などに挿入されます。
+ <br>
+ 引数 string は、対象の HTML 文字列 を渡します。
+ <br>
+ 任意に、引数 useXML を 真 (true) として指定すると、&lt;br&gt; の代わりに &lt;br /&gt; を使用します。
+ <br>
+ useXML が省略され、文章内で XML と判断した場合は &lt;br /&gt; が使用されます。
+ <br>
+ 明示的に useXML を省略する場合は、null を渡します。
+ <br>
+ 任意に、引数 all を 真 (true) として渡すと、すべての改行の前に挿入します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.br() が br() で実行できます。
+</p>
+<p>
+ &lt;br&gt; を挿入した文字列が返ります。
+</p>
+
+<pre>var string = &#039;1. foo.\n2. bar.\n3. baz.&#039;;
+var result = Pot.br(string);
+debug(result); // &#039;1. foo.&lt;br&gt;\n2. bar.&lt;br&gt;\n3. baz.&#039;</pre>
+
+
+<pre>var string = &#039; - foo.\n - bar.\n - baz.&#039;;
+var result = Pot.br(string, true);
+debug(result); // &#039; - foo.&lt;br /&gt;\n - bar.&lt;br /&gt;\n - baz.&#039;</pre>
+
+
+<pre>var string = &#039;&lt;ul&gt;&lt;li&gt;foo&lt;br /&gt;fooo&lt;/li&gt;&lt;li&gt;bar\nbaaar&lt;/li&gt;&lt;/ul&gt;&#039;;
+var result = Pot.br(string);
+debug(result); // &#039;&lt;ul&gt;&lt;li&gt;foo&lt;br /&gt;fooo&lt;/li&gt;&lt;li&gt;bar&lt;br /&gt;\nbaaar&lt;/li&gt;&lt;/ul&gt;&#039;</pre>
+
+
+<pre>var string = [
+    &#039;&lt;div&gt;&#039;,
+    &#039;&lt;h1&gt;Hoge&lt;/h1&gt;&#039;,
+    &#039;&lt;p&gt;&#039;,
+    &#039;foo&#039;,
+    &#039;bar&#039;,
+    &#039;&lt;/p&gt;&#039;,
+    &#039;&lt;span&gt;baz&lt;/span&gt;&#039;,
+    &#039;&lt;b&gt;qux&lt;/b&gt;&#039;,
+    &#039;&lt;pre&gt;&#039;,
+    &#039;function hoge() {&#039;,
+    &#039;  return this;&#039;,
+    &#039;}&#039;,
+    &#039;&lt;/pre&gt;&#039;,
+    &#039;&lt;hr&gt;&#039;,
+    &#039;&lt;/div&gt;&#039;
+].join(&#039;\n&#039;);
+
+var result = Pot.br(string);
+debug(result);
+//
+// result:
+//
+//   &lt;div&gt;
+//   &lt;h1&gt;Hoge&lt;/h1&gt;
+//   &lt;p&gt;
+//   foo&lt;br&gt;
+//   bar&lt;br&gt;
+//   &lt;/p&gt;
+//   &lt;span&gt;baz&lt;/span&gt;&lt;br&gt;
+//   &lt;b&gt;qux&lt;/b&gt;&lt;br&gt;
+//   &lt;pre&gt;
+//   function hoge() {
+//     return this;
+//   }
+//   &lt;/pre&gt;
+//   &lt;hr&gt;
+//   &lt;/div&gt;
+//</pre>
+
+
+
+<pre>var string = [
+    &#039;&lt;div&gt;&#039;,
+    &#039;&lt;div&gt;foo&lt;/div&gt;&#039;,
+    &#039;&lt;div&gt;bar&lt;/div&gt;&#039;,
+    &#039;&lt;div&gt;baz&lt;/div&gt;&#039;,
+    &#039;&lt;/div&gt;&#039;
+].join(&#039;\n&#039;);
+
+var result = Pot.br(string, false, true);
+debug(result);
+//
+// result:
+//
+//   &lt;div&gt;&lt;br&gt;
+//   &lt;div&gt;foo&lt;/div&gt;&lt;br&gt;
+//   &lt;div&gt;bar&lt;/div&gt;&lt;br&gt;
+//   &lt;div&gt;baz&lt;/div&gt;&lt;br&gt;
+//   &lt;/div&gt;
+//</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

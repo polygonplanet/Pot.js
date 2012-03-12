@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.truncate</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.truncate';
+</script>
+</head>
+<body>
+<h1>Pot.Text.truncate</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.truncate"><em>Pot.Text.</em>truncate</dfn>
+    (<em>{String}</em> string [, <em>{Number}</em> maxLen = 140 [, <em>{String}</em> ellipsis = '...']])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string を指定の長さに丸めます。
+    </p>
+    <div>
+      <p>
+ 引数 string は、対象の文字列を指定します。
+ <br>
+ 引数 maxLen は、丸める最大の長さを任意に指定します。
+ <br>
+ maxLen のデフォルトは 140 です。
+ <br>
+ 引数 ellipsis は、任意に 丸めた末尾に付ける文字列を指定します。
+ <br>
+ ellipsis のデフォルトは '...' です。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.truncate() が truncate() で実行できます。
+</p>
+<p>
+ string を maxLen の長さに丸めた文字列が返ります。
+</p>
+
+<pre>
+var string = 'Helloooooooooo Wooooooooorld!! Hellooooo Woooooorld!!';
+var result = Pot.truncate(string, 10);
+debug(result + ' (length = ' + result.length + ')');
+// result = 'Hellooo...' (length = 10)</pre>
+
+
+<pre>var string = 'foooooooo baaaaaaaaar baaaaaaaaaaz';
+var result = Pot.truncate(string, 16, '...more');
+debug(result + ' (length = ' + result.length + ')');
+// result = 'foooooooo...more' (length = 16)</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

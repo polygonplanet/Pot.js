@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.wrap</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.wrap';
+</script>
+</head>
+<body>
+<h1>Pot.Text.wrap</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.wrap"><em>Pot.Text.</em>wrap</dfn>
+    (<em>{String}</em> string, <em>{String|Array}</em> wrapper [, <em>{String}</em> right])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string を wrapper で囲います。
+    </p>
+    <div>
+      <p>
+ 引数 string は、対象の文字列を指定します。
+ <br>
+ 引数 wrapper は、囲う文字または配列を指定します。
+ <br>
+ wrapper に配列が渡されると、最初の要素を左側、最後の要素を右側として使います。
+ <br>
+ 引数 right は、任意に右側の囲い文字を指定します。
+ <br>
+ right は省略可能です。
+ <br>
+ wrapper に、<code>'()'</code> や <code>'{}'</code> などの対になっている括弧を渡すと
+ <br>
+ それを分解し左側と右側に設定します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.wrap() が wrap() で実行できます。
+</p>
+<p>
+ string を wrapper で囲った文字列が返ります。
+</p>
+
+<pre>var s = 'hoge';
+debug( wrap(s, '&quot;') ); // '&quot;hoge&quot;'</pre>
+
+<pre>var s = 'hoge';
+debug( wrap(s, ['(', ')']) ); // '(hoge)'</pre>
+
+<pre>var s = 'hoge';
+debug( wrap(s, '{', '}') ); // '{hoge}'</pre>
+
+<pre>var s = 'hoge';
+debug( wrap(s, '()') + wrap(s, '[]') ); // '(hoge)[hoge]'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

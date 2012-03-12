@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.splitBySpace</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.splitBySpace';
+</script>
+</head>
+<body>
+<h1>Pot.Text.splitBySpace</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.Text.splitBySpace"><em>Pot.Text.</em>splitBySpace</dfn>
+    (<em>{String}</em> s)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 s をホワイトスペースで分割した配列を返します。
+    </p>
+    <div>
+      <p>
+ 引数 s を、ホワイトスペースで分割し 得られた配列を返します。
+ <br>
+ 分割した際に、長さが 0 の要素は除外されます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.splitBySpace() が splitBySpace() で実行できます。
+</p>
+<p>
+ 分割された配列が返ります。
+</p>
+
+
+<pre>var s = '  Hello  \r\n  World  \r\n  \t !  ';
+
+debug(Pot.splitBySpace(s)); // ['Hello', 'World', '!']</pre>
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

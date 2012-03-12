@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.rtrim</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.rtrim';
+</script>
+</head>
+<body>
+<h1>Pot.Text.rtrim</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.rtrim"><em>Pot.Text.</em>rtrim</dfn>
+    (<em>{String}</em> s [, <em>{String}</em> chars [, <em>{Boolean}</em> ignoreCase = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 s の右側のホワイトスペースを除去した文字列を返します。 
+    </p>
+    <div>
+      <p>
+ 引数 s の右側のホワイトスペースを除去して返します。
+ <br>
+ ホワイトスペースは、全角スペース U+3000 を含む Unicode Whitespace キャラクタです。
+ <br>
+ 文字列 chars が指定されると、ホワイトスペースの代わりに chars を除去して返します。
+ <br>
+ その際に、引数 ignoreCase が 真 (true) として渡されると、大文字小文字を無視して除去します。
+ <br>
+ chars は、1 文字単位で扱われます。
+ <br>
+ <a href="#reference.function.Pot.trim">Pot.trim()</a>, <a href="#reference.function.Pot.Text.ltrim">Pot.ltrim()</a> も参照ください。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.rtrim() が rtrim() で実行できます。
+</p>
+<p>
+ s の右側のホワイトスペースまたは chars を除去した文字列が返ります。
+</p>
+
+<pre>debug( Pot.rtrim(' hoge  ') );     // ' hoge'
+
+debug( Pot.rtrim('abc a', 'ac') ); // 'abc '</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

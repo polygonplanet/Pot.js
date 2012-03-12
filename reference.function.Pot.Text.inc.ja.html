@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.inc</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.inc';
+</script>
+</head>
+<body>
+<h1>Pot.Text.inc</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String|Number|*}</em>
+    <dfn id="definition.reference.function.Pot.Text.inc"><em>Pot.Text.</em>inc</dfn>
+    (<em>{String|Number|*}</em> value)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 value をマジックインクリメントして返します。
+    </p>
+    <div>
+      <p>
+ 引数 value はインクリメントする値を指定します。
+ <br>
+ マジックインクリメントは、Ruby の succ メソッドまたは Perl や PHP の ++$value のような表現です。
+ <br>
+ [a-z] と [A-Z], そして [0-9] だけを使ったインクリメントをします。
+ <br>
+ value が Number インスタンスの場合、たんに + 1 されて返ります。
+ <br>
+ value が文字列でない場合、そのまま value が返ります。
+ <br>
+ マジックデクリメント <a href="#reference.function.Pot.Text.dec">Pot.dec()</a> も参照ください。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.inc() が inc() で実行できます。
+</p>
+<p>
+ value をマジックインクリメントした値が返ります。
+</p>
+
+<pre>debug(Pot.inc('99')); // '100'
+debug(Pot.inc('a0')); // 'a1'
+debug(Pot.inc('Az')); // 'Ba'
+debug(Pot.inc('zz')); // 'aaa'</pre>
+
+
+<pre>var s = 'X';
+for (var i = 0; i &lt; 10; i++) {
+  s = Pot.inc(s);
+  Pot.debug(s);
+}
+// 結果:
+//
+//   Y
+//   Z
+//   AA
+//   AB
+//   AC
+//   AD
+//   AE
+//   AF
+//   AG
+//   AH
+//</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

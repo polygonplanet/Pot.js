@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.ord</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.ord';
+</script>
+</head>
+<body>
+<h1>Pot.Text.ord</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.Text.ord"><em>Pot.Text.</em>ord</dfn>
+    (<em>{String}</em> s)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 s の先頭の Unicode 値を返します。
+    </p>
+    <div>
+      <p>
+ 引数 s の、最初の文字の Unicode 値を数値で返します。
+ <br>
+ <code>String(s).charCodeAt(0)</code> のショートカットとして扱えます。
+ <br>
+ s が文字列でない場合、<a href="#reference.function.Pot.stringify">Pot.stringify()</a> によって文字列化されます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.ord() が ord() で実行できます。
+</p>
+<p>
+ s の最初の文字による Unicode 値が返ります。
+</p>
+
+<pre>debug(Pot.ord('Hello')); // 72</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -171,6 +171,51 @@
         "reference.function.Pot.Signal.cancelEvent":{"ja":"cancelEvent","en":"cancelEvent"}
       }
     },
+    "reference.Pot.Text.functions":{
+      "title":{"ja":"Pot.Text","en":"Pot.Text"},
+      "items":{
+        "reference.function.Pot.Text.chr":{"ja":"chr","en":"chr"},
+        "reference.function.Pot.Text.ord":{"ja":"ord","en":"ord"},
+        "reference.function.Pot.Text.ltrim":{"ja":"ltrim","en":"ltrim"},
+        "reference.function.Pot.Text.rtrim":{"ja":"rtrim","en":"rtrim"},
+        "reference.function.Pot.Text.strip":{"ja":"strip","en":"strip"},
+        "reference.function.Pot.Text.indent":{"ja":"indent","en":"indent"},
+        "reference.function.Pot.Text.unindent":{"ja":"unindent","en":"unindent"},
+        "reference.function.Pot.Text.normalizeSpace":{"ja":"normalizeSpace","en":"normalizeSpace"},
+        "reference.function.Pot.Text.splitBySpace":{"ja":"splitBySpace","en":"splitBySpace"},
+        "reference.function.Pot.Text.canonicalizeNL":{"ja":"canonicalizeNL","en":"canonicalizeNL"},
+        "reference.function.Pot.Text.wrap":{"ja":"wrap","en":"wrap"},
+        "reference.function.Pot.Text.unwrap":{"ja":"unwrap","en":"unwrap"},
+        "reference.function.Pot.Text.startsWith":{"ja":"startsWith","en":"startsWith"},
+        "reference.function.Pot.Text.endsWith":{"ja":"endsWith","en":"endsWith"},
+        "reference.function.Pot.Text.lower":{"ja":"lower","en":"lower"},
+        "reference.function.Pot.Text.upper":{"ja":"upper","en":"upper"},
+        "reference.function.Pot.Text.camelize":{"ja":"camelize","en":"camelize"},
+        "reference.function.Pot.Text.hyphenize":{"ja":"hyphenize","en":"hyphenize"},
+        "reference.function.Pot.Text.underscore":{"ja":"underscore","en":"underscore"},
+        "reference.function.Pot.Text.extract":{"ja":"extract","en":"extract"},
+        "reference.function.Pot.Text.inc":{"ja":"inc","en":"inc"},
+        "reference.function.Pot.Text.dec":{"ja":"dec","en":"dec"},
+        "reference.function.Pot.Text.br":{"ja":"br","en":"br"},
+        "reference.function.Pot.Text.stripTags":{"ja":"stripTags","en":"stripTags"},
+        "reference.function.Pot.Text.truncate":{"ja":"truncate","en":"truncate"},
+        "reference.function.Pot.Text.truncateMiddle":{"ja":"truncateMiddle","en":"truncateMiddle"},
+        "reference.function.Pot.Text.toHankakuCase":{"ja":"toHankakuCase","en":"toHankakuCase"},
+        "reference.function.Pot.Text.toZenkakuCase":{"ja":"toZenkakuCase","en":"toZenkakuCase"},
+        "reference.function.Pot.Text.toHanSpaceCase":{"ja":"toHanSpaceCase","en":"toHanSpaceCase"},
+        "reference.function.Pot.Text.toZenSpaceCase":{"ja":"toZenSpaceCase","en":"toZenSpaceCase"},
+        "reference.function.Pot.Text.toHiraganaCase":{"ja":"toHiraganaCase","en":"toHiraganaCase"},
+        "reference.function.Pot.Text.toKatakanaCase":{"ja":"toKatakanaCase","en":"toKatakanaCase"},
+        "reference.function.Pot.Text.toHankanaCase":{"ja":"toHankanaCase","en":"toHankanaCase"},
+        "reference.function.Pot.Text.toZenkanaCase":{"ja":"toZenkanaCase","en":"toZenkanaCase"}
+      }
+    },
+    "reference.Pot.Archive.functions":{
+      "title":{"ja":"Pot.Archive","en":"Pot.Archive"},
+      "items":{
+        "reference.function.Pot.Archive.AlphamericString":{"ja":"AlphamericString","en":"AlphamericString"}
+      }
+    },
     "reference.Pot.DropFile.prototype.functions":{
       "title":{"ja":"Pot.DropFile.prototype","en":"Pot.DropFile.prototype"},
       "items":{

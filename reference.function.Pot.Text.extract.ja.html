@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.extract</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.extract';
+</script>
+</head>
+<body>
+<h1>Pot.Text.extract</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Text.extract"><em>Pot.Text.</em>extract</dfn>
+    (<em>{String}</em> string, <em>{RegExp|String}</em> pattern [, <em>{Number}</em> index = 1])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      正規表現 pattern にマッチした string の特定のグループを返します。
+    </p>
+    <div>
+      <p>
+ 引数 string は、対象の文字列を指定します。
+ <br>
+ 引数 pattern は、抽出したい表現を含む正規表現を指定します。
+ <br>
+ extract は、<code>'foo bar'.match(/(fo+)/)[1]</code> のような抽出と同じです。
+ <br>
+ <code>'foo bar'</code> が string、<code>/(fo+)/</code> が pattern、 <code>1</code> が index にあたります。 
+ <br>
+ ただし、<code>'foo bar'.match(/(b.z)/)[1]</code> とした場合、TypeError になるのを防ぎます。
+ <br>
+ ヒットしたかどうか test して、その後 抽出というステップを簡単にすることができます。
+ <br>
+ 引数 index に数値を渡すと、そのインデックスが返ります。
+ <br>
+ マッチしなかった場合は、空文字 '' が返ります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.extract() が extract() で実行できます。
+</p>
+<p>
+ pattern にマッチした string のグループのうち index があればそれを返します。
+</p>
+
+<pre>var result = Pot.extract('foo:bar', /:(\w+)$/);
+debug(result); // 'bar'</pre>
+
+<pre>var result = Pot.extract('foo:bar', /^:(\w+)/);
+debug(result); // ''</pre>
+
+<pre>var result = Pot.extract('foo.html', /(foo|bar)\.([^.]+)$/, 2);
+debug(result); // 'html'</pre>
+
+<pre>var result = Pot.extract('foobar', 'foo');
+debug(result); // 'foo'</pre>
+
+<pre>var result = Pot.extract('foobar', 'fo+');
+debug(result); // ''</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
