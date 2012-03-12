@@ -469,9 +469,9 @@ update(Pot.Text, {
    * @public
    */
   chr : function(/*[...args]*/) {
-    var args = arguments, codes, chars, divs, i, len, limit;
+    var args = arguments, codes, chars, divs, i, len, limit = 0x2000;
     if (args.length === 1) {
-      if (Pot.isArrayLike(args[0])) {
+      if (Pot.isArray(args[0])) {
         codes = arrayize(args[0]);
       } else {
         return fromUnicode(args[0]);
@@ -1194,7 +1194,7 @@ update(Pot.Text, {
    */
   underscore : (function() {
     var re = /([A-Z]+)/g;
-    function(s) {
+    return function(s) {
       return stringify(s).replace(re, '_$1').toLowerCase();
     };
   }()),
