@@ -178,6 +178,7 @@ update(Pot.Crypt, {
       c = 0x98BADCFE,
       d = 0x10325476,
       AA, BB, CC, DD,
+      k,
       /**@ignore*/
       calculate = function() {
         AA = a;
@@ -733,12 +734,17 @@ update(Pot.Crypt, {
        * @ignore
        */
       init : function(key) {
+        var that = this, ed, dd;
         if (key != null) {
           this.setKey(key);
         }
         this.initTable();
-        this.encrypt.deferred.instance =
-          this.decrypt.deferred.instance = this;
+        ed = this.encrypt.deferred;
+        dd = this.decrypt.deferred;
+        ed.instance = dd.instance = this;
+        each(Pot.Internal.LightIterator.speeds, function(v, k) {
+          ed[k].instance = dd[k].instance = that;
+        });
         return this;
       },
       /**
