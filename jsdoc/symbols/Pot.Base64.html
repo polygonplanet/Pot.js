@@ -403,7 +403,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.decode">decode</a></b>(text)
+								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.decode">decode</a></b>(string)
 								</div>
 								<div class="description">Decodes a string from base64.</div>
 							</td>
@@ -412,9 +412,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.encode">encode</a></b>(text)
+								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.encode">encode</a></b>(string)
 								</div>
 								<div class="description">Encodes a string to base64.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.urlDecode">urlDecode</a></b>(string)
+								</div>
+								<div class="description">Decodes a string from base64 for URL safely.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.Base64.<b><a href="../symbols/Pot.Base64.html#.urlEncode">urlEncode</a></b>(string)
+								</div>
+								<div class="description">Encodes a string to base64 for URL safely.</div>
 							</td>
 						</tr>
 					
@@ -479,7 +497,7 @@ RFC 3548 - Base64 Data Encodings
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Base64.</span><b>decode</b>(text)
+					<span class="light">Pot.Base64.</span><b>decode</b>(string)
 					
 					</div>
 					<div class="description">
@@ -491,9 +509,22 @@ RFC 3548 - Base64 Data Encodings
 					
 					
 					<pre class="code">  var b64string = 'SGVsbG8gV29ybGQu';
-  var result = Pot.Base64.decode(b64string);
+  var result = Pot.base64Decode(b64string);
   debug(result);
   // @results 'Hello World.'</pre>
+					
+					<pre class="code">  var string = 'にゃふん!';
+  var encoded = Pot.base64Encode(string);
+  var decoded = Pot.base64Decode(encoded);
+  debug(
+    'string  = ' + string + '\n' +
+    'encoded = ' + encoded + '\n' +
+    'decoded = ' + decoded
+  );
+  // @results
+  //   string  = にゃふん!
+  //   encoded = 44Gr44KD44G144KTIQ==
+  //   decoded = にゃふん!</pre>
 					
 					
 					
@@ -502,7 +533,7 @@ RFC 3548 - Base64 Data Encodings
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>text</b>
+									<span class="light fixedFont">{String}</span> <b>string</b>
 									
 								</dt>
 								<dd>A base64 string.</dd>
@@ -529,7 +560,7 @@ RFC 3548 - Base64 Data Encodings
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Base64.</span><b>encode</b>(text)
+					<span class="light">Pot.Base64.</span><b>encode</b>(string)
 					
 					</div>
 					<div class="description">
@@ -541,9 +572,22 @@ RFC 3548 - Base64 Data Encodings
 					
 					
 					<pre class="code">  var string = 'Hello World.';
-  var result = Pot.Base64.encode(string);
+  var result = Pot.base64Encode(string);
   debug(result);
   // @results 'SGVsbG8gV29ybGQu'</pre>
+					
+					<pre class="code">  var string = 'にゃふん!';
+  var encoded = Pot.base64Encode(string);
+  var decoded = Pot.base64Decode(encoded);
+  debug(
+    'string  = ' + string + '\n' +
+    'encoded = ' + encoded + '\n' +
+    'decoded = ' + decoded
+  );
+  // @results
+  //   string  = にゃふん!
+  //   encoded = 44Gr44KD44G144KTIQ==
+  //   decoded = にゃふん!</pre>
 					
 					
 					
@@ -552,7 +596,135 @@ RFC 3548 - Base64 Data Encodings
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>text</b>
+									<span class="light fixedFont">{String}</span> <b>string</b>
+									
+								</dt>
+								<dd>A target string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> A base64 string.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".urlDecode"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Base64.</span><b>urlDecode</b>(string)
+					
+					</div>
+					<div class="description">
+						Decodes a string from base64 for URL safely.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var string = 'KCo-XzwqKQ==';
+  var result = Pot.base64URLDecode(string);
+  debug(result);
+  // @results '(*&gt;_&lt;*)'</pre>
+					
+					<pre class="code">  var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+  var encoded = Pot.base64URLEncode(string);
+  var decoded = Pot.base64URLDecode(encoded);
+  debug(
+    'string  = ' + string + '\n' +
+    'encoded = ' + encoded + '\n' +
+    'decoded = ' + decoded
+  );
+  // @results
+  //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･ 
+  //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+  //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+  //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>string</b>
+									
+								</dt>
+								<dd>A base64 string.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> A result string.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".urlEncode"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.Base64.</span><b>urlEncode</b>(string)
+					
+					</div>
+					<div class="description">
+						Encodes a string to base64 for URL safely.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var string = '(*&gt;_&lt;*)';
+  var result = Pot.base64URLEncode(string);
+  debug(result);
+  // @results 'KCo-XzwqKQ=='</pre>
+					
+					<pre class="code">  var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
+  var encoded = Pot.base64URLEncode(string);
+  var decoded = Pot.base64URLDecode(encoded);
+  debug(
+    'string  = ' + string + '\n' +
+    'encoded = ' + encoded + '\n' +
+    'decoded = ' + decoded
+  );
+  // @results
+  //   string  = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･ 
+  //   encoded = 776fK--9oToub--9pe--n--9peKUo8Ko
+  //             77234pSjwqjvvbfimIbvvaXvvp_vvaU=
+  //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>string</b>
 									
 								</dt>
 								<dd>A target string.</dd>
@@ -587,7 +759,7 @@ RFC 3548 - Base64 Data Encodings
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Feb 24 2012 17:18:08 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Mar 12 2012 15:58:27 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
