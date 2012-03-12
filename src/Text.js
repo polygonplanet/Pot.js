@@ -906,10 +906,23 @@ update(Pot.Text, {
   }, {
     /**@ignore*/
     PairMaps : {
-      '()' : ['(', ')'],
-      '<>' : ['<', '>'],
-      '[]' : ['[', ']'],
-      '{}' : ['{', '}']
+      '()'           : ['(',      ')'],
+      '<>'           : ['<',      '>'],
+      '[]'           : ['[',      ']'],
+      '{}'           : ['{',      '}'],
+      '\u300c\u300d' : ['\u300c', '\u300d'], // 「」
+      '\u201c\u201d' : ['\u201c', '\u201d'], // “”
+      '\u300e\u300f' : ['\u300e', '\u300f'], // 『』
+      '\u2018\u2019' : ['\u2018', '\u2019'], // ‘’
+      '\u226a\u226b' : ['\u226a', '\u226b'], // ≪≫
+      '\uff1c\uff1e' : ['\uff1c', '\uff1e'], // ＜＞
+      '\u3014\u3015' : ['\u3014', '\u3015'], // 〔〕
+      '\uff3b\uff3d' : ['\uff3b', '\uff3d'], // ［］
+      '\uff5b\uff5d' : ['\uff5b', '\uff5d'], // ｛｝
+      '\u3008\u3009' : ['\u3008', '\u3009'], // 〈〉
+      '\uff08\uff09' : ['\uff08', '\uff09'], // （）
+      '\u300a\u300b' : ['\u300a', '\u300b'], // 《》
+      '\u3010\u3011' : ['\u3010', '\u3011']  // 【】
     }
   }),
   /**
@@ -964,6 +977,19 @@ update(Pot.Text, {
         right = maps[w][1];
       } else {
         left = right = w;
+      }
+    }
+    if (!left && !right && s) {
+      left  = s.charAt(0);
+      right = s.slice(-1);
+      w = left + right;
+      if (w in maps) {
+        left  = maps[w][0];
+        right = maps[w][1];
+      } else {
+        if (left !== right) {
+          return s;
+        }
       }
     }
     if (left && Text.startsWith(s, left)) {
@@ -1115,11 +1141,17 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  camelize : function(s) {
-    return stringify(s).replace(/[_-]+(\w)/g, function(a, w) {
+  camelize : (function() {
+    var
+    re = /[_-]+(\w)/g,
+    /**@ignore*/
+    rep = function(a, w) {
       return w.toUpperCase();
-    });
-  },
+    };
+    return function(s) {
+      return stringify(s).replace(re, rep);
+    };
+  }()),
   /**
    * Convert a string to "hyphen-delimited syntax".
    *
@@ -1137,9 +1169,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  hyphenize : function(s) {
-    return stringify(s).replace(/([A-Z]+)/g, '-$1').toLowerCase();
-  },
+  hyphenize : (function() {
+    var re = /([A-Z]+)/g;
+    return function(s) {
+      return stringify(s).replace(re, '-$1').toLowerCase();
+    };
+  }()),
   /**
    * Convert a string to "Underscore-syntax".
    *
@@ -1157,9 +1192,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  underscore : function(s) {
-    return stringify(s).replace(/([A-Z]+)/g, '_$1').toLowerCase();
-  },
+  underscore : (function() {
+    var re = /([A-Z]+)/g;
+    function(s) {
+      return stringify(s).replace(re, '_$1').toLowerCase();
+    };
+  }()),
   /**
    * Extract a substring from string .
    *
@@ -1939,9 +1977,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  toHanSpaceCase : function(text) {
-    return stringify(text, true).replace(/[\u3000]/g, ' ');
-  },
+  toHanSpaceCase : (function() {
+    var re = /[\u3000]/g, rep = ' ';
+    return function(text) {
+      return stringify(text, true).replace(re, rep);
+    };
+  }()),
   /**
    * 半角スペースを全角スペースに変換
    * Convert the single space(U+0020) to the em space(U+3000).
@@ -1953,9 +1994,12 @@ update(Pot.Text, {
    * @static
    * @public
    */
-  toZenSpaceCase : function(text) {
-    return stringify(text, true).replace(/[\u0020]/g, '\u3000');
-  },
+  toZenSpaceCase : (function() {
+    var re = /[\u0020]/g, rep = '\u3000';
+    return function(text) {
+      return stringify(text, true).replace(re, rep);
+    };
+  }()),
   /**
    * 全角カタカナを全角ひらがなに変換
    * Convert the zenkaku katakana to the zenkaku hiragana.
