@@ -27,7 +27,7 @@ fromCharCode   = String.fromCharCode,
  */
 fromUnicode = (function() {
   var i, maps = [];
-  for (i = 0; i < 0xFFFF; i++) {
+  for (i = 0; i <= 0xFFFF; i++) {
     maps[i] = fromCharCode(i);
   }
   return function(c) {
