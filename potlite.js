@@ -4,7 +4,7 @@
  * PotLite.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.32, 2012-03-12
+ * Version 1.33, 2012-03-13
  * Copyright (c) 2012 polygon planet <polygon.planet@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
@@ -67,8 +67,8 @@
  *
  * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.32
- * @date           2012-03-12
+ * @version        1.33
+ * @date           2012-03-13
  * @link           http://polygonplanet.github.com/Pot.js/index.html
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
@@ -102,7 +102,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.32', TYPE : 'lite'},
+var Pot = {VERSION : '1.33', TYPE : 'lite'},
 
 // A shortcut of prototype methods.
 push           = Array.prototype.push,
@@ -122,7 +122,7 @@ fromCharCode   = String.fromCharCode,
  */
 fromUnicode = (function() {
   var i, maps = [];
-  for (i = 0; i < 0xFFFF; i++) {
+  for (i = 0; i <= 0xFFFF; i++) {
     maps[i] = fromCharCode(i);
   }
   return function(c) {
