@@ -9,8 +9,8 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.09
- * @date           2012-03-12
+ * @version        1.10
+ * @date           2012-03-13
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
@@ -4424,7 +4424,15 @@ $(function() {
     }, {
       title  : 'Pot.chr()',
       code   : function() {
+        var i, ok = true;
+        for (i = 0; i <= 0xFFFF; i++) {
+          if (chr(i) !== String.fromCharCode(i)) {
+            ok = false;
+            break;
+          }
+        }
         return [
+          ok,
           chr(97),
           chr(97, 98, 99),
           chr([
@@ -4433,6 +4441,7 @@ $(function() {
         ];
       },
       expect : [
+        true,
         'a',
         'abc',
         'Hello World!'
