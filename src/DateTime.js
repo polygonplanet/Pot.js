@@ -520,11 +520,209 @@ update(Pot.DateTime, {
        */
       W3C : 'Y-m-d\\TH:i:sP'
     });
+  }()),
+  /**
+   * Return the formatted relative date string.
+   *
+   *
+   * @example
+   *   debug(Pot.prettyDate('Fri Mar 16 2012 06:42:50 GMT+0900'));
+   *   // @results e.g. 'just now'
+   *   debug(Pot.prettyDate('Fri Mar 16 2012 08:42:50 GMT+0900'));
+   *   // @results e.g. 'an hour ago'
+   *   debug(Pot.prettyDate('Fri Mar 16 2012 00:42:50 GMT+0900'));
+   *   // @results e.e. '6 hours ago'
+   *
+   *
+   * @example
+   *   debug(Pot.prettyDate(new Date().getTime() + 10));
+   *   // @results e.g. 'just now'
+   *   debug(Pot.prettyDate(new Date().getTime() - 1000 * 60 - 10));
+   *   // @results e.g. 'a minute ago'
+   *   debug(Pot.prettyDate(new Date().getTime() - 1000 * 60 * 60 - 10));
+   *   // @results e.g. 'an hour ago'
+   *   debug(Pot.prettyDate(new Date().getTime() - 1000 * 60 * 60 * 24 - 10));
+   *   // @results e.g. 'yesterday'
+   *   debug(
+   *     Pot.prettyDate(new Date().getTime() - 1000 * 60 * 60 * 24 * 7 - 10)
+   *   );
+   *   // @results e.g. 'last week'
+   *   debug(Pot.prettyDate(new Date().getTime() + 1000 * 60 + 10));
+   *   // @results e.g. 'a minute from now'
+   *   debug(Pot.prettyDate(new Date().getTime() + 1000 * 60 * 60 + 10));
+   *   // @results e.g. 'an hour from now'
+   *   debug(Pot.prettyDate(new Date().getTime() + 1000 * 60 * 60 * 24 + 10));
+   *   // @results e.g. 'tomorrow'
+   *   debug(
+   *     Pot.prettyDate(new Date().getTime() + 1000 * 60 * 60 * 24 * 7 + 10)
+   *   );
+   *   // @results e.g. 'next week'
+   *
+   *
+   * @param  {Date|Number|*}    date   The specific timestamp.
+   * @param  {String}          (lang)  (optional)The language (default='en').
+   * @return {String}                  Return the formatted date string.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  prettyDate : (function() {
+    var
+    MINUTE  = 60,
+    HOUR    = 60 * MINUTE,
+    DAY     = 24 * HOUR,
+    WEEK    = 7 * DAY,
+    MONTH   = 4 * WEEK,
+    YEAR    = 365 * DAY,
+    CENTURY = 100 * YEAR,
+    isJa    = /^j[ap]/i,
+    suffix  = {
+      past   : {en : 'ago',      ja : '\u524d'}, // 前
+      future : {en : 'from now', ja : '\u5f8c'}  // 後
+    },
+    glue    = {en : ' ', ja : ''},
+    formats = [
+      [
+        MINUTE,
+        {en : 'just now', ja : '\u305f\u3063\u305f\u4eca'}, // たった今
+        1
+      ],
+      [
+        2 * MINUTE,
+        {
+          en : 'a minute ' + suffix.past.en,
+          ja : '1\u5206' + suffix.past.ja    // 1分
+        },
+        {
+          en : 'a minute ' + suffix.future.en,
+          ja : '1\u5206' + suffix.future.ja  // 1分
+        }
+      ],
+      [
+        HOUR,
+        {en : 'minutes', ja : '\u5206'}, // 分
+        MINUTE
+      ],
+      [
+        2 * HOUR,
+        {
+          en : 'an hour ' + suffix.past.en,
+          ja : '1\u6642\u9593' + suffix.past.ja // 1時間
+        },
+        {
+          en : 'an hour ' + suffix.future.en,
+          ja : '1\u6642\u9593' + suffix.future.ja // 1時間
+        }
+      ],
+      [
+        DAY,
+        {en : 'hours', ja : '\u6642\u9593'}, // 時間
+        HOUR
+      ],
+      [
+        2 * DAY,
+        {en : 'yesterday', ja : '\u6628\u65e5'}, // 昨日
+        {en : 'tomorrow',  ja : '\u660e\u65e5'}  // 明日
+      ],
+      [
+        WEEK,
+        {en : 'days', ja : '\u65e5'}, // 日
+        DAY
+      ],
+      [
+        2 * WEEK,
+        {en : 'last week', ja : '\u5148\u9031'}, // 先週
+        {en : 'next week', ja : '\u6765\u9031'}  // 来週
+      ],
+      [
+        MONTH,
+        {en : 'weeks', ja : '\u9031\u9593'}, // 週間
+        WEEK
+      ],
+      [
+        2 * MONTH,
+        {en : 'last month', ja : '\u5148\u6708'}, // 先月
+        {en : 'next month', ja : '\u6765\u6708'}  // 来月
+      ],
+      [
+        YEAR,
+        {en : 'months', ja : '\u30f6\u6708'}, // ヶ月
+        MONTH
+      ],
+      [
+        2 * YEAR,
+        {en : 'last year', ja : '\u53bb\u5e74'}, // 去年
+        {en : 'next year', ja : '\u6765\u5e74'}  // 来年
+      ],
+      [
+        CENTURY,
+        {en : 'years', ja : '\u5e74'}, // 年
+        YEAR
+      ],
+      [
+        2 * CENTURY,
+        {en : 'last century', ja : '\u524d\u4e16\u7d00'}, // 前世紀
+        {en : 'next century', ja : '\u6765\u4e16\u7d00'}  // 来世紀
+      ],
+      [
+        Number.MAX_VALUE,
+        {en : 'centuries', ja : '\u4e16\u7d00'}, // 世紀
+        CENTURY
+      ]
+    ],
+    /**@ignore*/
+    relativeDate = function(date, language) {
+      var result = '', d, seconds, tail, index, i = 0, f,
+          lang = isJa.test(language) ? 'ja' : 'en';
+      if (Pot.isDate(date)) {
+        d = date;
+      } else if (Pot.isNumeric(date) || (date && isString(date))) {
+        d = new Date(date);
+      } else {
+        d = new Date();
+      }
+      seconds = (new Date - d.getTime()) / 1000;
+      if (seconds < 0) {
+        seconds = Math.abs(seconds);
+        tail = suffix.future[lang];
+        index = 2;
+      } else {
+        tail = suffix.past[lang];
+        index = 1;
+      }
+      while ((f = formats[i++])) {
+        if (seconds < f[0]) {
+          if (Pot.isObject(f[2])) {
+            result = f[index][lang];
+          } else if (i > 1) {
+            result = [
+              Math.floor(seconds / f[2]),
+              f[1][lang],
+              tail
+            ].join(glue[lang]);
+          } else {
+            result = f[1][lang];
+          }
+          break;
+        }
+      }
+      return result;
+    };
+    each(['en', 'ja'], function(lang) {
+      /**@ignore*/
+      relativeDate[lang] = function(date) {
+        return relativeDate(date, lang);
+      };
+    });
+    return relativeDate;
   }())
 });
 
 // Update Pot object.
 Pot.update({
-  time : Pot.DateTime.time,
-  date : Pot.DateTime.format
+  time       : Pot.DateTime.time,
+  date       : Pot.DateTime.format,
+  prettyDate : Pot.DateTime.prettyDate
 });
