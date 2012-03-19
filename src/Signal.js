@@ -1195,9 +1195,9 @@ Pot.Signal.DropFile.prototype = update(Pot.Signal.DropFile.prototype, {
       }
       data = opts.sendContent || opts.queryString || {};
       if (Pot.isArray(data)) {
-        data[data.length] = [key, files.splice(0)];
+        data[data.length] = [key, files.splice(0, files.length)];
       } else {
-        data[key] = files.splice(0);
+        data[key] = files.splice(0, files.length);
       }
       opts.sendContent = data;
       opts.queryString = null;

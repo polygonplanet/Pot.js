@@ -434,7 +434,7 @@ update(Pot.Text, {
           }
           r = r.split(uniq).join(match);
         }
-        saving.splice(0);
+        saving.splice(0, saving.length);
         return r;
       }
     });
