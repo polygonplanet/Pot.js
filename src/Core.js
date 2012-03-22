@@ -623,7 +623,7 @@ Pot.update({
 /*{#endif}*/
 // Definition of System.
 update(Pot.System, (function() {
-  var o = {}, g/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
+  var o = {}, g, w, wb, b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -730,6 +730,68 @@ update(Pot.System, (function() {
       o.isYieldable = true;
     }
   } catch (e) {}
+  try {
+    b = (typeof BlobBuilder       !== 'undefined') ? BlobBuilder       :
+        (typeof MozBlobBuilder    !== 'undefined') ? MozBlobBuilder    :
+        (typeof WebKitBlobBuilder !== 'undefined') ? WebKitBlobBuilder :
+        (typeof MSBlobBuilder     !== 'undefined') ? MSBlobBuilder     : null;
+    if (!b ||
+        typeof b !== 'function' ||
+        typeof b.prototype.append !== 'function' ||
+        typeof b.prototype.getBlob !== 'function'
+    ) {
+      b = null;
+    } else {
+      o.BlobBuilder = b;
+    }
+  } catch (e) {}
+  try {
+    u = (typeof URL       !== 'undefined') ? URL       :
+        (typeof webkitURL !== 'undefined') ? webkitURL : null;
+    if (!u || typeof u.createObjectURL !== 'function') {
+      u = null;
+    } else {
+      o.BlobURI = u;
+    }
+  } catch (e) {}
+  try {
+    if (typeof Worker === 'function' &&
+        typeof Worker.prototype.postMessage === 'function') {
+      o.hasWorker = true;
+      w = new Worker(
+        'data:application/javascript;base64,' +
+        // base64: onmessage=function(e){postMessage(e.data+1)}
+        'b25tZXNzYWdlPWZ1bmN0aW9uKGUpe3Bvc3RNZXNzYWdlKGUuZGF0YSsxKX0='
+      );
+      /**@ignore*/
+      w.onmessage = function(ev) {
+        if (ev && ev.data === 'x1') {
+          Pot.System.canWorkerDataURI = true;
+        }
+        try {
+          w.terminate();
+        } catch (ex) {}
+      };
+      w.postMessage('x');
+    }
+  } catch (e) {}
+  if (o.hasWorker && o.BlobBuilder && o.BlobURI) {
+    try {
+      b = new o.BlobBuilder();
+      b.append('onmessage=function(e){postMessage(e.data+2)}');
+      wb = new Worker(o.BlobURI.createObjectURL(b.getBlob()));
+      /**@ignore*/
+      wb.onmessage = function(ev) {
+        if (ev && ev.data === 'x2') {
+          Pot.System.canWorkerBlobURI = true;
+        }
+        try {
+          wb.terminate();
+        } catch (ex) {}
+      };
+      wb.postMessage('x');
+    } catch (e) {}
+  }
   return o;
 }()));
 
@@ -1131,7 +1193,7 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (Pot.StopIteration !== undefined &&
+    if (Pot.StopIteration !== void 0 &&
         (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
       return true;
     }
@@ -1139,7 +1201,7 @@ Pot.update({
         (o == StopIteration || o instanceof StopIteration)) {
       return true;
     }
-    if (this && this.StopIteration !== undefined &&
+    if (this && this.StopIteration !== void 0 &&
         (o == this.StopIteration || o instanceof this.StopIteration)) {
       return true;
     }
@@ -1315,7 +1377,7 @@ Pot.update({
         throw o;
       }
       for (p in o) {}
-      result = (p === undefined || hasOwnProperty.call(o, p));
+      result = (p === void 0 || hasOwnProperty.call(o, p));
     } catch (e) {
       result = false;
     }
@@ -1457,6 +1519,31 @@ Pot.update({
      (x.id   != null && x.id   === Pot.Iter.prototype.id &&
       x.NAME != null && x.NAME === Pot.Iter.prototype.NAME &&
                 typeof x.next  === 'function'));
+  },
+  /**
+   * Check whether the argument object is an instance of Pot.Workeroid.
+   *
+   *
+   * @example
+   *   var o = {hoge: 1};
+   *   var w = new Pot.Workeroid();
+   *   debug(isWorkeroid(o)); // false
+   *   debug(isWorkeroid(w)); // true
+   *
+   *
+   * @param  {Object|*}  x  The target object to test.
+   * @return {Boolean}      Return true if the argument object is an
+   *                          instance of Pot.Workeroid,
+   *                          otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isWorkeroid : function(x) {
+    return x != null && ((x instanceof Pot.Workeroid) ||
+     (x.id   != null && x.id   === Pot.Workeroid.prototype.id &&
+      x.NAME != null && x.NAME === Pot.Workeroid.prototype.NAME));
   },/*{#if Pot}*/
   /**
    * Check whether the argument object is an instance of Pot.Hash.
@@ -2211,7 +2298,7 @@ Pot.update({
         scope = Pot.Global;
       }
       if (Pot.System.isGreasemonkey) {
-        // eval does not work to global scope on greasemonkey
+        // eval does not work to global scope in greasemonkey
         //   even if using the unsafeWindow.
         return Pot.localEval(code, scope || Pot.Global);
       }
@@ -2225,15 +2312,16 @@ Pot.update({
           do {
             id = buildSerial(Pot, '');
           } while (id in scope);
-          scope[func]('var ' + id + '=1;');
-          if (id in scope && scope[id] === 1) {
+          scope[id] = 1;
+          scope[func]('try{delete ' + id + ';}catch(e){}');
+          if (!(id in scope)) {
             me.worksForGlobal = true;
           }
           try {
             delete scope[id];
           } catch (e) {
             try {
-              scope[id] = (void 0);
+              scope[id] = void 0;
             } catch (e) {}
           }
         }
@@ -2256,8 +2344,12 @@ Pot.update({
         if (head) {
           script = doc.createElement('script');
           script.type = 'text/javascript';
-          script.defer = false;
-          script.appendChild(doc.createTextNode(code));
+          script.defer = script.async = false;
+          if (Pot.System.hasActiveXObject && 'text' in script) {
+            script.text = code;
+          } else {
+            script.appendChild(doc.createTextNode(code));
+          }
           head.appendChild(script);
           head.removeChild(script);
         }
@@ -2315,11 +2407,15 @@ Pot.update({
           do {
             id = buildSerial(Pot, '');
           } while (id in scope);
-          scope[func].call(scope, 'var ' + id + '=1;');
-          if (id in scope && scope[id] === 1) {
+          scope[id] = 1;
+          scope[func].call(scope, 'try{delete ' + id + '}catch(e){}');
+          if (!(id in scope)) {
             me.worksForGlobal = true;
+          } else {
+            try {
+              delete scope[id];
+            } catch (e) {}
           }
-          delete scope[id];
         } catch (e) {
           me.worksForGlobal = false;
         }
@@ -2426,6 +2522,363 @@ Pot.update({
       )).call(scope);
     }
   }),
+  /**
+   * Get the function code.
+   *
+   *
+   * @example
+   *   debug(getFunctionCode(function() { return 'hoge'; }));
+   *   // @results e.g.
+   *   //   'function () {' +
+   *   //   '    return "hoge";' +
+   *   //   '}'
+   *
+   *
+   * @example
+   *   debug(getFunctionCode('function() { return 1; }'));
+   *   // @results 'function() { return 1; }'
+   *
+   *
+   * @example
+   *   debug(getFunctionCode(1));      // ''
+   *   debug(getFunctionCode(false));  // ''
+   *   debug(getFunctionCode(true));   // ''
+   *   debug(getFunctionCode(null));   // ''
+   *   debug(getFunctionCode(void 0)); // ''
+   *   debug(getFunctionCode({}));     // ''
+   *
+   *
+   * @example
+   *   debug(getFunctionCode(new Function('return 1')));
+   *   // @results e.g.
+   *   //   'function anonymous() {' +
+   *   //   '    return 1;' +
+   *   //   '}'
+   *
+   *
+   * @param  {Function|String}   func  Target function or string code.
+   * @return {String}                  Returns function code
+   *                                     or empty string ''.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  getFunctionCode : function(func) {
+    if (!func || func == null ||
+        (!Pot.isFunction(func) && !Pot.isString(func))
+    ) {
+      return '';
+    } else if (func.toString) {
+      return func.toString();
+    } else {
+      return '' + func;
+    }
+  },
+  /**
+   * Checks whether a token is words.
+   *
+   *
+   * @example
+   *   debug(isWords(' '));     // false
+   *   debug(isWords('abc'));   // true
+   *   debug(isWords('ほげ'));  // true
+   *   debug(isWords('\r\n'));  // false
+   *   debug(isWords(' \n'));   // false
+   *   debug(isWords(' abc'));  // false
+   *   debug(isWords('abc '));  // false
+   *   debug(isWords('_'));     // true
+   *   debug(isWords(false));   // false
+   *   debug(isWords(true));    // false
+   *   debug(isWords(void 0));  // false
+   *   debug(isWords({}));      // false
+   *   debug(isWords(['ABC'])); // false
+   *   debug(isWords('$hoge')); // true
+   *   debug(isWords('$_'));    // true
+   *
+   *
+   * @param  {String}   c  A string token.
+   * @return {Boolean}     Returns whether a token is words.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  isWords : (function() {
+    var isSpace = /\s/,
+        notWord = /[^$\w\u0100-\uFFFF]/;
+    return function(c) {
+      return Pot.isString(c) && !isSpace.test(c) && !notWord.test(c);
+    };
+  }()),
+  /**
+   * Checks whether a token is line-break.
+   *
+   *
+   * @example
+   *   debug(isNL('abc'));            // false
+   *   debug(isNL(' '));              // false
+   *   debug(isNL('\n'));             // true
+   *   debug(isNL('\r'));             // true
+   *   debug(isNL('\r\n'));           // true
+   *   debug(isNL('\nhoge'));         // false
+   *   debug(isNL('\r \n'));          // false
+   *   debug(isNL('\r\n\r\n'));       // true
+   *   // Note: includes U+2028 - U+2029
+   *   debug(isNL('\u2028\u2029'));   // true
+   *   debug(isNL(null));             // false
+   *   debug(isNL(void 0));           // false
+   *   debug(isNL(false));            // false
+   *   debug(isNL(true));             // false
+   *   debug(isNL(new String('\n'))); // true
+   *   debug(isNL({}));               // false
+   *   debug(isNL(['\n']));           // false
+   *
+   *
+   * @param  {String}   c  A string token.
+   * @return {Boolean}     Returns whether a token is NL.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  isNL : (function() {
+    var notNL = /[^\r\n\u2028\u2029]/;
+    return function(c) {
+      return Pot.isString(c) && !notNL.test(c);
+    };
+  }()),
+  /**
+   * Formats to a string by arguments.
+   *
+   *
+   * @example
+   *   var result = format('#1 + #2 + #3', 10, 20, 30);
+   *   debug(result);
+   *   // @results '10 + 20 + 30'
+   *
+   *
+   * @example
+   *   var result = format('J#1v#1#2 ECMA#2', 'a', 'Script');
+   *   debug(result);
+   *   // @results 'JavaScript ECMAScript'
+   *
+   *
+   * @param  {String}   fmt   A string format.
+   * @param  {...*}    (...)  Format arguments.
+   * @return {String}         Returns a formatted string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  format : (function() {
+    var args,
+        re = /#(\d+)/g,
+        /**@ignore*/
+        rep = function(a, i) {
+          return args && args[+i];
+        };
+    return function(fmt/*[, ...args]*/) {
+      var f = stringify(fmt, true);
+      args = arrayize(arguments);
+      if (!args || !args.length) {
+        return f;
+      }
+      re.lastIndex = 0;
+      return f.replace(re, rep);
+    };
+  }()),
+  /**
+   * Tokenize a function code simply.
+   *
+   *
+   * @example
+   *   var hoge = function() {
+   *     var a = 1, b = 0.5, c = '"hoge"', $d = /'\/'/g;
+   *     return $d.test(c) ? a : b;
+   *   };
+   *   debug( Pot.tokenize(hoge) );
+   *   // @results
+   *   // [
+   *   //   'function', '(', ')', '{', '\n',
+   *   //     'var', 'a', '=', '1', ',', 'b', '=', '0.5', ',',
+   *   //            'c', '=', '\'"hoge"\'', ',',
+   *   //            '$d', '=', '/\'\\/\'/g', ';', '\n',
+   *   //     'return', '$d', '.', 'test', '(', 'c', ')', '?',
+   *   //               'a', ':', 'b', ';', '\n',
+   *   //   '}'
+   *   // ]
+   *
+   *
+   * @param  {Function|String}   func   The code or function to tokenize.
+   * @return {Array}                    Tokens as an array.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  tokenize : (function() {
+    var RE = {
+      TOKEN : new RegExp(
+        '(' + '/[*][\\s\\S]*?[*]/' +                  // multiline comment
+        '|' + '/{2,}[^\\r\\n]*(?:\\r\\n|\\r|\\n|)' +  // single line comment
+        '|' + '"(?:\\\\[\\s\\S]|[^"\\r\\n\\\\])*"' +  // string literal
+        '|' + "'(?:\\\\[\\s\\S]|[^'\\r\\n\\\\])*'" +  // string literal
+        '|' + '(' + '^' +                         // (2) regexp literal prefix
+              '|' + '[-!%&*+,/:;<=>?[{(^|~]' +
+              ')' +
+              '(?:' +
+                  '(' +    // (3) line break
+                    '(?!' + '[\\r\\n])\\s+' +
+                      '|' + '(?:\\r\\n|\\r|\\n)' +
+                   ')' +
+                '|' + '\\s*' +
+              ')' +
+              '(?:' +
+                '(' +      // (4) regular expression literal
+                    '(?:/(?![*])(?:\\\\.|[^/\\r\\n\\\\])+/)' +
+                    '(?:[gimy]{0,4}|\\b)' +
+                ')' +
+                '(?=\\s*' +
+                  '(?:' + '(?!\\s*[/\\\\<>*+%`^"\'\\w$-])' +
+                          '[^/\\\\<>*+%`^\'"@({[\\w$-]' +
+                    '|' + '===?' +
+                    '|' + '!==?' +
+                    '|' + '[|][|]' +
+                    '|' + '[&][&]' +
+                    '|' + '/(?:[*]|/)' +
+                    '|' + '[,.;:!?)}\\]\\r\\n]' +
+                    '|' + '$' +
+                  ')' +
+                ')' +
+              ')' +
+        '|' + '<(\\w+(?::\\w+|))\\b[^>]*>' +          // (5) e4x
+              '(?:(?!</\\5>(?!\\s*[\'"]))[\\s\\S])*' +
+              '</\\5>' +
+        '|' + '<>[\\s\\S]*?</>' +                     // e4x
+        '|' + '>>>=?|<<=|===|!==|>>=' +               // operators
+        '|' + '[+][+](?=[+])|[-][-](?=[-])' +
+        '|' + '[=!<>*+/&|^-]=' +
+        '|' + '[&][&]|[|][|]|[+][+]|[-][-]|<<|>>' +
+        '|' + '0(?:[xX][0-9a-fA-F]+|[0-7]+)' +        // number literal
+        '|' + '\\d+(?:[.]\\d+)?(?:[eE][+-]?\\d+)?' +
+        '|' + '[1-9]\\d*' +
+        '|' + '[-+/%*=&|^~<>!?:,;@()\\\\[\\].{}]' +   // operator
+        '|' + '(?:(?![\\r\\n])\\s)+' +                // white space
+        '|' + '(?:\\r\\n|\\r|\\n)' +                  // nl
+        '|' + '[^\\s+/%*=&|^~<>!?:,;@()\\\\[\\].{}\'"-]+' + // token
+        ')',
+        'g'
+      ),
+      LINEBREAK : /^(?:\r\n|\r|\n)/,
+      NOTSPACE  : /[\S\r\n]/,
+      COMMENTS  : /^\/{2,}[\s\S]*$|^\/[*][\s\S]*?[*]\/$/
+    },
+    LIMIT  = 0x2000,
+    COUNT  = 0,
+    PREFIX = '.',
+    CACHES = {};
+    return function(func) {
+      var r = [], m, token, prev, s = Pot.getFunctionCode(func);
+      if (s) {
+        if ((PREFIX + s) in CACHES) {
+          return CACHES[PREFIX + s];
+        }
+        RE.TOKEN.lastIndex = 0;
+        while ((m = RE.TOKEN.exec(s)) != null) {
+          token = m[1];
+          if (!RE.NOTSPACE.test(token) || RE.COMMENTS.test(token)) {
+            continue;
+          }
+          if (m[4]) {
+            if (m[2]) {
+              r[r.length] = m[2];
+            }
+            if (m[3] && RE.NOTSPACE.test(m[3])) {
+              r[r.length] = m[3];
+            }
+            r[r.length] = m[4];
+          } else {
+            prev = r[r.length - 1];
+            if (!prev ||
+                !RE.LINEBREAK.test(prev) || !RE.LINEBREAK.test(token)) {
+              r[r.length] = token;
+            }
+          }
+        }
+        if (COUNT < LIMIT) {
+          CACHES[PREFIX + s] = r;
+          COUNT++;
+        }
+      }
+      return r;
+    };
+  }()),
+  /**
+   * Joins the tokenized array.
+   *
+   *
+   * @example
+   *   var hoge = function() {
+   *     var a = 1, b = 0.5, c = '"hoge"', $d = /'\/'/g;
+   *     return $d.test(c) ? a : b;
+   *   };
+   *   var tokens = Pot.tokenize(hoge);
+   *   var result = Pot.joinTokens(tokens);
+   *   // @results
+   *   //   'function(){\n' +
+   *   //     'var a=1,b=0.5,c=\'"hoge"\',$d=/\'\\/\'/g;\n' +
+   *   //     'return $d.test(c)?a:b;\n' +
+   *   //   '}'
+   *
+   *
+   * @param  {Array}   tokens   The tokenized array.
+   * @return {String}           Returns a string that joined from tokens.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  joinTokens : (function() {
+    var isWord = /^[^\s+\/%*=&|^~<>!?:,;@()\\[\].{}'"-]+$/,
+        isSign = /^[-+]+$/;
+    return function(tokens) {
+      var result = [], len, prev, prevSuf, pre, suf, i, token;
+      if (Pot.isArray(tokens)) {
+        len = tokens.length;
+        for (i = 0; i < len; i++) {
+          token = tokens[i];
+          if (!prev) {
+            result[result.length] = token;
+          } else {
+            pre = '';
+            suf = '';
+            if (token === 'in') {
+              if (!prevSuf) {
+                pre = ' ';
+              }
+              suf = ' ';
+            } else if (isSign.test(token)) {
+              if (!prevSuf && isSign.test(prev)) {
+                pre = ' ';
+              }
+            } else if (isWord.test(prev.slice(-1)) &&
+                       isWord.test(token.charAt(0))) {
+              pre = ' ';
+            }
+            if (prevSuf === ' ') {
+              pre = '';
+            }
+            result[result.length] = pre + token + suf;
+          }
+          prev = token;
+          prevSuf = suf;
+        }
+      }
+      return result.join('');
+    };
+  }()),
   /**
    * Check whether the function has "return" statement.
    *
@@ -2917,7 +3370,7 @@ Pot.update({
  * @ignore
  */
 function update() {
-  var args = arguments, len = args.length, i = 1, j, o, p, x, keys, n;
+  var args = arguments, len = args.length, i = 1, o, p, x;
   if (len === i) {
     o = this || {};
     i--;
@@ -2928,23 +3381,11 @@ function update() {
     do {
       x = args[i];
       if (x) {
-        if (Pot.keys) {
-          keys = Pot.keys(x);
-          n = keys.length;
-          for (j = 0; j < n; j++) {
-            p = keys[j];
-            try {
-              o[p] = x[p];
-            } catch (e) {}
-          }
-        } else {
-          for (p in x) {
-            try {
-              if (hasOwnProperty.call(x, p)) {
-                o[p] = x[p];
-              }
-            } catch (e) {}
-          }
+        // Includes prototype properties.
+        for (p in x) {
+          try {
+            o[p] = x[p];
+          } catch (e) {}
         }
       }
     } while (++i < len);
@@ -3448,7 +3889,8 @@ update(debug, {
               fontFamily : 'monospace',
               position   : 'absolute',
               padding    : '10px',
-              margin     : '0px'
+              margin     : '0px',
+              zoom       : 1
             };
             wrapper = doc.createElement('div');
             style = wrapper.style;
@@ -3460,31 +3902,48 @@ update(debug, {
             style.zIndex       = 9996;
             style.left         = '0px';
             style.bottom       = '0px';
+            style.zoom         = 1;
             if (ie6) {
               style.height = Math.floor(de.clientHeight / 3.2) + 'px';
             } else {
               style.position = 'fixed';
               style.height   = '25%';
             }
+            me.titlebar = doc.createElement('div');
+            style = me.titlebar.style;
+            style.zIndex      = 9999;
+            style.border      = '0';
+            style.width       = '95%';
+            style.position    = 'relative';
+            style.margin      = '2px';
+            style.fontWeight  = 'bold';
+            style.color       = '#333';
+            style.background  = '#fff';
+            style.fontFamily  = 'verdana';
+            style.zoom        = 1;
+            me.titlebar.appendChild(doc.createTextNode('Pot.js Console'));
             me.ieConsole = wrapper.cloneNode(false);
             me.ieConsole.id = me.ieConsoleId = buildSerial(Pot, '');
             style = me.ieConsole.style;
             style.borderWidth = '1px';
             style.width       = '95%';
-            style.height      = '87%';
+            style.height      = '68%';
             style.position    = 'relative';
             style.zIndex      = 9997;
+            style.marginTop   = '3px';
             style.padding     = '5px';
             style.whiteSpace  = 'pre';
             style.wordWrap    = 'break-word';
             style.overflowX   = 'hidden';
             style.overflowY   = 'auto';
+            style.zoom        = 1;
             me.hr = doc.createElement('hr');
             style = me.hr.style;
-            style.position    = 'static';
+            style.position    = 'relative';
             style.width       = '100%';
             style.border      = '1px solid #aaa';
             style.zIndex      = 9998;
+            style.zoom        = 1;
             close = doc.createElement('div');
             style = close.style;
             each(defStyle, function(v, k) {
@@ -3499,8 +3958,25 @@ update(debug, {
             style.right       = '2px';
             style.top         = '2px';
             style.cursor      = 'pointer';
+            style.zoom        = 1;
             close.title       = 'close';
-            close.innerHTML   = 'x';
+            close.appendChild(doc.createTextNode('x'));
+            me.histories = [];
+            me.historyIndex = 0;
+            me.historyLimit = 50;
+            me.executer = doc.createElement('input');
+            me.executer.type  = 'text';
+            style = me.executer.style;
+            style.zIndex      = 9999;
+            style.position    = 'relative';
+            style.display     = 'block';
+            style.fontFamily  = 'monospace';
+            style.fontSize    = '13px';
+            style.padding     = '2px';
+            style.marginTop   = '5px';
+            style.width       = '95.5%';
+            style.border      = '2px solid #999';
+            style.zoom        = 1;
             /**@ignore*/
             onResize = function() {
               var width, height, def = '95%';
@@ -3529,6 +4005,52 @@ update(debug, {
                 wrapper = me.ieConsole = null;
               } catch (e) {}
             };
+            /**@ignore*/
+            onKeydown = function(ev) {
+              var result, prevCode, nextCode, code = trim(me.executer.value);
+              ev = window.event || ev;
+              if (ev) {
+                if (code && ev.keyCode == 13) { // enter
+                  try {
+                    result = Pot.localEval(code);
+                  } catch (e) {
+                    result = Pot.getErrorMessage(e);
+                  }
+                  Pot.debug(result);
+                  if (me.histories.length > me.historyLimit) {
+                    me.histories.pop();
+                  }
+                  me.histories.unshift(code);
+                  me.executer.value = '';
+                  me.historyIndex = 0;
+                } else if (ev.keyCode == 38) { // up
+                  prevCode = me.histories[me.historyIndex];
+                  me.historyIndex = Math.max(
+                    0,
+                    Math.min(me.histories.length - 1, me.historyIndex + 1)
+                  );
+                  if (prevCode) {
+                    me.executer.value = prevCode;
+                  }
+                } else if (ev.keyCode == 40) { // down
+                  if (me.historyIndex - 1 < 0) {
+                    me.executer.value = '';
+                    me.historyIndex = 0;
+                  } else {
+                    me.historyIndex = Math.max(
+                      0,
+                      Math.min(me.histories.length - 1, me.historyIndex - 1)
+                    );
+                    nextCode = me.histories[me.historyIndex];
+                    if (nextCode) {
+                      me.executer.value = nextCode;
+                    }
+                  }
+                } else {
+                  me.historyIndex = 0;
+                }
+              }
+            };
             if (typeof window !== 'undefined' &&
                 window && window.attachEvent) {
               if (ie6) {
@@ -3542,6 +4064,9 @@ update(debug, {
               if (close.attachEvent) {
                 close.attachEvent('onclick', onClick);
               }
+              if (me.executer.attachEvent) {
+                me.executer.attachEvent('onkeydown', onKeydown);
+              }
             }
             if (ie6) {
               Pot.Deferred.wait(0.25).then(function() {
@@ -3550,8 +4075,10 @@ update(debug, {
                 wrapper.style.bottom = '0px';
               });
             }
-            wrapper.appendChild(close);
-            wrapper.appendChild(me.ieConsole);
+            each([close, me.titlebar,
+                  me.ieConsole, me.executer], function(el) {
+              wrapper.appendChild(el);
+            });
             doc.body.appendChild(wrapper);
             me.append();
           });
