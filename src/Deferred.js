@@ -1214,7 +1214,7 @@ function fireProcedure() {
         reply = callback.call(this, result);
       }
       // We ignore undefined result when "return" statement is not exists.
-      if (reply === undefined &&
+      if (reply === void 0 &&
           this.state !== Pot.Deferred.states.failure &&
           !Pot.isError(result) && !Pot.hasReturn(callback)) {
         reply = result;
