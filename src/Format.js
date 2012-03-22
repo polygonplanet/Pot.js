@@ -21,6 +21,31 @@ update(Pot.Format, {
    * @lends Pot.Format
    */
   /**
+   * Formats to a string by arguments.
+   *
+   *
+   * @example
+   *   var result = format('#1 + #2 + #3', 10, 20, 30);
+   *   debug(result);
+   *   // @results '10 + 20 + 30'
+   *
+   *
+   * @example
+   *   var result = format('J#1v#1#2 ECMA#2', 'a', 'Script');
+   *   debug(result);
+   *   // @results 'JavaScript ECMAScript'
+   *
+   *
+   * @param  {String}   fmt   A string format.
+   * @param  {...*}    (...)  Format arguments.
+   * @return {String}         Returns a formatted string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  format : Pot.format,
+  /**
    * sprintf.
    *
    * This function is compatible with PHP sprintf function that
@@ -339,5 +364,6 @@ update(Pot.Format, {
 
 // Update Pot object.
 Pot.update({
+  format  : Pot.Format.format,
   sprintf : Pot.Format.sprintf
 });
