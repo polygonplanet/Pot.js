@@ -53,17 +53,19 @@ update(Pot.Net, {
    *                                 +----------------------------------
    *                                 | Available options:
    *                                 +----------------------------------
-   *                                 - method      : {String}    'GET'
-   *                                 - sendContent : {Object}    null
-   *                                 - queryString : {Object}    null
-   *                                 - username    : {String}    null
-   *                                 - password    : {String}    null
-   *                                 - headers     : {Object}    null
-   *                                 - mimeType    : {String}    null
-   *                                 - cache       : {Boolean}   true
-   *                                 - binary      : {Boolean}   false
-   *                                 - cookie      : {Boolean}   false
-   *                                 - crossDomain : {Boolean}   false
+   *                                 - method       : {String}    'GET'
+   *                                 - sendContent  : {Object}    null
+   *                                 - queryString  : {Object}    null
+   *                                 - username     : {String}    null
+   *                                 - password     : {String}    null
+   *                                 - headers      : {Object}    null
+   *                                 - mimeType     : {String}    null
+   *                                 - cache        : {Boolean}   true
+   *                                 - sync         : {Boolean}   false
+   *                                 - responseType : {String}    null
+   *                                 - binary       : {Boolean}   false
+   *                                 - cookie       : {Boolean}   false
+   *                                 - crossDomain  : {Boolean}   false
    *                                 </pre>
    * @return {Deferred}            Return the instance of Pot.Deferred.
    * @type Function
@@ -172,17 +174,19 @@ update(Pot.Net, {
      *                                 +----------------------------------
      *                                 | Available options:
      *                                 +----------------------------------
-     *                                 - method      : {String}    'GET'
-     *                                 - sendContent : {Object}    null
-     *                                 - queryString : {Object}    null
-     *                                 - username    : {String}    null
-     *                                 - password    : {String}    null
-     *                                 - headers     : {Object}    null
-     *                                 - mimeType    : {String}    null
-     *                                 - cache       : {Boolean}   true
-     *                                 - binary      : {Boolean}   false
-     *                                 - cookie      : {Boolean}   false
-     *                                 - crossDomain : {Boolean}   false
+     *                                 - method       : {String}    'GET'
+     *                                 - sendContent  : {Object}    null
+     *                                 - queryString  : {Object}    null
+     *                                 - username     : {String}    null
+     *                                 - password     : {String}    null
+     *                                 - headers      : {Object}    null
+     *                                 - mimeType     : {String}    null
+     *                                 - cache        : {Boolean}   true
+     *                                 - sync         : {Boolean}   false
+     *                                 - responseType : {String}    null
+     *                                 - binary       : {Boolean}   false
+     *                                 - cookie       : {Boolean}   false
+     *                                 - crossDomain  : {Boolean}   false
      *                                 </pre>
      * @return {Deferred}            Return the instance of Pot.Deferred.
      * @type Function
@@ -268,18 +272,20 @@ update(Pot.Net, {
          */
         setOptions : function(options) {
           var opts, parts, defaults = {
-            method      : 'GET',
-            sendContent : null,
-            queryString : null,
-            callback    : null,
-            username    : null,
-            password    : null,
-            mimeType    : null,
-            binary      : false,
-            cache       : true,
-            cookie      : false,
-            crossDomain : null,
-            headers     : {
+            method       : 'GET',
+            sendContent  : null,
+            queryString  : null,
+            callback     : null,
+            username     : null,
+            password     : null,
+            mimeType     : null,
+            responseType : null,
+            binary       : false,
+            cache        : true,
+            sync         : false,
+            cookie       : false,
+            crossDomain  : null,
+            headers      : {
               'Accept'           : ['*/'] + ['*'], //XXX: Check MimeType.
               'X-Requested-With' : 'XMLHttpRequest'
             }
@@ -320,22 +326,26 @@ update(Pot.Net, {
           if (this.options.binary && !this.options.mimeType) {
             this.options.mimeType = 'text/plain; charset=x-user-defined';
           }
+          if (this.options.sync) {
+            this.deferred.async(false);
+          }
         },
         /**
          * @private
          * @ignore
          */
         open : function() {
+          var async = this.options.sync ? false : true;
           if (this.options.username != null) {
             this.xhr.open(
               this.options.method,
               this.url,
-              true,
+              async,
               stringify(this.options.username, true),
               stringify(this.options.password, true)
             );
           } else {
-            this.xhr.open(this.options.method, this.url, true);
+            this.xhr.open(this.options.method, this.url, async);
           }
         },
         /**
@@ -345,6 +355,11 @@ update(Pot.Net, {
         setHeaders : function() {
           var that = this, contentType;
           try {
+            if (this.options.responseType) {
+              try {
+                this.xhr.responseType = this.options.responseType;
+              } catch (e) {}
+            }
             if (this.options.cookie) {
               try {
                 // https://developer.mozilla.org/en/HTTP_access_control
@@ -371,7 +386,8 @@ update(Pot.Net, {
             }
             if (!contentType &&
                 this.options.method === 'POST') {
-              contentType = 'application/x-www-form-urlencoded';
+              contentType =
+                'application/x-www-form-urlencoded; charset=UTF-8';
             }
             if (contentType) {
               this.xhr.setRequestHeader('Content-Type', contentType);
@@ -383,15 +399,25 @@ update(Pot.Net, {
          * @ignore
          */
         setReadyStateChange : function() {
-          var that = this;
+          var that = this, flush;
+          if (this.options.sync) {
+            /**@ignore*/
+            flush = function(f) {
+              var d = new Pot.Deferred({async : false});
+              return d.then(f).begin();
+            };
+          } else {
+            flush = Pot.Deferred.flush;
+          }
           /**@ignore*/
           this.xhr.onreadystatechange = function() {
-            var status = null;
+            var status = null, text;
             if (that.xhr.readyState == Pot.Net.XHR.ReadyState.COMPLETE) {
               that.cancel();
               try {
-                status = parseInt(that.xhr.status);
-                if (!status && that.xhr.responseText) {
+                status = +that.xhr.status;
+                text = that.xhr.responseText;
+                if (!status && text) {
                   // 0 or undefined seems to mean cached or local
                   status = 304;
                 }
@@ -401,9 +427,9 @@ update(Pot.Net, {
                   status === 304 || status === 1223) {
                 that.assignResponseText();
                 if (Pot.isFunction(that.options.callback)) {
-                  Pot.Deferred.flush(function() {
+                  flush(function() {
                     that.options.callback.call(
-                      that.xhr, that.xhr.responseText, that.xhr
+                      that.xhr, text, that.xhr
                     );
                   }).ensure(function(res) {
                     that.deferred.begin(that.xhr);
@@ -429,7 +455,12 @@ update(Pot.Net, {
           if (this.options.binary) {
             bytes = [];
             chars = [];
-            s = this.xhr.responseText || '';
+            try {
+              // IE will throws exception when Text is binary data.
+              s = this.xhr.responseText || '';
+            } catch (e) {
+              s = '';
+            }
             len = s.length;
             for (i = 0; i < len; i++) {
               c = s.charCodeAt(i) & 0xFF;
@@ -440,7 +471,15 @@ update(Pot.Net, {
               this.xhr.originalText  = s;
               this.xhr.responseBytes = bytes;
               this.xhr.responseText  = chars.join('');
-            } catch (e) {}
+            } catch (e) {
+              try {
+                this.xhr = update(this.xhr, {
+                  originalText  : s,
+                  responseBytes : bytes,
+                  responseText  : chars.join('')
+                });
+              } catch (ex) {}
+            }
           }
         },
         /**
@@ -490,13 +529,14 @@ update(Pot.Net, {
    * @ignore
    */
   requestByGreasemonkey : function(url, options) {
-    var d, opts, maps, type;
+    var d, opts, maps, type, lazy;
     d = new Pot.Deferred();
     opts = update({cache : true}, options || {});
     maps = {
       sendContent : 'data',
       mimeType    : 'overrideMimeType',
-      username    : 'user'
+      username    : 'user',
+      sync        : 'synchronous'
     };
     each(maps, function(gm, org) {
       if (org in opts) {
@@ -532,6 +572,16 @@ update(Pot.Net, {
         'Content-Type' : type
       });
     }
+    if (opts.sync) {
+      d.async(false);
+      /**@ignore*/
+      lazy = function(f) {
+        f();
+      };
+    } else {
+      /**@ignore*/
+      lazy = Pot.Deferred.callLazy;
+    }
     if (opts.onload) {
       d.then(opts.onload);
     }
@@ -548,7 +598,7 @@ update(Pot.Net, {
         d.raise.apply(d, arguments);
       }
     });
-    Pot.Deferred.callLazy(function() {
+    lazy(function() {
       var req = GM_xmlhttpRequest(opts);
       d.data({
         request : req
@@ -713,7 +763,10 @@ update(Pot.Net, {
        */
       setOptions : function(options) {
         var opts, method, ssl, uri, host, port, path, auth, data;
-        opts = update({cache : true}, options || {});
+        opts = update({
+          cache : true,
+          sync  : false
+        }, options || {});
         method = trim(opts.method).toUpperCase() || 'GET';
         ssl = false;
         uri = require('url').parse(opts.url);
@@ -754,9 +807,13 @@ update(Pot.Net, {
             }
           }
         }
+        if (opts.sync) {
+          this.deferred.async(false);
+        }
         this.requestOptions = {
           data : data,
           ssl  : ssl,
+          sync : opts.sync,
           settings  : {
             host    : host,
             port    : port,
@@ -771,7 +828,7 @@ update(Pot.Net, {
        * @ignore
        */
       send : function() {
-        var that = this, doRequest;
+        var that = this, doRequest, waiting = true;
         if (this.requestOptions.ssl) {
           doRequest = require('https').request;
         } else {
@@ -792,18 +849,24 @@ update(Pot.Net, {
             }
           });
           that.response.on('end', function() {
+            waiting = false;
             that.deferred.begin(that.response);
           });
           that.response.on('error', function(err) {
+            waiting = false;
             that.handleError(err);
           });
         }).on('error', function(err) {
+          waiting = false;
           that.handleError(err);
         });
         if (this.requestOptions.data) {
           this.request.write(this.requestOptions.data);
         }
         this.request.end();
+        if (this.requestOptions.sync) {
+          while (waiting) {}
+        }
       },
       /**
        * @private
@@ -870,6 +933,7 @@ update(Pot.Net, {
    *                                 +------------------------------------
    *                                 - queryString : {Object}   null
    *                                 - cache       : {Boolean}  false
+   *                                 - sync        : {Boolean}  false
    *                                 - callback    : {String}   'callback'
    *                                 </pre>
    * @return {Deferred}            Return the instance of Pot.Deferred.
@@ -889,7 +953,10 @@ update(Pot.Net, {
           doc, uri, head, script, done, defaults;
       defaults = 'callback';
       d = new Pot.Deferred();
-      opts    = update({cache : false}, options || {});
+      opts    = update({
+        cache : false,
+        sync  : false
+      }, options || {});
       context = globals || Pot.Global;
       doc     = Pot.System.currentDocument;
       head    = getHead();
@@ -940,7 +1007,8 @@ update(Pot.Net, {
         }
         if (Pot.System.isGreasemonkey) {
           return Pot.Net.requestByGreasemonkey(uri, {
-            method : 'GET'
+            method : 'GET',
+            sync   : opts.sync
           }).then(function(res) {
             var code = trim(res && res.responseText);
             code = code.replace(/^[^{]*|[^}]*$/g, '');
@@ -948,7 +1016,11 @@ update(Pot.Net, {
           });
         }
         script = doc.createElement('script');
-        script.async = 'async';
+        if (opts.sync) {
+          d.async(false);
+        } else {
+          script.async = 'async';
+        }
         if (opts.type) {
           script.type = opts.type;
         }
@@ -969,7 +1041,7 @@ update(Pot.Net, {
             if (script) {
               script.parentNode.removeChild(script);
             }
-            script = undefined;
+            script = void 0;
           } catch (e) {}
           if (Pot.isFunction(callback)) {
             callback.apply(callback, args);
@@ -994,7 +1066,7 @@ update(Pot.Net, {
                 head.removeChild(script);
               } catch (e) {}
             }
-            script = undefined;
+            script = void 0;
           }
         };
         d.canceller(function() {
@@ -1034,12 +1106,13 @@ update(Pot.Net, {
    * @static
    */
   getJSON : (function() {
-    var fixJson = /^[^{]*|[^}]*$/g;
+    var fixJson = /^[^{]*|[^}]*$/g,
+        type = 'application/json';
     return function(url, options) {
       return Pot.Net.request(url, update({
-        mimeType : 'application/json',
+        mimeType : type,
         headers  : {
-          'Content-Type' : 'application/json'
+          'Content-Type' : type
         }
       }, options || {})).then(function(res) {
         var data = trim(res && res.responseText).replace(fixJson, '');
@@ -1068,11 +1141,14 @@ update(Pot.Net, {
       return function(url, options) {
         return Pot.Net.request(url, update({
           method   : 'GET',
-          mimeType : 'text/javascript',
+          mimeType : 'application/javascript',
           headers  : {
-            'Content-Type' : 'text/javascript'
+            'Content-Type' : 'application/javascript'
           }
-        }, {cache : false}, options || {})).then(function(res) {
+        }, {
+          cache : false,
+          sync  : false
+        }, options || {})).then(function(res) {
           return Pot.globalEval(res.responseText);
         });
       };
@@ -1115,7 +1191,11 @@ update(Pot.Net, {
           return d.raise(uri || head || doc);
         }
         script = doc.createElement('script');
-        script.async = 'async';
+        if (opts.sync) {
+          d.async(false);
+        } else {
+          script.async = 'async';
+        }
         script.type = opts.type || 'text/javascript';
         if (opts.charset) {
           script.charset = opts.charset;
@@ -1138,7 +1218,7 @@ update(Pot.Net, {
                 head.removeChild(script);
               } catch (e) {}
             }
-            script = undefined;
+            script = void 0;
             d.begin();
           }
         };
