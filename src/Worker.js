@@ -1048,7 +1048,7 @@ function mergeObjects(context) {
       'port', 'pathname', 'search', 'hash'
     ], function(key) {
       try {
-        locations[k] = stringify(location[key]);
+        locations[key] = stringify(location[key]);
       } catch (e) {}
     });
   }
