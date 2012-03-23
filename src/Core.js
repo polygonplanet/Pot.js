@@ -500,7 +500,14 @@ update(Pot, {
         }
       }
       return outputs;
-    }
+    },
+    /**
+     * Pot.js Script Implementation.
+     *
+     * @private
+     * @ignore
+     */
+    ScriptImplementation : PotScriptImplementation
   },
   /**
    * @lends Pot
@@ -623,7 +630,8 @@ Pot.update({
 /*{#endif}*/
 // Definition of System.
 update(Pot.System, (function() {
-  var o = {}, g, w, wb, b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
+  var o = {}, g, w, wb, msg, ref,
+      b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -758,38 +766,85 @@ update(Pot.System, (function() {
     if (typeof Worker === 'function' &&
         typeof Worker.prototype.postMessage === 'function') {
       o.hasWorker = true;
+      /**@ignore*/
+      ref = function() {
+        return 1;
+      };
+      msg = {
+        /**@ignore*/
+        a : function() {
+          return ref();
+        }
+      };
       w = new Worker(
         'data:application/javascript;base64,' +
-        // base64: onmessage=function(e){postMessage(e.data+1)}
-        'b25tZXNzYWdlPWZ1bmN0aW9uKGUpe3Bvc3RNZXNzYWdlKGUuZGF0YSsxKX0='
+        // base64:
+        // onmessage = function(e) {
+        //   postMessage(
+        //     (e && e.data &&
+        //       ((typeof e.data.a === 'function' && e.data.a()) || e.data)
+        //     ) + 1
+        //   )
+        // }
+        'b25tZXNzYWdlPWZ1bmN0aW9uKGUpe3Bvc3RNZXNzYWdlKChlJiZlLmRhdGEmJigod' +
+        'HlwZW9mIGUuZGF0YS5hPT09J2Z1bmN0aW9uJyYmZS5kYXRhLmEoKSl8fGUuZGF0YS' +
+        'kpKzEpfQ=='
       );
       /**@ignore*/
       w.onmessage = function(ev) {
-        if (ev && ev.data === 'x1') {
-          Pot.System.canWorkerDataURI = true;
+        if (ev) {
+          switch (ev.data) {
+            case (msg.a() + 1):
+                Pot.System.canWorkerPostObject = true;
+                // FALL THROUGH
+            case (msg + 1):
+            case 'x1':
+                Pot.System.canWorkerDataURI = true;
+          }
         }
         try {
           w.terminate();
         } catch (ex) {}
       };
-      w.postMessage('x');
+      try {
+        w.postMessage(msg);
+      } catch (ex) {
+        w.postMessage('x');
+      }
     }
   } catch (e) {}
   if (o.hasWorker && o.BlobBuilder && o.BlobURI) {
     try {
       b = new o.BlobBuilder();
-      b.append('onmessage=function(e){postMessage(e.data+2)}');
+      b.append('onmessage=function(e){' +
+        'postMessage(' +
+          '(e&&e.data&&' +
+            '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
+          ')+1' +
+        ')' +
+      '}');
       wb = new Worker(o.BlobURI.createObjectURL(b.getBlob()));
       /**@ignore*/
       wb.onmessage = function(ev) {
-        if (ev && ev.data === 'x2') {
-          Pot.System.canWorkerBlobURI = true;
+        if (ev) {
+          switch (ev.data) {
+            case (msg.a() + 1):
+                Pot.System.canWorkerPostObject = true;
+                // FALL THROUGH
+            case (msg + 1):
+            case 'x1':
+                Pot.System.canWorkerBlobURI = true;
+          }
         }
         try {
           wb.terminate();
         } catch (ex) {}
       };
-      wb.postMessage('x');
+      try {
+        wb.postMessage(msg);
+      } catch (ex) {
+        wb.postMessage('x');
+      }
     } catch (e) {}
   }
   return o;
