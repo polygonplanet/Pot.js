@@ -2724,7 +2724,7 @@ update(Pot.Deferred, {
           var name;
           if (Pot.isFunction(o)) {
             try {
-              name = o.toString().match(re.funcName)[1];
+              name = Pot.getFunctionCode(o).match(re.funcName)[1];
             } catch (e) {}
             if (name && re.rescue.test(name)) {
               chain.rescue(o);

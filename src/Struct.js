@@ -1368,7 +1368,8 @@ update(Pot.Struct, {
             break;
         case 'function':
             if (Pot.isFunction(subject)) {
-              if (cmp(object.toString(), subject.toString()) &&
+              if (cmp(Pot.getFunctionCode(object),
+                      Pot.getFunctionCode(subject)) &&
                   object.constructor === subject.constructor) {
                 /**@ignore*/
                 empty = function(a) {

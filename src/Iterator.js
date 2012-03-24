@@ -4274,10 +4274,7 @@ update(Pot.Internal, {
      * @ignore
      */
     toCode : function(func) {
-      return stringify(
-        (func && func.toString) ? func.toString() :
-                         (func  ? ('' + func)     : '')
-      );
+      return Pot.getFunctionCode(func);
     },
     /**
      * @internal
