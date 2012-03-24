@@ -209,8 +209,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   compriseScript : function(script, isFunc) {
     var result = '', tokens, code, wrapper, hasWorker;
-    if (System.hasWorker &&
-        (System.canWorkerDataURI || System.canWorkerBlobURI)) {
+    if ((System.hasWorker &&
+         (System.canWorkerDataURI || System.canWorkerBlobURI)) ||
+        (System.hasChromeWorker &&
+         (System.canChromeWorkerDataURI || System.canChromeWorkerBlobURI))
+    ) {
       hasWorker = true;
     }
     if (script) {
@@ -497,9 +500,16 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   loadScript : function(js, recursive) {
     var that = this, result, code,
-        hasWorker = System.hasWorker,
-        canWorkerDataURI = hasWorker && System.canWorkerDataURI,
-        canWorkerBlobURI = hasWorker && System.canWorkerBlobURI;
+        hasWorker, canWorkerDataURI, canWorkerBlobURI;
+    if (isChromeWorkerAvailable()) {
+      hasWorker = System.hasChromeWorker;
+      canWorkerDataURI = hasWorker && System.canChromeWorkerDataURI;
+      canWorkerBlobURI = hasWorker && System.canChromeWorkerBlobURI;
+    } else {
+      hasWorker = System.hasWorker;
+      canWorkerDataURI = hasWorker && System.canWorkerDataURI;
+      canWorkerBlobURI = hasWorker && System.canWorkerBlobURI;
+    }
     if (js) {
       if (isFunction(js)) {
         code = this.compriseScript(js, true);
@@ -564,7 +574,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       var elem;
       if (code) {
         if (useNative) {
-          that.nativeWorker = new Worker(code);
+          that.nativeWorker = createWorker(code);
           that.loaded = true;
         } else {
           if (System.isWebBrowser && System.isNotExtension) {
@@ -1363,6 +1373,41 @@ function fromBase64(string) {
     }());
   }
   return fromBase64.decode(string);
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function createWorker(js) {
+  return isChromeWorkerAvailable() ? new ChromeWorker(js) : new Worker(js);
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function isChromeWorkerAvailable() {
+  var cw = 0, w = 0;
+  if (System.hasChromeWorker) {
+    cw++;
+    if (System.canChromeWorkerDataURI) {
+      cw++;
+    }
+    if (System.canChromeWorkerBlobURI) {
+      cw++;
+    }
+  }
+  if (System.hasWorker) {
+    w++;
+    if (System.canWorkerDataURI) {
+      w++;
+    }
+    if (System.canWorkerBlobURI) {
+      w++;
+    }
+  }
+  return cw >= w;
 }
 
 /**

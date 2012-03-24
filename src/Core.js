@@ -19,6 +19,7 @@ indexOf        = Array.prototype.indexOf,
 lastIndexOf    = Array.prototype.lastIndexOf,
 toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
+toFuncString   = Function.prototype.toString,
 fromCharCode   = String.fromCharCode,
 
 /**
@@ -44,7 +45,7 @@ XLINK_NS_URI = 'http://www.w3.org/1999/xlink',
 XSL_NS_URI   = 'http://www.w3.org/1999/XSL/Transform',
 SVG_NS_URI   = 'http://www.w3.org/2000/svg',
 XUL_NS_URI   = 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
-JS_VOID_URI  = 'javascript:void(0)',
+JS_VOID_URI  = ['javascript'] + [':void(0);'],
 
 // Constant strings.
 UPPER_ALPHAS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -474,7 +475,7 @@ update(Pot, {
             delete outputs[id];
           } catch (e) {
             try {
-              outputs[id] = (void 0);
+              outputs[id] = void 0;
             } catch (e) {}
           }
           if (!valid) {
@@ -630,8 +631,7 @@ Pot.update({
 /*{#endif}*/
 // Definition of System.
 update(Pot.System, (function() {
-  var o = {}, g, w, wb, msg, ref,
-      b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
+  var o = {}, g, ws, b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -672,7 +672,7 @@ update(Pot.System, (function() {
         /**@ignore*/
         f = function() {};
         f.prototype = oe;
-        ce = new f;
+        ce = new f();
         if (oe.nodeName === ce.nodeName && oe.nodeType === ce.nodeType) {
           o.canCloneDOM = true;
         }
@@ -723,7 +723,7 @@ update(Pot.System, (function() {
     /**@ignore*/
     f = function() {};
     f.prototype = ov;
-    cv = new f;
+    cv = new f();
     cv.a = 0;
     if (ov !== cv && ov.a === 1 && cv.a === 0 && ov.b === cv.b) {
       o.canProtoClone = true;
@@ -762,10 +762,23 @@ update(Pot.System, (function() {
       o.BlobURI = u;
     }
   } catch (e) {}
-  try {
-    if (typeof Worker === 'function' &&
-        typeof Worker.prototype.postMessage === 'function') {
-      o.hasWorker = true;
+  ws = [];
+  if (typeof Worker === 'function') {
+    ws.push([Worker, 'Worker']);
+  }
+  if (typeof ChromeWorker === 'function') {
+    ws.push([ChromeWorker, 'ChromeWorker']);
+  }
+  while (ws.length) {
+    (function() {
+      var item = ws.shift(),
+          worker = item[0],
+          key    = item[1],
+          hasWorker           = 'has' + key,
+          canWorkerDataURI    = 'can' + key + 'DataURI',
+          canWorkerBlobURI    = 'can' + key + 'BlobURI',
+          canWorkerPostObject = 'can' + key + 'PostObject',
+          ref, msg, w, bb, wb;
       /**@ignore*/
       ref = function() {
         return 1;
@@ -776,76 +789,90 @@ update(Pot.System, (function() {
           return ref();
         }
       };
-      w = new Worker(
-        'data:application/javascript;base64,' +
-        // base64:
-        // onmessage = function(e) {
-        //   postMessage(
-        //     (e && e.data &&
-        //       ((typeof e.data.a === 'function' && e.data.a()) || e.data)
-        //     ) + 1
-        //   )
-        // }
-        'b25tZXNzYWdlPWZ1bmN0aW9uKGUpe3Bvc3RNZXNzYWdlKChlJiZlLmRhdGEmJigod' +
-        'HlwZW9mIGUuZGF0YS5hPT09J2Z1bmN0aW9uJyYmZS5kYXRhLmEoKSl8fGUuZGF0YS' +
-        'kpKzEpfQ=='
-      );
-      /**@ignore*/
-      w.onmessage = function(ev) {
-        if (ev) {
-          switch (ev.data) {
-            case (msg.a() + 1):
-                Pot.System.canWorkerPostObject = true;
-                // FALL THROUGH
-            case (msg + 1):
-            case 'x1':
-                Pot.System.canWorkerDataURI = true;
+      try {
+        if (typeof worker.prototype.postMessage === 'function') {
+          // hasWorker: 'hasWorker' or 'hasChromeWorker'
+          o[hasWorker] = true;
+          w = new worker(
+            'data:application/javascript;base64,' +
+            // base64:
+            // onmessage = function(e) {
+            //   postMessage(
+            //     (e && e.data &&
+            //       ((typeof e.data.a === 'function' && e.data.a()) ||
+            //         e.data
+            //       )
+            //     ) + 1
+            //   )
+            // }
+            'b25tZXNzYWdlPWZ1bmN0aW9uKGUpe3Bvc3RNZXNzYWdlKChlJiZlLmRhdGEmJ' +
+            'igodHlwZW9mIGUuZGF0YS5hPT09J2Z1bmN0aW9uJyYmZS5kYXRhLmEoKSl8fG' +
+            'UuZGF0YSkpKzEpfQ=='
+          );
+          /**@ignore*/
+          w.onmessage = function(ev) {
+            if (ev) {
+              switch (ev.data) {
+                case (msg.a() + 1):
+                    // canWorkerPostObject:
+                    //   'canWorkerPostObject' or 'canChromeWorkerPostObject'
+                    Pot.System[canWorkerPostObject] = true;
+                    // FALL THROUGH
+                case (msg + 1):
+                case 'x1':
+                    // canWorkerDataURI:
+                    //   'canWorkerDataURI' or 'canChromeWorkerDataURI'
+                    Pot.System[canWorkerDataURI] = true;
+              }
+            }
+            try {
+              w.terminate();
+            } catch (ex) {}
+          };
+          try {
+            w.postMessage(msg);
+          } catch (ex) {
+            w.postMessage('x');
           }
         }
+      } catch (e) {}
+      if (o[hasWorker] && o.BlobBuilder && o.BlobURI) {
         try {
-          w.terminate();
-        } catch (ex) {}
-      };
-      try {
-        w.postMessage(msg);
-      } catch (ex) {
-        w.postMessage('x');
-      }
-    }
-  } catch (e) {}
-  if (o.hasWorker && o.BlobBuilder && o.BlobURI) {
-    try {
-      b = new o.BlobBuilder();
-      b.append('onmessage=function(e){' +
-        'postMessage(' +
-          '(e&&e.data&&' +
-            '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
-          ')+1' +
-        ')' +
-      '}');
-      wb = new Worker(o.BlobURI.createObjectURL(b.getBlob()));
-      /**@ignore*/
-      wb.onmessage = function(ev) {
-        if (ev) {
-          switch (ev.data) {
-            case (msg.a() + 1):
-                Pot.System.canWorkerPostObject = true;
-                // FALL THROUGH
-            case (msg + 1):
-            case 'x1':
-                Pot.System.canWorkerBlobURI = true;
+          bb = new o.BlobBuilder();
+          bb.append('onmessage=function(e){' +
+            'postMessage(' +
+              '(e&&e.data&&' +
+                '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
+              ')+1' +
+            ')' +
+          '}');
+          wb = new worker(o.BlobURI.createObjectURL(bb.getBlob()));
+          /**@ignore*/
+          wb.onmessage = function(ev) {
+            if (ev) {
+              switch (ev.data) {
+                case (msg.a() + 1):
+                    Pot.System[canWorkerPostObject] = true;
+                    // FALL THROUGH
+                case (msg + 1):
+                case 'x1':
+                    // canWorkerBlobURI:
+                    //   'canWorkerBlobURI' or 'canChromeWorkerBlobURI'
+                    Pot.System[canWorkerBlobURI] = true;
+              }
+            }
+            try {
+              wb.terminate();
+            } catch (ex) {}
+          };
+          try {
+            wb.postMessage(msg);
+          } catch (ex) {
+            wb.postMessage('x');
           }
-        }
-        try {
-          wb.terminate();
-        } catch (ex) {}
-      };
-      try {
-        wb.postMessage(msg);
-      } catch (ex) {
-        wb.postMessage('x');
+        } catch (e) {}
       }
-    } catch (e) {}
+    }());
   }
   return o;
 }()));
@@ -1214,7 +1241,7 @@ Pot.update({
       toString    : f.toString
     };
     f.prototype.constructor.prototype = f.constructor.prototype;
-    return new f;
+    return new f();
   }()),
   /**
    * Return whether the argument is StopIteration or not.
@@ -1307,7 +1334,8 @@ Pot.update({
    */
   isIterable : function(x) {
     return !!(x && Pot.isFunction(x.next) &&
-         (~x.next.toString().indexOf(SI) || Pot.isNativeCode(x.next)));
+         (~Pot.getFunctionCode(x.next).indexOf(SI) ||
+           Pot.isNativeCode(x.next)));
   },
   /**
    * Return whether the argument is scalar type.
@@ -1477,7 +1505,7 @@ Pot.update({
    * @public
    */
   isEmpty : function(o) {
-    var empty, p, f;
+    var empty, p, f, toCode = Pot.getFunctionCode;
     switch (Pot.typeLikeOf(o)) {
       case 'object':
           empty = true;
@@ -1502,8 +1530,8 @@ Pot.update({
             break;
           }
           if (empty) {
-            if (o.toString() === f.toString() ||
-                RE_EMPTYFN.test(o.toString())
+            if (toCode(o) === toCode(f) ||
+                RE_EMPTYFN.test(toCode(o))
             ) {
               if (o.prototype) {
                 for (p in o.prototype) {
@@ -1787,7 +1815,15 @@ Pot.update({
     if (!method) {
       return false;
     }
-    code = method.toString();
+    if (Pot.getFunctionCode) {
+      code = Pot.getFunctionCode(method);
+    } else if (Pot.isFunction(method)) {
+      code = toFuncString.call(method);
+    } else if (method.toString) {
+      code = method.toString();
+    } else {
+      code = '' + method;
+    }
     return !!(~code.indexOf('[native code]') && code.length <= 92);
   },
   /**
@@ -2463,7 +2499,7 @@ Pot.update({
             id = buildSerial(Pot, '');
           } while (id in scope);
           scope[id] = 1;
-          scope[func].call(scope, 'try{delete ' + id + '}catch(e){}');
+          scope[func].call(scope, 'try{delete ' + id + ';}catch(e){}');
           if (!(id in scope)) {
             me.worksForGlobal = true;
           } else {
@@ -2620,15 +2656,16 @@ Pot.update({
    * @public
    */
   getFunctionCode : function(func) {
-    if (!func || func == null ||
-        (!Pot.isFunction(func) && !Pot.isString(func))
-    ) {
-      return '';
-    } else if (func.toString) {
-      return func.toString();
-    } else {
+    if (Pot.isFunction(func)) {
+      return toFuncString.call(func);
+    }
+    if (Pot.isString(func)) {
+      if (func.toString) {
+        return func.toString();
+      }
       return '' + func;
     }
+    return '';
   },
   /**
    * Checks whether a token is words.
@@ -3046,9 +3083,7 @@ Pot.update({
     return function(func) {
       var result = false, code, open, close, org,
           s, i, len, c, n, x, z, r, m, cdata, tag, skip;
-      code = stringify(
-        func && func.toString && func.toString() || String(func)
-      );
+      code = Pot.getFunctionCode(func);
       if (code in cache) {
         return cache[code];
       }
@@ -3332,7 +3367,7 @@ Pot.update({
           canApply = !!(object[prop] && object[prop].apply &&
             typeof object[prop].apply === typeof object[prop].call);
           if (converters) {
-            code = org = method.toString();
+            code = org = Pot.getFunctionCode(method);
             patterns = arrayize(converters);
             if (!Pot.isArray(patterns[0])) {
               patterns = [patterns];
