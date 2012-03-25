@@ -110,6 +110,9 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
         } catch (e) {}
         child.elem = null;
       }
+      if (child.context && child.stopId && child.stopId in child.context) {
+        child.context[child.stopId] = true;
+      }
     }
   },
   /**
@@ -187,6 +190,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    * @private
    * @ignore
    */
+  stopId : null,
+  /**
+   * @private
+   * @ignore
+   */
   init : function(server, js) {
     var that = this;
     this.server = server;
@@ -198,6 +206,8 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       onmessage           : null,
       onerror             : null
     });
+    this.stopId = buildSerial(Pot, 'stop');
+    this.context[this.stopId] = false;
     Pot.Deferred.flush(function() {
       that.runScript(js);
     });
@@ -229,7 +239,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         if (hasWorker) {
           result = this.insertProvision(tokens, isFunc);
         } else {
-          result = code;
+          result = this.insertStepStatements(tokens);
         }
       } else {
         wrapper = '(#1).call(' +
@@ -246,6 +256,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         if (hasWorker) {
           result = this.providePot(code);
         } else {
+          code = this.insertStepStatements(Pot.tokenize(code));
           result = 'onmessage=(function(){' +
             'var self=this;' +
             'return function(){' +
@@ -262,6 +273,74 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       }
     }
     return result;
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  insertStepStatements : function(tokens) {
+    var results = [],
+        token, i, j, k, len, prev, next, next2, add,
+        open  = '(',
+        close = ')',
+        id = buildSerial(Pot, '$this$scope'),
+        statements = {
+          pre  : Pot.format(
+            'var #1=this;' +
+            'Pot.Deferred.forEver(function(){(function(){',
+            id
+          ),
+          suf  : Pot.format(
+            '}).call(#1);throw Pot.StopIteration;});',
+            id
+          ),
+          step : Pot.format(
+            'if(#1){throw Pot.StopIteration;}',
+            this.stopId
+          )
+        };
+    len = tokens.length;
+    for (i = 0; i < len; i++) {
+      add = false;
+      token = tokens[i];
+      next = '';
+      for (j = i + 1; j < len; j++) {
+        next = tokens[j];
+        if (Pot.isNL(next)) {
+          continue;
+        } else {
+          break;
+        }
+      }
+      next2 = '';
+      for (k = j + 1; k < len; k++) {
+        next2 = tokens[k];
+        if (Pot.isNL(next2)) {
+          continue;
+        } else {
+          break;
+        }
+      }
+      switch (token) {
+        case '{':
+            if (prev === close && next !== '}' && next2 !== ':') {
+              add = true;
+            }
+            break;
+        default:
+            break;
+      }
+      if (!Pot.isNL(token)) {
+        prev = token;
+      }
+      results[results.length] = token;
+      if (add) {
+        results[results.length] = statements.step;
+      }
+    }
+    results.unshift(statements.pre + statements.step);
+    results.push(statements.suf);
+    return Pot.joinTokens(results);
   },
   /**
    * @private
@@ -375,6 +454,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         sufs[sufs.length] = token;
         continue;
       }
+      next = '';
       for (j = i + 1; j < len; j++) {
         next = tokens[j];
         if (Pot.isNL(next)) {
@@ -1076,7 +1156,6 @@ function mergeObjects(context) {
  */
 function runWithFunction(code, context) {
   mergeObjects(context);
-  //XXX: Exit a worker thread when worker.terminate was called.
   return (new Function('with(this){' + code + '}')).call(context);
 }
 
