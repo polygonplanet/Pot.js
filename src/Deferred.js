@@ -1222,6 +1222,9 @@ function fireProcedure() {
       result = reply;
       this.destAssign = false;
       this.state = setState.call({}, result);
+      if (Pot.isWorkeroid(result)) {
+        result = workerMessaging.call(this, result);
+      }
       if (Pot.isDeferred(result)) {
         /**@ignore*/
         nesting = function(result) {
@@ -1360,6 +1363,40 @@ function bush(result) {
       (this.state & Pot.Deferred.states.fired)) {
     fire.call(this);
   }
+}
+
+/**
+ * Messaging for Pot.Workeroid.
+ *
+ * @private
+ * @ignore
+ */
+function workerMessaging(worker) {
+  var result, async = false;
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  result = new Pot.Deferred({async : async});
+  return result.then(function() {
+    var defer = new Pot.Deferred({async : async}), count = 0;
+    if (worker && worker.workers) {
+      each(worker.workers, function(w, k) {
+        if (w && k && k.charAt && k.charAt(0) === '.') {
+          /**@ignore*/
+          w.callback = function(data) {
+            count--;
+            if (count === 0) {
+              defer.begin(data);
+            }
+          };
+          count++;
+        }
+      });
+    } else {
+      defer.begin();
+    }
+    return defer;
+  }).begin();
 }
 
 /**

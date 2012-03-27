@@ -179,7 +179,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   setAsync : function() {
     var a = null;
-    if (this.options.async !== undefined) {
+    if (this.options.async !== void 0) {
       a = !!this.options.async;
     }
     if (a !== null) {
@@ -324,7 +324,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         }
         if (this.async && Pot.isDeferred(result)) {
           return result.ensure(function(res) {
-            if (res !== undefined) {
+            if (res !== void 0) {
               if (Pot.isError(res)) {
                 if (Pot.isStopIter(res)) {
                   that.isDeferStopIter = true;
@@ -990,7 +990,7 @@ update(Pot.tmp, {
     /**@ignore*/
     create = function(speed) {
       var interval;
-      if (Pot.Internal.LightIterator.speeds[speed] === undefined) {
+      if (Pot.Internal.LightIterator.speeds[speed] === void 0) {
         interval = Pot.Internal.LightIterator.defaults.speed;
       } else {
         interval = Pot.Internal.LightIterator.speeds[speed];
@@ -2139,7 +2139,7 @@ update(Pot.Iter, {
     iterateDefer = this && this.iterateSpeed;
     arrayLike  = object && Pot.isArrayLike(object);
     objectLike = object && !arrayLike && Pot.isObject(object);
-    if (initial === undefined) {
+    if (initial === void 0) {
       /**@ignore*/
       value = (function() {
         var first;

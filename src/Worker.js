@@ -68,6 +68,11 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
    * @private
    * @ignore
    */
+  callback : null,
+  /**
+   * @private
+   * @ignore
+   */
   init : function(js) {
     this.child = new WorkerChild(this, js);
     return this;
@@ -327,6 +332,8 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
               add = true;
             }
             break;
+        case open:
+        case close:
         default:
             break;
       }
@@ -1026,6 +1033,7 @@ function referWorkerEvents() {
         /**@ignore*/
         worker.onmessage = function(ev) {
           that.onmessage.call(that, ev && ev.data, ev);
+          worker.callback && worker.callback(ev && ev.data);
         };
       }
       if (that.onerror) {
