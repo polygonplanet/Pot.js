@@ -208,7 +208,8 @@ update(Pot.Internal, {
     isPlainObject           : Pot.isPlainObject,
     isEmpty                 : Pot.isEmpty,/*{#endif}*/
     isDeferred              : Pot.isDeferred,
-    isIter                  : Pot.isIter,/*{#if Pot}*/
+    isIter                  : Pot.isIter,
+    isWorkeroid             : Pot.isWorkeroid,/*{#if Pot}*/
     isHash                  : Pot.isHash,
     isJSEscaped             : Pot.isJSEscaped,/*{#endif}*/
     isPercentEncoded        : Pot.isPercentEncoded,/*{#if Pot}*/
