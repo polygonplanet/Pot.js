@@ -299,6 +299,7 @@ update(Pot.Internal, {
     throughout              : Pot.XPCOM.throughout,
     getMostRecentWindow     : Pot.XPCOM.getMostRecentWindow,
     getChromeWindow         : Pot.XPCOM.getChromeWindow,
+    Workeroid               : Pot.Workeroid,
     attach                  : Pot.Signal.attach,
     attachBefore            : Pot.Signal.attachBefore,
     attachAfter             : Pot.Signal.attachAfter,
