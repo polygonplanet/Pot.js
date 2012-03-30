@@ -91,8 +91,8 @@
 /**
  * @namespace Pot{#if PotLite}Lite{#endif}.js
  */
-!function PotScriptImplementation(globals, undefined) {
+(function PotScriptImplementation(globals, undefined) {
 
 /*{#code}*/
 
-}(this || {});
+}(this || {}));
