@@ -751,6 +751,10 @@ update(Pot.System, (function() {
       b = null;
     } else {
       o.BlobBuilder = b;
+      if (b &&
+          typeof MozBlobBuilder !== 'undefined' && b === MozBlobBuilder) {
+        o.isMozillaBlobBuilder = true;
+      }
     }
   } catch (e) {}
   try {
