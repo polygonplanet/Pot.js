@@ -531,7 +531,7 @@ update(Pot.DateTime, {
    *   debug(Pot.prettyDate('Fri Mar 16 2012 08:42:50 GMT+0900'));
    *   // @results e.g. 'an hour ago'
    *   debug(Pot.prettyDate('Fri Mar 16 2012 00:42:50 GMT+0900'));
-   *   // @results e.e. '6 hours ago'
+   *   // @results e.g. '6 hours ago'
    *
    *
    * @example
@@ -678,7 +678,7 @@ update(Pot.DateTime, {
           lang = isJa.test(language) ? 'ja' : 'en';
       if (Pot.isDate(date)) {
         d = date;
-      } else if (Pot.isNumeric(date) || (date && isString(date))) {
+      } else if (Pot.isNumeric(date) || (date && Pot.isString(date))) {
         d = new Date(date);
       } else {
         d = new Date();
