@@ -3,3 +3,5 @@
 
 // Export the Pot object.
 Pot.Internal.exportPot(false, false, false, true);
+
+return Pot;
