@@ -1220,11 +1220,11 @@ function fireProcedure() {
         reply = result;
       }
       result = reply;
-      this.destAssign = false;
-      this.state = setState.call({}, result);
       if (Pot.isWorkeroid(result)) {
         result = workerMessaging.call(this, result);
       }
+      this.destAssign = false;
+      this.state = setState.call({}, result);
       if (Pot.isDeferred(result)) {
         /**@ignore*/
         nesting = function(result) {
@@ -1392,6 +1392,9 @@ function workerMessaging(worker) {
           count++;
         }
       });
+      if (count === 0) {
+        defer.begin();
+      }
     } else {
       defer.begin();
     }

@@ -200,6 +200,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    * @private
    * @ignore
    */
+  usePot : false,
+  /**
+   * @private
+   * @ignore
+   */
   init : function(server, js) {
     var that = this;
     this.server = server;
@@ -239,6 +244,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       }
       tokens = Pot.tokenize(code);
       code = Pot.joinTokens(tokens);
+      this.usePot = this.isPotUsing(tokens);
+      if (this.usePot && System.isMozillaBlobBuilder) {
+        //XXX: Fix setTimeout and scope in Firefox's Worker thread.
+        hasWorker = false;
+      }
       if (RE.MSG.test(code)) {
         // STATE: has onmessage settings: onmessage = function(data) {...}
         if (hasWorker) {
@@ -274,6 +284,39 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             '(typeof self!=="undefined"&&self&&' +
              'self.postMessage)?self:this' +
           ');';
+        }
+      }
+    }
+    return result;
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  isPotUsing : function(tokens) {
+    var result = false, i, j, len, token, next;
+    if (tokens) {
+      len = tokens.length;
+      for (i = 0; i < len; i++) {
+        token = tokens[i];
+        next = '';
+        for (j = i + 1; j < len; j++) {
+          next = tokens[j];
+          if (Pot.isNL(next)) {
+            continue;
+          } else {
+            break;
+          }
+        }
+        switch (token) {
+          case 'Pot':
+              if (next === '.') {
+                result = true;
+              }
+              break;
+        }
+        if (result) {
+          break;
         }
       }
     }
@@ -328,7 +371,9 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       }
       switch (token) {
         case '{':
-            if (prev === close && next !== '}' && next2 !== ':') {
+            if (prev === close  && next !== '}' &&
+                next !== 'case' && next !== 'default' &&
+                next2 !== ':') {
               add = true;
             }
             break;
@@ -600,7 +645,9 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
     if (js) {
       if (isFunction(js)) {
         code = this.compriseScript(js, true);
-        if (canWorkerBlobURI) {
+        if (System.isMozillaBlobBuilder && this.usePot) {
+          result = [code, false];
+        } else if (canWorkerBlobURI) {
           result = [toBlobURI(code), true];
         } else if (canWorkerDataURI) {
           result = [toDataURI(code), true];
@@ -612,7 +659,9 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         if (isURI(code)) {
           if (isJavaScriptScheme(code)) {
             code = this.compriseScript(fromJavaScriptScheme(code));
-            if (canWorkerBlobURI) {
+            if (System.isMozillaBlobBuilder && this.usePot) {
+              result = [code, false];
+            } else if (canWorkerBlobURI) {
               result = [toBlobURI(code), true];
             } else if (canWorkerDataURI) {
               result = [toDataURI(code), true];
@@ -621,7 +670,9 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             }
           } else if (isDataURI(code)) {
             code = this.compriseScript(fromDataURI(code));
-            if (canWorkerDataURI) {
+            if (System.isMozillaBlobBuilder && this.usePot) {
+              result = [code, false];
+            } else if (canWorkerDataURI) {
               result = [toDataURI(code), true];
             } else if (canWorkerBlobURI) {
               result = [toBlobURI(code), true];
@@ -639,7 +690,9 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
           }
         } else {
           code = this.compriseScript(code);
-          if (canWorkerBlobURI) {
+          if (System.isMozillaBlobBuilder && this.usePot) {
+            result = [code, false];
+          } else if (canWorkerBlobURI) {
             result = [toBlobURI(code), true];
           } else if (canWorkerDataURI) {
             result = [toDataURI(code), true];
