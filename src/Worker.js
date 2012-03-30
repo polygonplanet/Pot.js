@@ -447,7 +447,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             '}' +
             'var #3=#4;' +
             'return #3.apply(this,arguments);' +
-          '}).call(self);' +
+          '}).apply(self,arguments);' +
         '};' +
       '}).call(' +
         '(typeof self!=="undefined"&&self&&' +
