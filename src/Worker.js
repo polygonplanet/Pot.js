@@ -294,7 +294,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    * @ignore
    */
   isPotUsing : function(tokens) {
-    var result = false, i, j, len, token, next;
+    var result = false, i, j, k, len, token, next, next2;
     if (tokens) {
       len = tokens.length;
       for (i = 0; i < len; i++) {
@@ -308,9 +308,19 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             break;
           }
         }
+        next2 = '';
+        for (k = j + 1; k < len; k++) {
+          next2 = tokens[k];
+          if (Pot.isNL(next2)) {
+            continue;
+          } else {
+            break;
+          }
+        }
         switch (token) {
           case 'Pot':
-              if (next === '.') {
+              if (next === '.' ||
+                  (next === '[' && next2 !== ']')) {
                 result = true;
               }
               break;
@@ -851,6 +861,36 @@ Pot.update({
    * This allows for background tasks for long-running scripts or
    *  heavy-weight processing that are not interrupted by scripts that
    *  respond to user interactions.
+   *
+   *
+   * @example
+   *   var worker = new Pot.Workeroid(function(data) {
+   *     // This function scope is a child Worker's "onmessage" that
+   *     //  will be other process or thread.
+   *     switch (data) {
+   *       case 'foo':
+   *           postMessage('foo!');
+   *           break;
+   *       case 'bar':
+   *           postMessage('bar!');
+   *           break;
+   *       default:
+   *           postMessage('hello!');
+   *           break;
+   *     }
+   *   });
+   *   // You can coding like same usage of native Worker.
+   *   worker.onmessage = function(data) {
+   *     Pot.debug(data);
+   *   };
+   *   worker.onerror = function(err) {
+   *     Pot.debug(err);
+   *   };
+   *   // Sends data and starts Worker thread.
+   *   worker.postMessage('foo');
+   *   // -- results --
+   *   //  This will be received a message "foo!" from a child Worker.
+   *   //
    *
    *
    * @param  {String|Function|Object|*} script Script that will runs in
