@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Workeroid.prototype.importScripts</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Workeroid.prototype.importScripts';
+</script>
+</head>
+<body>
+<h1>Pot.Workeroid.prototype.importScripts</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Void}</em>
+    <dfn id="definition.reference.function.Pot.Workeroid.prototype.importScripts"><em>Pot.Workeroid.prototype.</em>importScripts</dfn>
+    (<em>{String}</em> file [, <em>{String}</em> file2 [, ...]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Worker スレッド内でスクリプトをインポートします。
+    </p>
+    <div>
+      <p>
+ importScripts は、子 Worker スレッド内で、別のスクリプトをインポートする際に使用します。
+ <br>
+ ネイティブの importScripts と同様に働きます。
+ <br>
+ 引数は可変で、スクリプトのファイルパスを渡します。
+ <br>
+ できるだけフルパス (もしくは http からはじまる URL) で指定してください。
+</p>
+<p>
+ なお、importScripts は Pot.Workeroid.prototype ではありませんが、ここで解説しています。
+</p>
+
+<p>
+ 返り値はありません。
+</p>
+
+<pre>var worker = new Pot.Workeroid(function(data) {
+    importScripts('/path/to/hoge.js');
+    postMessage( hoge(data) );
+});
+worker.onmessage = function(data) {
+    Pot.debug(data);
+};
+worker.postMessage('Hello!'); // output: e.g. 'Hello!hoge'</pre>
+
+<p>
+ hoge.js :
+</p>
+
+<pre>function hoge(data) {
+    return data + 'hoge';
+}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

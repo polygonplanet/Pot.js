@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Format.format</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Format.format';
+</script>
+</head>
+<body>
+<h1>Pot.Format.format</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Format.format"><em>Pot.Format.</em>format</dfn>
+    (<em>{String}</em> tpl [, <em>{*}</em> arg1 [, <em>{*}</em> arg2 [, ...]]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      それぞれの引数をフォーマットした文字列を返します。
+    </p>
+    <div>
+      <p>
+ 引数 tpl をテンプレートとし、それぞれの引数をフォーマットして返します。
+ <br>
+ #1 は tpl の次の引数, #2 はその次の引数, ... #10 は ... という変換がなされます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.format() が format() で実行できます。
+</p>
+<p>
+ フォーマットされた文字列が返ります。
+</p>
+
+<pre>var result = Pot.format('#1 + #2 + #3', 10, 20, 30);
+debug(result); // '10 + 20 + 30'</pre>
+
+<pre>var result = Pot.format('J#1v#1#2 ECMA#2', 'a', 'Script');
+debug(result); // 'JavaScript ECMAScript'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

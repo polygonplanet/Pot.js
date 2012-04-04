@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.js - Pot.Workeroid.prototype methods</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.Pot.Workeroid.methods';
+</script>
+</head>
+<body>
+<h1>Pot.js - Pot.Workeroid.prototype methods</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<h2 id="description.reference.Pot.Workeroid.methods">Pot.Workeroid.prototype methods</h2>
+<p>
+ このセクションは Workeroid (Pot.Workeroid) の prototype メソッドを扱います。
+</p>
+<p>
+ Pot.Workeroid は、HTML5 API の <a href="http://www.w3.org/TR/workers/" title="Web Workers - W3C" target="_blank">Web Workers</a>
+ を柔軟に扱えるようにしたものです。
+ <br>
+ Worker が利用できない環境では、それをエミュレートし クロスブラウザに動作する Worker として作られています。
+ <br>
+ Web ブラウザ上では Worker を使用し、userscript (Greasemonkey) や XUL (Firefox アドオン) 上では
+ <br>
+ <a href="https://developer.mozilla.org/en/DOM/ChromeWorker" title="ChromeWorker - MDN" target="_blank">ChromeWorker</a>
+ が有効であればそれを使います。
+ <br>
+ どちらも利用できない場合は 単にバックグラウンドで実行されます。
+ <br>
+ どちらの場合でも、<a href="#reference.function.Pot.Workeroid.prototype.terminate">terminate()</a> により途中で処理を終了させることが可能です。
+ <br>
+ メッセージの受け渡しには 従来の Worker と同じく <a href="#reference.function.Pot.Workeroid.prototype.postMessage">postMessage()</a> を使います。
+ <br>
+ 同じくメッセージの受信イベントに <a href="#reference.function.Pot.Workeroid.prototype.onmessage">onmessage</a>, エラー時に <a href="#reference.function.Pot.Workeroid.prototype.onerror">onerror</a> を使用します。
+ <br>
+ この際に addEventListener を利用することも可能です。
+ <br>
+ <a href="#reference.function.Pot.Workeroid.prototype.terminate">terminate()</a> は、Worker スレッドの実行を中断または終了する際に使用します。
+ <br>
+ 子 Worker スレッドでの <a href="#reference.function.Pot.Workeroid.prototype.importScripts">importScripts()</a> はスクリプトを読み込む際に使用します。
+ <br>
+ 基本的にネイティブの Worker と同じように利用できます。
+</p>
+<p>
+ また、子 Worker から Pot オブジェクトが利用できます。
+ <br>
+ Pot.js が実行中でであれば Pot.js が、PotLite.js が実行中の場合は PotLite.js がデフォルトで利用可能です。
+ <br>
+ したがって、<a href="#reference.function.Pot.forEach">Pot.Deferred.forEach</a> などを利用し CPU を抑えたループが利用できます。
+ <br>
+ 子 Worker 内の Pot オブジェクトは、親スレッドでの Pot オブジェクトとは別ものです。
+</p>
+<p>
+ prototype メソッドは、<code>new Pot.Workeroid(script)</code> から返される
+ <br>
+ Pot.Workeroid インスタンスから実行できる関数/メソッドです。
+</p>
+<p>
+ Pot.Workeroid は、コンストラクタに ファイル名のほか、<strong>function や文字列を渡すことができます。</strong>
+ <br>
+ 以下は function で Worker スレッドを生成する例です。
+</p>
+<style type="text/css">
+.pot-workeroid-thread {
+  background: #ffcfea;
+  margin: 0;
+  padding: 5px;
+  *padding: 0;
+  line-height: 1;
+}
+</style>
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                          
+    // このスコープの中が 子 Worker スレッド    
+    //                                          
+    var add = 1;                                
+    postMessage(data + add);                    
+}</span>);
+
+// メッセージを受信した時
+worker.onmessage = function(data) {
+    alert(data);
+};
+
+// エラー時の設定 (任意)
+worker.onerror = function(err) {
+    alert(err);
+};
+
+// 1 を 子 Worker に送信 =&gt; 2 が alert される
+worker.postMessage(1);</pre>
+<p>
+ ファイル名を渡すことに慣れている場合、分かり難いかもしれませんが
+ <br>
+ コンストラクタに渡した function が、子 Worker の onmessage に設定されます。
+ <br>
+ つまり、渡した function は別スレッドで動きます。(エミュレート時以外)。
+</p>
+<p>
+ 引数の data は、event.data にあたるものです。
+ <br>
+ function オブジェクトを直接指定した場合、event.data がそのまま 第一引数に返ります。
+ <br>
+ event オブジェクトを取得したい場合は、第二引数で取得できます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、
+ 例えば new Pot.Workeroid が、 new Workeroid と実行できます。
+</p>
+
+<p>
+ コンストラクタの例を含む詳細は <a href="#reference.function.Pot.Workeroid">new Workeroid</a> から参照ください。
+</p>
+
+<p><br></p>
+
+<p>
+ このリファレンスのサンプルコードの多くは、
+ 便宜上 <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されたと仮定して記述しています。
+ <br>
+ 例えば、<a href="#reference.function.Pot.forEach">Pot.forEach</a> として定義されている関数を forEach(...) と表現している場合があります。
+ これは、Pot.globalize() がされていない場合 Pot.forEach(...) として呼び出せます。
+ 他の関数も同様です。
+ <br>
+ Pot.globalize() が適応済みの場合、定義名のままで呼び出せます。
+</p>
+<p>
+ また、サンプルコードでは コンソールに出力するデバッグ用関数 <a href="#reference.function.Pot.debug">Pot.debug()</a> を多用しています。
+ <br>
+ Pot.debug() を、たんに debug() と表している場合もあります。
+ <br>
+ Pot.debug については このセクションで扱っているので詳しくはメニューから参照ください。
+</p>
+<p>
+ このリファレンスは Pot.js, PotLite.js の関数を事細かく解説しているわけではないので、
+ 足りない情報があるかもしれません。
+ <br>
+ より詳しくは
+ ソースコードから自動生成された
+ <a href="jsdoc/index.html" 
+    title="Pot.js - JSDoc Reference - Index">JSDoc ドキュメント (Pot.js)</a>
+ or
+ <a href="jsdoc/potlite/index.html" 
+    title="PotLite.js - JSDoc Reference - Index">JSDoc ドキュメント (PotLite.js)</a>
+ または直接ソースコードを参照ください。
+</p>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

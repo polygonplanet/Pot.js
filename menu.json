@@ -75,9 +75,14 @@
         "reference.function.Pot.isNodeLike":{"ja":"isNodeLike","en":"isNodeLike"},
         "reference.function.Pot.globalEval":{"ja":"globalEval","en":"globalEval"},
         "reference.function.Pot.localEval":{"ja":"localEval","en":"localEval"},
+        "reference.function.Pot.tokenize":{"ja":"tokenize","en":"tokenize"},
+        "reference.function.Pot.joinTokens":{"ja":"joinTokens","en":"joinTokens"},
+        "reference.function.Pot.isWords":{"ja":"isWords","en":"isWords"},
+        "reference.function.Pot.isNL":{"ja":"isNL","en":"isNL"},
         "reference.function.Pot.hasReturn":{"ja":"hasReturn","en":"hasReturn"},
         "reference.function.Pot.override":{"ja":"override","en":"override"},
         "reference.function.Pot.getErrorMessage":{"ja":"getErrorMessage","en":"getErrorMessage"},
+        "reference.function.Pot.getFunctionCode":{"ja":"getFunctionCode","en":"getFunctionCode"},
         "reference.function.Pot.currentWindow":{"ja":"currentWindow","en":"currentWindow"},
         "reference.function.Pot.currentDocument":{"ja":"currentDocument","en":"currentDocument"},
         "reference.function.Pot.currentURI":{"ja":"currentURI","en":"currentURI"},
@@ -155,6 +160,17 @@
         "reference.function.Pot.Deferred.deferreed":{"ja":"deferreed","en":"deferreed"},
         "reference.function.Pot.Deferred.parallel":{"ja":"parallel","en":"parallel"},
         "reference.function.Pot.Deferred.chain":{"ja":"chain","en":"chain"}
+      }
+    },
+    "reference.Pot.Workeroid.methods":{
+      "title":{"ja":"Pot.Workeroid.prototype","en":"Pot.Workeroid.prototype"},
+      "items":{
+        "reference.function.Pot.Workeroid":{"ja":"new Workeroid","en":"new Workeroid"},
+        "reference.function.Pot.Workeroid.prototype.onmessage":{"ja":"onmessage","en":"onmessage"},
+        "reference.function.Pot.Workeroid.prototype.onerror":{"ja":"onerror","en":"onerror"},
+        "reference.function.Pot.Workeroid.prototype.postMessage":{"ja":"postMessage","en":"postMessage"},
+        "reference.function.Pot.Workeroid.prototype.terminate":{"ja":"terminate","en":"terminate"},
+        "reference.function.Pot.Workeroid.prototype.importScripts":{"ja":"importScripts","en":"importScripts"}
       }
     },
     "reference.Pot.Signal.functions":{
@@ -259,12 +275,14 @@
       "title":{"ja":"Pot.DateTime","en":"Pot.DateTime"},
       "items":{
         "reference.function.Pot.DateTime.time":{"ja":"time","en":"time"},
-        "reference.function.Pot.DateTime.format":{"ja":"format","en":"format"}
+        "reference.function.Pot.DateTime.format":{"ja":"format","en":"format"},
+        "reference.function.Pot.DateTime.prettyDate":{"ja":"prettyDate","en":"prettyDate"}
       }
     },
     "reference.Pot.Format.functions":{
       "title":{"ja":"Pot.Format","en":"Pot.Format"},
       "items":{
+        "reference.function.Pot.Format.format":{"ja":"format","en":"format"},
         "reference.function.Pot.Format.sprintf":{"ja":"sprintf","en":"sprintf"}
       }
     },

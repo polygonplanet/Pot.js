@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.getFunctionCode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.getFunctionCode';
+</script>
+</head>
+<body>
+<h1>Pot.getFunctionCode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.getFunctionCode"><em>Pot.</em>getFunctionCode</dfn>
+    (<em>{Function|String}</em> func)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 func の function 内部コードを文字列で取得します。
+    </p>
+    <div>
+      <p>
+ 関数内の内部コード文字列を取得します。
+ <br>
+ 引数 func に、対象の関数 もしくは 文字列を指定します。
+ <br>
+ 取得した内部コードは、宣言時のものとは変化している可能性があります。
+ <br>
+ この差は、実行環境により違いがでるので注意してください。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.getFunctionCode() が getFunctionCode() で実行できます。
+</p>
+<p>
+ 取得した function コードが返ります。
+</p>
+
+<pre>debug(getFunctionCode(function() { return 'hoge'; }));
+// e.g.
+//   'function () {' +
+//   '    return "hoge";' +
+//   '}'</pre>
+
+<pre>debug(getFunctionCode('function() { return 1; }'));
+// e.g. 'function() { return 1; }'</pre>
+
+<pre>debug(getFunctionCode(1));      // ''
+debug(getFunctionCode(false));  // ''
+debug(getFunctionCode(true));   // ''
+debug(getFunctionCode(null));   // ''
+debug(getFunctionCode(void 0)); // ''
+debug(getFunctionCode({}));     // ''</pre>
+
+<pre>debug(getFunctionCode(new Function('return 1')));
+// e.g.
+//   'function anonymous() {' +
+//   '    return 1;' +
+//   '}'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

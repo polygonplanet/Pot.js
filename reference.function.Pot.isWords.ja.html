@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.isWords</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.isWords';
+</script>
+</head>
+<body>
+<h1>Pot.isWords</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isWords"><em>Pot.</em>isWords</dfn>
+    (<em>{String}</em> token)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 token が words かどうか調べます。
+    </p>
+    <div>
+      <p>
+ 引数 token をトークンまたは単一の文字列とみなし、それが words であれば true を返します。
+ <br>
+ words は、添字や変数名などで使用できる範囲の Unicode 値として扱われます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.isWords() が isWords() で実行できます。
+</p>
+<p>
+ words であれば true が返ります。違う場合は false が返ります。
+</p>
+
+<pre>debug(isWords(' '));     // false
+debug(isWords('abc'));   // true
+debug(isWords('ほげ'));  // true
+debug(isWords('\r\n'));  // false
+debug(isWords(' \n'));   // false
+debug(isWords(' abc'));  // false
+debug(isWords('abc '));  // false
+debug(isWords('_'));     // true
+debug(isWords(false));   // false
+debug(isWords(true));    // false
+debug(isWords(void 0));  // false
+debug(isWords({}));      // false
+debug(isWords(['ABC'])); // false
+debug(isWords('$hoge')); // true
+debug(isWords('$_'));    // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

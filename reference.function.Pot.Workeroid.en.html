@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Workeroid</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Workeroid';
+</script>
+</head>
+<body>
+<h1>Pot.Workeroid</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Workeroid}</em>
+    <em>new</em>
+    <dfn id="definition.reference.function.Pot.Workeroid"><em>Pot.</em>Workeroid</dfn>
+    (<em>{Function|String|*}</em> script)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      与えられた script と共に Worker スレッドを生成し、Pot.Workeroid の新しいインスタンスを返します。
+    </p>
+    <div>
+
+<p>
+ Pot.Workeroid の解説については <a href="#reference.Pot.Workeroid.methods">Pot.Workeroid</a> を参照ください。
+</p>
+<p>
+ 引数 script には、子 Worker の ファイル名、または function オブジェクト、評価される文字列などを指定します。
+ <br>
+ コンストラクタの生成と同時に、script が Worker として評価され、実行されます。
+ <br>
+ 実行は常に非同期で行われ、ネイティブ Worker が利用可能な場合 別プロセスで実行されます。
+ <br>
+ script がファイル名の場合、従来の Worker と同じように実行されます。
+ <br>
+ この場合、<code>onmessage = function(event) {...}</code> と イベントの設定が必要です。
+ <br>
+ script が function オブジェクトの場合、その関数を onmessage のイベントとして設定し、評価します。
+ <br>
+ script が function オブジェクトであり、コード内に <code>onmessage = function(event) {...}</code> の設定がされていた場合
+ <br>
+ イベントとして設定はされずに評価されます。
+</p>
+<p>
+ また、子 Worker から Pot オブジェクトが利用できます。
+ <br>
+ Pot.js が実行中でであれば Pot.js が、PotLite.js が実行中の場合は PotLite.js がデフォルトで利用可能です。
+ <br>
+ したがって、<a href="#reference.function.Pot.forEach">Pot.Deferred.forEach</a> などを利用し CPU を抑えたループが利用できます。
+ <br>
+ 子 Worker 内の Pot オブジェクトは、親スレッドでの Pot オブジェクトとは別のオブジェクトです。
+</p>
+<style type="text/css">
+.pot-workeroid-thread {
+  background: #ffcfea;
+  margin: 0;
+  padding: 5px;
+  *padding: 0;
+  line-height: 1;
+}
+</style>
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                          
+    // このスコープの中が 子 Worker スレッド    
+    //                                          
+    var add = 1;                                
+    postMessage(data + add);                    
+}</span>);
+
+// メッセージを受信した時
+worker.onmessage = function(data) {
+    alert(data);
+};
+
+// 1 を 子 Worker に送信 =&gt; 2 が alert される
+worker.postMessage(1);</pre>
+<p>
+ ファイル名を渡すことに慣れている場合、分かり難いかもしれませんが
+ <br>
+ コンストラクタに渡した function が、子 Worker の onmessage に設定されます。
+ <br>
+ つまり、渡した function は別スレッドで動きます。(エミュレート時以外)。
+</p>
+<p>
+ 引数の data は、event.data にあたるものです。
+ <br>
+ function オブジェクトを直接指定した場合、event.data がそのまま 第一引数に返ります。
+ <br>
+ event オブジェクトを取得したい場合は、第二引数から取得できます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、new Pot.Workeroid() が new Workeroid() で実行できます。
+</p>
+<p>
+ 新しい Pot.Workeroid インスタンスが返ります。
+</p>
+
+<h3>function で指定</h3>
+<p>
+ script に function オブジェクトを渡した場合の例:
+</p>
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                          
+    // このスコープの中が 子 Worker スレッド    
+    //                                          
+    var add = 1;                                
+    postMessage(data + add);                    
+    // self.postMessage(...) でも可             
+}</span>);
+
+// メッセージを受信した時 (addEventListener でも設定可)
+worker.addEventListener('message', function(data, event) {
+    alert(data);
+}, false);
+
+// 1 を 子 Worker に送信 =&gt; 2 が alert される
+worker.postMessage(1);</pre>
+
+
+<h3>ファイル名で指定</h3>
+<p>
+ script に ファイル名で指定した場合の例:
+ <br>
+ worker.example.parent.js : 
+</p>
+<pre>var worker = new Pot.Workeroid('worker.example.child.js');
+
+// メッセージを受信した時 (addEventListener でも設定可)
+worker.onmessage = function(data, event) {
+    alert(data);
+};
+
+// エラー時の設定 (任意)
+worker.onerror = function(err) {
+    alert(err);
+};
+
+// 1 を 子 Worker に送信 =&gt; 2 が alert される
+worker.postMessage(1);</pre>
+
+<p>
+ worker.example.child.js :
+</p>
+<pre>// 子 Worker 内
+
+var add = 1;
+
+onmessage = function(event) {
+    postMessage(event.data + add);
+};</pre>
+
+<p>
+ script に function で指定し、その関数内で onmessage の設定を持つ場合:
+ <br>
+ この場合は ファイル名指定と同じく onmessage 関数に event オブジェクトが直接渡される。
+</p>
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function() {
+    //                                          
+    // このスコープの中が 子 Worker スレッド    
+    //                                          
+    var add = 1;                                
+    onmessage = function(event) {               
+        postMessage(event.data + add);          
+    };                                          
+}</span>);
+
+// メッセージを受信した時
+worker.onmessage = function(data, event) {
+    alert(data);
+};
+
+// 1 を 子 Worker に送信 =&gt; 2 が alert される
+worker.postMessage(1);</pre>
+
+<p>
+ このように ファイル名指定と同じく onmessage の指定と共に実行できますが、
+ <br>
+ Pot.Workeroid では、onmessage の設定のない function 指定を推奨します。
+ <br>
+ これは、onmessage の外側のスコープの扱いがブラウザ間で異なる場合があることと、
+ <br>
+ 引数が event なのか data なのか混乱することを避けるためです。
+</p>
+
+<h3>Pot.js を利用する</h3>
+<p>
+ 子 Worker からデフォルトで利用できる Pot オブジェクトを利用すると、
+ <br>
+ CPU 負荷をかけずに実行することができます。
+</p>
+
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                               
+    // このスコープの中が 子 Worker スレッド         
+    //                                               
+    var n = 1;                                       
+    search: while (true) {                           
+        n += 1;                                      
+        for (var i = 2; i &lt;= Math.sqrt(n); i += 1) { 
+            if (n % i == 0) {                        
+                continue search;                     
+            }                                        
+        }                                            
+        // 素数をポスト                              
+        postMessage(n);                              
+    }                                                
+}</span>);
+
+// メッセージを受信した時
+worker.onmessage = function(data, event) {
+    Pot.debug(data);
+};
+
+// Worker を開始
+worker.postMessage();</pre>
+
+<p>
+ この例では、素数をひたすら 親スレッドへポストし続けます。
+ <br>
+ その間、処理はバックグラウンドで行われますが CPU の配慮がありません。
+ <br>
+ そこで、Pot.js のイテレータを利用します。
+</p>
+
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                               
+    // このスコープの中が 子 Worker スレッド         
+    //                                               
+    var n = 1;                                       
+    Pot.Deferred.forEver(function() {                
+        n += 1;                                      
+        for (var i = 2; i &lt;= Math.sqrt(n); i += 1) { 
+            if (n % i == 0) {                        
+                return;                              
+            }                                        
+        }                                            
+        // 素数をポスト                              
+        postMessage(n);                              
+    });                                              
+}</span>);
+
+// メッセージを受信した時
+worker.onmessage = function(data, event) {
+    Pot.debug(data);
+};
+
+// Worker を開始
+worker.postMessage();</pre>
+
+<p>
+ <a href="#reference.function.Pot.forEver">Pot.Deferred.forEver</a> は、<a href="#reference.property.Pot.StopIteration">StopIteration</a> が throw されるまでイテレートします。
+ <br>
+ この変化により、CPU 使用率は減少し安定したスレッドに保てます。
+ <br>
+ 必要に応じて、<code>Pot.Deferred.forEver<strong>.slow</strong>(...)</code> などの速度調整が可能です。
+ <br>
+ 速度の調整については <a href="#manualsub.Deferred.Reference.speedControl">Deferred 速度の指定</a> を参照ください。
+</p>
+
+<h3>Pot.Deferred と連携</h3>
+<p>
+ <a href="#manualsub.Deferred.Reference.callbackChain">Pot.Deferred チェイン</a> の中で Pot.Workeroid インスタンスを返すと、
+ <br>
+ 子 Worker が postMessage するまで待機します。
+</p>
+
+<pre>var worker = new Pot.Workeroid(<span class="pot-workeroid-thread">function(data) {
+    //                                          
+    // このスコープの中が 子 Worker スレッド    
+    //                                          
+    // タイマーで順序を狂わせるように返す       
+    switch (data) {                             
+        case 'foo':                             
+            setTimeout(function() {             
+                postMessage('Foooooooooo!');    
+            }, 3000);                           
+            break;                              
+        case 'bar':                             
+            Pot.callLater(2, function() {       
+                postMessage('Baaaaaaaaaaaa!!'); 
+            });                                 
+            break;                              
+        case 'baz':                             
+            setTimeout(function() {             
+                postMessage('Baaaaaaaaaz!!!');  
+            }, 20);                             
+            break;                              
+    }                                           
+}</span>);
+
+worker.onmessage = function(data) {
+    Pot.debug(data);
+};
+
+Pot.Deferred.begin(function() {
+    worker.postMessage('foo');
+
+    // worker を返すことで
+    // 子 Worker が postMessage するまで待機
+    return worker;
+
+}).then(function() {
+    worker.postMessage('bar');
+    return worker;
+}).then(function() {
+    worker.postMessage('baz');
+    return worker;
+});
+//
+// 結果:
+//   'Foooooooooo!'
+//   'Baaaaaaaaaaaa!!'
+//   'Baaaaaaaaaz!!!'
+//   の順でコンソールに出力される
+//</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

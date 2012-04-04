@@ -156,6 +156,22 @@ originalText  : <em class="var-type">{String}</em> オリジナルの responseTe
    <br>
    サーバ側で 'Access-Control-Allow-Origin' ヘッダなどの設定が必要です。
   </dd>
+  <dt><em>{Boolean}</em> <dfn>sync</dfn> = false</dt>
+  <dd>
+   同期で実行する場合、true に設定します。
+   <br>
+   デフォルトは非同期です。
+  </dd>
+  <dt><em>{String}</em> <dfn>responseType</dfn> = null</dt>
+  <dd>
+   取得するタイプを指定できます。
+   <br>
+   例えば、'arraybuffer', 'blob', 'document', 'json', 'text' などです。
+   <br>
+   詳細は、<a href="http://www.w3.org/TR/XMLHttpRequest/#the-responsetype-attribute" target="_blank" title="XMLHttpRequest Level 2 - W3C">XMLHttpRequest Level 2 - W3C</a> などを参照ください。
+   <br>
+   Web ブラウザ以外の環境、またはサポートされていない環境では有効になりません。
+  </dd>
  </dl>
 </div>
 

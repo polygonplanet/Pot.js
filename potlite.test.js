@@ -9,14 +9,15 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.21
- * @date           2012-03-13
- * @copyright      Copyright (c) 2012 polygon planet <polygon.planet*gmail.com>
+ * @version        1.22
+ * @date           2012-04-04
+ * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  */
 var Assert = {
   JSON_URL     : './potlite.test.json',
   JSONP_URL    : 'http://api.polygonpla.net/js/pot/potlite.test.json',
+  WORKER_URL   : './pot.worker.test.js',
   POTJS_LOADED : false
 };
 
@@ -580,6 +581,14 @@ $(function() {
       },
       expect : true
     }, {
+      title  : 'Pot.isWorkeroid()',
+      code   : function() {
+        var o = {hoge : 1};
+        var w = new Workeroid();
+        return [isWorkeroid(o), isWorkeroid(w)];
+      },
+      expect : [false, true]
+    }, {
       title  : 'Pot.isNumeric()',
       code   : function() {
         return [
@@ -699,6 +708,141 @@ $(function() {
         return result;
       },
       expect : true
+    }, {
+      title  : 'Pot.getFunctionCode()',
+      code   : function() {
+        return [
+          getFunctionCode(function() { return 'hoge'; }).replace(/^\s*[(]+\s*|\s*[)]+\s*$/g, ''),
+          getFunctionCode('function() { return 1; }'),
+          getFunctionCode(1),
+          getFunctionCode(false),
+          getFunctionCode(true),
+          getFunctionCode(null),
+          getFunctionCode(void 0),
+          getFunctionCode({}),
+          getFunctionCode(new Function('return 1')).replace(/^\s*[(]+\s*|\s*[)]+\s*$/g, '')
+        ];
+      },
+      expect : [
+        (function() { return 'hoge'; }).toString().replace(/^\s*[(]+\s*|\s*[)]+\s*$/g, ''),
+        'function() { return 1; }',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        (new Function('return 1')).toString().replace(/^\s*[(]+\s*|\s*[)]+\s*$/g, '')
+      ]
+    }, {
+      title  : 'Pot.isWords()',
+      code   : function() {
+        return [
+          isWords(' '),
+          isWords('abc'),
+          isWords('ほげ'),
+          isWords('\r\n'),
+          isWords(' \n'),
+          isWords(' abc'),
+          isWords('abc '),
+          isWords('_'),
+          isWords(false),
+          isWords(true),
+          isWords(void 0),
+          isWords({}),
+          isWords(['ABC']),
+          isWords('$hoge'),
+          isWords('$_')
+        ];
+      },
+      expect : [
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
+    }, {
+      title  : 'Pot.isNL()',
+      code   : function() {
+        return [
+          isNL('abc'),
+          isNL(' '),
+          isNL('\n'),
+          isNL('\r'),
+          isNL('\r\n'),
+          isNL('\nhoge'),
+          isNL('\r \n'),
+          isNL('\r\n\r\n'),
+          isNL('\u2028\u2029'),
+          isNL(null),
+          isNL(void 0),
+          isNL(false),
+          isNL(true),
+          isNL(new String('\n')),
+          isNL({}),
+          isNL(['\n'])
+        ];
+      },
+      expect : [
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ]
+    }, {
+      title  : 'Pot.tokenize()',
+      code   : function() {
+        var hoge = function() {
+          var a = 1, b = 0.5, c = String(1), $d = /'\/'/g;
+          return $d.test(c) ? a : b;
+        };
+        return tokenize(hoge);
+      },
+      expect : [
+        'function', '(', ')', '{', '\n',
+          'var', 'a', '=', '1', ',', 'b', '=', '0.5', ',',
+                 'c', '=', 'String', '(', '1', ')', ',',
+                 '$d', '=', '/\'\\/\'/g', ';', '\n',
+          'return', '$d', '.', 'test', '(', 'c', ')', '?',
+                    'a', ':', 'b', ';', '\n',
+        '}'
+      ]
+    }, {
+      title  : 'Pot.joinTokens()',
+      code   : function() {
+        var hoge = function() {
+          var a = 1, b = 0.5, c = String(1), $d = /'\/'/g;
+          return $d.test(c) ? a : b;
+        };
+        return joinTokens(tokenize(hoge));
+      },
+      expect : 'function(){\n' +
+        'var a=1,b=0.5,c=String(1),$d=/\'\\/\'/g;\n' +
+        'return $d.test(c)?a:b;\n' +
+      '}'
     }, {
       title  : 'Pot.hasReturn()',
       code   : function() {
@@ -2485,6 +2629,137 @@ $(function() {
         });
       },
       expect : 'foobarbaz'
+    }, {
+      title  : 'Pot.Workeroid with function',
+      code   : function() {
+        var d = new Deferred();
+        var worker = new Workeroid(function(data) {
+          postMessage(data + 1);
+        });
+        worker.onmessage = function(data) {
+          d.begin(data);
+        };
+        worker.onerror = function(err) {
+          d.raise(err);
+        };
+        worker.postMessage(1);
+        return d;
+      },
+      expect : 2
+    }, {
+      title  : 'Pot.Workeroid with function by self',
+      code   : function() {
+        var d = new Deferred();
+        var worker = new Workeroid(function(data) {
+          self.postMessage(data + 1);
+        });
+        worker.onmessage = function(data) {
+          d.begin(data);
+        };
+        worker.onerror = function(err) {
+          d.raise(err);
+        };
+        worker.postMessage(1);
+        return d;
+      },
+      expect : 2
+    }, {
+      title  : 'Pot.Workeroid with scope',
+      code   : function() {
+        var d = new Deferred();
+        var worker = new Workeroid(function() {
+          onmessage = function(ev) {
+            postMessage(ev.data + 'bar');
+          };
+        });
+        worker.onmessage = function(data) {
+          d.begin(data);
+        };
+        worker.onerror = function(err) {
+          d.raise(err);
+        };
+        worker.postMessage('foo');
+        return d;
+      },
+      expect : 'foobar'
+    }, {
+      title  : 'Pot.Workeroid with scope by self',
+      code   : function() {
+        var d = new Deferred();
+        var worker = new Workeroid(function() {
+          var bar = 'bar';
+          self.onmessage = function(ev) {
+            self.postMessage(ev.data + bar);
+          };
+        });
+        worker.onmessage = function(data) {
+          d.begin(data);
+        };
+        worker.onerror = function(err) {
+          d.raise(err);
+        };
+        worker.postMessage('foo');
+        return d;
+      },
+      expect : 'foobar'
+    }, {
+      title  : 'Pot.Workeroid with file',
+      code   : function() {
+        var d = new Deferred();
+        var worker = new Workeroid('pot.worker.test.js');
+        worker.onmessage = function(data) {
+          d.begin(data);
+        };
+        worker.onerror = function(err) {
+          d.raise(err);
+        };
+        worker.postMessage('foo');
+        return d;
+      },
+      expect : 'foobar'
+    }, {
+      title  : 'Pot.Workeroid with Deferred chain',
+      code   : function() {
+        var results = [];
+        var d = new Deferred();
+        var worker = new Workeroid(function(data) {
+          switch (data) {
+            case 'foo':
+                setTimeout(function() {
+                  postMessage('foo!');
+                }, 2000);
+                break;
+            case 'bar':
+                Pot.callLater(1, function() {
+                  postMessage('bar!');
+                });
+                break;
+            case 'baz':
+                postMessage('baz!');
+                break;
+          }
+        });
+        worker.onmessage = function(data) {
+          results.push(data);
+        };
+        worker.onerror = function(err) {
+          results.push(err);
+        };
+        return begin(function() {
+          worker.postMessage('foo');
+          return worker;
+        }).then(function() {
+          worker.postMessage('bar');
+          return worker;
+        }).then(function() {
+          worker.postMessage('baz');
+          return worker;
+        }).then(function() {
+          worker.terminate();
+          return d.begin(results);
+        });
+      },
+      expect : ['foo!', 'bar!', 'baz!']
     }, {
       title  : 'Pot.Signal.attach() and Pot.Signal.detach() for Object',
       code   : function() {

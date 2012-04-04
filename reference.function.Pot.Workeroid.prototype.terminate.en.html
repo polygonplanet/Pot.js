@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Workeroid.prototype.terminate</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Workeroid.prototype.terminate';
+</script>
+</head>
+<body>
+<h1>Pot.Workeroid.prototype.terminate</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Workeroid}</em>
+    <dfn id="definition.reference.function.Pot.Workeroid.prototype.terminate"><em>Pot.Workeroid.prototype.</em>terminate</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Worker スレッドを終了します。
+    </p>
+    <div>
+      <p>
+ 実行中の Worker を終了させます。
+ <br>
+ Pot.Workeroid がエミュレート動作であっても Worker スレッドは処理を中止します。
+ <br>
+ また、Pot.Workeroid では GC の処理も兼ねているため、強制中断でなくても
+ <br>
+ 終了した Worker には terminate() を実行することを推奨します。
+</p>
+
+<p>
+ 実行中の Pot.Workeroid インスタンス自身 が返ります。
+</p>
+
+<pre>var worker = new Pot.Workeroid(function(data) {
+    // 1 から順にひたすら数字を返す
+    Pot.Deferred.forEver.slow(function(i) {
+        postMessage(i);
+        if (i % 2 === 0) {
+            return Pot.Deferred.wait(0.1);
+        }
+    });
+});
+
+worker.onmessage = function(data) {
+    Pot.debug(data);
+};
+
+// Worker 開始
+worker.postMessage();
+
+// 5 秒後に終了
+Pot.callLater(5, function() {
+    worker.terminate();
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

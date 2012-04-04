@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.isNL</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.isNL';
+</script>
+</head>
+<body>
+<h1>Pot.isNL</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isNL"><em>Pot.</em>isNL</dfn>
+    (<em>{String}</em> token)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 token が改行かどうか調べます。
+    </p>
+    <div>
+      <p>
+ 引数 token をトークンまたは単一の文字列とみなし、それがすべて改行であれば true を返します。
+ <br>
+ 改行は、Unicode で扱われます。U+2028 - U+2029 も含まれます。
+ <br>
+ 2 つ以上の改行であっても、すべてが改行であれば true が返ります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.isNL() が isNL() で実行できます。
+</p>
+<p>
+ token がすべて改行なら true が返ります。違う場合は false が返ります。
+</p>
+
+<pre>debug(isNL('abc'));            // false
+debug(isNL(' '));              // false
+debug(isNL('\n'));             // true
+debug(isNL('\r'));             // true
+debug(isNL('\r\n'));           // true
+debug(isNL('\nhoge'));         // false
+debug(isNL('\r \n'));          // false
+debug(isNL('\r\n\r\n'));       // true
+// Note: includes U+2028 - U+2029
+debug(isNL('\u2028\u2029'));   // true
+debug(isNL(null));             // false
+debug(isNL(void 0));           // false
+debug(isNL(false));            // false
+debug(isNL(true));             // false
+debug(isNL(new String('\n'))); // true
+debug(isNL({}));               // false
+debug(isNL(['\n']));           // false</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
