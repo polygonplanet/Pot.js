@@ -1235,7 +1235,9 @@ td.marker, td.marker * {
 <script type="text/javascript" async="async" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
 setTimeout(function() {
+  var GOOGLE_CSE_ID = '016609467813454575271:hrg8_jergck';
   var done, loaded;
+
   if (typeof Pot === 'undefined' || typeof google === 'undefined' || typeof $ === 'undefined') {
     return setTimeout(arguments.callee, 13);
   }
@@ -1264,7 +1266,7 @@ setTimeout(function() {
     Pot.Reference.isCustomSearchLoaded = true;
 
     container = $('#cse-search-result-container');
-    customSearchControl = new google.search.CustomSearchControl('001996688748745519152:u0c9tdqbk0y', {
+    customSearchControl = new google.search.CustomSearchControl(GOOGLE_CSE_ID, {
       adoptions : {layout : 'noTop'}
     });
     customSearchControl.setResultSetSize(google.search.Search.LARGE_RESULTSET);
