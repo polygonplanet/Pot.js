@@ -21,6 +21,7 @@ toString       = Object.prototype.toString,
 hasOwnProperty = Object.prototype.hasOwnProperty,
 toFuncString   = Function.prototype.toString,
 fromCharCode   = String.fromCharCode,
+StopIteration  = (typeof StopIteration === 'undefined') ? void 0 : StopIteration,
 
 /**
  * faster way of String.fromCharCode(c).
@@ -2065,8 +2066,8 @@ Pot.update({
 }('StopIteration'));
 
 // Define StopIteration (this scope only)
-if (typeof StopIteration === 'undefined') {
-  var StopIteration = Pot.StopIteration;
+if (typeof StopIteration === 'undefined' || !StopIteration) {
+  StopIteration = Pot.StopIteration;
 }
 
 // Definition of current Document and URI.
