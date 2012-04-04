@@ -64,9 +64,8 @@ Pot.update({
    * @public
    */
   globalize : function(target, advised) {
-    var result = false, args = arrayize(arguments);
-    var inputs, outputs, len, noops = [];
-    len = args.length;
+    var result = false, args = arrayize(arguments),
+        inputs, outputs, len = args.length, noops = [];
     if (len <= 1 && this === Pot && !Pot.isObject(target)) {
       inputs = this;
       if (len >= 1 && Pot.isBoolean(target)) {

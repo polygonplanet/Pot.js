@@ -3745,8 +3745,8 @@ function rescape(s) {
  * @ignore
  */
 function invoke(/*object[, method[, ...args]]*/) {
-  var args = arrayize(arguments), argn = args.length;
-  var object, method, params, emit, p, t, i, len, err;
+  var args = arrayize(arguments), argn = args.length,
+      object, method, params, emit, p, t, i, len, err;
   try {
     switch (argn) {
       case 0:

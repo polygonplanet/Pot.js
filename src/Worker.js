@@ -254,7 +254,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    * @ignore
    */
   compriseScript : function(script, isFunc) {
-    var result = '', tokens, code, wrapper, hasWorker;
+    var result = '', tokens, code, hasWorker;
     if ((System.hasWorker &&
          (System.canWorkerDataURI || System.canWorkerBlobURI)) ||
         (System.hasChromeWorker &&

@@ -1009,8 +1009,8 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @public
    */
   data : function(/*[key/obj [, value [, ...args]]]*/) {
-    var that = this, result = this, args = arrayize(arguments);
-    var i, len = args.length, prefix = '.';
+    var that = this, result = this, args = arrayize(arguments),
+        i, len = args.length, prefix = '.';
     if (this.options) {
       if (!this.options.storage) {
         this.options.storage = {};
