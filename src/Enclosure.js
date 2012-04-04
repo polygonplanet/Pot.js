@@ -5,7 +5,7 @@
  *  that can execute JavaScript without burdening the CPU.
  *
  * Version {#$version}, {#$date}
- * Copyright (c) {#$year} polygon planet <polygon.planet@gmail.com>
+ * Copyright (c) {#$year} polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
  * http://polygonplanet.github.com/Pot.js/index.html
  */
