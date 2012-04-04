@@ -331,9 +331,13 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.UTF8.html">Pot.UTF8</a></li>
 	
+	<li><a href="../symbols/Pot.Workeroid.html">Pot.Workeroid</a></li>
+	
 	<li><a href="../symbols/Pot.XPCOM.html">Pot.XPCOM</a></li>
 	
 	<li><a href="../symbols/Pot.zip.html">Pot.zip</a></li>
+	
+	<li><a href="../symbols/PotScriptImplementation.html">PotScriptImplementation</a></li>
 	
 </ul>
 <hr />
@@ -746,9 +750,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.format">format</a></b>(fmt)
+								</div>
+								<div class="description">Formats to a string by arguments.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.getErrorMessage">getErrorMessage</a></b>(error, (defaults))
 								</div>
 								<div class="description">Get the error message from Error object.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.getFunctionCode">getFunctionCode</a></b>(func)
+								</div>
+								<div class="description">Get the function code.</div>
 							</td>
 						</tr>
 					
@@ -937,6 +959,15 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isNL">isNL</a></b>(c)
+								</div>
+								<div class="description">Checks whether a token is line-break.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isNodeLike">isNodeLike</a></b>(x)
 								</div>
 								<div class="description">Check whether the object looks like a DOM node.</div>
@@ -1003,6 +1034,33 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isWindow">isWindow</a></b>(x)
 								</div>
 								<div class="description">Check whether the argument object is Window.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isWords">isWords</a></b>(c)
+								</div>
+								<div class="description">Checks whether a token is words.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isWorkeroid">isWorkeroid</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument object is an instance of Pot.Workeroid.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.joinTokens">joinTokens</a></b>(tokens)
+								</div>
+								<div class="description">Joins the tokenized array.</div>
 							</td>
 						</tr>
 					
@@ -1113,6 +1171,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.stringify">stringify</a></b>(x, (ignoreBoolean))
 								</div>
 								<div class="description">Evaluate a string can be a scalar value only.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.tokenize">tokenize</a></b>(func)
+								</div>
+								<div class="description">Tokenize a function code simply.</div>
 							</td>
 						</tr>
 					
@@ -2141,6 +2208,65 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name=".format"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>format</b>(fmt)
+					
+					</div>
+					<div class="description">
+						Formats to a string by arguments.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var result = format('#1 + #2 + #3', 10, 20, 30);
+  debug(result);
+  // @results '10 + 20 + 30'</pre>
+					
+					<pre class="code">  var result = format('J#1v#1#2 ECMA#2', 'a', 'Script');
+  debug(result);
+  // @results 'JavaScript ECMAScript'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>fmt</b>
+									
+								</dt>
+								<dd>A string format.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{...*}</span> <b>(...)</b>
+									
+								</dt>
+								<dd>Format arguments.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Returns a formatted string.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".getErrorMessage"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2188,6 +2314,74 @@ ul.inheritsList
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{String}</span> Return the error message, or 'error'.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".getFunctionCode"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>getFunctionCode</b>(func)
+					
+					</div>
+					<div class="description">
+						Get the function code.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug(getFunctionCode(function() { return 'hoge'; }));
+  // @results e.g.
+  //   'function () {' +
+  //   '    return "hoge";' +
+  //   '}'</pre>
+					
+					<pre class="code">  debug(getFunctionCode('function() { return 1; }'));
+  // @results 'function() { return 1; }'</pre>
+					
+					<pre class="code">  debug(getFunctionCode(1));      // ''
+  debug(getFunctionCode(false));  // ''
+  debug(getFunctionCode(true));   // ''
+  debug(getFunctionCode(null));   // ''
+  debug(getFunctionCode(void 0)); // ''
+  debug(getFunctionCode({}));     // ''</pre>
+					
+					<pre class="code">  debug(getFunctionCode(new Function('return 1')));
+  // @results e.g.
+  //   'function anonymous() {' +
+  //   '    return 1;' +
+  //   '}'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Function|String}</span> <b>func</b>
+									
+								</dt>
+								<dd>Target function or string code.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Returns function code
+                                    or empty string ''.</dd>
 							
 							</dl>
 						
@@ -3421,6 +3615,69 @@ That is for cases where JavaScript sucks
 
 					<hr />
 				
+					<a name=".isNL"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isNL</b>(c)
+					
+					</div>
+					<div class="description">
+						Checks whether a token is line-break.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug(isNL('abc'));            // false
+  debug(isNL(' '));              // false
+  debug(isNL('\n'));             // true
+  debug(isNL('\r'));             // true
+  debug(isNL('\r\n'));           // true
+  debug(isNL('\nhoge'));         // false
+  debug(isNL('\r \n'));          // false
+  debug(isNL('\r\n\r\n'));       // true
+  // Note: includes U+2028 - U+2029
+  debug(isNL('\u2028\u2029'));   // true
+  debug(isNL(null));             // false
+  debug(isNL(void 0));           // false
+  debug(isNL(false));            // false
+  debug(isNL(true));             // false
+  debug(isNL(new String('\n'))); // true
+  debug(isNL({}));               // false
+  debug(isNL(['\n']));           // false</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>c</b>
+									
+								</dt>
+								<dd>A string token.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Returns whether a token is NL.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".isNodeLike"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -3873,6 +4130,176 @@ This function treats as scalar type for
 							
 								<dd><span class="light fixedFont">{Boolean}</span> Return true if the argument object
                                         is Window, otherwise return false.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isWords"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isWords</b>(c)
+					
+					</div>
+					<div class="description">
+						Checks whether a token is words.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  debug(isWords(' '));     // false
+  debug(isWords('abc'));   // true
+  debug(isWords('ほげ'));  // true
+  debug(isWords('\r\n'));  // false
+  debug(isWords(' \n'));   // false
+  debug(isWords(' abc'));  // false
+  debug(isWords('abc '));  // false
+  debug(isWords('_'));     // true
+  debug(isWords(false));   // false
+  debug(isWords(true));    // false
+  debug(isWords(void 0));  // false
+  debug(isWords({}));      // false
+  debug(isWords(['ABC'])); // false
+  debug(isWords('$hoge')); // true
+  debug(isWords('$_'));    // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>c</b>
+									
+								</dt>
+								<dd>A string token.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Returns whether a token is words.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isWorkeroid"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isWorkeroid</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument object is an instance of Pot.Workeroid.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var o = {hoge: 1};
+  var w = new Pot.Workeroid();
+  debug(isWorkeroid(o)); // false
+  debug(isWorkeroid(w)); // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object|*}</span> <b>x</b>
+									
+								</dt>
+								<dd>The target object to test.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if the argument object is an
+                         instance of Pot.Workeroid,
+                         otherwise return false.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".joinTokens"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>joinTokens</b>(tokens)
+					
+					</div>
+					<div class="description">
+						Joins the tokenized array.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var hoge = function() {
+    var a = 1, b = 0.5, c = '"hoge"', $d = /'\/'/g;
+    return $d.test(c) ? a : b;
+  };
+  var tokens = Pot.tokenize(hoge);
+  var result = Pot.joinTokens(tokens);
+  // @results
+  //   'function(){\n' +
+  //     'var a=1,b=0.5,c=\'"hoge"\',$d=/\'\\/\'/g;\n' +
+  //     'return $d.test(c)?a:b;\n' +
+  //   '}'</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Array}</span> <b>tokens</b>
+									
+								</dt>
+								<dd>The tokenized array.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> Returns a string that joined from tokens.</dd>
 							
 							</dl>
 						
@@ -4642,6 +5069,67 @@ This function can treat XML object that
 
 					<hr />
 				
+					<a name=".tokenize"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>tokenize</b>(func)
+					
+					</div>
+					<div class="description">
+						Tokenize a function code simply.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var hoge = function() {
+    var a = 1, b = 0.5, c = '"hoge"', $d = /'\/'/g;
+    return $d.test(c) ? a : b;
+  };
+  debug( Pot.tokenize(hoge) );
+  // @results
+  // [
+  //   'function', '(', ')', '{', '\n',
+  //     'var', 'a', '=', '1', ',', 'b', '=', '0.5', ',',
+  //            'c', '=', '\'"hoge"\'', ',',
+  //            '$d', '=', '/\'\\/\'/g', ';', '\n',
+  //     'return', '$d', '.', 'test', '(', 'c', ')', '?',
+  //               'a', ':', 'b', ';', '\n',
+  //   '}'
+  // ]</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Function|String}</span> <b>func</b>
+									
+								</dt>
+								<dd>The code or function to tokenize.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Array}</span> Tokens as an array.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".toString"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -4924,7 +5412,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Mar 13 2012 09:47:11 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Apr 04 2012 21:18:09 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
