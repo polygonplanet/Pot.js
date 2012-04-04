@@ -90,12 +90,21 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
       var items = arrayize(that.queues.splice(0, that.queues.length));
       return Pot.Deferred.forEach(items, function(item) {
         return Pot.Deferred.flush(function() {
-          if (child.nativeWorker) {
-            child.nativeWorker.postMessage(item);
-          } else {
-            child.onmessage({data : item});
+          var err;
+          try {
+            if (child.nativeWorker) {
+              child.nativeWorker.postMessage(item);
+            } else {
+              child.onmessage({data : item});
+            }
+          } catch (e) {
+            err = e;
+            if (!Pot.isStopIter(err)) {
+              throw err;
+            }
+          } finally {
+            that.fired = true;
           }
-          that.fired = true;
         });
       });
     });
@@ -109,14 +118,21 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
       if (child.nativeWorker) {
         child.nativeWorker.terminate();
       }
-      if (child.elem) {
-        try {
-          child.elem.parentNode.removeChild(child.elem);
-        } catch (e) {}
-        child.elem = null;
-      }
       if (child.context && child.stopId && child.stopId in child.context) {
         child.context[child.stopId] = true;
+        if (child.elem) {
+          // When removes iframe in asynchronous processing will be warnings.
+          Pot.Deferred.till(function() {
+            return child.context[child.isStoppedId] === true;
+          }).wait(1).then(function() {
+            try {
+              child.elem.parentNode.removeChild(child.elem);
+            } catch (e) {}
+            child.elem = null;
+          }).ensure(function() {
+            // ignore error.
+          });
+        }
       }
     }
   },
@@ -200,6 +216,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    * @private
    * @ignore
    */
+  isStoppedId : null,
+  /**
+   * @private
+   * @ignore
+   */
   usePot : false,
   /**
    * @private
@@ -216,8 +237,13 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       onmessage           : null,
       onerror             : null
     });
-    this.stopId = buildSerial(Pot, 'stop');
-    this.context[this.stopId] = false;
+    each({
+      stopId      : ['stop',    false],
+      isStoppedId : ['stopped', false]
+    }, function(v, k) {
+      that[k] = buildSerial(Pot, v[0]);
+      that.context[that[k]] = v[1];
+    });
     Pot.Deferred.flush(function() {
       that.runScript(js);
     });
@@ -250,21 +276,28 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         hasWorker = false;
       }
       if (RE.MSG.test(code)) {
-        // STATE: has onmessage settings: onmessage = function(data) {...}
+        // STATE: has onmessage settings: onmessage = function(ev) {...}
         if (hasWorker) {
           result = this.insertProvision(tokens, isFunc);
         } else {
-          result = this.insertStepStatements(tokens);
+          if (RE.DEFF.test(code)) {
+            code = Pot.format(
+              '(#1).call(this);',
+              code.replace(RE.HEAD, '$1').replace(RE.FUNC, '')
+            );
+            result = this.insertStepStatements(Pot.tokenize(code));
+          } else {
+            result = this.insertStepStatements(tokens);
+          }
         }
       } else {
-        wrapper = '(#1).call(' +
-          'this,' +
-          '(!event||typeof event.data==="undefined")?void 0:event.data,' +
-          'event' +
-        ');';
         if (RE.DEFF.test(code)) {
           code = Pot.format(
-            wrapper,
+            '(#1).call(' +
+              'this,' +
+              '(!event||typeof event.data==="undefined")?void 0:event.data,' +
+              'event' +
+            ');',
             code.replace(RE.HEAD, '$1').replace(RE.FUNC, '')
           );
         }
@@ -349,8 +382,10 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             id
           ),
           suf  : Pot.format(
-            '}).call(#1);throw Pot.StopIteration;});',
-            id
+            '}).call(#1);throw Pot.StopIteration;}).then(function(){' +
+              '#2=true;' +
+            '});',
+            id, this.isStoppedId
           ),
           step : Pot.format(
             'if(#1){throw Pot.StopIteration;}',
@@ -790,7 +825,15 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       var items = arrayize(that.queues.splice(0, that.queues.length));
       return Pot.Deferred.forEach(items, function(item) {
         return Pot.Deferred.flush(function() {
-          that.server.onmessage({data : item});
+          var err;
+          try {
+            that.server.onmessage({data : item});
+          } catch (e) {
+            err = e;
+            if (!Pot.isStopIter(err)) {
+              throw err;
+            }
+          }
         });
       });
     });
@@ -1029,8 +1072,11 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
           break;
     }
     referWorkerEvents.call(this);
-    each(data, function(msg, name) {
-      var worker = getWorker.call(that, name);
+    each(data, function(val, name) {
+      var msg = val, worker = getWorker.call(that, name);
+      if (msg == null) {
+        msg = null;
+      }
       if (worker && worker.postMessage) {
         worker.postMessage(msg);
       }
