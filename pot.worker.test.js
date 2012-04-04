@@ -8,11 +8,6 @@
  *  JavaScriptライブラリPot.js用のテストスクリプト
  *
  */
-
-function bar() {
-  return 'bar';
-}
-
 onmessage = function(ev) {
-  postMessage(ev.data + bar());
+  postMessage(ev.data + 'bar');
 };
