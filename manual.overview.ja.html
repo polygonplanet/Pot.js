@@ -119,7 +119,7 @@ location.href = './#manual.overview';
  <pre>&lt;script type=&quot;text/javascript&quot; src=&quot;pot.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;!-- または下記で説明する API サーバが利用できます --&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/1.16/pot.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;http://api.polygonpla.net/js/pot/1.17/pot.min.js&quot;&gt;&lt;/script&gt;
 </pre>
  <p>
   読み込み後の例:
@@ -178,34 +178,34 @@ Pot.Deferred.begin(function() {
   その場合、ホスティング用の API サーバが利用できます。
  </p>
  <div>
-  <p>Pot.js Version 1.16 を使う場合:</p>
+  <p>Pot.js Version 1.17 を使う場合:</p>
   <ul>
    <li>
-    v1.16 :
-     <a href="http://api.polygonpla.net/js/pot/1.16/pot.min.js"
-        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.16/pot.min.js</a>
+    v1.17 :
+     <a href="http://api.polygonpla.net/js/pot/1.17/pot.min.js"
+        title="pot.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/1.17/pot.min.js</a>
    </li>
   </ul>
  </div>
  <p>
-  これは、1.16 の部分をリリース済みのバージョンに合わせて変更できます。
+  これは、1.17 の部分をリリース済みのバージョンに合わせて変更できます。
   <br>
   レポジトリに (例えば 1.xx と) バージョンをタグ付けした時に、
   あわせて API サーバに置くようにしています。
  </p>
  <p>
-  例えば Greasemonkey で 1.16 を使う場合、
+  例えば Greasemonkey で 1.17 を使う場合、
  </p>
  <pre>// ==UserScript==
 // ...
-// @require  http://api.polygonpla.net/js/pot/1.16/pot.min.js
+// @require  http://api.polygonpla.net/js/pot/1.17/pot.min.js
 // ...
 // ==/UserScript==</pre>
  <p>
   と記述できます。
  </p>
  <p>
-  この例では 1.16 としていますが、このマニュアルは常に更新しているわけではないので
+  この例では 1.17 としていますが、このマニュアルは常に更新しているわけではないので
   最新とは限りません。
   <br>
   より安定したバージョンを選び使ってください。
@@ -216,9 +216,9 @@ Pot.Deferred.begin(function() {
   </p>
   <ul>
    <li>
-    PotLite.js v1.33 :
-     <a href="http://api.polygonpla.net/js/pot/potlite/1.33/potlite.min.js"
-        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.33/potlite.min.js</a>
+    PotLite.js v1.34 :
+     <a href="http://api.polygonpla.net/js/pot/potlite/1.34/potlite.min.js"
+        title="potlite.min.js - api.polygonpla.net">http://api.polygonpla.net/js/pot/potlite/1.34/potlite.min.js</a>
    </li>
   </ul>
   <p>
@@ -397,16 +397,44 @@ alert(foo() + bar()); // 'foobar'</pre>
  <div>
    <ul>
      <li>
-       <a href="http://polygon-planet.blogspot.com/2011/11/javascript.html"
-          title="フリーズやカクカクしない安定した動作のアプリやアドオン、ゲームなどが作れるJavaScriptライブラリ | 圧縮電子精神音楽浮遊構造体">Pot.js / PotLite.js と jQuery のループ処理 CPU 負荷をグラフで比較 | 圧縮電子精神音楽浮遊構造体</a>
+       <a href="http://polygon-planet-log.blogspot.com/2012/04/workerworkeroidjavascriptpotjs-117.html"
+          title="並列処理のWorkerぽいWorkeroid実装。JavaScriptライブラリPot.js 1.17 リリース | 圧縮電子どうのこうの"
+          target="_blank">並列処理のWorkerぽいWorkeroid実装。JavaScriptライブラリPot.js 1.17 リリース | 圧縮電子どうのこうの</a>
      </li>
      <li>
-       <a href="http://polygon-planet.blogspot.com/2011/11/javascript-potlitejs-122-signal.html"
-          title="JavaScript非同期ライブラリ PotLite.js 1.22 リリース。アスペクト指向っぽく書けるSignal実装 | 圧縮電子精神音楽浮遊構造体">Pot.js / PotLite.js - アスペクト指向っぽく書けるSignal実装 | 圧縮電子精神音楽浮遊構造体</a>
+       <a href="http://polygon-planet-log.blogspot.com/2012/03/jsfiddle-javascriptpotjspotlitejs_12.html"
+          title="jsFiddleだらけ-JavaScriptライブラリPot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの"
+          target="_blank">jsFiddleだらけ-JavaScriptライブラリPot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの</a>
      </li>
      <li>
-       <a href="http://polygon-planet.blogspot.com/2011/10/javascriptdeferred.html"
-          title="JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子精神音楽浮遊構造体">JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子精神音楽浮遊構造体</a>
+       <a href="http://polygon-planet-log.blogspot.com/2012/02/javascriptpotjspotlitejs_24.html"
+          title="同期処理を非同期に変換-JavaScriptライブラリPot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの"
+          target="_blank">同期処理を非同期に変換-JavaScriptライブラリPot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの</a>
+     </li>
+     <li>
+       <a href="http://polygon-planet-log.blogspot.com/2012/02/javascript-whilepotdeferredforevercpu_11.html"
+          title="JavaScript whileループとPot.Deferred.forEverイテレータでCPU使用率を比較-Pot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの"
+          target="_blank">JavaScript whileループとPot.Deferred.forEverイテレータでCPU使用率を比較-Pot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの</a>
+     </li>
+     <li>
+       <a href="http://polygon-planet-log.blogspot.com/2012/01/html5-file-api-potjspotlitejs_11.html"
+          title="HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの"
+          target="_blank">HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子どうのこうの</a>
+     </li>
+     <li>
+       <a href="http://polygon-planet-log.blogspot.com/2011/11/javascript-potlitejs-122-signal_23.html"
+          title="JavaScript非同期ライブラリ PotLite.js 1.22 リリース。アスペクト指向っぽく書けるSignal実装 | 圧縮電子どうのこうの"
+          target="_blank">JavaScript非同期ライブラリ PotLite.js 1.22 リリース。アスペクト指向っぽく書けるSignal実装 | 圧縮電子どうのこうの</a>
+     </li>
+     <li>
+       <a href="http://polygon-planet-log.blogspot.com/2011/11/javascript_05.html"
+          title="フリーズやカクカクしない安定した動作のアプリやアドオン、ゲームなどが作れるJavaScriptライブラリ | 圧縮電子どうのこうの"
+          target="_blank">Pot.js / PotLite.js と jQuery のループ処理 CPU 負荷をグラフで比較 | 圧縮電子どうのこうの</a>
+     </li>
+     <li>
+       <a href="http://polygon-planet-log.blogspot.com/2011/10/javascriptdeferred_11.html"
+          title="JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子どうのこうの"
+          target="_blank">JavaScriptでDeferredとイテレータの非同期処理用ライブラリ作ってみた | 圧縮電子どうのこうの</a>
      </li>
    </ul>
  </div>
