@@ -86,7 +86,7 @@ update(Pot.Signal, {
     if (!Pot.isObject(evt)) {
       pi.orgEvent = evt = {type : evt};
     }
-    each(evt, function(v, p) {
+    each(update({}, evt), function(v, p) {
       if (!hasOwnProperty.call(that, p)) {
         that[p] = v;
       }
