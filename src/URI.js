@@ -689,7 +689,7 @@ update(Pot.URI, {
       cur = context.document || context.ownerDocument;
       if (cur) {
         cur = cur.documentURI || cur.URL ||
-              (cur.location && cur.location.href) || ''
+              (cur.location && cur.location.href) || '';
       }
     }
     cur = stringify(cur);
