@@ -7,7 +7,7 @@
  * Version {#$version}, {#$date}
  * Copyright (c) {#$year} polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT and GPL v2 licenses.
- * http://polygonplanet.github.com/Pot.js/index.html
+ * http://polygonplanet.github.com/Pot.js/
  */
 /**
  * Project Pot{#if PotLite}Lite{#endif}.js
@@ -69,8 +69,8 @@
  * @author         polygon planet
  * @version        {#$version}
  * @date           {#$date}
- * @link           http://polygonplanet.github.com/Pot.js/index.html
- * @copyright      Copyright (c) {#$year} polygon planet <polygon.planet*gmail.com>
+ * @link           http://polygonplanet.github.com/Pot.js/
+ * @copyright      Copyright (c) {#$year} polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT and GPL v2 licenses.
  *
  * Based:
