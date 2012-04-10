@@ -316,6 +316,7 @@ update(Pot.Net, {
             this.url = addNoCache(this.url);
           }
           if (this.options.crossDomain == null) {
+            PATTERNS.URI.lastIndex = 0;
             parts = PATTERNS.URI.exec(Pot.currentURI().toLowerCase());
             this.options.crossDomain = !!(parts &&
               (parts[1] !== CURRENT_URIS[1] ||
@@ -415,7 +416,7 @@ update(Pot.Net, {
             if (that.xhr.readyState == Pot.Net.XHR.ReadyState.COMPLETE) {
               that.cancel();
               try {
-                status = +that.xhr.status;
+                status = parseInt(that.xhr.status, 10);
                 text = that.xhr.responseText;
                 if (!status && text) {
                   // 0 or undefined seems to mean cached or local
