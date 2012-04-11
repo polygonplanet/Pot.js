@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="max-age=0">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="cache-control" content="no-store">
+<title>Pot.js + PotLite.js - Cheat Sheet Generator - JavaScript Library</title>
+<link rel="shourtcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico">
+<meta name="description" lang="en" content="Pot.js/PotLite.js is an implemental utility library that can execute JavaScript without burdening the CPU.">
+<meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
+<meta name="description" lang="ja" content="Pot.js/PotLite.jsはCPUに負荷をかけることなくJavaScriptの実行を可能とするユーティリティライブラリ.">
+<meta name="keywords" lang="ja" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,非同期,並列,同期,負荷,分散,deferred,defer,deferrize,iterator,iterate,イテレータ,ecmascript,node.js,cross-browser,クロスブラウザ,ajax,xmlhttprequest,json,jsonp,library,ライブラリ">
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="Pot.js + PotLite.js - Document and Reference" href="http://polygonplanet.github.com/Pot.js/">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="http://api.polygonpla.net/css/pot.css?2">
+<!--[if lt IE 7]>
+<script>var IE7_PNG_SUFFIX = '.png';</script>
+<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+<![endif]-->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" async="async" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/pot/1.12/pot.min.js"></script>
+<script type="text/javascript" async="async" src="http://api.polygonpla.net/js/google/analytics.js?ua=UA-30496045-3"></script>
+<script type="text/javascript">
+setTimeout(function() {
+  var LOADING_CIRCLE_URL = 'http://api.polygonpla.net/img/icon/loading-circle-cycle.gif';
+  var done, images = {}, lang, loading;
+
+  (function loadback() {
+
+    if (typeof $ === 'undefined' || typeof Pot === 'undefined' || !$.ui) {
+      setTimeout(loadback, 20);
+
+    } else if (!done) {
+      done = true;
+
+      $(function() {
+        init();
+      });
+    }
+
+  }());
+
+
+  function init() {
+    var panel, dropFile;
+
+    Pot.update(images, {
+      cheatsheet : {
+        img     : null,
+        opacity : 0.9,
+        width   : 0,
+        height  : 0,
+        loading : false
+      },
+      background : {
+        img     : null,
+        opacity : 0.75,
+        size    : 100,
+        width   : 0,
+        height  : 0,
+        loading : false
+      }
+    });
+
+    initLang();
+
+    loading  = createLoading();
+    panel    = createDropPanel();
+    dropFile = createDropFile(panel);
+
+    Pot.forEach(['cheatsheet', 'background'], function(val) {
+      $('.cheatsheet-generator-opacity-' + val)
+        .slider({
+          animate : true,
+          range   : 'min',
+          min     : 0,
+          max     : 100,
+          value   : images[val].opacity * 100,
+          slide   : function(event, ui) {
+            var opacity = ui.value / 100;
+            images[val].opacity = opacity;
+            $('.cheatsheet-generator-opacity-' + val + ' a.ui-slider-handle')
+              .attr({title : opacity});
+          },
+          create  : function(event, ui) {
+            $('.cheatsheet-generator-opacity-' + val + ' a.ui-slider-handle')
+              .attr({title : images[val].opacity});
+          },
+          change  : function() {
+            drawImage();
+          }
+        });
+    });
+
+    $('.cheatsheet-generator-background-size')
+      .slider({
+        animate : true,
+        range   : 'min',
+        min     : 0,
+        max     : 300,
+        value   : images.background.size,
+        slide   : function(event, ui) {
+          var value = ui.value;
+          images.background.size = value;
+          $('.cheatsheet-generator-background-size a.ui-slider-handle')
+            .attr({title : value + '%'});
+        },
+        create  : function(event, ui) {
+          $('.cheatsheet-generator-background-size a.ui-slider-handle')
+            .attr({title : images.background.size + '%'});
+        },
+        change  : function() {
+          drawImage();
+        }
+      });
+
+    $('.cheatsheet-generator-base-sheet').change(selectCheatsheet);
+    $('.cheatsheet-generator-composite-operation,' +
+      '.cheatsheet-generator-background-position').change(function() {
+      drawImage();
+    });
+
+    Pot.callLazy(function() {
+      selectCheatsheet.call($('.cheatsheet-generator-base-sheet'));
+    });
+  }
+
+
+  function initLang() {
+    var re = /:(ja|en)/i,
+        toggle = function() {
+          return (lang === 'ja') ? 'en' : 'ja';
+        };
+
+    if (location && location.hash && re.test(location.hash)) {
+      lang = Pot.stringify(location.hash).match(re)[1];
+    } else {
+      lang = Pot.LANG === 'ja' && Pot.LANG || 'en';
+    }
+
+    $('.header-lang')
+      .append(
+        $('<a/>')
+          .addClass('header-lang-select')
+          .attr({
+            href  : 'javascript:void(0);',
+            title : 'Language: ' + toggle()
+          })
+          .click(function() {
+            $('.lang-' + lang).hide();
+            $('.lang-' + toggle()).show();
+            lang = toggle();
+            $(this)
+              .attr({
+                title : 'Language: ' + toggle()
+              })
+              .text(
+                (lang === 'ja' ? 'English' : 'Japanese')
+              );
+          })
+          .text(
+            (lang === 'ja' ? 'English' : 'Japanese')
+          )
+      );
+
+    Pot.callLazy(function() {
+      $('.lang-' + toggle()).hide();
+      $('.lang-nop').hide();
+    });
+  }
+
+
+  function createLoading() {
+    var img = $('<img/>')
+      .addClass('cheatsheet-generator-image-loading')
+      .css({
+        border  : 0,
+        outline : 0
+      })
+      .attr({
+        src : LOADING_CIRCLE_URL
+      });
+
+    return img;
+  }
+
+
+  function getMessage(msg) {
+    return msg && msg[lang] != null && msg[lang] || msg;
+  }
+
+
+  function selectCheatsheet() {
+    var val = $(this).val(), matches, type, width, height, fileName;
+
+    if (!val) {
+      return;
+    }
+
+    matches = val.match(/(\w+)-(\d+)[Xx](\d+)/);
+    if (!matches || !matches[1]) {
+      return;
+    }
+
+    type = matches[1] || 'black';
+    width = matches[2] - 0;
+    height = matches[3] - 0;
+    if (!width || !height) {
+      return;
+    }
+
+    fileName = Pot.sprintf('pot.js-cheatsheet-%s-%dx%d.png',
+      type, width, height
+    );
+
+    Pot.till(function() {
+      return !images.cheatsheet.loading && !images.background.loading;
+
+    }).then(function() {
+      var sheet = images.cheatsheet;
+
+      sheet.img = null;
+      sheet.img = new Image();
+      sheet.width = width;
+      sheet.height = height;
+      sheet.loading = true;
+
+      sheet.img.onload = function() {
+        sheet.loading = false;
+        sheet.img.onload = Pot.noop;
+        drawImage();
+      };
+
+      sheet.img.onerror = function(err) {
+        sheet.loading = false;
+        sheet.img.onerror = Pot.noop;
+        error(err);
+        throw err;
+      };
+
+      sheet.img.src = fileName;
+    });
+  }
+
+
+  function createDropPanel() {
+    var panel = $('<div/>')
+      .css({
+        position        : 'fixed',
+        left            : '10%',
+        top             : '10%',
+        width           : '80%',
+        height          : '80%',
+        minHeight       : 200,
+        background      : '#ff8cd3',
+        zIndex          : 9999999,
+        display         : 'table',
+        textAlign       : 'center',
+        WebkitBoxShadow : '1px 1px 10px #333',
+        MozBoxShadow    : '1px 1px 10px #333',
+        boxShadow       : '1px 1px 10px #333'
+      })
+      .append(
+        $('<div/>')
+          .css({
+            display       : 'table-cell',
+            color         : '#fff',
+            fontWeight    : 'bold',
+            verticalAlign : 'middle',
+            fontSize      : '160%'
+          })
+          .append(
+            $('<div/>')
+              .text(getMessage({
+                ja : 'ここに画像ファイルをドロップします',
+                en : 'Drop image file here.'
+              }))
+          )
+      )
+      .hide()
+      .appendTo('body');
+    return panel;
+  }
+
+
+  function createDropFile(panel) {
+    var dropFile = new Pot.DropFile(panel, {
+      onShow : function() {
+        panel.show();
+      },
+      onHide : function() {
+        panel.hide();
+      },
+      onLoadImage : function(data, name, size, type) {
+
+        Pot.till(function() {
+          return !images.cheatsheet.loading && !images.background.loading;
+
+        }).then(function() {
+          var bg = images.background;
+
+          bg.img = null;
+          bg.img = new Image();
+          bg.loading = true;
+
+          bg.img.onload = function() {
+            var img = bg.img;
+
+            bg.width  = img.naturalWidth  || img.clientWidth  || img.width;
+            bg.height = img.naturalHeight || img.clientHeight || img.height;
+            bg.loading = false;
+            bg.img.onload = Pot.noop;
+
+            appendThumbnail(data, bg.width, bg.height);
+            drawImage();
+          };
+
+          bg.img.onerror = function(err) {
+            bg.loading = false;
+            bg.img.onerror = Pot.noop;
+            error(err);
+            throw err;
+          };
+
+          bg.img.src = data;
+        });
+      }
+    });
+    return dropFile;
+  }
+
+
+  function appendThumbnail(src, width, height) {
+    var size = getImageResizeSize(
+      width,
+      height,
+      120,
+      90
+    );
+
+    $('.cheatsheet-generator-drop-background-image-wrapper')
+      .empty()
+      .append(
+        $('<img/>')
+          .attr({
+            width  : size.width,
+            height : size.height,
+            src    : src
+          })
+      );
+  }
+
+
+  function drawImage() {
+    var ctx, uri, size, ratio, pos,
+        canvas = $('#cheatsheet-generator-image').get(0),
+        composite = $('.cheatsheet-generator-composite-operation').val();
+
+    if (!canvas || !canvas.getContext) {
+      error('Your browser not supported canvas.');
+
+    } else if (images && images.cheatsheet && images.cheatsheet.img &&
+              images.cheatsheet.width && images.cheatsheet.height) {
+
+      $(canvas).hide();
+      $(loading).remove();
+      $('.cheatsheet-generator-result')
+        .empty()
+        .addClass('cheatsheet-generator-image-loading-wrapper')
+        .append(loading);
+
+      Pot.flush(function() {
+
+        canvas.width  = images.cheatsheet.width;
+        canvas.height = images.cheatsheet.height;
+
+        size = getImageResizeSize(
+          images.cheatsheet.width,
+          images.cheatsheet.height,
+          480,
+          360
+        );
+
+        $(canvas).css({
+          maxWidth  : size.width,
+          maxHeight : size.height
+        });
+
+        ctx = canvas.getContext('2d');
+        ctx.globalCompositeOperation = composite || 'source-over';
+
+        if (images.background && images.background.img) {
+          ctx.globalAlpha = images.background.opacity;
+          size = getImageResizeSize(
+            images.background.width,
+            images.background.height,
+            /*images.cheatsheet.width,*/
+            images.cheatsheet.height
+          );
+
+          ratio = images.background.size / 100;
+          if (ratio) {
+            size.width  *= ratio;
+            size.height *= ratio;
+          }
+
+          pos = calcBackgroundPos(size);
+          ctx.drawImage(images.background.img, pos.x, pos.y, size.width, size.height);
+        }
+
+        if (images.cheatsheet.img) {
+          ctx.globalAlpha = images.cheatsheet.opacity;
+          ctx.drawImage(images.cheatsheet.img, 0, 0);
+        }
+
+        showImage(canvas, canvas.toDataURL());
+      });
+    }
+  }
+
+
+  function calcBackgroundPos(size) {
+    var x, y;
+
+    switch ($('.cheatsheet-generator-background-position').val()) {
+      case 'center':
+          x = images.cheatsheet.width / 2 - size.width / 2;
+          y = 0;
+          break;
+      case 'right':
+          x = images.cheatsheet.width - size.width;
+          y = 0;
+          break;
+      case 'left':
+      default:
+          x = 0;
+          y = 0;
+          break;
+    }
+    return {
+      x : x,
+      y : y
+    };
+  }
+
+
+  function getImageResizeSize(orgWidth, orgHeight, maxWidth, maxHeight) {
+    var result, percent, ratioX, ratioY;
+
+    if (maxHeight == null) {
+      maxHeight = maxWidth;
+      if (orgHeight > maxHeight) {
+        percent = maxHeight / orgHeight * 100;
+      } else {
+        percent = 100;
+      }
+
+    } else {
+      if (orgWidth > maxWidth) {
+        ratioX = maxWidth / orgWidth * 100;
+      } else {
+        ratioX = 100;
+      }
+
+      if (orgHeight > maxHeight) {
+        ratioY = maxHeight / orgHeight * 100;
+      } else {
+        ratioY = 100;
+      }
+
+      if (ratioX < ratioY) {
+        percent = ratioX;
+      } else if (ratioX > ratioY) {
+        percent = ratioY;
+      } else {
+        percent = 0;
+      }
+    }
+
+    if (percent === 0) {
+      result = {
+        width  : maxWidth,
+        height : maxHeight
+      };
+    } else {
+      result = {
+        width  : Math.round(orgWidth  * percent / 100),
+        height : Math.round(orgHeight * percent / 100)
+      };
+    }
+    return result;
+  }
+
+
+  function showImage(canvas, uri) {
+    var result, img;
+
+    result = $('.cheatsheet-generator-result');
+
+    img = $('<img/>')
+      .hide()
+      .addClass('cheatsheet-generator-result-image')
+      .css({
+        maxWidth  : 480,
+        maxHeight : 360
+      })
+      .attr({
+        title : 'Pot.js Cheat Sheet',
+        alt   : 'Pot.js Cheat Sheet',
+        src   : uri
+      })
+      .click(function() {
+        //TODO: 他に方法ないのかな(?)
+        var win, src = $(this).attr('src');
+
+        win = window.open(src);
+      });
+
+    $(canvas).hide();
+    $(loading).remove();
+
+    result
+      .removeClass('cheatsheet-generator-image-loading-wrapper')
+      .empty()
+      .append(img);
+
+    img.fadeIn();
+  }
+
+
+  function error(err) {
+    var msg, elem = $('.cheatsheet-generator-error');
+
+    if (!err) {
+      msg = 'Error!';
+    } else {
+      msg = 'Error! ' + Pot.getErrorMessage(err);
+    }
+
+    elem
+      .addClass('error')
+      .addClass('cheatsheet-generator-error-text')
+      .text(msg)
+      .show();
+
+    Pot.callLater(3, function() {
+      elem
+        .removeClass('cheatsheet-generator-error-text')
+        .removeClass('error')
+        .text('')
+        .hide('fast');
+    });
+  }
+
+}, 20);
+</script>
+<style type="text/css" media="all">
+body .layout-liquid-container {
+  max-width: 99%;
+  width: 95%;
+}
+
+h2 *, h3 * {
+  font-weight: bold;
+}
+
+.header-logo {
+  float: left;
+  width: 310px;
+  max-width: 310px;
+  height: 200px;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  z-index: 20;
+}
+
+.header-desc {
+  float: left;
+  width: 100%;
+  height: 200px;
+  margin-right: -310px;
+  padding: 0;
+  border: 0 none;
+  position: relative;
+  z-index: 10;
+}
+
+.header-lang {
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+
+.header-desc-negative-wrapper {
+  margin-right: 310px;
+  padding: 4px;
+}
+
+.mini {
+  font-size: 80%;
+}
+
+.cheatsheet-thumbnail {
+  margin: 1em 0 1em 1em;
+  border: 1px solid #777788;
+}
+
+.cheatsheet-thumbnail-wrapper {
+  float: left;
+}
+
+.cheatsheet-basic-download-a {
+  margin: 0 0 0 1em;
+  font-weight: bold;
+}
+
+.cheatsheet-generator-drop-panel {
+  border: 1px dotted #777788;
+  padding: 1em 2em;
+  margin: 1em;
+}
+
+.cheatsheet-generator-controller-wrapper {
+  margin: 1em;
+}
+
+.cheatsheet-generator-controller {
+  margin: 1em;
+}
+
+.cheatsheet-generator-controller-item {
+  margin: 1em;
+}
+
+.cheatsheet-generator-panel-wrapper {
+  border: 1px solid #777788;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+.cheatsheet-generator-panel-menu {
+  float: left;
+}
+
+.cheatsheet-generator-panel-content {
+  float: left;
+  border-left: 1px solid #888899;
+}
+
+.cheatsheet-generator-error {}
+
+.cheatsheet-generator-error-text {
+  margin: 1em;
+  font-weight: bold;
+}
+
+#cheatsheet-generator-image {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  border: 0 none;
+}
+
+.cheatsheet-generator-result-wrapper {
+  margin: 1em;
+  min-height: 500px;
+}
+
+.cheatsheet-generator-result {
+  margin: 1em;
+}
+
+.cheatsheet-generator-result-image {
+  margin: 1em;
+  padding: 0;
+  border: 2px solid #777788;
+  background: transparent;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 1px 1px 5px #333;
+  -moz-box-shadow: 1px 1px 5px #333;
+  box-shadow: 1px 1px 5px #333;
+  cursor: pointer;
+}
+
+.cheatsheet-generator-opacity-cheatsheet,
+.cheatsheet-generator-opacity-background,
+.cheatsheet-generator-background-size {
+  margin: 0.5em;
+  width: 250px;
+}
+
+.cheatsheet-generator-drop-background-image-wrapper img {
+  max-width: 120px;
+  max-height: 90px;
+  margin: 0.5em 1em 0.5em 1em;
+  padding: 0;
+  border: 1px solid #777788;
+  background: transparent;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.cheatsheet-generator-image-loading-wrapper {
+  width: 400px;
+  height: 300px;
+  text-align: center;
+}
+
+.cheatsheet-generator-image-loading {
+  display: block;
+  margin: 100px auto;
+}
+
+.ui-slider-handle {
+  outline: 0 none;
+}
+
+</style>
+</head>
+<body>
+  <div class="layout-liquid-container">
+    <div class="header clearfix">
+      <div class="header-logo">
+        <a href="http://polygonplanet.github.com/Pot.js/"
+           title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library"><img src="http://api.polygonpla.net/img/logo/pot.js.mini.png?2"></a>
+      </div>
+      <div class="header-desc">
+        <div class="header-desc-negative-wrapper">
+          <div class="header-lang"></div>
+          <h1>
+            <a href="http://polygonplanet.github.com/Pot.js/"
+               title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library">Pot.js / PotLite.js <span class="mini">- JavaScript Library</span></a>
+          </h1>
+          <p>
+            <a href="http://polygonplanet.github.com/Pot.js/#manual.cheatsheet.references"
+               title="Cheat Sheet Generator - Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library"><span class="lang-ja">≪ Pot.js/PotLite.js リファレンスに戻る</span><br class="lang-nop"><span class="lang-en">Back to the Pot.js/PotLite.js reference.</span></a>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <h2 id="potjs-basic-cheatsheet">Basic Cheat Sheet</h2>
+      <p>
+        <span class="lang-ja">Pot.js (PotLite.js) のチートシートです。「名前をつけて保存」してご利用ください。</span>
+        <br class="lang-nop">
+        <span class="lang-en">These are Pot.js (PotLite.js) cheat sheets. You can use by &quot;Save As&quot;.</span>
+      </p>
+      <div class="clearfix">
+        <div class="cheatsheet-thumbnail-wrapper clearfix">
+          <div>
+            <img class="cheatsheet-thumbnail" src="pot.js-cheatsheet-thumbnail-black-2560x1600-400x250.png">
+          </div>
+          <div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1280x1024.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1280x1024.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1440x900.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1440x900.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1600x1200.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1600x1200.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1680x1050.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1680x1050.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1920x1080.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1920x1080.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-1920x1200.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-1920x1200.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-black-2560x1600.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-black-2560x1600.png</a></div>
+          </div>
+        </div>
+        <div class="cheatsheet-thumbnail-wrapper clearfix">
+          <div>
+            <img class="cheatsheet-thumbnail" src="pot.js-cheatsheet-thumbnail-white-2560x1600-400x250.png">
+          </div>
+          <div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1280x1024.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1280x1024.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1440x900.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1440x900.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1600x1200.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1600x1200.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1680x1050.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1680x1050.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1920x1080.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1920x1080.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-1920x1200.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-1920x1200.png</a></div>
+            <div><a href="pot.js-cheatsheet-thumbnail-white-2560x1600.png" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheatsheet-white-2560x1600.png</a></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>PDF</h3>
+        <p>
+          <a href="pot.js-cheat-sheet.pdf" class="cheatsheet-basic-download-a" target="_blank">pot.js-cheat-sheet.pdf</a>
+        </p>
+      </div>
+      <h2 id="potjs-cheatsheet-generator">Cheat Sheet Generator</h2>
+      <p>
+        <span class="lang-ja">お好きな壁紙などを背景にして作成できます。</span>
+        <br class="lang-nop">
+        <span class="lang-en">You can generate cheatsheet with your wallpaper.</span>
+      </p>
+      <div class="cheatsheet-generator-error"></div>
+      <h3>1.
+        <span class="lang-ja">背景画像をここにドロップ</span>
+        <span class="lang-en">Drop your background image here.</span>
+      </h3>
+      <div class="cheatsheet-generator-drop-panel clearfix">
+        <div class="cheatsheet-generator-drop-background-image-wrapper"></div>
+        <div class="cheatsheet-generator-drop-description">
+          <span class="lang-ja">自分の好きな背景画像をここにドロップします。</span>
+          <br class="lang-nop">
+          <span class="lang-en">Drop here if you use your background image.</span>
+        </div>
+      </div>
+      <h3>2.
+        <span class="lang-ja">画像を調節してダウンロードします</span>
+        <span class="lang-en">Customize image and download your original cheat sheet.</span>
+      </h3>
+      <div class="cheatsheet-generator-panel-wrapper clearfix">
+        <div class="cheatsheet-generator-panel-menu">
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">大きさ</span>
+              <span class="lang-en">Size</span>
+              :
+            </div>
+            <select class="cheatsheet-generator-base-sheet">
+              <option value="black-1280x1024" selected="selected">黒 (black) 1280x1024</option>
+              <option value="black-1440x900">黒 (black) 1440x900</option>
+              <option value="black-1600x1200">黒 (black) 1600x1200</option>
+              <option value="black-1680x1050">黒 (black) 1680x1050</option>
+              <option value="black-1920x1080">黒 (black) 1920x1080</option>
+              <option value="black-1920x1200">黒 (black) 1920x1200</option>
+              <option value="black-2560x1600">黒 (black) 2560x1600</option>
+              <option value="white-1280x1024">白 (white) 1280x1024</option>
+              <option value="white-1440x900">白 (white) 1440x900</option>
+              <option value="white-1600x1200">白 (white) 1600x1200</option>
+              <option value="white-1680x1050">白 (white) 1680x1050</option>
+              <option value="white-1920x1080">白 (white) 1920x1080</option>
+              <option value="white-1920x1200">白 (white) 1920x1200</option>
+              <option value="white-2560x1600">白 (white) 2560x1600</option>
+              <option value="alpha-1280x1024">透明 (alpha) 1280x1024</option>
+              <option value="alpha-1440x900">透明 (alpha) 1440x900</option>
+              <option value="alpha-1600x1200">透明 (alpha) 1600x1200</option>
+              <option value="alpha-1680x1050">透明 (alpha) 1680x1050</option>
+              <option value="alpha-1920x1080">透明 (alpha) 1920x1080</option>
+              <option value="alpha-1920x1200">透明 (alpha) 1920x1200</option>
+              <option value="alpha-2560x1600">透明 (alpha) 2560x1600</option>
+            </select>
+          </div>
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">合成モード</span>
+              <span class="lang-en">Composite Operation</span>
+              :
+            </div>
+            <select class="cheatsheet-generator-composite-operation">
+              <option value="source-atop">source-atop</option>
+              <option value="source-in">source-in</option>
+              <option value="source-out">source-out</option>
+              <option value="source-over" selected="selected">source-over</option>
+              <option value="destination-atop">destination-atop</option>
+              <option value="destination-in">destination-in</option>
+              <option value="destination-out">destination-out</option>
+              <option value="destination-over">destination-over</option>
+              <option value="darker">darker</option>
+              <option value="lighter">lighter</option>
+              <option value="copy">copy</option>
+              <option value="xor">xor</option>
+            </select>
+          </div>
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">チートシートの透明度</span>
+              <span class="lang-en">Cheatsheet Opacity</span>
+              :
+            </div>
+            <div class="cheatsheet-generator-opacity-cheatsheet"></div>
+          </div>
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">背景の透明度</span>
+              <span class="lang-en">Background Opacity</span>
+              :
+            </div>
+            <div class="cheatsheet-generator-opacity-background"></div>
+          </div>
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">背景の大きさ</span>
+              <span class="lang-en">Background Size</span>
+              :
+            </div>
+            <div class="cheatsheet-generator-background-size"></div>
+          </div>
+          <div class="cheatsheet-generator-controller-item">
+            <div>
+              <span class="lang-ja">背景の位置</span>
+              <span class="lang-en">Background Position</span>
+              :
+            </div>
+            <select class="cheatsheet-generator-background-position">
+              <option value="left" selected="selected"><span class="lang-ja">左</span> <span class="lang-en">Left</span></option>
+              <option value="center"><span class="lang-ja">中央</span> <span class="lang-en">Center</span></option>
+              <option value="right"><span class="lang-ja">右</span> <span class="lang-en">Right</span></option>
+            </select>
+          </div>
+        </div>
+        <div class="cheatsheet-generator-panel-content">
+          <div class="cheatsheet-generator-result-wrapper">
+            <p>
+              <span class="lang-ja">
+                下の画像を 右クリックして 「名前をつけて保存」 でダウンロードできます。
+                <br>
+                クリックすると新しいウィンドウ (タブ) で画像を開きます。
+              </span>
+              <br class="lang-nop">
+              <span class="lang-en">
+                To download Save As the following image by right-clicking.
+                <br>
+                You can confirm image with original size by clicking image.
+              </span>
+            </p>
+            <canvas id="cheatsheet-generator-image"></canvas>
+            <div class="cheatsheet-generator-result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <p>
+        Last modified: 2012-04-11
+        Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet" target="_blank">polygon planet</a>
+        Designed by <a href="http://r-m-t.jp/" title="R M T | 同人音楽サークル (Japanese)" target="_blank">yinyang302mg</a>
+      </p>
+    </div>
+  </div>
+  <noscript>
+    <style type="text/css" media="screen">
+    body .layout-liquid-container .layout-2-column-left-menu {
+      display: none;
+    }
+    body .layout-script-warn-container .layout-script-warn-wrapper {
+      border-color: #a05860;
+    }
+    body .layout-script-warn-container .layout-script-warn-wrapper,
+    body .layout-script-warn-container .layout-script-warn-wrapper .script-warning {
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+    }
+    body {
+      padding-top: 78px;
+    }
+    .header-search, .header-lang-container,
+    .footer-buttons-wrapper iframe {
+      display: none;
+    }
+    </style>
+    <div class="layout-script-warn-container">
+      <div class="layout-script-warn-wrapper">
+        <div class="script-warning">
+         このページは JavaScript で動きます / This page require JavaScript.
+        </div>
+      </div>
+    </div>
+  </noscript>
+</body>
+</html>
