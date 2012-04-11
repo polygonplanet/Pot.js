@@ -224,6 +224,8 @@ setTimeout(function() {
     }).then(function() {
       var sheet = images.cheatsheet;
 
+      showLoading();
+
       sheet.img = null;
       sheet.img = new Image();
       sheet.width = width;
@@ -233,7 +235,7 @@ setTimeout(function() {
       sheet.img.onload = function() {
         sheet.loading = false;
         sheet.img.onload = Pot.noop;
-        drawImage();
+        drawImage(true);
       };
 
       sheet.img.onerror = function(err) {
@@ -356,7 +358,17 @@ setTimeout(function() {
   }
 
 
-  function drawImage() {
+  function showLoading() {
+    $('#cheatsheet-generator-image').hide();
+    $(loading).remove();
+    $('.cheatsheet-generator-result')
+      .empty()
+      .addClass('cheatsheet-generator-image-loading-wrapper')
+      .append(loading);
+  }
+
+
+  function drawImage(isLoading) {
     var ctx, uri, size, ratio, pos,
         canvas = $('#cheatsheet-generator-image').get(0),
         composite = $('.cheatsheet-generator-composite-operation').val();
@@ -367,12 +379,9 @@ setTimeout(function() {
     } else if (images && images.cheatsheet && images.cheatsheet.img &&
               images.cheatsheet.width && images.cheatsheet.height) {
 
-      $(canvas).hide();
-      $(loading).remove();
-      $('.cheatsheet-generator-result')
-        .empty()
-        .addClass('cheatsheet-generator-image-loading-wrapper')
-        .append(loading);
+      if (!isLoading) {
+        showLoading();
+      }
 
       Pot.flush(function() {
 
@@ -515,10 +524,39 @@ setTimeout(function() {
         src   : uri
       })
       .click(function() {
-        //TODO: 他に方法ないのかな(?)
-        var win, src = $(this).attr('src');
+        var win, doc, elem, src = $(this).attr('src');
 
-        win = window.open(src);
+        win = window.open();
+        doc = win.document;
+
+        doc.open();
+        doc.write([
+          '<html>',
+          '<head>',
+          '<title>Pot.js Cheat Sheet.png</title>',
+          '<style>',
+            'html,body{margin:0;padding:0;width:100%;height:100%}',
+            'img{cursor:-moz-zoom-out}',
+            '.full{max-height:100%;max-width:100%;cursor:-moz-zoom-in}',
+          '</style>',
+          '</head>',
+          '<body></body>',
+          '</html>'
+        ].join('\n'));
+        doc.close();
+
+        try {
+          elem = doc.createElement('img');
+        } catch (e) {
+          elem = document.createElement('img');
+        }
+        elem.src = src;
+
+        $(elem).click(function() {
+          $(elem).toggleClass('full');
+        });
+
+        doc.body.appendChild(elem);
       });
 
     $(canvas).hide();
@@ -818,8 +856,8 @@ h2 *, h3 * {
         <div class="cheatsheet-generator-panel-menu">
           <div class="cheatsheet-generator-controller-item">
             <div>
-              <span class="lang-ja">大きさ</span>
-              <span class="lang-en">Size</span>
+              <span class="lang-ja">色と大きさ</span>
+              <span class="lang-en">Color and Size</span>
               :
             </div>
             <select class="cheatsheet-generator-base-sheet">
@@ -898,9 +936,9 @@ h2 *, h3 * {
               :
             </div>
             <select class="cheatsheet-generator-background-position">
-              <option value="left" selected="selected"><span class="lang-ja">左</span> <span class="lang-en">Left</span></option>
-              <option value="center"><span class="lang-ja">中央</span> <span class="lang-en">Center</span></option>
-              <option value="right"><span class="lang-ja">右</span> <span class="lang-en">Right</span></option>
+              <option value="left" selected="selected">左 (Left)</option>
+              <option value="center">中央 (Center)</option>
+              <option value="right">右 (Right)</option>
             </select>
           </div>
         </div>
