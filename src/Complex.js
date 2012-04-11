@@ -720,7 +720,7 @@ update(Pot.Complex, {
           } else if (isNaN(ver)) {
             return this.versionMaps[ver] || this.versionMapMin - 1;
           } else {
-            return parseInt(ver);
+            return parseInt(ver, 10);
           }
         }
       });

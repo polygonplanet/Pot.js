@@ -165,7 +165,7 @@ update(Pot.Format, {
         }
         /**@ignore*/
         function parse(n, isFloat) {
-          var r = isFloat ? parseFloat(n) : parseInt(n);
+          var r = isFloat ? parseFloat(n) : parseInt(n, 10);
           return isNaN(r) ? 0 : r;
         }
         /**@ignore*/

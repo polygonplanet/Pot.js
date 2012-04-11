@@ -436,16 +436,16 @@ update(Pot, {
      * @private
      * @ignore
      */
-    getMagicNumber : update(function() {
-      var me = arguments.callee, n = me.n + (me.c++);
-      if (!isFinite(n) || isNaN(n)) {
-        me.c = me.n = n = 0;
-      }
-      return n;
-    }, {
-      c : 0,
-      n : +'0xC26BEB642C0A'
-    }),
+    getMagicNumber : (function(sn) {
+      var c = 0, n = +sn;
+      return function() {
+        var me = arguments.callee, i = me.n + (me.c++);
+        if (!isFinite(i) || isNaN(i)) {
+          me.c = me.n = i = 0;
+        }
+        return i;
+      };
+    }('0xC26BEB642C0A')),
     /**
      * Get the export object.
      *
@@ -1525,7 +1525,7 @@ Pot.update({
           break;
       case 'function':
           /**@ignore*/
-          f = (function() {});
+          f = function() {};
           empty = true;
           for (p in o) {
             if (p in f) {
@@ -2372,9 +2372,10 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, id, scope, func, doc, script, head;
+    var me = arguments.callee, id, scope, func, doc, script, head,
+        System = Pot.System;
     if (code && me.patterns.valid.test(code)) {
-      if (Pot.System.hasActiveXObject) {
+      if (System.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
             me.test(execScript)) {
           return execScript(code, me.language);
@@ -2393,7 +2394,7 @@ Pot.update({
       } else if (func in Pot.Global && me.test(func, Pot.Global)) {
         scope = Pot.Global;
       }
-      if (Pot.System.isGreasemonkey) {
+      if (System.isGreasemonkey) {
         // eval does not work to global scope in greasemonkey
         //   even if using the unsafeWindow.
         return Pot.localEval(code, scope || Pot.Global);
@@ -2425,10 +2426,10 @@ Pot.update({
           return scope[func](code);
         }
       }
-      if (Pot.System.isNodeJS) {
+      if (System.isNodeJS) {
         return me.doEvalInGlobalNodeJS(func, code);
       }
-      if (Pot.System.isWebBrowser &&
+      if (System.isWebBrowser &&
           typeof document === 'object') {
         doc = document;
         head = doc.getElementsByTagName('head');
@@ -2518,7 +2519,7 @@ Pot.update({
       }
       if (me.worksForGlobal) {
         result = scope[func].call(scope, code);
-      } else if (typeof require !== 'undefined') {
+      } else if (typeof require !== 'undefined' && require) {
         vm = require('vm');
         if (vm && vm.createScript) {
           script = vm.createScript(code);
@@ -3697,7 +3698,7 @@ function stringify(x, ignoreBoolean) {
           break;
       case 'object':
           if (x) {
-            // Fixed object valueOf. e.g. new String('hoge');
+            //XXX: TypedArray String convertion.
             c = x.constructor;
             if (c === String || c === Number ||
                 (typeof XML !== 'undefined' && c === XML) ||
