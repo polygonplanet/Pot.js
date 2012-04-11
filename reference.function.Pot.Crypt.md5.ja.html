@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Crypt.md5</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Crypt.md5';
+</script>
+</head>
+<body>
+<h1>Pot.Crypt.md5</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Crypt.md5"><em>Pot.Crypt.</em>md5</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string の md5 ハッシュ値を計算します。
+    </p>
+    <div>
+
+<p>
+  <a href="http://www.faqs.org/rfcs/rfc1321" target="_blank" title="RFC1321 - The MD5 Message-Digest Algorithm">RFC1321 - The MD5 Message-Digest Algorithm</a> を用いて string の MD5 ハッシュ値を計算し、そのハッシュを返します。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.md5() が md5() で実行できます。
+</p>
+<p>
+ 計算された結果の 32 文字の 16 進数からなるハッシュがすべて小文字で返ります。
+</p>
+
+<pre>Pot.debug(Pot.md5('apple')); // '1f3870be274f6c49b3e31a0c6728957f'</pre>
+
+<p>
+ md5 には deferred というメソッドがあり、非同期で実行することが可能です。
+ <br>
+ 非同期で実行することにより、巨大な文字列に対しても負荷を抑え実行することが可能です。
+</p>
+
+<div style="margin: 1.5em;">
+ <dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.Crypt.</em>md5.deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    引数 string の MD5 ハッシュ値を計算します。同期で md5() したのと同じです。
+    <br>
+    処理は非同期で行われます。
+    <br>
+    計算された結果を引数に持つ <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> が返ります。
+    <br>
+    Pot.md5.deferred() で実行できます。
+    <br>
+    結果からは <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などによりチェインを繋げることができます。
+   </p>
+
+<p>
+ <code>Pot.md5.deferred.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid" style="width:300px;">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+
+<p>
+ 非同期で実行する例:
+</p>
+
+<pre>Pot.md5.deferred('apple').then(function(res) {
+    debug(res); // '1f3870be274f6c49b3e31a0c6728957f'
+});</pre>
+
+  </dd>
+ </dl>
+</div>
+
+<p>
+ Pot.md5 Async Test:
+ <br>
+ <a href="http://jsfiddle.net/polygonplanet/6e2E5/" target="_blank" title="Pot.js - Pot.md5 Async Test - jsFiddle">http://jsfiddle.net/polygonplanet/6e2E5/</a>
+</p>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

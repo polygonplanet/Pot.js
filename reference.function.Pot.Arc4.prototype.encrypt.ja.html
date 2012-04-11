@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Arc4.prototype.encrypt</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Arc4.prototype.encrypt';
+</script>
+</head>
+<body>
+<h1>Pot.Arc4.prototype.encrypt</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Arc4}</em>
+    <dfn id="definition.reference.function.Pot.Arc4.prototype.encrypt"><em>Pot.Arc4.prototype.</em>encrypt</dfn>
+    (<em>{String}</em> text)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 text を Arc4 で暗号化します。
+    </p>
+    <div>
+      <p>
+ Arc4 アルゴリズムで 文字列 text を暗号化して返します。
+ <br>
+ 結果の文字列は、ほとんどの場合 表示できない範囲の文字が含まれます。
+ <br>
+ 表示したり、ASCII 値で取得したりする場合は <a href="#reference.Pot.Base64.functions">Base64</a> などを利用ください。
+</p>
+
+<p>
+ 現在の Pot.Arc4 インスタンス が返ります。
+</p>
+
+<pre>var arc4 = new Pot.Arc4('hoge');
+
+// 暗号化
+var cipherText = arc4.encrypt('Hello World!');
+debug('cipherText = ' + cipherText); // 'cipherText = (...cipherText)'
+
+// 復号化
+var origText = arc4.decrypt(cipherText);
+debug('origText = ' + origText); // 'origText = Hello World!'</pre>
+
+<p>
+ encrypt は deferred というメソッドがあり、非同期で実行することが可能です。
+ <br>
+ 非同期で実行することにより、巨大な文字列に対しても負荷を抑え実行することが可能です。
+</p>
+
+<div style="margin: 1.5em;">
+ <dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.Arc4.prototype.</em>encrypt.deferred</dfn>
+    (<em>{String}</em> text)
+  </dt>
+  <dd>
+   <p>
+    Arc4 アルゴリズムで 文字列 text を非同期で暗号化します。
+    <br>
+    暗号化された結果を引数に持つ <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> が返ります。
+    <br>
+    encrypt.deferred() で実行できます。
+    <br>
+    結果からは <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などによりチェインを繋げることができます。
+   </p>
+
+<p>
+ <code>encrypt.deferred.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid" style="width:300px;">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+
+<p>
+ 非同期実行の例:
+</p>
+
+<pre>var arc4 = new Pot.Arc4('hoge');
+
+arc4.encrypt.deferred('Hello World!').then(function(cipherText) {
+    debug('cipherText = ' + cipherText); // 'cipherText = (...cipherText)'
+    return arc4.decrypt.deferred(cipherText).then(function(origText) {
+        debug('origText = ' + origText); // 'origText = Hello World!'
+    });
+});</pre>
+
+
+  </dd>
+ </dl>
+</div>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

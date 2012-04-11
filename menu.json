@@ -37,6 +37,12 @@
         "manualsub.reverse.lookup.references.references":{"ja":"逆引きリファレンス","en":"Reverse Lookup"}
       }
     },
+    "manual.cheatsheet.references":{
+      "title":{"ja":"チートシート","en":"Cheat Sheet"},
+      "items":{
+        "manualsub.cheatsheet.references.references":{"ja":"チートシートジェネレータ","en":"Cheat Sheet Generator"}
+      }
+    },
     "reference.Pot.Core.functionsAndProperties":{
       "title":{"ja":"Pot Core","en":"Pot Core"},
       "items":{
@@ -64,15 +70,20 @@
         "reference.function.Pot.isStopIter":{"ja":"isStopIter","en":"isStopIter"},
         "reference.function.Pot.isIterable":{"ja":"isIterable","en":"isIterable"},
         "reference.function.Pot.isDeferred":{"ja":"isDeferred","en":"isDeferred"},
+        "reference.function.Pot.isWorkeroid":{"ja":"isWorkeroid","en":"isWorkeroid"},
+        "reference.function.Pot.isHash":{"ja":"isHash","en":"isHash"},
         "reference.function.Pot.isIter":{"ja":"isIter","en":"isIter"},
         "reference.function.Pot.isNumeric":{"ja":"isNumeric","en":"isNumeric"},
         "reference.function.Pot.isInt":{"ja":"isInt","en":"isInt"},
+        "reference.function.Pot.isPlainObject":{"ja":"isPlainObject","en":"isPlainObject"},
+        "reference.function.Pot.isEmpty":{"ja":"isEmpty","en":"isEmpty"},
         "reference.function.Pot.isBuiltinMethod":{"ja":"isBuiltinMethod","en":"isBuiltinMethod"},
         "reference.function.Pot.isWindow":{"ja":"isWindow","en":"isWindow"},
         "reference.function.Pot.isDocument":{"ja":"isDocument","en":"isDocument"},
         "reference.function.Pot.isElement":{"ja":"isElement","en":"isElement"},
         "reference.function.Pot.isNodeList":{"ja":"isNodeList","en":"isNodeList"},
         "reference.function.Pot.isNodeLike":{"ja":"isNodeLike","en":"isNodeLike"},
+        "reference.function.Pot.isDOMLike":{"ja":"isDOMLike","en":"isDOMLike"},
         "reference.function.Pot.globalEval":{"ja":"globalEval","en":"globalEval"},
         "reference.function.Pot.localEval":{"ja":"localEval","en":"localEval"},
         "reference.function.Pot.tokenize":{"ja":"tokenize","en":"tokenize"},
@@ -262,13 +273,109 @@
       "title":{"ja":"Pot.URI","en":"Pot.URI"},
       "items":{
         "reference.function.Pot.URI.urlEncode":{"ja":"urlEncode","en":"urlEncode"},
-        "reference.function.Pot.URI.urlDecode":{"ja":"urlDecode","en":"urlDecode"}
+        "reference.function.Pot.URI.urlDecode":{"ja":"urlDecode","en":"urlDecode"},
+        "reference.function.Pot.URI.parseURI":{"ja":"parseURI","en":"parseURI"},
+        "reference.function.Pot.URI.buildURI":{"ja":"buildURI","en":"buildURI"},
+        "reference.function.Pot.URI.resolveRelativeURI":{"ja":"resolveRelativeURI","en":"resolveRelativeURI"},
+        "reference.function.Pot.URI.getExt":{"ja":"getExt","en":"getExt"},
+        "reference.function.Pot.URI.toDataURI":{"ja":"toDataURI","en":"toDataURI"}
+      }
+    },
+    "reference.Pot.Hash.prototype.functions":{
+      "title":{"ja":"Pot.Hash.prototype","en":"Pot.Hash.prototype"},
+      "items":{
+        "reference.function.Pot.Hash":{"ja":"new Hash","en":"new Hash"},
+        "reference.function.Pot.Hash.prototype.get":{"ja":"get","en":"get"},
+        "reference.function.Pot.Hash.prototype.set":{"ja":"set","en":"set"},
+        "reference.function.Pot.Hash.prototype.has":{"ja":"has","en":"has"},
+        "reference.function.Pot.Hash.prototype.hasValue":{"ja":"hasValue","en":"hasValue"},
+        "reference.function.Pot.Hash.prototype.remove":{"ja":"remove","en":"remove"},
+        "reference.function.Pot.Hash.prototype.clear":{"ja":"clear","en":"clear"},
+        "reference.function.Pot.Hash.prototype.keys":{"ja":"keys","en":"keys"},
+        "reference.function.Pot.Hash.prototype.values":{"ja":"values","en":"values"},
+        "reference.function.Pot.Hash.prototype.toJSON":{"ja":"toJSON","en":"toJSON"},
+        "reference.function.Pot.Hash.prototype.toObject":{"ja":"toObject","en":"toObject"},
+        "reference.function.Pot.Hash.prototype.toItems":{"ja":"toItems","en":"toItems"},
+        "reference.function.Pot.Hash.prototype.forEach":{"ja":"forEach","en":"forEach"},
+        "reference.function.Pot.Hash.prototype.map":{"ja":"map","en":"map"},
+        "reference.function.Pot.Hash.prototype.filter":{"ja":"filter","en":"filter"},
+        "reference.function.Pot.Hash.prototype.reduce":{"ja":"reduce","en":"reduce"},
+        "reference.function.Pot.Hash.prototype.every":{"ja":"every","en":"every"},
+        "reference.function.Pot.Hash.prototype.some":{"ja":"some","en":"some"}
+      }
+    },
+    "reference.Pot.Collection.functions":{
+      "title":{"ja":"Pot.Collection","en":"Pot.Collection"},
+      "items":{
+        "reference.function.Pot.Collection.merge":{"ja":"merge","en":"merge"},
+        "reference.function.Pot.Collection.unique":{"ja":"unique","en":"unique"},
+        "reference.function.Pot.Collection.flatten":{"ja":"flatten","en":"flatten"},
+        "reference.function.Pot.Collection.alphanumSort":{"ja":"alphanumSort","en":"alphanumSort"}
+      }
+    },
+    "reference.Pot.Struct.functions":{
+      "title":{"ja":"Pot.Struct","en":"Pot.Struct"},
+      "items":{
+        "reference.function.Pot.Struct.clone":{"ja":"clone","en":"clone"},
+        "reference.function.Pot.Struct.bind":{"ja":"bind","en":"bind"},
+        "reference.function.Pot.Struct.partial":{"ja":"partial","en":"partial"},
+        "reference.function.Pot.Struct.keys":{"ja":"keys","en":"keys"},
+        "reference.function.Pot.Struct.values":{"ja":"values","en":"values"},
+        "reference.function.Pot.Struct.tuple":{"ja":"tuple","en":"tuple"},
+        "reference.function.Pot.Struct.unzip":{"ja":"unzip","en":"unzip"},
+        "reference.function.Pot.Struct.pairs":{"ja":"pairs","en":"pairs"},
+        "reference.function.Pot.Struct.count":{"ja":"count","en":"count"},
+        "reference.function.Pot.Struct.first":{"ja":"first","en":"first"},
+        "reference.function.Pot.Struct.firstKey":{"ja":"firstKey","en":"firstKey"},
+        "reference.function.Pot.Struct.last":{"ja":"last","en":"last"},
+        "reference.function.Pot.Struct.lastKey":{"ja":"lastKey","en":"lastKey"},
+        "reference.function.Pot.Struct.contains":{"ja":"contains","en":"contains"},
+        "reference.function.Pot.Struct.remove":{"ja":"remove","en":"remove"},
+        "reference.function.Pot.Struct.removeAll":{"ja":"removeAll","en":"removeAll"},
+        "reference.function.Pot.Struct.removeAt":{"ja":"removeAt","en":"removeAt"},
+        "reference.function.Pot.Struct.equals":{"ja":"equals","en":"equals"},
+        "reference.function.Pot.Struct.reverse":{"ja":"reverse","en":"reverse"},
+        "reference.function.Pot.Struct.flip":{"ja":"flip","en":"flip"},
+        "reference.function.Pot.Struct.shuffle":{"ja":"shuffle","en":"shuffle"},
+        "reference.function.Pot.Struct.fill":{"ja":"fill","en":"fill"},
+        "reference.function.Pot.Struct.implode":{"ja":"implode","en":"implode"},
+        "reference.function.Pot.Struct.explode":{"ja":"explode","en":"explode"},
+        "reference.function.Pot.Struct.glue":{"ja":"glue","en":"glue"}
+      }
+    },
+    "reference.Pot.UTF8.functions":{
+      "title":{"ja":"Pot.UTF8","en":"Pot.UTF8"},
+      "items":{
+        "reference.function.Pot.UTF8.encode":{"ja":"encode","en":"encode"},
+        "reference.function.Pot.UTF8.decode":{"ja":"decode","en":"decode"},
+        "reference.function.Pot.UTF8.byteOf":{"ja":"byteOf","en":"byteOf"}
+      }
+    },
+    "reference.Pot.Base64.functions":{
+      "title":{"ja":"Pot.Base64","en":"Pot.Base64"},
+      "items":{
+        "reference.function.Pot.Base64.encode":{"ja":"encode","en":"encode"},
+        "reference.function.Pot.Base64.decode":{"ja":"decode","en":"decode"},
+        "reference.function.Pot.Base64.urlEncode":{"ja":"urlEncode","en":"urlEncode"},
+        "reference.function.Pot.Base64.urlDecode":{"ja":"urlDecode","en":"urlDecode"}
       }
     },
     "reference.Pot.Crypt.functions":{
       "title":{"ja":"Pot.Crypt","en":"Pot.Crypt"},
       "items":{
-        "reference.function.Pot.Crypt.hashCode":{"ja":"hashCode","en":"hashCode"}
+        "reference.function.Pot.Crypt.hashCode":{"ja":"hashCode","en":"hashCode"},
+        "reference.function.Pot.Crypt.md5":{"ja":"md5","en":"md5"},
+        "reference.function.Pot.Crypt.crc32":{"ja":"crc32","en":"crc32"},
+        "reference.function.Pot.Crypt.sha1":{"ja":"sha1","en":"sha1"}
+      }
+    },
+    "reference.Pot.Arc4.prototype.functions":{
+      "title":{"ja":"Pot.Arc4.prototype","en":"Pot.Arc4.prototype"},
+      "items":{
+        "reference.function.Pot.Arc4":{"ja":"new Arc4","en":"new Arc4"},
+        "reference.function.Pot.Arc4.prototype.setKey":{"ja":"setKey","en":"setKey"},
+        "reference.function.Pot.Arc4.prototype.encrypt":{"ja":"encrypt","en":"encrypt"},
+        "reference.function.Pot.Arc4.prototype.decrypt":{"ja":"decrypt","en":"decrypt"}
       }
     },
     "reference.Pot.DateTime.functions":{
@@ -293,6 +400,27 @@
         "reference.function.Pot.Complex.limit":{"ja":"limit","en":"limit"},
         "reference.function.Pot.Complex.convertToBase":{"ja":"convertToBase","en":"convertToBase"},
         "reference.function.Pot.Complex.compareVersions":{"ja":"compareVersions","en":"compareVersions"}
+      }
+    },
+    "reference.Pot.Sanitizer.functions":{
+      "title":{"ja":"Pot.Sanitizer","en":"Pot.Sanitizer"},
+      "items":{
+        "reference.function.Pot.Sanitizer.escapeHTML":{"ja":"escapeHTML","en":"escapeHTML"},
+        "reference.function.Pot.Sanitizer.unescapeHTML":{"ja":"unescapeHTML","en":"unescapeHTML"},
+        "reference.function.Pot.Sanitizer.escapeXPathText":{"ja":"escapeXPathText","en":"escapeXPathText"},
+        "reference.function.Pot.Sanitizer.escapeAppleScriptString":{"ja":"escapeAppleScriptString","en":"escapeAppleScriptString"},
+        "reference.function.Pot.Sanitizer.escapeString":{"ja":"escapeString","en":"escapeString"},
+        "reference.function.Pot.Sanitizer.unescapeString":{"ja":"unescapeString","en":"unescapeString"},
+        "reference.function.Pot.Sanitizer.escapeFileName":{"ja":"escapeFileName","en":"escapeFileName"},
+        "reference.function.Pot.Sanitizer.escapeSequence":{"ja":"escapeSequence","en":"escapeSequence"},
+        "reference.function.Pot.Sanitizer.unescapeSequence":{"ja":"unescapeSequence","en":"unescapeSequence"}
+      }
+    },
+    "reference.Pot.MimeType.functions":{
+      "title":{"ja":"Pot.MimeType","en":"Pot.MimeType"},
+      "items":{
+        "reference.function.Pot.MimeType.getExtByMimeType":{"ja":"getExtByMimeType","en":"getExtByMimeType"},
+        "reference.function.Pot.MimeType.getMimeTypeByExt":{"ja":"getMimeTypeByExt","en":"getMimeTypeByExt"}
       }
     },
     "reference.Pot.XPCOM.functions":{
