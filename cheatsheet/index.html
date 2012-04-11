@@ -39,7 +39,11 @@ setTimeout(function() {
       done = true;
 
       $(function() {
-        init();
+        Pot.callLazy(function() {
+          init();
+        }).then(function() {
+          appendTweetButton();
+        });
       });
     }
 
@@ -595,6 +599,48 @@ setTimeout(function() {
     });
   }
 
+  // Twitter Tweet Button.
+  function appendTweetButton() {
+    Pot.till(function() {
+      return $('head').length > 0;
+
+    }).then(function() {
+      var tweet = {
+        id   : 'twitter-wjs',
+        src  : '//platform.twitter.com/widgets.js',
+        elem : null,
+        text : 'Pot.js + PotLite.js - Cheat Sheet Generator - JavaScript Library',
+        url  : Pot.rtrim((Pot.currentURI() + ':').split('/').slice(0, -1).join('/'), '/') + '/',
+        via  : 'polygon_planet',
+        tags : 'Potjs'
+      };
+
+      if ($('#' + tweet.id).length === 0) {
+
+        $('<a/>')
+          .addClass('twitter-share-button')
+          .attr({
+            href            : 'https://twitter.com/share',
+            //'data-count'    : 'none',
+            'data-text'     : tweet.text,
+            'data-url'      : tweet.url,
+            //'data-via'      : tweet.via,
+            'data-hashtags' : tweet.tags
+          })
+          .text('Tweet')
+          .appendTo('.twitter-tweet-button-container');
+
+        $('<script/>')
+          .attr({
+            async : 'async',
+            id    : tweet.id,
+            src   : tweet.src
+          })
+          .appendTo('head');
+      }
+    });
+  }
+
 }, 20);
 </script>
 <style type="text/css" media="all">
@@ -757,6 +803,23 @@ h2 *, h3 * {
 .cheatsheet-generator-image-loading {
   display: block;
   margin: 100px auto;
+}
+
+.footer-wrapper {
+  display: inline-block;
+}
+
+.footer-wrapper iframe {
+  border: 0 none;
+}
+
+.twitter-tweet-button-container {
+  float: left;
+  margin: 1em;
+}
+
+.footer-desc {
+  float: left;
 }
 
 .ui-slider-handle {
@@ -964,11 +1027,14 @@ h2 *, h3 * {
       </div>
     </div>
     <div class="footer">
-      <p>
-        Last modified: 2012-04-11
-        Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet" target="_blank">polygon planet</a>
-        Designed by <a href="http://r-m-t.jp/" title="R M T | 同人音楽サークル (Japanese)" target="_blank">yinyang302mg</a>
-      </p>
+      <div class="footer-wrapper clearfix">
+        <div class="twitter-tweet-button-container"></div>
+        <p class="footer-desc">
+          Last modified: 2012-04-11
+          Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet" target="_blank">polygon planet</a>
+          Designed by <a href="http://r-m-t.jp/" title="R M T | 同人音楽サークル (Japanese)" target="_blank">yinyang302mg</a>
+        </p>
+      </div>
     </div>
   </div>
   <noscript>
