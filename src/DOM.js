@@ -2065,7 +2065,7 @@ update(DOM, {
   removeClass : function(elem, name) {
     var names, value, sp;
     if (Pot.isElement(elem) && elem.className) {
-      if (name === undefined) {
+      if (name === void 0) {
         elem.className = '';
       } else if (name && isString(name)) {
         sp = ' ';

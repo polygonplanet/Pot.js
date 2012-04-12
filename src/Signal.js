@@ -195,7 +195,7 @@ update(Pot.Signal, {
    * @public
    */
   DropFile : function(target, options) {
-    return Pot.Signal.DropFile.prototype.init(target, options);
+    return new Pot.Signal.DropFile.prototype.init(target, options);
   },
   /**
    * @lends Pot.Signal
