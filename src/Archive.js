@@ -214,10 +214,10 @@ update(Pot.Archive, {
          */
         deferred : function(speed) {
           var that = this, max = this.max;
-          return Pot.Deferred.forEver[speed](function() {
+          return Deferred.forEver[speed](function() {
             var buffer = that.string.substr(that.index, max);
             if (!buffer) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             that.searchSlidingWindow(buffer);
             if (that.size === 2 ||
@@ -413,7 +413,7 @@ update(Pot.Archive, {
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new AlphamericStringEncoder(string)).deferred(speed);
           }
@@ -559,12 +559,12 @@ update(Pot.Archive, {
          */
         deferred : function(speed) {
           var that = this;
-          return Pot.Deferred.forEver[speed](function() {
+          return Deferred.forEver[speed](function() {
             var c = that.peek();
             if (c < 0x3F) {
               that.decode(c);
             } else {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
           }).then(function() {
             return that.result.slice(0x400);
@@ -723,7 +723,7 @@ update(Pot.Archive, {
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new AlphamericStringDecoder(string)).deferred(speed);
           }
