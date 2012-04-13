@@ -153,13 +153,13 @@ update(Pot.Collection, {
           result = arrayize(arg);
           break;
       default:
-          if (Pot.isArrayLike(arg)) {
+          if (isArrayLike(arg)) {
             result = concat.apply([], args);
-          } else if (Pot.isObject(arg)) {
+          } else if (isObject(arg)) {
             args.unshift({});
             result = update.apply(null, args);
-          } else if (Pot.isString(arg)) {
-            result = Array.prototype.join.call(args, '');
+          } else if (isString(arg)) {
+            result = ArrayProto.join.call(args, '');
           } else {
             result = args;
           }
@@ -292,7 +292,7 @@ update(Pot.Collection, {
       useStrict = !loose;
       iCase = !!ignoreCase;
       if (object) {
-        if (Pot.isArray(object)) {
+        if (isArray(object)) {
           len = object.length;
           if (len) {
             for (i = 0; i < len; i++) {
@@ -310,7 +310,7 @@ update(Pot.Collection, {
               }
             }
           }
-        } else if (Pot.isObject(object)) {
+        } else if (isObject(object)) {
           results = {};
           array = [];
           each(object, function(val, key) {
@@ -331,7 +331,7 @@ update(Pot.Collection, {
               } catch (e) {}
             }
           }
-        } else if (Pot.isString(object)) {
+        } else if (isString(object)) {
           args[0] = object.split('');
           results = me.apply(null, args).join('');
         } else {
@@ -362,9 +362,8 @@ update(Pot.Collection, {
    * @static
    * @public
    */
-  flatten : function(array) {
-    var results = [], me = arguments.callee,
-        i, len, item, items, isArray = Pot.isArray;
+  flatten : function flatten(array) {
+    var results = [], i, len, item, items;
     if (!isArray(array)) {
       results[results.length] = array;
     } else {
@@ -373,7 +372,7 @@ update(Pot.Collection, {
       for (i = 0; i < len; i++) {
         item = items[i];
         if (isArray(item)) {
-          push.apply(results, me(item));
+          push.apply(results, flatten(item));
         } else {
           results[results.length] = item;
         }
@@ -435,7 +434,7 @@ update(Pot.Collection, {
       return aa.length - bb.length;
     }
     return function(array) {
-      if (Pot.isArray(array)) {
+      if (isArray(array)) {
         array.sort(alphanumCase);
       }
       return array;

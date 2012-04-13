@@ -94,7 +94,7 @@ update(Pot.Complex, {
    */
   rand : update(function(min, max) {
     var result = 0, args = arguments, me = args.callee,
-        t, n, x, scale, forString = false, isString = Pot.isString;
+        t, n, x, scale, forString = false;
     if (!me.getScale) {
       /**@ignore*/
       me.getScale = function(a) {
@@ -190,7 +190,7 @@ update(Pot.Complex, {
        */
       alpha : update(function(length) {
         var result = '', c, len, max;
-        len = Pot.isNumeric(length) ? length - 0 : 1;
+        len = isNumeric(length) ? length - 0 : 1;
         if (len > 0) {
           c = [];
           max = ALPHAS.length - 1;
@@ -253,7 +253,7 @@ update(Pot.Complex, {
        */
       alnum : update(function(length, valid) {
         var result = '', len, max, c;
-        len = Pot.isNumeric(length) ? length - 0 : 1;
+        len = isNumeric(length) ? length - 0 : 1;
         if (len > 0) {
           c = [];
           max = ALPHANUMS.length - 1;
@@ -476,11 +476,11 @@ update(Pot.Complex, {
    * @static
    * @public
    */
-  limit : function(x, min, max) {
+  limit : function limit(x, min, max) {
     var result, tmp, args = arguments, values;
     switch (args.length) {
       case 0:
-          result = (void 0);
+          result = void 0;
           break;
       case 1:
           result = x;
@@ -510,8 +510,7 @@ update(Pot.Complex, {
           values = arrayize(args, 1);
           min = Math.min.apply(null, values);
           max = Math.max.apply(null, values);
-          result = args.callee(x, min, max);
-          break;
+          result = limit(x, min, max);
     }
     return result;
   },
