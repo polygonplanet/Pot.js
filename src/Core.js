@@ -9,17 +9,78 @@
  */
 var Pot = {VERSION : '{#$version}', TYPE : /*{#if Pot}'full'{#else}*/'lite'/*{#endif}*/},
 
+// Refer the Pot properties/functions.
+PotSystem,
+PotPlugin,
+PotToString,
+PotBrowser,
+PotLang,
+PotOS,
+PotGlobal,
+PotNoop,
+PotTmp,
+PotInternal,
+
+// Asynchronous/Iteration methods/properties.
+PotInternalCallInBackground,
+PotInternalSetTimeout,
+PotInternalClearTimeout,
+PotStopIteration,
+
+// is* : object typing.
+typeOf,
+typeLikeOf,
+isBoolean,
+isNumber,
+isString,
+isFunction,
+isArray,
+isDate,
+isRegExp,
+isObject,
+isError,
+isArrayLike,
+isNumeric,
+isStopIter,
+isDeferred,
+isHash,
+isIter,
+isWorkeroid,
+isWindow,
+isDocument,
+isElement,
+isNodeList,
+isNodeLike,
+
+// Constructors.
+Deferred,
+Hash,
+Iter,
+PotInternalLightIterator,
+Signal,
+DropFile,
+Workeroid,
+
+/*{#if 0}*/
+//XXX: todo;
+// Pot.current*
+// Math.*
+/*{#endif}*/
 // A shortcut of prototype methods.
-push           = Array.prototype.push,
-slice          = Array.prototype.slice,
-splice         = Array.prototype.splice,
-concat         = Array.prototype.concat,
-unshift        = Array.prototype.unshift,
-indexOf        = Array.prototype.indexOf,
-lastIndexOf    = Array.prototype.lastIndexOf,
-toString       = Object.prototype.toString,
-hasOwnProperty = Object.prototype.hasOwnProperty,
-toFuncString   = Function.prototype.toString,
+ArrayProto     = Array.prototype,
+ObjectProto    = Object.prototype,
+StringProto    = String.prototype,
+FunctionProto  = Function.prototype,
+push           = ArrayProto.push,
+slice          = ArrayProto.slice,
+splice         = ArrayProto.splice,
+concat         = ArrayProto.concat,
+unshift        = ArrayProto.unshift,
+indexOf        = ArrayProto.indexOf,
+lastIndexOf    = ArrayProto.lastIndexOf,
+toString       = ObjectProto.toString,
+hasOwnProperty = ObjectProto.hasOwnProperty,
+toFuncString   = FunctionProto.toString,
 fromCharCode   = String.fromCharCode,
 StopIteration  = (typeof StopIteration === 'undefined') ? void 0 : StopIteration,
 
@@ -253,29 +314,23 @@ update(Pot, {
    * @property {Object} blackberry BlackBerry.
    */
   Browser : (function(n) {
-    // Expression from: jquery.browser (based)
-    var r = {}, u, m, ua, ver, re, rs, i, len;
-    re = {
+    var r = {}, m, ua, ver, i, len, re = {
       webkit  : /(webkit)(?:.*version|)[\s\/]+([\w.]+)/,
       opera   : /(opera)(?:.*version|)[\s\/]+([\w.]+)/,
       msie    : /(msie)[\s\/]+([\w.]+)/,
       mozilla : /(?!^.*compatible.*$).*(mozilla)(?:.*?\s+rv[:\s\/]+([\w.]+)|)/
-    };
+    },
     rs = [
-      /webkit.*(chrome)[\s\/]+([\w.]+)/,
       /webkit.*version[\s\/]+([\w.]+).*(safari)/,
-      /webkit.*(safari)[\s\/]+([\w.]+)/,
-      /(iphone).*version[\s\/]+([\w.]+)/,
-      /(ipod).*version[\s\/]+([\w.]+)/,
-      /(ipad).*version[\s\/]+([\w.]+)/,
-      /(android).*version[\s\/]+([\w.]+)/,
+      /webkit.*(chrome|safari)[\s\/]+([\w.]+)/,
+      /(iphone|ipod|ipad|android).*version[\s\/]+([\w.]+)/,
       /(blackberry)(?:[\s\d]*|.*version)[\s\/]+([\w.]+)/,
       re.webkit,
       re.opera,
       re.msie,
       /(?!^.*compatible.*$).*mozilla.*?(firefox)(?:[\s\/]+([\w.]+)|)/,
       re.mozilla
-    ];
+    ],
     u = String(n && n.userAgent).toLowerCase();
     if (u) {
       for (i = 0, len = rs.length; i < len; i++) {
@@ -345,21 +400,21 @@ update(Pot, {
    * @property {Function} toString   Represents OS as a string.
    */
   OS : (function(nv) {
-    var r = {}, n = nv || {}, pf, ua, av, maps, i, len, o;
-    pf = String(n.platform).toLowerCase();
-    ua = String(n.userAgent).toLowerCase();
-    av = String(n.appVersion).toLowerCase();
-    maps = [
-      {s: 'iphone',     p: pf},
-      {s: 'ipod',       p: pf},
-      {s: 'ipad',       p: ua},
-      {s: 'blackberry', p: ua},
-      {s: 'android',    p: ua},
-      {s: 'mac',        p: pf},
-      {s: 'win',        p: pf},
-      {s: 'linux',      p: pf},
-      {s: 'x11',        p: av}
-    ];
+    var r = {}, n = nv || {}, i, len, o,
+        pf = String(n.platform).toLowerCase(),
+        ua = String(n.userAgent).toLowerCase(),
+        av = String(n.appVersion).toLowerCase(),
+        maps = [
+          {s : 'iphone',     p : pf},
+          {s : 'ipod',       p : pf},
+          {s : 'ipad',       p : ua},
+          {s : 'blackberry', p : ua},
+          {s : 'android',    p : ua},
+          {s : 'mac',        p : pf},
+          {s : 'win',        p : pf},
+          {s : 'linux',      p : pf},
+          {s : 'x11',        p : av}
+        ];
     for (i = 0, len = maps.length; i < len; i++) {
       o = maps[i];
       if (~o.p.indexOf(o.s)) {
@@ -395,11 +450,12 @@ update(Pot, {
    * @public
    */
   Global : (function() {
+    var g = (new Function('return this;'))();
     if (!globals ||
         typeof globals !== 'object' || !('setTimeout' in globals)) {
-      globals = this || {};
+      globals = this || g || {};
     }
-    return this || {};
+    return this || g || {};
   }()),
   /**
    * Noop function.
@@ -439,9 +495,9 @@ update(Pot, {
     getMagicNumber : (function(sn) {
       var c = 0, n = +sn;
       return function() {
-        var me = arguments.callee, i = me.n + (me.c++);
+        var i = n + (c++);
         if (!isFinite(i) || isNaN(i)) {
-          me.c = me.n = i = 0;
+          c = n = i = 0;
         }
         return i;
       };
@@ -455,15 +511,15 @@ update(Pot, {
     getExportObject : function(forGlobalScope) {
       var outputs, id, valid;
       if (forGlobalScope) {
-        if (Pot.System.isNonBrowser) {
-          outputs = Pot.Global || globals;
+        if (PotSystem.isNonBrowser) {
+          outputs = PotGlobal || globals;
         } else {
-          outputs = (Pot.isWindow(globals) && globals) ||
-                    (Pot.isWindow(Pot.Global) && Pot.Global) ||
+          outputs = (isWindow(globals) && globals) ||
+                    (isWindow(PotGlobal) && PotGlobal) ||
                      Pot.currentWindow();
         }
         if (!outputs &&
-            typeof window !== 'undefined' && Pot.isWindow(window)) {
+            typeof window !== 'undefined' && isWindow(window)) {
           outputs = window;
         }
         if (outputs) {
@@ -480,12 +536,12 @@ update(Pot, {
             } catch (e) {}
           }
           if (!valid) {
-            outputs = Pot.Global;
+            outputs = PotGlobal;
           }
         }
       }
       if (!outputs) {
-        if (Pot.System.isNodeJS) {
+        if (PotSystem.isNodeJS) {
           if (typeof module === 'object' &&
               typeof module.exports === 'object') {
             outputs = module.exports;
@@ -498,7 +554,7 @@ update(Pot, {
           outputs = globals;
         }
         if (!outputs) {
-          outputs = globals || Pot.Global || Pot.currentWindow();
+          outputs = globals || PotGlobal || Pot.currentWindow();
         }
       }
       return outputs;
@@ -542,6 +598,19 @@ update(Pot, {
   Pot : Pot
 });
 }(typeof navigator !== 'undefined' && navigator || {}));
+
+// Refer the Pot properties.
+PotSystem   = Pot.System;
+PotPlugin   = Pot.Plugin;
+PotToString = Pot.toString;
+PotBrowser  = Pot.Browser;
+PotLang     = Pot.LANG;
+PotOS       = Pot.OS;
+PotGlobal   = Pot.Global;
+PotNoop     = Pot.noop;
+PotTmp      = Pot.tmp;
+PotInternal = Pot.Internal;
+
 /*{#if Pot}*/
 // Path/Directory Delimiter
 Pot.update({
@@ -555,7 +624,7 @@ Pot.update({
    * @static
    * @const
    */
-  PATH_DELIMITER : Pot.OS.win ? ';'  : ':',
+  PATH_DELIMITER : PotOS.win ? ';'  : ':',
   /**
    * Delimiter for directory.
    *
@@ -563,7 +632,7 @@ Pot.update({
    * @static
    * @const
    */
-  DIR_DELIMITER : Pot.OS.win ? '\\' : '/',
+  DIR_DELIMITER : PotOS.win ? '\\' : '/',
   /**
    * XML/HTML namespace URI.
    *
@@ -631,7 +700,7 @@ Pot.update({
 });
 /*{#endif}*/
 // Definition of System.
-update(Pot.System, (function() {
+update(PotSystem, (function() {
   var o = {}, g, ws, b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
@@ -652,7 +721,7 @@ update(Pot.System, (function() {
         Cu = Components.utils;
         o.isWaitable = true;
         o.hasComponents = true;
-        if (Pot.Browser.firefox || Pot.Browser.mozilla) {
+        if (PotBrowser.firefox || PotBrowser.mozilla) {
           o.isFirefoxExtension = true;
         }
       } catch (e) {
@@ -689,12 +758,12 @@ update(Pot.System, (function() {
       o.isNodeJS = true;
     }
   }
-  if (Pot.Global && Pot.Global.ActiveXObject ||
-      typeof ActiveXObject !== 'undefined' && (ActiveXObject)) {
+  if (PotGlobal && PotGlobal.ActiveXObject ||
+      typeof ActiveXObject !== 'undefined' && ActiveXObject) {
     o.hasActiveXObject = true;
   }
   if (!o.isFirefoxExtension) {
-    if (Pot.Browser.chrome || Pot.Browser.webkit || Pot.Browser.safari) {
+    if (PotBrowser.chrome || PotBrowser.webkit || PotBrowser.safari) {
       if (typeof chrome === 'object' &&
           typeof chrome.extension === 'object') {
         o.isChromeExtension = true;
@@ -821,13 +890,13 @@ update(Pot.System, (function() {
                 case (msg.a() + 1):
                     // canWorkerPostObject:
                     //   'canWorkerPostObject' or 'canChromeWorkerPostObject'
-                    Pot.System[canWorkerPostObject] = true;
+                    PotSystem[canWorkerPostObject] = true;
                     // FALL THROUGH
                 case (msg + 1):
                 case 'x1':
                     // canWorkerDataURI:
                     //   'canWorkerDataURI' or 'canChromeWorkerDataURI'
-                    Pot.System[canWorkerDataURI] = true;
+                    PotSystem[canWorkerDataURI] = true;
               }
             }
             try {
@@ -857,13 +926,13 @@ update(Pot.System, (function() {
             if (ev) {
               switch (ev.data) {
                 case (msg.a() + 1):
-                    Pot.System[canWorkerPostObject] = true;
+                    PotSystem[canWorkerPostObject] = true;
                     // FALL THROUGH
                 case (msg + 1):
                 case 'x1':
                     // canWorkerBlobURI:
                     //   'canWorkerBlobURI' or 'canChromeWorkerBlobURI'
-                    Pot.System[canWorkerBlobURI] = true;
+                    PotSystem[canWorkerBlobURI] = true;
               }
             }
             try {
@@ -916,8 +985,8 @@ update(Pot.System, (function() {
  * @property {Function} isError    Detect the Error type. (static)
  */
 (function(types) {
-  var i, len, typeMaps = {};
-  for (i = 0, len = types.length; i < len; i++) {
+  var i = 0, len = types.length, typeMaps = {};
+  for (; i < len; i++) {
     (function() {
       var type = types[i], low = type.toLowerCase();
       typeMaps[buildObjectString(type)] = low;
@@ -926,18 +995,18 @@ update(Pot.System, (function() {
           case 'error':
               return function(o) {
                 return (o != null &&
-                        (o instanceof Error || Pot.typeOf(o) === low)
+                        (o instanceof Error || typeOf(o) === low)
                        ) || false;
               };
           case 'date':
               return function(o) {
                 return (o != null &&
-                        (o instanceof Date || Pot.typeOf(o) === low)
+                        (o instanceof Date || typeOf(o) === low)
                        ) || false;
               };
           default:
               return function(o) {
-                return Pot.typeOf(o) === low;
+                return typeOf(o) === low;
               };
         }
       }());
@@ -998,18 +1067,32 @@ update(Pot.System, (function() {
      * @public
      */
     typeLikeOf : function(o) {
-      var type = Pot.typeOf(o);
-      if (type !== 'array' && Pot.isArrayLike(o)) {
+      var type = typeOf(o);
+      if (type !== 'array' && isArrayLike(o)) {
         type = 'array';
       }
       return type;
     }
   });
 }('Boolean Number String Function Array Date RegExp Object Error'.split(' ')));
+
+// Refer variables.
+isBoolean   = Pot.isBoolean;
+isNumber    = Pot.isNumber;
+isString    = Pot.isString;
+isFunction  = Pot.isFunction;
+isArray     = Pot.isArray;
+isDate      = Pot.isDate;
+isRegExp    = Pot.isRegExp;
+isObject    = Pot.isObject;
+isError     = Pot.isError;
+isArrayLike = Pot.isArrayLike;
+typeOf      = Pot.typeOf;
+typeLikeOf  = Pot.typeLikeOf;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 (function(SI) {
 // Aggregate in this obejct for global functions. (HTML5 Task)
-update(Pot.Internal, {
+update(PotInternal, {
   /**
    * @lends Pot.Internal
    */
@@ -1052,9 +1135,9 @@ update(Pot.Internal, {
      */
     byEvent : (function() {
       var IMAGE;
-      if (Pot.System.isNonBrowser || Pot.System.isNodeJS ||
+      if (PotSystem.isNonBrowser || PotSystem.isNodeJS ||
           typeof window !== 'object'  || typeof document !== 'object' ||
-          typeof Image !== 'function' || window.opera || Pot.Browser.opera ||
+          typeof Image !== 'function' || window.opera || PotBrowser.opera ||
           typeof document.addEventListener !== 'function'
       ) {
         return false;
@@ -1071,8 +1154,7 @@ update(Pot.Internal, {
               'R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
       /**@ignore*/
       return function(callback) {
-        var done, img, handler;
-        img = new Image();
+        var done, handler, img = new Image();
         /**@ignore*/
         handler = function() {
           try {
@@ -1098,7 +1180,7 @@ update(Pot.Internal, {
      * @ignore
      */
     byTick : (function() {
-      if (!Pot.System.isNodeJS || typeof process !== 'object' ||
+      if (!PotSystem.isNodeJS || typeof process !== 'object' ||
           typeof process.nextTick !== 'function') {
         return false;
       }
@@ -1116,6 +1198,9 @@ update(Pot.Internal, {
     }
   },
   /**
+   * @lends Pot.Internal
+   */
+  /**
    * Alias for window.setTimeout function. (for non-window-environment)
    *
    * @type  Function
@@ -1126,7 +1211,7 @@ update(Pot.Internal, {
    */
   setTimeout : function(func, msec) {
     try {
-      return Pot.Internal.callInBackground.byTimer(func, msec || 0);
+      return PotInternalCallInBackground.byTimer(func, msec || 0);
     } catch (e) {}
   },
   /**
@@ -1172,6 +1257,11 @@ update(Pot.Internal, {
     } catch (e) {}
   }
 });
+
+// Refer objects.
+PotInternalCallInBackground = PotInternal.callInBackground;
+PotInternalSetTimeout       = PotInternal.setTimeout;
+PotInternalClearTimeout     = PotInternal.clearTimeout;
 
 // Define distinction of types.
 Pot.update({
@@ -1238,7 +1328,7 @@ Pot.update({
       return f;
     }, {
       NAME     : SI,
-      toString : Pot.toString
+      toString : PotToString
     });
     f.prototype = {
       constructor : f,
@@ -1280,8 +1370,8 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (Pot.StopIteration !== void 0 &&
-        (o == Pot.StopIteration || o instanceof Pot.StopIteration)) {
+    if (PotStopIteration !== void 0 &&
+        (o == PotStopIteration || o instanceof PotStopIteration)) {
       return true;
     }
     if (typeof StopIteration !== 'undefined' &&
@@ -1296,8 +1386,8 @@ Pot.update({
         ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
       return true;
     }
-    if (Pot.isError(o) && o[SI] && !(SI in o[SI]) &&
-        !Pot.isError(o[SI]) && Pot.isStopIter(o[SI])) {
+    if (isError(o) && o[SI] && !(SI in o[SI]) &&
+        !isError(o[SI]) && isStopIter(o[SI])) {
       return true;
     }
     return false;
@@ -1338,7 +1428,7 @@ Pot.update({
    * @public
    */
   isIterable : function(x) {
-    return !!(x && Pot.isFunction(x.next) &&
+    return !!(x && isFunction(x.next) &&
          (~Pot.getFunctionCode(x.next).indexOf(SI) ||
            Pot.isNativeCode(x.next)));
   },
@@ -1374,8 +1464,7 @@ Pot.update({
    * @public
    */
   isScalar : function(x) {
-    return x != null &&
-      (Pot.isString(x) || Pot.isNumber(x) || Pot.isBoolean(x));
+    return x != null && (isString(x) || isNumber(x) || isBoolean(x));
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -1402,17 +1491,17 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (Pot.isArray(o) || o instanceof Array || o.constructor === Array) {
+    if (isArray(o) || o instanceof Array || o.constructor === Array) {
       return true;
     }
     len = o.length;
-    if (!Pot.isNumber(len) || (!Pot.isObject(o) && !Pot.isArray(o)) ||
-        o === Pot || o === Pot.Global || o === globals ||
-        Pot.isWindow(o) || Pot.isDocument(o) || Pot.isElement(o)
+    if (!isNumber(len) || (!isObject(o) && !isArray(o)) ||
+        o === Pot || o === PotGlobal || o === globals ||
+        isWindow(o) || isDocument(o) || isElement(o)
     ) {
       return false;
     }
-    if (o.isArray || Pot.isFunction(o.callee) || Pot.isNodeList(o) ||
+    if (o.isArray || isFunction(o.callee) || isNodeList(o) ||
         ((typeof o.item === 'function' ||
           typeof o.nextNode === 'function') &&
            o.nodeType != 3 && o.nodeType != 4) ||
@@ -1454,8 +1543,8 @@ Pot.update({
   isPlainObject : function(o) {
     var result = false, p;
     try {
-      if (!o || !Pot.isObject(o) ||
-          Pot.isElement(o) || Pot.isWindow(o) || Pot.isDocument(o)) {
+      if (!o || !isObject(o) ||
+          isElement(o) || isWindow(o) || isDocument(o)) {
         throw o;
       }
       if (o.constructor &&
@@ -1511,7 +1600,7 @@ Pot.update({
    */
   isEmpty : function(o) {
     var empty, p, f, toCode = Pot.getFunctionCode;
-    switch (Pot.typeLikeOf(o)) {
+    switch (typeLikeOf(o)) {
       case 'object':
           empty = true;
           for (p in o) {
@@ -1579,9 +1668,9 @@ Pot.update({
    * @public
    */
   isDeferred : function(x) {
-    return x != null && ((x instanceof Pot.Deferred) ||
-     (x.id   != null && x.id   === Pot.Deferred.prototype.id &&
-      x.NAME != null && x.NAME === Pot.Deferred.prototype.NAME));
+    return x != null && ((x instanceof Deferred) ||
+     (x.id   != null && x.id   === Deferred.fn.id &&
+      x.NAME != null && x.NAME === Deferred.fn.NAME));
   },
   /**
    * Check whether the argument object is an instance of Pot.Iter.
@@ -1603,9 +1692,9 @@ Pot.update({
    * @public
    */
   isIter : function(x) {
-    return x != null && ((x instanceof Pot.Iter) ||
-     (x.id   != null && x.id   === Pot.Iter.prototype.id &&
-      x.NAME != null && x.NAME === Pot.Iter.prototype.NAME &&
+    return x != null && ((x instanceof Iter) ||
+     (x.id   != null && x.id   === Iter.fn.id &&
+      x.NAME != null && x.NAME === Iter.fn.NAME &&
                 typeof x.next  === 'function'));
   },
   /**
@@ -1629,9 +1718,9 @@ Pot.update({
    * @public
    */
   isWorkeroid : function(x) {
-    return x != null && ((x instanceof Pot.Workeroid) ||
-     (x.id   != null && x.id   === Pot.Workeroid.prototype.id &&
-      x.NAME != null && x.NAME === Pot.Workeroid.prototype.NAME));
+    return x != null && ((x instanceof Workeroid) ||
+     (x.id   != null && x.id   === Workeroid.fn.id &&
+      x.NAME != null && x.NAME === Workeroid.fn.NAME));
   },/*{#if Pot}*/
   /**
    * Check whether the argument object is an instance of Pot.Hash.
@@ -1653,9 +1742,9 @@ Pot.update({
    * @public
    */
   isHash : function(x) {
-    return x != null && ((x instanceof Pot.Hash) ||
-     (x.id   != null && x.id   === Pot.Hash.prototype.id &&
-      x.NAME != null && x.NAME === Pot.Hash.prototype.NAME));
+    return x != null && ((x instanceof Hash) ||
+     (x.id   != null && x.id   === Hash.fn.id &&
+      x.NAME != null && x.NAME === Hash.fn.NAME));
   },
   /**
    * Check whether the value is escaped as JavaScript String.
@@ -1785,7 +1874,7 @@ Pot.update({
    * @public
    */
   isInt : function(n) {
-    return Pot.isNumber(n) && isFinite(n) && n % 1 == 0;
+    return isNumber(n) && isFinite(n) && n % 1 == 0;
   },
   /**
    * Check whether the argument is the native code.
@@ -1822,7 +1911,7 @@ Pot.update({
     }
     if (Pot.getFunctionCode) {
       code = Pot.getFunctionCode(method);
-    } else if (Pot.isFunction(method)) {
+    } else if (isFunction(method)) {
       code = toFuncString.call(method);
     } else if (method.toString) {
       code = method.toString();
@@ -1996,11 +2085,11 @@ Pot.update({
    */
   isNodeList : function(x) {
     var type;
-    if (x && Pot.isNumber(x.length)) {
+    if (x && isNumber(x.length)) {
       type = typeof x.item;
-      if (Pot.isObject(x)) {
+      if (isObject(x)) {
         return type === 'function' || type === 'string';
-      } else if (Pot.isFunction(x)) {
+      } else if (isFunction(x)) {
         return type === 'function';
       }
     }
@@ -2037,8 +2126,8 @@ Pot.update({
       'i'
     );
     return function(x) {
-      return (Pot.isNodeLike(x) || Pot.isNodeList(x)  ||
-              Pot.isWindow(x)   || Pot.isDocument(x)) ||
+      return (isNodeLike(x) || isNodeList(x)  ||
+              isWindow(x)   || isDocument(x)) ||
         x != null && typeof x === 'object' && (
         // Event
         ((x.preventDefault || 'returnValue' in x) &&
@@ -2070,6 +2159,21 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
   StopIteration = Pot.StopIteration;
 }
 
+// Refer the Pot properties/functions.
+PotStopIteration = Pot.StopIteration;
+isArrayLike      = Pot.isArrayLike;
+isNumeric        = Pot.isNumeric;
+isStopIter       = Pot.isStopIter;
+isDeferred       = Pot.isDeferred;
+isHash           = Pot.isHash;
+isIter           = Pot.isIter;
+isWorkeroid      = Pot.isWorkeroid;
+isWindow         = Pot.isWindow;
+isDocument       = Pot.isDocument;
+isElement        = Pot.isElement;
+isNodeList       = Pot.isNodeList;
+isNodeLike       = Pot.isNodeLike;
+
 // Definition of current Document and URI.
 (function() {
   var win, doc, uri, wp, dp, a;
@@ -2079,20 +2183,20 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
   function detectWindow(x) {
     var w;
     if (x) {
-      if (Pot.isWindow(x)) {
+      if (isWindow(x)) {
         w = x;
       } else {
         each(wp, function(p) {
           try {
-            if (Pot.isWindow(x[p])) {
+            if (isWindow(x[p])) {
               w = x[p];
             }
-            if (x[p].content && Pot.isWindow(x[p].content)) {
+            if (x[p].content && isWindow(x[p].content)) {
               w = x[p].content;
             }
           } catch (e) {}
           if (w) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         });
       }
@@ -2103,20 +2207,20 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
   function detectDocument(x) {
     var d;
     if (x) {
-      if (Pot.isDocument(x)) {
+      if (isDocument(x)) {
         d = x;
       } else {
         each(dp, function(p) {
           try {
-            if (Pot.isDocument(x[p])) {
+            if (isDocument(x[p])) {
               d = x[p];
             }
-            if (x[p].content && Pot.isDocument(x[p].content.document)) {
+            if (x[p].content && isDocument(x[p].content.document)) {
               d = x[p].content.document;
             }
           } catch (e) {}
           if (d) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         });
       }
@@ -2125,7 +2229,7 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
   }
   each([
     globals,
-    Pot.Global,
+    PotGlobal,
     typeof window   === 'undefined' ? this : window,
     typeof document === 'undefined' ? this : document
   ], function(x) {
@@ -2137,11 +2241,11 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
         doc = detectDocument(x);
       }
       if (win && doc) {
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
     }
   });
-  if (Pot.System.isNodeJS) {
+  if (PotSystem.isNodeJS) {
     uri = (typeof process === 'object' &&
             process.mainModule && process.mainModule.filename) ||
           (typeof __filename === 'string' && __filename);
@@ -2163,7 +2267,7 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
       }
     }
   }
-  update(Pot.System, {
+  update(PotSystem, {
     /**
      * @lends Pot.System
      */
@@ -2206,7 +2310,7 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
      * @public
      */
     currentWindow : function() {
-      return Pot.System.currentWindow;
+      return PotSystem.currentWindow;
     },
     /**
      * Get the current DOM Document object if exists (i.e., on web-browser).
@@ -2218,7 +2322,7 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
      * @public
      */
     currentDocument : function() {
-      return Pot.System.currentDocument;
+      return PotSystem.currentDocument;
     },
     /**
      * Get the current document URI (on web-browser)
@@ -2230,13 +2334,13 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
      * @public
      */
     currentURI : function() {
-      return Pot.System.currentURI;
+      return PotSystem.currentURI;
     }
   });
 }());
 
 // Definition of builtin method states.
-update(Pot.System, {
+update(PotSystem, {
   /**
    * @lends Pot.System
    */
@@ -2253,14 +2357,14 @@ update(Pot.System, {
    * @type  Boolean
    * @const
    */
-  isBuiltinArrayForEach : Pot.isBuiltinMethod(Array.prototype.forEach),
+  isBuiltinArrayForEach : Pot.isBuiltinMethod(ArrayProto.forEach),
   /**
    * Whether the environment supports the built-in "Array.prototype.indexOf".
    *
    * @type  Boolean
    * @const
    */
-  isBuiltinArrayIndexOf : Pot.isBuiltinMethod(Array.prototype.indexOf),
+  isBuiltinArrayIndexOf : Pot.isBuiltinMethod(ArrayProto.indexOf),
   /**
    * Whether the environment supports
    *   the built-in "Array.prototype.lastIndexOf".
@@ -2268,7 +2372,7 @@ update(Pot.System, {
    * @type  Boolean
    * @const
    */
-  isBuiltinArrayLastIndexOf : Pot.isBuiltinMethod(Array.prototype.lastIndexOf)
+  isBuiltinArrayLastIndexOf : Pot.isBuiltinMethod(ArrayProto.lastIndexOf)
 });
 
 // Update Pot object methods.
@@ -2320,7 +2424,7 @@ Pot.update({
       if (type !== 'object' && type !== 'function' || object === null) {
         return results;
       }
-      if (Pot.isArrayLike(object)) {
+      if (isArrayLike(object)) {
         len = object.length;
         for (i = 0; i < len; i++) {
           if (i in object) {
@@ -2328,7 +2432,7 @@ Pot.update({
           }
         }
       } else {
-        if (Pot.System.isBuiltinObjectKeys) {
+        if (PotSystem.isBuiltinObjectKeys) {
           try {
             results = Object.keys(object);
             return results;
@@ -2372,10 +2476,9 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, id, scope, func, doc, script, head,
-        System = Pot.System;
+    var me = arguments.callee, id, scope, func, doc, script, head;
     if (code && me.patterns.valid.test(code)) {
-      if (System.hasActiveXObject) {
+      if (PotSystem.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
             me.test(execScript)) {
           return execScript(code, me.language);
@@ -2383,21 +2486,21 @@ Pot.update({
           func = 'execScript';
           if (func in globals && me.test(func, globals)) {
             return globals[func](code, me.language);
-          } else if (func in Pot.Global && me.test(func, Pot.Global)) {
-            return Pot.Global[func](code, me.language);
+          } else if (func in PotGlobal && me.test(func, PotGlobal)) {
+            return PotGlobal[func](code, me.language);
           }
         }
       }
       func = 'eval';
       if (func in globals && me.test(func, globals)) {
         scope = globals;
-      } else if (func in Pot.Global && me.test(func, Pot.Global)) {
-        scope = Pot.Global;
+      } else if (func in PotGlobal && me.test(func, PotGlobal)) {
+        scope = PotGlobal;
       }
-      if (System.isGreasemonkey) {
+      if (PotSystem.isGreasemonkey) {
         // eval does not work to global scope in greasemonkey
         //   even if using the unsafeWindow.
-        return Pot.localEval(code, scope || Pot.Global);
+        return Pot.localEval(code, scope || PotGlobal);
       }
       if (scope) {
         if (scope[func].call && scope[func].apply &&
@@ -2426,10 +2529,10 @@ Pot.update({
           return scope[func](code);
         }
       }
-      if (System.isNodeJS) {
+      if (PotSystem.isNodeJS) {
         return me.doEvalInGlobalNodeJS(func, code);
       }
-      if (System.isWebBrowser &&
+      if (PotSystem.isWebBrowser &&
           typeof document === 'object') {
         doc = document;
         head = doc.getElementsByTagName('head');
@@ -2442,7 +2545,7 @@ Pot.update({
           script = doc.createElement('script');
           script.type = 'text/javascript';
           script.defer = script.async = false;
-          if (Pot.System.hasActiveXObject && 'text' in script) {
+          if (PotSystem.hasActiveXObject && 'text' in script) {
             script.text = code;
           } else {
             script.appendChild(doc.createTextNode(code));
@@ -2451,7 +2554,7 @@ Pot.update({
           head.removeChild(script);
         }
       } else {
-        return Pot.localEval(code, scope || Pot.Global);
+        return Pot.localEval(code, scope || PotGlobal);
       }
     }
   }, {
@@ -2497,7 +2600,7 @@ Pot.update({
      * @ignore
      */
     doEvalInGlobalNodeJS : function(func, code) {
-      var result, me = arguments.callee, vm, script, scope = Pot.Global, id;
+      var result, me = arguments.callee, vm, script, scope = PotGlobal, id;
       if (me.worksForGlobal == null) {
         try {
           me.worksForGlobal = false;
@@ -2555,8 +2658,8 @@ Pot.update({
       func = 'eval';
       if (func in globals && that.test(func, globals)) {
         context = globals;
-      } else if (func in Pot.Global && that.test(func, Pot.Global)) {
-        context = Pot.Global;
+      } else if (func in PotGlobal && that.test(func, PotGlobal)) {
+        context = PotGlobal;
       }
       if (context && context[func]) {
         if (context[func].call && context[func].apply &&
@@ -2662,10 +2765,10 @@ Pot.update({
    * @public
    */
   getFunctionCode : function(func) {
-    if (Pot.isFunction(func)) {
+    if (isFunction(func)) {
       return toFuncString.call(func);
     }
-    if (Pot.isString(func)) {
+    if (isString(func)) {
       if (func.toString) {
         return func.toString();
       }
@@ -2706,7 +2809,7 @@ Pot.update({
     var isSpace = /\s/,
         notWord = /[^$\w\u0100-\uFFFF]/;
     return function(c) {
-      return Pot.isString(c) && !isSpace.test(c) && !notWord.test(c);
+      return isString(c) && !isSpace.test(c) && !notWord.test(c);
     };
   }()),
   /**
@@ -2743,7 +2846,7 @@ Pot.update({
   isNL : (function() {
     var notNL = /[^\r\n\u2028\u2029]/;
     return function(c) {
-      return Pot.isString(c) && !notNL.test(c);
+      return isString(c) && !notNL.test(c);
     };
   }()),
   /**
@@ -2943,7 +3046,7 @@ Pot.update({
         isSign = /^[-+]+$/;
     return function(tokens) {
       var result = [], len, prev, prevSuf, pre, suf, i, token;
-      if (Pot.isArray(tokens)) {
+      if (isArray(tokens)) {
         len = tokens.length;
         for (i = 0; i < len; i++) {
           token = tokens[i];
@@ -3341,26 +3444,26 @@ Pot.update({
     var props = [], t;
     if (object && properties && (converters || overrider)) {
       if (overrider) {
-        if (Pot.isFunction(converters)) {
+        if (isFunction(converters)) {
           t = converters;
           converters = overrider;
           overrider = t;
         }
       } else {
-        if (Pot.isFunction(converters)) {
+        if (isFunction(converters)) {
           overrider = converters;
         }
       }
-      if (Pot.isRegExp(converters)) {
+      if (isRegExp(converters)) {
         converters = [converters, ''];
-      } else if (Pot.isString(converters)) {
+      } else if (isString(converters)) {
         converters = [new RegExp(rescape(converters), 'g'), ''];
       }
       each(arrayize(properties), function(name) {
         if (name) {
           each(object, function(val, prop) {
-            if (Pot.isFunction(val) &&
-                ((Pot.isRegExp(name) && name.test(prop)) || name == prop)) {
+            if (isFunction(val) &&
+                ((isRegExp(name) && name.test(prop)) || name == prop)) {
               props[props.length] = prop;
             }
           });
@@ -3375,7 +3478,7 @@ Pot.update({
           if (converters) {
             code = org = Pot.getFunctionCode(method);
             patterns = arrayize(converters);
-            if (!Pot.isArray(patterns[0])) {
+            if (!isArray(patterns[0])) {
               patterns = [patterns];
             }
             each(patterns, function(pattern) {
@@ -3383,10 +3486,10 @@ Pot.update({
               try {
                 from = pattern[0];
                 to   = pattern[1];
-                if (Pot.isString(from)) {
+                if (isString(from)) {
                   from = new RegExp(rescape(from), 'g');
                 }
-                if (!Pot.isString(to)) {
+                if (!isString(to)) {
                   to = '';
                 }
                 code = code.replace(from, to);
@@ -3398,7 +3501,7 @@ Pot.update({
           }
           object[prop] = update(function() {
             var that = this, args = arguments;
-            if (Pot.isFunction(overrider)) {
+            if (isFunction(overrider)) {
               return overrider.call(that, function() {
                 var a = arguments;
                 if (a.length === 1 && a[0] && a[0].callee &&
@@ -3421,7 +3524,7 @@ Pot.update({
             }
           }, object[prop]);
           if (!object[prop].overridden ||
-              Pot.isNumber(object[prop].overridden)) {
+              isNumber(object[prop].overridden)) {
             update(object[prop], {
               overridden : ((object[prop].overridden || 0) - 0) + 1
             });
@@ -3451,7 +3554,7 @@ Pot.update({
    */
   getErrorMessage : function(error, defaults) {
     var msg;
-    if (Pot.isError(error)) {
+    if (isError(error)) {
       msg = String(error.message  || error.description ||
                   (error.toString && error.toString()) || error);
     }
@@ -3496,10 +3599,10 @@ function arrayize(object, index) {
   var array, i, len, me = arguments.callee, t;
   if (me.canNodeList == null) {
     // NodeList cannot convert to the Array in the Blackberry, IE browsers.
-    if (Pot.System.currentDocument) {
+    if (PotSystem.currentDocument) {
       try {
         t = slice.call(
-          Pot.System.currentDocument.documentElement.childNodes
+          PotSystem.currentDocument.documentElement.childNodes
         )[0].nodeType;
         t = null;
         me.canNodeList = true;
@@ -3511,13 +3614,13 @@ function arrayize(object, index) {
   if (object == null) {
     array = [object];
   } else {
-    switch (Pot.typeOf(object)) {
+    switch (typeOf(object)) {
       case 'array':
           array = object.slice();
           break;
       case 'object':
-          if (Pot.isArrayLike(object)) {
-            if (!me.canNodeList && Pot.isNodeList(object)) {
+          if (isArrayLike(object)) {
+            if (!me.canNodeList && isNodeList(object)) {
               array = [];
               i = 0;
               len = object.length;
@@ -3532,7 +3635,6 @@ function arrayize(object, index) {
           // FALL THROUGH
       default:
           array = slice.call(concat.call([], object));
-          break;
     }
   }
   if (index > 0) {
@@ -3563,16 +3665,16 @@ function numeric(value, defaults) {
         /^[^\d]{0,5}((?:0x?|)(?:\d+[.]?\d*|[.]\d+)(?:e[-+]?\d+|))/i
     };
   }
-  if (Pot.isNumeric(value)) {
+  if (isNumeric(value)) {
     result = value - 0;
   } else {
-    if (args.length >= 2 && Pot.isNumeric(defaults)) {
+    if (args.length >= 2 && isNumeric(defaults)) {
       result = defaults - 0;
     } else if (value == null) {
       result = 0;
     } else {
       def = 0;
-      switch (Pot.typeLikeOf(value)) {
+      switch (typeLikeOf(value)) {
         case 'boolean':
             result = (value == true) ? 1 : 0;
             break;
@@ -3663,11 +3765,10 @@ function numeric(value, defaults) {
                 (value == null) ? String(value) : value.toString()
               );
             }
-            break;
       }
     }
   }
-  return (Pot.isNumeric(result) ? result : def) - 0;
+  return (isNumeric(result) ? result : def) - 0;
 }
 /*{#endif}*/
 /**
@@ -3712,9 +3813,6 @@ function stringify(x, ignoreBoolean) {
               }
             }
           }
-          break;
-      default:
-          break;
     }
   }
   return result.toString();
@@ -3769,27 +3867,26 @@ function invoke(/*object[, method[, ...args]]*/) {
           object = args[0];
           method = args[1];
           params = arrayize(args, 2);
-          break;
     }
     if (!method) {
       throw method;
     }
-    if (!object && Pot.isString(method)) {
+    if (!object && isString(method)) {
       object = (object && object[method] && object)  ||
              (globals && globals[method] && globals) ||
-          (Pot.Global && Pot.Global[method] && Pot.Global);
+          (PotGlobal && PotGlobal[method] && PotGlobal);
     }
-    if (Pot.isString(method)) {
+    if (isString(method)) {
       emit = true;
       if (!object) {
-        object = (globals || Pot.Global);
+        object = (globals || PotGlobal);
       }
     }
   } catch (e) {
     err = e;
-    throw Pot.isError(err) ? err : new Error(err);
+    throw isError(err) ? err : new Error(err);
   }
-  if (Pot.isFunction(method.apply) && Pot.isFunction(method.call)) {
+  if (isFunction(method.apply) && isFunction(method.call)) {
     if (params == null || !params.length) {
       return method.call(object);
     } else {
@@ -3805,7 +3902,6 @@ function invoke(/*object[, method[, ...args]]*/) {
         case 1: return object[method](p[0]);
         case 2: return object[method](p[0], p[1]);
         case 3: return object[method](p[0], p[1], p[2]);
-        default: break;
       }
     } else {
       switch (len) {
@@ -3813,7 +3909,6 @@ function invoke(/*object[, method[, ...args]]*/) {
         case 1: return method(p[0]);
         case 2: return method(p[0], p[1]);
         case 3: return method(p[0], p[1], p[2]);
-        default: break;
       }
     }
     t = [];
@@ -3834,7 +3929,7 @@ function debug(msg) {
   var args = arguments, me = args.callee, func, consoleService;
   try {
     if (!me.firebug('log', args)) {
-      if (!Pot.System.hasComponents) {
+      if (!PotSystem.hasComponents) {
         throw false;
       }
       consoleService = Cc['@mozilla.org/consoleservice;1']
@@ -3886,7 +3981,7 @@ update(debug, {
   firebug : function(method, args) {
     var result = false, win, fbConsole;
     try {
-      if (!Pot.System.hasComponents) {
+      if (!PotSystem.hasComponents) {
         throw false;
       }
       win = Pot.XPCOM.getMostRecentWindow();
@@ -3930,14 +4025,14 @@ update(debug, {
       return o.toSource();
     }
     r = [];
-    switch (Pot.typeLikeOf(o)) {
+    switch (typeLikeOf(o)) {
       case 'array':
           each(o, function(v) {
             r[r.length] = me(v);
           });
           return '[' + r.join(', ') + ']';
       case 'object':
-          if (Pot.isNodeLike(o) || Pot.isWindow(o) || Pot.isDocument(o)) {
+          if (isNodeLike(o) || isWindow(o) || isDocument(o)) {
             r[r.length] = toString.call(o);
           } else {
             each(o, function(v, k) {
@@ -3958,7 +4053,7 @@ update(debug, {
    */
   divConsole : update(function(msg) {
     var me = arguments.callee, ie6, doc, de, onResize, onScroll, onClick;
-    if (Pot.System.hasActiveXObject && typeof document !== 'undefined') {
+    if (PotSystem.hasActiveXObject && typeof document !== 'undefined') {
       doc = document;
       de = doc.documentElement || {};
       try {
@@ -3973,7 +4068,7 @@ update(debug, {
         me.msgStack.push(msg);
         if (!me.done) {
           me.done = true;
-          Pot.Deferred.till(function() {
+          Deferred.till(function() {
             return !!(doc && doc.body);
           }).then(function() {
             var defStyle, style, close, wrapper;
@@ -4165,7 +4260,7 @@ update(debug, {
               }
             }
             if (ie6) {
-              Pot.Deferred.wait(0.25).then(function() {
+              Deferred.wait(0.25).then(function() {
                 wrapper.style.bottom = '1px';
               }).wait(0.5).then(function() {
                 wrapper.style.bottom = '0px';
@@ -4199,7 +4294,7 @@ update(debug, {
           while (stack.length) {
             v = stack.shift();
             s = debug.dump(v);
-            if (Pot.isString(v) &&
+            if (isString(v) &&
                 s.charAt(0) === '"' && s.slice(-1) === '"') {
               s = s.slice(1, -1);
             }
@@ -4210,7 +4305,7 @@ update(debug, {
               me.ieConsole.appendChild(node);
             });
           }
-          Pot.Internal.setTimeout(function() {
+          PotInternalSetTimeout(function() {
             me.ieConsole.scrollTop = me.ieConsole.scrollHeight;
           }, 10);
         } catch (e) {}
@@ -4494,7 +4589,7 @@ function each(object, callback, context) {
   if (object) {
     len = object.length;
     try {
-      if (Pot.isArrayLike(object)) {
+      if (isArrayLike(object)) {
         for (i = 0; i < len; i++) {
           if (i in object) {
             try {
@@ -4520,7 +4615,7 @@ function each(object, callback, context) {
       }
     } catch (ex) {
       err = ex;
-      if (!Pot.isStopIter(err)) {
+      if (!isStopIter(err)) {
         throw err;
       }
     }
@@ -4559,20 +4654,20 @@ function buildObjectString(name) {
 function extendDeferredOptions(o, x) {
   var a, b;
   if (o && x) {
-    if (Pot.isObject(o.options)) {
+    if (isObject(o.options)) {
       a = o.options;
-    } else if (Pot.isObject(o)) {
+    } else if (isObject(o)) {
       a = o;
     }
-    if (Pot.isObject(x.options)) {
+    if (isObject(x.options)) {
       b = x.options;
-    } else if (Pot.isObject(x)) {
+    } else if (isObject(x)) {
       b = x;
     }
     if ('async' in b) {
       a.async = !!b.async;
     }
-    if ('speed' in b && Pot.isNumeric(b.speed)) {
+    if ('speed' in b && isNumeric(b.speed)) {
       a.speed = b.speed;
     }
     if ('cancellers' in b) {
