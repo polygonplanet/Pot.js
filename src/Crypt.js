@@ -265,11 +265,11 @@ update(Pot.Crypt, {
         /**@ignore*/
         async : function(speed) {
           k = 0;
-          return Pot.Deferred.forEver[speed](function() {
+          return Deferred.forEver[speed](function() {
             if (k < xl) {
               calculate();
             } else {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             k += 16;
           }).then(function() {
@@ -315,7 +315,7 @@ update(Pot.Crypt, {
        * @property {Function} rapid  Run with faster speed.
        * @property {Function} ninja  Run fastest speed.
        */
-      deferred : Pot.Internal.defineDeferrater(function(speed) {
+      deferred : PotInternal.defineDeferrater(function(speed) {
         return function(string) {
           return calc(string).async(speed);
         };
@@ -534,7 +534,6 @@ update(Pot.Crypt, {
             i = s.charCodeAt(sl - 3) << 24 |
                 s.charCodeAt(sl - 2) << 16 |
                 s.charCodeAt(sl - 1) <<  8 | 0x80;
-            break;
       }
       wa[wa.length] = i;
       while ((wa.length % 16) != 14) {
@@ -554,11 +553,11 @@ update(Pot.Crypt, {
         /**@ignore*/
         async : function(speed) {
           bs = 0;
-          return Pot.Deferred.forEver[speed](function() {
+          return Deferred.forEver[speed](function() {
             if (bs < wal) {
               calculate();
             } else {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             bs += 16;
           }).then(function() {
@@ -604,7 +603,7 @@ update(Pot.Crypt, {
        * @property {Function} rapid  Run with faster speed.
        * @property {Function} ninja  Run fastest speed.
        */
-      deferred : Pot.Internal.defineDeferrater(function(speed) {
+      deferred : PotInternal.defineDeferrater(function(speed) {
         return function(string) {
           return calc(string).async(speed);
         };
@@ -685,11 +684,11 @@ update(Pot.Crypt, {
         /**@ignore*/
         async : function(speed) {
           y = 0;
-          return Pot.Deferred.forEver[speed](function() {
+          return Deferred.forEver[speed](function() {
             if (y < n) {
               calculate();
             } else {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             y++;
           }).then(function() {
@@ -743,7 +742,7 @@ update(Pot.Crypt, {
         ed = this.encrypt.deferred;
         dd = this.decrypt.deferred;
         ed.instance = dd.instance = this;
-        each(Pot.Internal.LightIterator.speeds, function(v, k) {
+        each(PotInternalLightIterator.speeds, function(v, k) {
           ed[k].instance = dd[k].instance = that;
         });
         return this;
@@ -851,7 +850,7 @@ update(Pot.Crypt, {
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(text) {
             var me = arguments.callee, that = me.instance;
             return arc4Crypt(
@@ -936,7 +935,7 @@ update(Pot.Crypt, {
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(text) {
             var me = arguments.callee, that = me.instance;
             return arc4Crypt(

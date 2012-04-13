@@ -149,9 +149,9 @@ update(Pot.Text, {
   ReplaceSaver : (function() {
     /**@ignore*/
     var Saver = function(string, pattern, reserve) {
-      return new Saver.prototype.init(string, pattern, reserve);
+      return new Saver.fn.init(string, pattern, reserve);
     };
-    Saver.prototype = update(Saver.prototype, {
+    Saver.fn = Saver.prototype = update(Saver.prototype, {
       /**
        * @lends Pot.Text.ReplaceSaver
        */
@@ -164,7 +164,7 @@ update(Pot.Text, {
        * @private
        * @ignore
        */
-      id : Pot.Internal.getMagicNumber(),
+      id : PotInternal.getMagicNumber(),
       /**
        * @const
        * @private
@@ -186,7 +186,7 @@ update(Pot.Text, {
        * @static
        * @public
        */
-      toString : Pot.toString,
+      toString : PotToString,
       /**
        * @ignore
        * @private
@@ -301,15 +301,15 @@ update(Pot.Text, {
             i = item[1];
             if (Pot.isScalar(v)) {
               search = stringify(v);
-            } else if (Pot.isRegExp(v)) {
+            } else if (isRegExp(v)) {
               search = v;
             }
             if (search != null) {
               if (!i) {
                 index = 0;
-              } else if (Pot.isNumeric(i)) {
+              } else if (isNumeric(i)) {
                 index = Math.floor(i - 0) || 0;
-              } else if (Pot.isFunction(i)) {
+              } else if (isFunction(i)) {
                 index = i;
               } else {
                 index = 0;
@@ -393,7 +393,7 @@ update(Pot.Text, {
             }
             s = s.replace(search, function() {
               var matches = arrayize(arguments), idx;
-              if (Pot.isFunction(index)) {
+              if (isFunction(index)) {
                 idx = index(matches) || 0;
               } else {
                 idx = (index - 0) || 0;
@@ -438,7 +438,7 @@ update(Pot.Text, {
         return r;
       }
     });
-    Saver.prototype.init.prototype = Saver.prototype;
+    Saver.fn.init.prototype = Saver.fn;
     return Saver;
   }()),
   /**
@@ -471,7 +471,7 @@ update(Pot.Text, {
   chr : function(/*[...args]*/) {
     var args = arguments, codes, chars, divs, i, len, limit = 0x2000;
     if (args.length === 1) {
-      if (Pot.isArray(args[0])) {
+      if (isArray(args[0])) {
         codes = arrayize(args[0]);
       } else {
         return fromUnicode(args[0]);
@@ -689,7 +689,7 @@ update(Pot.Text, {
     var s = stringify(string),
         c, sz, unsz, i, j, len, line, lines, nl, m, space;
     if (s) {
-      if (Pot.isString(size)) {
+      if (isString(size)) {
         c = size;
         sz = ch;
       } else {
@@ -697,7 +697,7 @@ update(Pot.Text, {
         sz = size;
       }
       c = stringify(c) || ' ';
-      sz = Pot.isNumeric(sz) ? ((sz - 0) || 2) : 2;
+      sz = isNumeric(sz) ? ((sz - 0) || 2) : 2;
       if (sz < 0) {
         unsz = -sz;
         space = new Array(unsz + 1).join(c);
@@ -751,7 +751,7 @@ update(Pot.Text, {
    */
   unindent : function(string, size, ch) {
     var sz, c;
-    if (Pot.isString(size)) {
+    if (isString(size)) {
       c = size;
       sz = ch;
     } else {
@@ -1245,12 +1245,12 @@ update(Pot.Text, {
   extract : function(string, pattern, index) {
     var r = '', s = stringify(string), re, idx, m;
     if (s && pattern) {
-      if (Pot.isRegExp(pattern)) {
+      if (isRegExp(pattern)) {
         re = pattern;
       } else {
-        re = new RegExp(Pot.rescape(pattern));
+        re = new RegExp(rescape(pattern));
       }
-      idx = (index != null && Pot.isNumeric(index)) ? index : 1;
+      idx = (index != null && isNumeric(index)) ? index : 1;
       m = s.match(re);
       if (m) {
         r = r + m[(m[idx] == null) ? 0 : idx];
@@ -1307,10 +1307,10 @@ update(Pot.Text, {
   inc : function(value) {
     var LOWER = 1, UPPER = 2, NUMERIC = 3,
         pos, s, c, last, carry, add;
-    if (Pot.isNumber(value)) {
+    if (isNumber(value)) {
       return ++value;
     }
-    if (!Pot.isString(value)) {
+    if (!isString(value)) {
       return value;
     }
     last = 0;
@@ -1422,10 +1422,10 @@ update(Pot.Text, {
   dec : function(value) {
     var LOWER = 1, UPPER = 2, NUMERIC = 3,
         i, len, s, c, t, n1, n2, carry, last, borrow;
-    if (Pot.isNumber(value)) {
+    if (isNumber(value)) {
       return --value;
     }
-    if (!Pot.isString(value)) {
+    if (!isString(value)) {
       return value;
     }
     s = value.toString().split('').reverse();
@@ -1498,7 +1498,6 @@ update(Pot.Text, {
           ) {
             borrow = true;
           }
-          break;
     }
     if (i >= len) {
       i--;
@@ -1813,7 +1812,7 @@ update(Pot.Text, {
   truncate : function(string, maxLen, ellipsis) {
     var result = '', s, max, ch, cl;
     s = stringify(string, true);
-    max = Pot.isNumeric(maxLen) ? maxLen - 0 : 140;
+    max = isNumeric(maxLen) ? maxLen - 0 : 140;
     if (arguments.length < 3) {
       ch = '...';
     } else {
@@ -1869,7 +1868,7 @@ update(Pot.Text, {
   truncateMiddle : function(string, maxLen, ellipsis) {
     var result, s, max, ch, half, pos;
     s = stringify(string, true);
-    max = Pot.isNumeric(maxLen) ? maxLen - 0 : 140;
+    max = isNumeric(maxLen) ? maxLen - 0 : 140;
     if (arguments.length < 3) {
       ch = '...';
     } else {

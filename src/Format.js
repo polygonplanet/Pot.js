@@ -171,7 +171,7 @@ update(Pot.Format, {
         /**@ignore*/
         function base(n, val) {
           var r, i, len, octets;
-          if (Pot.isNumeric(val)) {
+          if (isNumeric(val)) {
             r = (parse(val) >>> 0).toString(n);
           } else {
             r = '';
@@ -210,7 +210,7 @@ update(Pot.Format, {
             value = value.toString();
             if (mark.charAt(0) === '+') {
               if (value - 0 >= 0) {
-                if (Pot.isFunction(numeric)) {
+                if (isFunction(numeric)) {
                   value = mark.charAt(0) + numeric(value);
                 } else {
                   value = mark.charAt(0) + (value - 0);
@@ -282,7 +282,7 @@ update(Pot.Format, {
                   break;
               case 'c':
                   try {
-                    v = Pot.isNumeric(v) ? fromUnicode(v) : '';
+                    v = isNumeric(v) ? fromUnicode(v) : '';
                   } catch (e) {
                     v = '';
                   }
@@ -300,7 +300,7 @@ update(Pot.Format, {
                   point = 6;
                   v = parse(v, true);
                   if (precision) {
-                    if (Pot.isNumeric(precision)) {
+                    if (isNumeric(precision)) {
                       point = Math.max(0, Math.min(20, precision));
                     }
                     precision = null;
@@ -316,7 +316,7 @@ update(Pot.Format, {
                   point = 6;
                   v = parse(v, true);
                   if (precision) {
-                    if (Pot.isNumeric(precision)) {
+                    if (isNumeric(precision)) {
                       precision = ((v < 0) ? 1 : 0) + (precision - 0);
                       point = Math.max(0, Math.min(20, precision));
                     }
@@ -344,9 +344,6 @@ update(Pot.Format, {
                   break;
               case 'A':
                   v = base(36, v).toUpperCase();
-                  break;
-              default:
-                  break;
             }
             result = justify(v, mark, width, precision, left, numeric);
           }

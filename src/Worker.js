@@ -1,12 +1,7 @@
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Web Worker.
 (function() {
-var System = Pot.System,
-    Internal = Pot.Internal,
-    isObject = Pot.isObject,
-    isFunction = Pot.isFunction,
-    isWorkeroid = Pot.isWorkeroid,
-    WorkerServer,
+var WorkerServer,
     WorkerChild,
     PREFIX = '.',
     RE = {
@@ -41,10 +36,10 @@ var System = Pot.System,
 
 /**@ignore*/
 WorkerServer = function(js) {
-  return new WorkerServer.prototype.init(js);
+  return new WorkerServer.fn.init(js);
 };
 
-WorkerServer.prototype = update(WorkerServer.prototype, {
+WorkerServer.fn = WorkerServer.prototype = update(WorkerServer.prototype, {
   /**
    * @ignore
    */
@@ -84,12 +79,12 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
   postMessage : function(data) {
     var that = this, child = this.child;
     this.queues.push(data);
-    Pot.Deferred.till(function() {
+    Deferred.till(function() {
       return child.isReady();
     }).then(function() {
       var items = arrayize(that.queues.splice(0, that.queues.length));
-      return Pot.Deferred.forEach(items, function(item) {
-        return Pot.Deferred.flush(function() {
+      return Deferred.forEach(items, function(item) {
+        return Deferred.flush(function() {
           var err;
           try {
             if (child.nativeWorker) {
@@ -99,7 +94,7 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
             }
           } catch (e) {
             err = e;
-            if (!Pot.isStopIter(err)) {
+            if (!isStopIter(err)) {
               throw err;
             }
           } finally {
@@ -122,7 +117,7 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
         child.context[child.stopId] = true;
         if (child.elem) {
           // When removes iframe in asynchronous processing will be warnings.
-          Pot.Deferred.till(function() {
+          Deferred.till(function() {
             return child.context[child.isStoppedId] === true;
           }).wait(1).then(function() {
             try {
@@ -147,7 +142,6 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
             break;
         case 'error':
             this.onerror = func;
-            break;
       }
     }
   },
@@ -161,18 +155,17 @@ WorkerServer.prototype = update(WorkerServer.prototype, {
           break;
       case 'error':
           this.onerror = null;
-          break;
     }
   }
 });
-WorkerServer.prototype.init.prototype = WorkerServer.prototype;
+WorkerServer.fn.init.prototype = WorkerServer.fn;
 
 /**@ignore*/
 WorkerChild = function(server, js) {
-  return new WorkerChild.prototype.init(server, js);
+  return new WorkerChild.fn.init(server, js);
 };
 
-WorkerChild.prototype = update(WorkerChild.prototype, {
+WorkerChild.fn = WorkerChild.prototype = update(WorkerChild.prototype, {
   /**
    * @ignore
    */
@@ -244,7 +237,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       that[k] = buildSerial(Pot, v[0]);
       that.context[that[k]] = v[1];
     });
-    Pot.Deferred.flush(function() {
+    Deferred.flush(function() {
       that.runScript(js);
     });
     return this;
@@ -255,10 +248,10 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   compriseScript : function(script, isFunc) {
     var result = '', tokens, code, hasWorker;
-    if ((System.hasWorker &&
-         (System.canWorkerDataURI || System.canWorkerBlobURI)) ||
-        (System.hasChromeWorker &&
-         (System.canChromeWorkerDataURI || System.canChromeWorkerBlobURI))
+    if ((PotSystem.hasWorker &&
+         (PotSystem.canWorkerDataURI || PotSystem.canWorkerBlobURI)) ||
+        (PotSystem.hasChromeWorker &&
+         (PotSystem.canChromeWorkerDataURI || PotSystem.canChromeWorkerBlobURI))
     ) {
       hasWorker = true;
     }
@@ -271,7 +264,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       tokens = Pot.tokenize(code);
       code = Pot.joinTokens(tokens);
       this.usePot = this.isPotUsing(tokens);
-      if (this.usePot && System.isMozillaBlobBuilder) {
+      if (this.usePot && PotSystem.isMozillaBlobBuilder) {
         //XXX: Fix setTimeout and scope in Firefox's Worker thread.
         hasWorker = false;
       }
@@ -356,7 +349,6 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
                   (next === '[' && next2 !== ']')) {
                 result = true;
               }
-              break;
         }
         if (result) {
           break;
@@ -372,8 +364,6 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
   insertStepStatements : function(tokens) {
     var results = [],
         token, i, j, k, len, prev, next, next2, add,
-        open  = '(',
-        close = ')',
         id = buildSerial(Pot, '$this$scope'),
         statements = {
           pre  : Pot.format(
@@ -416,16 +406,11 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
       }
       switch (token) {
         case '{':
-            if (prev === close  && next !== '}' &&
+            if (prev === ')'    && next !== '}' &&
                 next !== 'case' && next !== 'default' &&
                 next2 !== ':') {
               add = true;
             }
-            break;
-        case open:
-        case close:
-        default:
-            break;
       }
       if (!Pot.isNL(token)) {
         prev = token;
@@ -529,7 +514,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   getPotScript : function() {
     var script = Pot.getFunctionCode(
-      Internal.ScriptImplementation
+      PotInternal.ScriptImplementation
     ).replace(RE.FUNC, '');
     return script;
   },
@@ -649,7 +634,6 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             if (inListener && Pot.isWords(token)) {
               inListener = false;
             }
-            break;
       }
       if (prepared || inFunc || last) {
         parts[parts.length] = token;
@@ -679,18 +663,18 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
     var that = this, result, code,
         hasWorker, canWorkerDataURI, canWorkerBlobURI;
     if (isChromeWorkerAvailable()) {
-      hasWorker = System.hasChromeWorker;
-      canWorkerDataURI = hasWorker && System.canChromeWorkerDataURI;
-      canWorkerBlobURI = hasWorker && System.canChromeWorkerBlobURI;
+      hasWorker = PotSystem.hasChromeWorker;
+      canWorkerDataURI = hasWorker && PotSystem.canChromeWorkerDataURI;
+      canWorkerBlobURI = hasWorker && PotSystem.canChromeWorkerBlobURI;
     } else {
-      hasWorker = System.hasWorker;
-      canWorkerDataURI = hasWorker && System.canWorkerDataURI;
-      canWorkerBlobURI = hasWorker && System.canWorkerBlobURI;
+      hasWorker = PotSystem.hasWorker;
+      canWorkerDataURI = hasWorker && PotSystem.canWorkerDataURI;
+      canWorkerBlobURI = hasWorker && PotSystem.canWorkerBlobURI;
     }
     if (js) {
       if (isFunction(js)) {
         code = this.compriseScript(js, true);
-        if (System.isMozillaBlobBuilder && this.usePot) {
+        if (PotSystem.isMozillaBlobBuilder && this.usePot) {
           result = [code, false];
         } else if (canWorkerBlobURI) {
           result = [toBlobURI(code), true];
@@ -704,7 +688,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         if (isURI(code)) {
           if (isJavaScriptScheme(code)) {
             code = this.compriseScript(fromJavaScriptScheme(code));
-            if (System.isMozillaBlobBuilder && this.usePot) {
+            if (PotSystem.isMozillaBlobBuilder && this.usePot) {
               result = [code, false];
             } else if (canWorkerBlobURI) {
               result = [toBlobURI(code), true];
@@ -715,7 +699,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             }
           } else if (isDataURI(code)) {
             code = this.compriseScript(fromDataURI(code));
-            if (System.isMozillaBlobBuilder && this.usePot) {
+            if (PotSystem.isMozillaBlobBuilder && this.usePot) {
               result = [code, false];
             } else if (canWorkerDataURI) {
               result = [toDataURI(code), true];
@@ -735,7 +719,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
           }
         } else {
           code = this.compriseScript(code);
-          if (System.isMozillaBlobBuilder && this.usePot) {
+          if (PotSystem.isMozillaBlobBuilder && this.usePot) {
             result = [code, false];
           } else if (canWorkerBlobURI) {
             result = [toBlobURI(code), true];
@@ -747,7 +731,7 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
         }
       }
     }
-    return Pot.Deferred.maybeDeferred(result);
+    return Deferred.maybeDeferred(result);
   },
   /**
    * @private
@@ -762,12 +746,12 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
           that.nativeWorker = createWorker(code);
           that.loaded = true;
         } else {
-          if (System.isWebBrowser && System.isNotExtension) {
+          if (PotSystem.isWebBrowser && PotSystem.isNotExtension) {
             elem = runWithFrame(code, that.context, that);
           }
           if (elem) {
             that.elem = elem;
-            Pot.Deferred.till(function() {
+            Deferred.till(function() {
               return isFrameLoaded(elem);
             }).then(function() {
               that.loaded = true;
@@ -819,18 +803,18 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
   postMessage : function(data) {
     var that = this;
     this.queues.push(data);
-    return Pot.Deferred.till(function() {
+    return Deferred.till(function() {
       return that.isReady() && that.server.fired;
     }).then(function() {
       var items = arrayize(that.queues.splice(0, that.queues.length));
-      return Pot.Deferred.forEach(items, function(item) {
-        return Pot.Deferred.flush(function() {
+      return Deferred.forEach(items, function(item) {
+        return Deferred.flush(function() {
           var err;
           try {
             that.server.onmessage({data : item});
           } catch (e) {
             err = e;
-            if (!Pot.isStopIter(err)) {
+            if (!isStopIter(err)) {
               throw err;
             }
           }
@@ -869,7 +853,6 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
             break;
         case 'error':
             this.onerror = func;
-            break;
       }
     }
   },
@@ -884,11 +867,10 @@ WorkerChild.prototype = update(WorkerChild.prototype, {
           break;
       case 'error':
           this.onerror = null;
-          break;
     }
   }
 });
-WorkerChild.prototype.init.prototype = WorkerChild.prototype;
+WorkerChild.fn.init.prototype = WorkerChild.fn;
 
 // Definition of Pot.Workeroid.
 Pot.update({
@@ -947,24 +929,27 @@ Pot.update({
    * @public
    */
   Workeroid : function(script) {
-    return isWorkeroid(this) ? this.init(script) :
-        new Pot.Workeroid.prototype.init(script);
+    return isWorkeroid(this) ? this.init(script)
+                             : new Workeroid.fn.init(script);
   }
 });
 
-Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
+// Refer the Pot properties/functions.
+Workeroid = Pot.Workeroid;
+
+Workeroid.fn = Workeroid.prototype = update(Workeroid.prototype, {
   /**
    * @lends Pot.Workeroid.prototype
    */
   /**
    * @ignore
    */
-  constructor : Pot.Workeroid,
+  constructor : Workeroid,
   /**
    * @private
    * @ignore
    */
-  id : Internal.getMagicNumber(),
+  id : PotInternal.getMagicNumber(),
   /**
    * A unique strings.
    *
@@ -986,7 +971,7 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
    * @function
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * isWorkeroid.
    *
@@ -1069,7 +1054,6 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
           do {
             data[args[i++]] = args[i++];
           } while (i < len);
-          break;
     }
     referWorkerEvents.call(this);
     each(data, function(val, name) {
@@ -1103,7 +1087,6 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
           break;
       default:
           names = arrayize(args);
-          break;
     }
     if (names) {
       each(names, function(name) {
@@ -1131,7 +1114,6 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
             break;
         case 'error':
             this.onerror = func;
-            break;
       }
     }
     return this;
@@ -1153,7 +1135,6 @@ Pot.Workeroid.prototype = update(Pot.Workeroid.prototype, {
           break;
       case 'error':
           this.onerror = null;
-          break;
     }
     return this;
   }
@@ -1315,9 +1296,9 @@ function runWithFrame(code, context, child) {
   win = Pot.currentWindow();
   doc = Pot.currentDocument();
   if (win && doc && win.document === doc && doc.body) {
-    ie = !!(Pot.Browser.msie && System.hasActiveXObject);
+    ie = !!(PotBrowser.msie && PotSystem.hasActiveXObject);
     if (ie) {
-      version = parseInt(Pot.Browser.msie.version, 10);
+      version = parseInt(PotBrowser.msie.version, 10);
     }
     do {
       id = buildSerial({NAME : 'potiframeworker'}, '');
@@ -1339,7 +1320,7 @@ function runWithFrame(code, context, child) {
     style.border = style.outline = style.margin = style.padding = '0';
     style.minWidth = style.minHeight = '0px';
     style.width = style.height = style.maxWidth = style.maxHeight = '10px';
-    if (Pot.Browser.webkit) {
+    if (PotBrowser.webkit) {
       // Safari 2.0.* bug: iframe's absolute position and src set.
       style.marginTop = style.marginLeft = '-10px';
     } else {
@@ -1408,7 +1389,7 @@ function runSubScriptWithFrame(js, iframe, context) {
         script = doc.createElement('script');
         script.type = 'text/javascript';
         script.defer = script.async = false;
-        if (System.hasActiveXObject && 'text' in script) {
+        if (PotSystem.hasActiveXObject && 'text' in script) {
           script.text = code;
         } else {
           script.appendChild(doc.createTextNode(code));
@@ -1441,7 +1422,7 @@ function isFrameLoaded(frame) {
   var result = false, doc;
   try {
     if (frame) {
-      if (System.hasActiveXObject && RE.LOAD.test(frame.readyState)) {
+      if (PotSystem.hasActiveXObject && RE.LOAD.test(frame.readyState)) {
         result = true;
       } else {
         doc = detectFrameDocument(frame);
@@ -1459,7 +1440,7 @@ function isFrameLoaded(frame) {
  * @ignore
  */
 function detectFrameDocument(frame) {
-  var isWin = Pot.isWindow, isDoc = Pot.isDocument;
+  var isWin = isWindow, isDoc = isDocument;
   if (frame == null) {
     return null;
   }
@@ -1545,9 +1526,9 @@ function fromDataURI(uri) {
  * @ignore
  */
 function toBlobURI(code) {
-  var b = new System.BlobBuilder();
+  var b = new PotSystem.BlobBuilder();
   b.append(code);
-  return System.BlobURI.createObjectURL(b.getBlob());
+  return PotSystem.BlobURI.createObjectURL(b.getBlob());
 }
 
 /**
@@ -1615,21 +1596,21 @@ function createWorker(js) {
  */
 function isChromeWorkerAvailable() {
   var cw = 0, w = 0;
-  if (System.hasChromeWorker) {
+  if (PotSystem.hasChromeWorker) {
     cw++;
-    if (System.canChromeWorkerDataURI) {
+    if (PotSystem.canChromeWorkerDataURI) {
       cw++;
     }
-    if (System.canChromeWorkerBlobURI) {
+    if (PotSystem.canChromeWorkerBlobURI) {
       cw++;
     }
   }
-  if (System.hasWorker) {
+  if (PotSystem.hasWorker) {
     w++;
-    if (System.canWorkerDataURI) {
+    if (PotSystem.canWorkerDataURI) {
       w++;
     }
-    if (System.canWorkerBlobURI) {
+    if (PotSystem.canWorkerBlobURI) {
       w++;
     }
   }

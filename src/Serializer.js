@@ -79,7 +79,7 @@ Pot.update({
       if (object == null) {
         json[json.length] = NULL;
       } else {
-        switch (Pot.typeOf(object)) {
+        switch (typeOf(object)) {
           case 'string':
               this.serializeString(object, json);
               break;
@@ -106,7 +106,6 @@ Pot.update({
               break;
           default:
               json[json.length] = NULL;
-              break;
         }
       }
     },
@@ -199,7 +198,7 @@ Pot.update({
         if (hasOwnProperty.call(o, key)) {
           try {
             value = o[key];
-            if (Pot.isFunction(value)) {
+            if (isFunction(value)) {
               throw value;
             }
           } catch (e) {
@@ -395,11 +394,11 @@ update(Pot.Serializer, {
     if (typeof Buffer !== 'undefined' && params.constructor === Buffer) {
       return params;
     }
-    if (Pot.isString(params)) {
+    if (isString(params)) {
       return stringify(params);
     }
-    objectLike = Pot.isObject(params);
-    if (objectLike || Pot.isArrayLike(params)) {
+    objectLike = isObject(params);
+    if (objectLike || isArrayLike(params)) {
       encode = Pot.URI.urlEncode;
       each(params, function(v, k) {
         var item, key, val, sep, count = 0, ok = true;
@@ -426,7 +425,7 @@ update(Pot.Serializer, {
               }
             });
           }
-          if (count > 1 || Pot.isArray(val)) {
+          if (count > 1 || isArray(val)) {
             sep = '=';
             key = stringify(key, true) + '[]';
           } else {
@@ -505,7 +504,7 @@ update(Pot.Serializer, {
    */
   parseFromQueryString : function(queryString, toObject) {
     var result = [], decode, query, re;
-    if (Pot.isObject(queryString) || Pot.isArray(queryString)) {
+    if (isObject(queryString) || isArray(queryString)) {
       return queryString;
     }
     if (toObject) {

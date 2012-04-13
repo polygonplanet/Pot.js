@@ -34,7 +34,7 @@ update(Pot.Style, {
    * @static
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * Exclude the following css properties to add px
    *
@@ -62,7 +62,7 @@ update(Pot.Style, {
   PropMaps : (function() {
     var maps = {}, p;
     maps.dir = {
-      'float' : Pot.Browser.msie ? 'styleFloat' : 'cssFloat'
+      'float' : PotBrowser.msie ? 'styleFloat' : 'cssFloat'
     };
     maps.raw = {};
     for (p in maps.dir) {
@@ -133,22 +133,20 @@ update(Pot.Style, {
   css : function(elem, name, value) {
     var result, args = arguments;
     each(arrayize(elem), function(el) {
-      if (Pot.isElement(el) && name != null) {
+      if (isElement(el) && name != null) {
         switch (args.length) {
           case 0:
           case 1:
               break;
           case 2:
-              if (Pot.isObject(name)) {
+              if (isObject(name)) {
                 result = Pot.Style.setStyle(el, name);
               } else {
                 result = Pot.Style.getStyle(el, name);
               }
               break;
-          case 3:
           default:
               result = Pot.Style.setStyle(el, name, value);
-              break;
         }
       }
     });
@@ -252,7 +250,7 @@ update(Pot.Style, {
       case 1:
           return false;
       case 2:
-          if (Pot.isObject(name)) {
+          if (isObject(name)) {
             styles = name;
           } else {
             return false;
@@ -260,9 +258,8 @@ update(Pot.Style, {
           break;
       default:
           styles[stringify(name)] = value;
-          break;
     }
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       dir = Pot.Style.PropMaps.dir;
       ref = Pot.Style.PropMaps.ref;
       each.quick(styles, function(v, k) {
@@ -273,7 +270,7 @@ update(Pot.Style, {
         if (key in dir) {
           key = dir[key];
         }
-        if ((Pot.isNumber(val) || !/[^\d.]/.test(val)) &&
+        if ((isNumber(val) || !/[^\d.]/.test(val)) &&
             !(key in Pot.Style.NumberTypes)) {
           val = Pot.Style.pxize(val);
         }
@@ -341,7 +338,7 @@ update(Pot.Style, {
       } else if ('MozOpacity' in style) {
         style.MozOpacity = alpha;
       } else if ('filter' in style) {
-        if (Pot.isNumeric(alpha)) {
+        if (isNumeric(alpha)) {
           style.filter = 'alpha(opacity=' + (alpha * 100) + ')';
         } else {
           style.filter = '';
@@ -370,12 +367,12 @@ update(Pot.Style, {
     var style;
     if (el) {
       style = el.style;
-      if (Pot.Browser.msie &&
-          Pot.Complex.compareVersions(Pot.Browser.msie.version, '8', '<')
+      if (PotBrowser.msie &&
+          Pot.Complex.compareVersions(PotBrowser.msie.version, '8', '<')
       ) {
         style.whiteSpace = 'pre';
         style.wordWrap   = 'break-word';
-      } else if (Pot.Browser.mozilla) {
+      } else if (PotBrowser.mozilla) {
         style.whiteSpace = '-moz-pre-wrap';
       } else {
         style.whiteSpace = 'pre-wrap';
@@ -395,7 +392,7 @@ update(Pot.Style, {
    * @public
    */
   isShown : function(elem) {
-    return Pot.isElement(elem) &&
+    return isElement(elem) &&
            Pot.Style.getStyle(elem, 'display') != 'none';
   },
   /**
@@ -411,7 +408,7 @@ update(Pot.Style, {
    * @public
    */
   isVisible : function(elem) {
-    return Pot.isElement(elem) &&
+    return isElement(elem) &&
            Pot.Style.getStyle(elem, 'visibility') != 'hidden';
   },
   /**
@@ -427,7 +424,7 @@ update(Pot.Style, {
    * @public
    */
   pxize : function(value, round) {
-    var n = (Pot.isNumeric(value) ? value : numeric(value)) - 0;
+    var n = (isNumeric(value) ? value : numeric(value)) - 0;
     if (round) {
       n = Math.round(n);
     }
@@ -453,7 +450,7 @@ update(Pot.Style, {
       width  : null,
       height : null
     };
-    if (!elem || !Pot.isNodeLike(elem)) {
+    if (!elem || !isNodeLike(elem)) {
       return result;
     }
     style = elem.style;
@@ -502,7 +499,7 @@ update(Pot.Style, {
     var result = {}, maps;
     result.width  = null;
     result.height = null;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       maps = {
         Width : {
           Left  : 1,
@@ -569,7 +566,7 @@ update(Pot.Style, {
    */
   setSize : function(elem, width, height) {
     var size = {};
-    if (Pot.isObject(width)) {
+    if (isObject(width)) {
       size = width;
     } else {
       size.width  = width;
