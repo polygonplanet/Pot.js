@@ -103,14 +103,17 @@ update(Pot.UTF8, {
         c = s.charCodeAt(i++);
         n = (c >> 4);
         if (0 <= n && n <= 7) {
-          // 0xxxxxxx
+          // 0xxx xxxx
           chars[chars.length] = sc(c);
         } else if (12 <= n && n <= 13) {
-          // 110x xxxx  10xx xxxx
+          // 110x xxxx
+          // 10xx xxxx
           c2 = s.charCodeAt(i++);
           chars[chars.length] = sc(((c & 0x1F) << 6) | (c2 & 0x3F));
         } else if (n === 14) {
-          // 1110 xxxx  10xx xxxx  10xx xxxx
+          // 1110 xxxx
+          // 10xx xxxx
+          // 10xx xxxx
           c2 = s.charCodeAt(i++);
           c3 = s.charCodeAt(i++);
           chars[chars.length] = sc(((c  & 0x0F) << 12) |
