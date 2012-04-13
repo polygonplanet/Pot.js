@@ -1,7 +1,12 @@
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Define iteration methods. (internal)
+(function() {
+var LightIterator,
+    QuickIteration,
+    createLightIterateConstructor,
+    createSyncIterator;
 
-update(Pot.Internal, {
+update(PotInternal, {
   /**
    * @lends Pot.Internal
    */
@@ -16,7 +21,7 @@ update(Pot.Internal, {
    * @ignore
    */
   LightIterator : update(function(object, callback, options) {
-    return new Pot.Internal.LightIterator.prototype.doit(
+    return new LightIterator.fn.doit(
       object, callback, options
     );
   }, {
@@ -53,33 +58,36 @@ update(Pot.Internal, {
   })
 });
 
-update(Pot.Internal.LightIterator, {
+// Refer the Pot properties/functions.
+PotInternalLightIterator = LightIterator = PotInternal.LightIterator;
+
+update(LightIterator, {
   /**@ignore*/
   defaults : {
-    speed : Pot.Internal.LightIterator.speeds.normal
+    speed : LightIterator.speeds.normal
   },
   /**@ignore*/
   revSpeeds : {}
 });
 
-each(Pot.Internal.LightIterator.speeds, function(v, k) {
-  Pot.Internal.LightIterator.revSpeeds[v] = k;
+each(LightIterator.speeds, function(v, k) {
+  LightIterator.revSpeeds[v] = k;
 });
 
-Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
-  update(Pot.Internal.LightIterator.prototype, {
+LightIterator.fn = LightIterator.prototype =
+  update(LightIterator.prototype, {
   /**
    * @lends Pot.Internal.LightIterator.prototype
    */
   /**
    * @ignore
    */
-  constructor : Pot.Internal.LightIterator,
+  constructor : LightIterator,
   /**
    * @private
    * @ignore
    */
-  interval : Pot.Internal.LightIterator.defaults.speed,
+  interval : LightIterator.defaults.speed,
   /**
    * @private
    * @ignore
@@ -159,16 +167,16 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   setInterval : function() {
     var n = null;
-    if (Pot.isNumeric(this.options.interval)) {
+    if (isNumeric(this.options.interval)) {
       n = this.options.interval - 0;
-    } else if (this.options.interval in Pot.Internal.LightIterator.speeds) {
-      n = Pot.Internal.LightIterator.speeds[this.options.interval] - 0;
+    } else if (this.options.interval in LightIterator.speeds) {
+      n = LightIterator.speeds[this.options.interval] - 0;
     }
     if (n !== null && !isNaN(n)) {
       this.interval = n;
     }
-    if (!Pot.isNumeric(this.interval)) {
-      this.interval = Pot.Internal.LightIterator.defaults.speed;
+    if (!isNumeric(this.interval)) {
+      this.interval = LightIterator.defaults.speed;
     }
   },
   /**
@@ -185,7 +193,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     if (a !== null) {
       this.async = !!a;
     }
-    if (!Pot.isBoolean(this.async)) {
+    if (!isBoolean(this.async)) {
       this.async = !!this.async;
     }
   },
@@ -196,7 +204,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    * @ignore
    */
   createDeferred : function() {
-    return new Pot.Deferred({ async : false });
+    return new Deferred({ async : false });
   },
   /**
    * Watch the process.
@@ -206,7 +214,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   watch : function() {
     var that = this;
-    if (!this.async && this.waiting === true && Pot.System.isWaitable) {
+    if (!this.async && this.waiting === true && PotSystem.isWaitable) {
       Pot.XPCOM.throughout(function() {
         return that.waiting !== true;
       });
@@ -239,7 +247,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         limit : 255
       };
       this.setIter(object, callback);
-      if (!this.async && !Pot.System.isWaitable) {
+      if (!this.async && !PotSystem.isWaitable) {
         this.revback();
         this.waiting = false;
       } else {
@@ -258,9 +266,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         });
         if (this.async) {
           this.deferred = d.then(function() {
-            if (Pot.isDeferred(that.result) &&
-                Pot.isStopIter(Pot.Deferred.lastError(that.result))) {
-              that.result = Pot.Deferred.lastResult(that.result);
+            if (isDeferred(that.result) &&
+                isStopIter(Deferred.lastError(that.result))) {
+              that.result = Deferred.lastResult(that.result);
             }
             return that.result;
           });
@@ -275,29 +283,37 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   setIter : function(object, callback) {
     var type = this.options.type,
-        types = Pot.Internal.LightIterator.types,
+        types = LightIterator.types,
         context = this.options.context;
-    if ((type & types.iterate) === types.iterate) {
-      this.result = null;
-      this.iter = this.iterate(object, callback, context);
-    } else if ((type & types.forEver) === types.forEver) {
-      this.result = {};
-      this.iter = this.forEver(object, context);
-    } else if ((type & types.repeat) === types.repeat) {
-      this.result = {};
-      this.iter = this.repeat(object, callback, context);
-    } else if ((type & types.items) === types.items) {
-      this.result = [];
-      this.iter = this.items(object, callback, context);
-    } else if ((type & types.zip) === types.zip) {
-      this.result = [];
-      this.iter = this.zip(object, callback, context);
-    } else if (Pot.isArrayLike(object)) {
-      this.result = object;
-      this.iter = this.forLoop(object, callback, context);
-    } else {
-      this.result = object;
-      this.iter = this.forInLoop(object, callback, context);
+    switch (true) {
+      case ((type & types.iterate) === types.iterate):
+          this.result = null;
+          this.iter = this.iterate(object, callback, context);
+          break;
+      case ((type & types.forEver) === types.forEver):
+          this.result = {};
+          this.iter = this.forEver(object, context);
+          break;
+      case ((type & types.repeat) === types.repeat):
+          this.result = {};
+          this.iter = this.repeat(object, callback, context);
+          break;
+      case ((type & types.items) === types.items):
+          this.result = [];
+          this.iter = this.items(object, callback, context);
+          break;
+      case ((type & types.zip) === types.zip):
+          this.result = [];
+          this.iter = this.zip(object, callback, context);
+          break;
+      default:
+          if (isArrayLike(object)) {
+            this.result = object;
+            this.iter = this.forLoop(object, callback, context);
+          } else {
+            this.result = object;
+            this.iter = this.forInLoop(object, callback, context);
+          }
     }
   },
   /**
@@ -312,38 +328,38 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         try {
           if (this.isDeferStopIter) {
             this.isDeferStopIter = false;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
           result = this.iter.next();
         } catch (e) {
           err = e;
-          if (Pot.isStopIter(err)) {
+          if (isStopIter(err)) {
             break REVOLVE;
           }
           throw err;
         }
-        if (this.async && Pot.isDeferred(result)) {
+        if (this.async && isDeferred(result)) {
           return result.ensure(function(res) {
             if (res !== void 0) {
-              if (Pot.isError(res)) {
-                if (Pot.isStopIter(res)) {
+              if (isError(res)) {
+                if (isStopIter(res)) {
                   that.isDeferStopIter = true;
-                  if (Pot.isDeferred(that.result) &&
-                      Pot.isStopIter(Pot.Deferred.lastError(that.result))) {
-                    that.result = Pot.Deferred.lastResult(that.result);
+                  if (isDeferred(that.result) &&
+                      isStopIter(Deferred.lastError(that.result))) {
+                    that.result = Deferred.lastResult(that.result);
                   }
                 } else {
-                  Pot.Deferred.lastError(this, res);
+                  Deferred.lastError(this, res);
                 }
               } else {
-                Pot.Deferred.lastResult(this, res);
+                Deferred.lastResult(this, res);
               }
             }
             that.flush(that.revback, true);
           });
         }
         time = now();
-        if (Pot.System.isWaitable) {
+        if (PotSystem.isWaitable) {
           if (this.time.total === null) {
             this.time.total = time;
           } else if (time - this.time.total >= this.time.rest) {
@@ -359,9 +375,9 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         this.time.diff = time - this.time.loop;
         if (this.time.diff >= this.interval) {
           if (this.async &&
-              this.interval < Pot.Internal.LightIterator.speeds.normal) {
+              this.interval < LightIterator.speeds.normal) {
             cutback = true;
-          } else if (this.async || this.restable || Pot.System.isWaitable) {
+          } else if (this.async || this.restable || PotSystem.isWaitable) {
             if (this.time.diff < this.interval + 8) {
               this.time.axis = 2;
             } else if (this.time.diff < this.interval + 36) {
@@ -383,7 +399,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       }
       return this.flush(this.revback, true);
     }
-    if (Pot.isDeferred(this.revDeferred)) {
+    if (isDeferred(this.revDeferred)) {
       this.revDeferred.begin();
     }
   },
@@ -406,7 +422,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       return that.revDeferred;
     }).ensure(function(er) {
       de.begin();
-      if (Pot.isError(er)) {
+      if (isError(er)) {
         throw er;
       }
     });
@@ -421,15 +437,15 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   flush : function(callback, useSpeed) {
     var that = this, d, lazy = false, speed, speedKey;
-    if (this.async || Pot.System.isWaitable) {
+    if (this.async || PotSystem.isWaitable) {
       lazy = true;
     }
-    if (!lazy && Pot.isFunction(callback)) {
+    if (!lazy && isFunction(callback)) {
       return callback.call(this);
     } else {
       d = this.createDeferred();
       d.then(function() {
-        if (Pot.isDeferred(callback)) {
+        if (isDeferred(callback)) {
           callback.begin();
         } else {
           callback.call(that);
@@ -438,10 +454,10 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
       if (lazy) {
         speed = 0;
         if (useSpeed) {
-          speedKey = Pot.Internal.LightIterator.revSpeeds[this.interval];
+          speedKey = LightIterator.revSpeeds[this.interval];
           if (speedKey &&
-              Pot.isNumeric(Pot.Internal.LightIterator.delays[speedKey])) {
-            speed = Pot.Internal.LightIterator.delays[speedKey];
+              isNumeric(LightIterator.delays[speedKey])) {
+            speed = LightIterator.delays[speedKey];
           }
           if (Math.random() * 10 < Math.max(2, (this.time.axis || 2) / 2.75)) {
             speed += Math.min(
@@ -455,13 +471,12 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
             );
           }
         }
-        Pot.Internal.setTimeout(function() {
+        PotInternalSetTimeout(function() {
           d.begin();
         }, speed);
       } else {
         d.begin();
       }
-      return (void 0);
     }
   },
   /**
@@ -474,7 +489,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     return {
       /**@ignore*/
       next : function() {
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
     };
   },
@@ -486,7 +501,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   forEver : function(callback, context) {
     var i = 0;
-    if (!Pot.isFunction(callback)) {
+    if (!isFunction(callback)) {
       return this.noop();
     }
     return {
@@ -512,26 +527,26 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   repeat : function(max, callback, context) {
     var i, loops, n, last;
-    if (!Pot.isFunction(callback)) {
+    if (!isFunction(callback)) {
       return this.noop();
     }
     if (!max || max == null) {
       n = 0;
-    } else if (Pot.isNumeric(max)) {
+    } else if (isNumeric(max)) {
       n = max - 0;
     } else {
       n = max || {};
-      if (Pot.isNumeric(n.start)) {
+      if (isNumeric(n.start)) {
         n.begin = n.start;
       }
-      if (Pot.isNumeric(n.stop)) {
+      if (isNumeric(n.stop)) {
         n.end = n.stop;
       }
     }
     loops = {
-      begin : Pot.isNumeric(n.begin) ? n.begin - 0 : 0,
-      end   : Pot.isNumeric(n.end)   ? n.end   - 0 : (n || 0) - 0,
-      step  : Pot.isNumeric(n.step)  ? n.step  - 0 : 1,
+      begin : isNumeric(n.begin) ? n.begin - 0 : 0,
+      end   : isNumeric(n.end)   ? n.end   - 0 : (n || 0) - 0,
+      step  : isNumeric(n.step)  ? n.step  - 0 : 1,
       last  : false,
       prev  : null
     };
@@ -546,7 +561,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           result = callback.call(context, i, loops.last, loops);
           loops.prev = result;
         } else {
-          throw Pot.StopIteration;
+          throw PotStopIteration;
         }
         i += loops.step;
         return result;
@@ -561,7 +576,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   forLoop : function(object, callback, context) {
     var copy, i = 0;
-    if (!object || !object.length || !Pot.isFunction(callback)) {
+    if (!object || !object.length || !isFunction(callback)) {
       return this.noop();
     }
     copy = arrayize(object);
@@ -571,7 +586,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         var val, result;
         while (true) {
           if (i >= copy.length) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
           if (!(i in copy)) {
             i++;
@@ -599,7 +614,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
   forInLoop : function(object, callback, context) {
     var copy, i = 0;
     //XXX: Should use "yield" for duplicate loops.
-    if (Pot.isFunction(callback)) {
+    if (isFunction(callback)) {
       copy = [];
       each(object, function(value, prop) {
         copy[copy.length] = [value, prop];
@@ -614,7 +629,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         var result, c, key, val;
         while (true) {
           if (i >= copy.length) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
           if (!(i in copy)) {
             i++;
@@ -645,7 +660,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
     var that = this, iterable;
     if (Pot.isIterable(object) && !Pot.isIter(object)) {
       // using "yield" generator.
-      if (Pot.isFunction(callback)) {
+      if (isFunction(callback)) {
         return {
           /**@ignore*/
           next : function() {
@@ -664,11 +679,11 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
         };
       }
     } else {
-      iterable = Pot.Iter.toIter(object);
-      if (!Pot.isIter(iterable)) {
+      iterable = Iter.toIter(object);
+      if (!isIter(iterable)) {
         return this.noop();
       }
-      if (Pot.isFunction(callback)) {
+      if (isFunction(callback)) {
         return {
           /**@ignore*/
           next : function() {
@@ -701,26 +716,26 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   items : function(object, callback, context) {
     var that = this, copy, i = 0, isPair;
-    if (Pot.isObject(object)) {
+    if (isObject(object)) {
       copy = [];
       each(object, function(ov, op) {
         copy[copy.length] = [op, ov];
       });
       isPair = true;
-    } else if (Pot.isArrayLike(object)) {
+    } else if (isArrayLike(object)) {
       copy = arrayize(object);
     }
     if (!copy || !copy.length) {
       return this.noop();
     }
-    if (Pot.isFunction(callback)) {
+    if (isFunction(callback)) {
       return {
         /**@ignore*/
         next : function() {
           var result, c, key, val;
           while (true) {
             if (i >= copy.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             if (!(i in copy)) {
               i++;
@@ -753,7 +768,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           var r, t, k, v;
           while (true) {
             if (i >= copy.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             if (!(i in copy)) {
               i++;
@@ -789,14 +804,14 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
    */
   zip : function(object, callback, context) {
     var that = this, copy, i = 0, max;
-    if (Pot.isArrayLike(object)) {
+    if (isArrayLike(object)) {
       copy = arrayize(object);
       max = copy.length;
     }
     if (!max || !copy || !copy.length) {
       return this.noop();
     }
-    if (Pot.isFunction(callback)) {
+    if (isFunction(callback)) {
       return {
         /**@ignore*/
         next : function() {
@@ -804,7 +819,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           for (j = 0; j < max; j++) {
             item = arrayize(copy[j]);
             if (!item || !item.length || i >= item.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             zips[zips.length] = item[i];
           }
@@ -822,7 +837,7 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
           for (k = 0; k < max; k++) {
             t = arrayize(copy[k]);
             if (!t || !t.length || i >= t.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             z[z.length] = t[i];
           }
@@ -835,11 +850,10 @@ Pot.Internal.LightIterator.fn = Pot.Internal.LightIterator.prototype =
   }
 });
 
-Pot.Internal.LightIterator.prototype.doit.prototype =
-  Pot.Internal.LightIterator.prototype;
+LightIterator.fn.doit.prototype = LightIterator.fn;
 
 // Update internal synchronous iteration.
-update(Pot.Internal.LightIterator, {
+update(LightIterator, {
   /**
    * @lends Pot.Internal.LightIterator
    */
@@ -867,7 +881,7 @@ update(Pot.Internal.LightIterator, {
         }
       } catch (e) {
         err = e;
-        if (!Pot.isStopIter(err)) {
+        if (!isStopIter(err)) {
           throw err;
         }
       }
@@ -877,17 +891,17 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEach : function(object, callback, context) {
-      var result, iter, that = Pot.Internal.LightIterator.fn;
+      var result, iter, that = LightIterator.fn;
       if (!object) {
         result = {};
       } else {
         result = object;
-        if (Pot.isArrayLike(object)) {
+        if (isArrayLike(object)) {
           iter = that.forLoop(object, callback, context);
         } else {
           iter = that.forInLoop(object, callback, context);
         }
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
       }
       return result;
     },
@@ -896,10 +910,10 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     repeat : function(max, callback, context) {
-      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
+      var result = {}, iter, that = LightIterator.fn;
       if (max) {
         iter = that.repeat(max, callback, context);
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
       }
       return result;
     },
@@ -908,10 +922,10 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     forEver : function(callback, context) {
-      var result = {}, iter, that = Pot.Internal.LightIterator.fn;
+      var result = {}, iter, that = LightIterator.fn;
       if (callback) {
         iter = that.forEver(callback, context);
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
       }
       return result;
     },
@@ -920,7 +934,7 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     iterate : function(object, callback, context) {
-      var result, iter, o, that = Pot.Internal.LightIterator.fn;
+      var result, iter, o, that = LightIterator.fn;
       if (!object) {
         result = {};
       } else {
@@ -930,7 +944,7 @@ update(Pot.Internal.LightIterator, {
           result : null
         };
         iter = that.iterate.call(o, object, callback, context);
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
         result = o.result;
       }
       return result;
@@ -940,14 +954,14 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     items : function(object, callback, context) {
-      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
           result : []
         };
         iter = that.items.call(o, object, callback, context);
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
         result = o.result;
       }
       return result;
@@ -957,14 +971,14 @@ update(Pot.Internal.LightIterator, {
      * @ignore
      */
     zip : function(object, callback, context) {
-      var result = [], iter, o, that = Pot.Internal.LightIterator.fn;
+      var result = [], iter, o, that = LightIterator.fn;
       if (object) {
         o = {
           noop   : that.noop,
           result : []
         };
         iter = that.zip.call(o, object, callback, context);
-        Pot.Internal.LightIterator.QuickIteration.resolve(iter);
+        QuickIteration.resolve(iter);
         result = o.result;
       }
       return result;
@@ -972,11 +986,12 @@ update(Pot.Internal.LightIterator, {
   }
 });
 
+QuickIteration = LightIterator.QuickIteration;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Define the main iterators.
 
 // Temporary creation function.
-update(Pot.tmp, {
+update(PotTmp, {
   /**
    * @lends Pot.tmp
    */
@@ -990,21 +1005,23 @@ update(Pot.tmp, {
     /**@ignore*/
     create = function(speed) {
       var interval;
-      if (Pot.Internal.LightIterator.speeds[speed] === void 0) {
-        interval = Pot.Internal.LightIterator.defaults.speed;
+      if (LightIterator.speeds[speed] === void 0) {
+        interval = LightIterator.defaults.speed;
       } else {
-        interval = Pot.Internal.LightIterator.speeds[speed];
+        interval = LightIterator.speeds[speed];
       }
       return creator(interval);
     },
     methods = {},
     construct = create();
-    for (name in Pot.Internal.LightIterator.speeds) {
+    for (name in LightIterator.speeds) {
       methods[name] = create(name);
     }
     return update(construct, methods);
   }
 });
+
+createLightIterateConstructor = PotTmp.createLightIterateConstructor;
 
 // Define the iterator functions to evaluate as synchronized.
 Pot.update({
@@ -1075,21 +1092,21 @@ Pot.update({
    * @property {Function} rapid  Iterates "for each" loop with faster speed.
    * @property {Function} ninja  Iterates "for each" loop with fastest speed.
    */
-  forEach : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  forEach : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.forLoop |
-                    Pot.Internal.LightIterator.types.forInLoop;
+        opts.type = LightIterator.types.forLoop |
+                    LightIterator.types.forInLoop;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+        return (new LightIterator(object, callback, opts)).result;
       };
     } else {
       return function(object, callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.forEach(
+        return QuickIteration.forEach(
           object, callback, context
         );
       };
@@ -1158,20 +1175,20 @@ Pot.update({
    * @property {Function} rapid  Iterates "repeat" loop with faster speed.
    * @property {Function} ninja  Iterates "repeat" loop with fastest speed.
    */
-  repeat : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  repeat : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(max, callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.repeat;
+        opts.type = LightIterator.types.repeat;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(max, callback, opts)).result;
+        return (new LightIterator(max, callback, opts)).result;
       };
     } else {
       return function(max, callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.repeat(
+        return QuickIteration.repeat(
           max, callback, context
         );
       };
@@ -1210,20 +1227,20 @@ Pot.update({
    * @property {Function} rapid  Iterates "forEver" loop with faster speed.
    * @property {Function} ninja  Iterates "forEver" loop with fastest speed.
    */
-  forEver : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  forEver : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.forEver;
+        opts.type = LightIterator.types.forEver;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(callback, null, opts)).result;
+        return (new LightIterator(callback, null, opts)).result;
       };
     } else {
       return function(callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.forEver(
+        return QuickIteration.forEver(
           callback, context
         );
       };
@@ -1252,20 +1269,20 @@ Pot.update({
    * @property {Function} rapid  Iterates "iterate" loop with faster speed.
    * @property {Function} ninja  Iterates "iterate" loop with fastest speed.
    */
-  iterate : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  iterate : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.iterate;
+        opts.type = LightIterator.types.iterate;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+        return (new LightIterator(object, callback, opts)).result;
       };
     } else {
       return function(object, callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.iterate(
+        return QuickIteration.iterate(
           object, callback, context
         );
       };
@@ -1328,20 +1345,20 @@ Pot.update({
    * @property {Function} rapid  Iterates "items" loop with faster speed.
    * @property {Function} ninja  Iterates "items" loop with fastest speed.
    */
-  items : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  items : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.items;
+        opts.type = LightIterator.types.items;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+        return (new LightIterator(object, callback, opts)).result;
       };
     } else {
       return function(object, callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.items(
+        return QuickIteration.items(
           object, callback, context
         );
       };
@@ -1445,20 +1462,20 @@ Pot.update({
    * @property {Function} rapid  Iterates "zip" loop with faster speed.
    * @property {Function} ninja  Iterates "zip" loop with fastest speed.
    */
-  zip : Pot.tmp.createLightIterateConstructor(function(interval) {
-    if (Pot.System.isWaitable &&
-        interval < Pot.Internal.LightIterator.speeds.normal) {
+  zip : createLightIterateConstructor(function(interval) {
+    if (PotSystem.isWaitable &&
+        interval < LightIterator.speeds.normal) {
       return function(object, callback, context) {
         var opts = {};
-        opts.type = Pot.Internal.LightIterator.types.zip;
+        opts.type = LightIterator.types.zip;
         opts.interval = interval;
         opts.async = false;
         opts.context = context;
-        return (new Pot.Internal.LightIterator(object, callback, opts)).result;
+        return (new LightIterator(object, callback, opts)).result;
       };
     } else {
       return function(object, callback, context) {
-        return Pot.Internal.LightIterator.QuickIteration.zip(
+        return QuickIteration.zip(
           object, callback, context
         );
       };
@@ -1467,7 +1484,7 @@ Pot.update({
 });
 
 // Define iterators for Deferred (Asynchronous)
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * Iterates as "for each" loop. (Asynchronous)
    *
@@ -1513,15 +1530,15 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "for each" loop with faster speed.
    * @property {Function} ninja  Iterates "for each" loop with fastest speed.
    */
-  forEach : Pot.tmp.createLightIterateConstructor(function(interval) {
+  forEach : createLightIterateConstructor(function(interval) {
     return function(object, callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.forLoop |
-                  Pot.Internal.LightIterator.types.forInLoop;
+      opts.type = LightIterator.types.forLoop |
+                  LightIterator.types.forInLoop;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+      return (new LightIterator(object, callback, opts)).deferred;
     };
   }),
   /**
@@ -1547,14 +1564,14 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "repeat" loop with faster speed.
    * @property {Function} ninja  Iterates "repeat" loop with fastest speed.
    */
-  repeat : Pot.tmp.createLightIterateConstructor(function(interval) {
+  repeat : createLightIterateConstructor(function(interval) {
     return function(max, callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.repeat;
+      opts.type = LightIterator.types.repeat;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(max, callback, opts)).deferred;
+      return (new LightIterator(max, callback, opts)).deferred;
     };
   }),
   /**
@@ -1578,14 +1595,14 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "forEver" loop with faster speed.
    * @property {Function} ninja  Iterates "forEver" loop with fastest speed.
    */
-  forEver : Pot.tmp.createLightIterateConstructor(function(interval) {
+  forEver : createLightIterateConstructor(function(interval) {
     return function(callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.forEver;
+      opts.type = LightIterator.types.forEver;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(callback, null, opts)).deferred;
+      return (new LightIterator(callback, null, opts)).deferred;
     };
   }),
   /**
@@ -1612,14 +1629,14 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "iterate" loop with faster speed.
    * @property {Function} ninja  Iterates "iterate" loop with fastest speed.
    */
-  iterate : Pot.tmp.createLightIterateConstructor(function(interval) {
+  iterate : createLightIterateConstructor(function(interval) {
     return function(object, callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.iterate;
+      opts.type = LightIterator.types.iterate;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+      return (new LightIterator(object, callback, opts)).deferred;
     };
   }),
   /**
@@ -1648,14 +1665,14 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "items" loop with faster speed.
    * @property {Function} ninja  Iterates "items" loop with fastest speed.
    */
-  items : Pot.tmp.createLightIterateConstructor(function(interval) {
+  items : createLightIterateConstructor(function(interval) {
     return function(object, callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.items;
+      opts.type = LightIterator.types.items;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+      return (new LightIterator(object, callback, opts)).deferred;
     };
   }),
   /**
@@ -1700,19 +1717,19 @@ update(Pot.Deferred, {
    * @property {Function} rapid  Iterates "zip" loop with faster speed.
    * @property {Function} ninja  Iterates "zip" loop with fastest speed.
    */
-  zip : Pot.tmp.createLightIterateConstructor(function(interval) {
+  zip : createLightIterateConstructor(function(interval) {
     return function(object, callback, context) {
       var opts = {};
-      opts.type = Pot.Internal.LightIterator.types.zip;
+      opts.type = LightIterator.types.zip;
       opts.interval = interval;
       opts.async = true;
       opts.context = context;
-      return (new Pot.Internal.LightIterator(object, callback, opts)).deferred;
+      return (new LightIterator(object, callback, opts)).deferred;
     };
   })
 });
 
-delete Pot.tmp.createLightIterateConstructor;
+delete PotTmp.createLightIterateConstructor;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Iter.
 Pot.update({
@@ -1734,25 +1751,28 @@ Pot.update({
    * @public
    */
   Iter : function() {
-    return Pot.isIter(this) ? this.init(arguments) :
-            new Pot.Iter.fn.init(arguments);
+    return isIter(this) ? this.init(arguments)
+                        : new Iter.fn.init(arguments);
   }
 });
 
+// Refer the Pot properties/functions.
+Iter = Pot.Iter;
+
 // Definition of the prototype
-Pot.Iter.fn = Pot.Iter.prototype = update(Pot.Iter.prototype, {
+Iter.fn = Iter.prototype = update(Iter.prototype, {
   /**
    * @lends Pot.Iter.prototype
    */
   /**
    * @ignore
    */
-  constructor : Pot.Iter,
+  constructor : Iter,
   /**
    * @private
    * @ignore
    */
-  id : Pot.Internal.getMagicNumber(),
+  id : PotInternal.getMagicNumber(),
   /**
    * A unique strings.
    *
@@ -1777,7 +1797,7 @@ Pot.Iter.fn = Pot.Iter.prototype = update(Pot.Iter.prototype, {
    * @static
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * isIter.
    *
@@ -1787,7 +1807,7 @@ Pot.Iter.fn = Pot.Iter.prototype = update(Pot.Iter.prototype, {
    * @static
    * @public
    */
-  isIter : Pot.isIter,
+  isIter : isIter,
   /**
    * Initialize properties.
    *
@@ -1811,7 +1831,7 @@ Pot.Iter.fn = Pot.Iter.prototype = update(Pot.Iter.prototype, {
    * @public
    */
   next : function() {
-    throw Pot.StopIteration;
+    throw PotStopIteration;
   }
   /**
    * The property that implemented since JavaScript 1.7
@@ -1825,10 +1845,10 @@ Pot.Iter.fn = Pot.Iter.prototype = update(Pot.Iter.prototype, {
   //}
 });
 
-Pot.Iter.prototype.init.prototype = Pot.Iter.prototype;
+Iter.fn.init.prototype = Iter.fn;
 
 // Define Iter object properties.
-update(Pot.Iter, {
+update(Iter, {
   /**
    * @lends Pot.Iter
    */
@@ -1840,7 +1860,7 @@ update(Pot.Iter, {
    * @const
    * @public
    */
-  StopIteration : Pot.StopIteration,
+  StopIteration : PotStopIteration,
   /**
    * Assign to an iterator from the argument object value.
    *
@@ -1853,11 +1873,11 @@ update(Pot.Iter, {
    */
   toIter : function(x) {
     var iter, o, arrayLike, objectLike;
-    if (Pot.isIter(x)) {
+    if (isIter(x)) {
       return x;
     }
-    arrayLike  = x && Pot.isArrayLike(x);
-    objectLike = x && !arrayLike && Pot.isObject(x);
+    arrayLike  = x && isArrayLike(x);
+    objectLike = x && !arrayLike && isObject(x);
     if (objectLike) {
       o = [];
       each(x, function(xv, xp) {
@@ -1866,7 +1886,7 @@ update(Pot.Iter, {
     } else {
       o = arrayize(x);
     }
-    iter = new Pot.Iter();
+    iter = new Iter();
     /**@ignore*/
     iter.next = (function() {
       var i = 0;
@@ -1875,7 +1895,7 @@ update(Pot.Iter, {
           var key, val, pair;
           while (true) {
             if (i >= o.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             if (!(i in o)) {
               i++;
@@ -1898,7 +1918,7 @@ update(Pot.Iter, {
           var value, result;
           while (true) {
             if (i >= o.length) {
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
             if (!(i in o)) {
               i++;
@@ -1964,8 +1984,8 @@ update(Pot.Iter, {
   map : function(object, callback, context) {
     var result, arrayLike, objectLike, iterateDefer, it, iterable;
     iterateDefer = this && this.iterateSpeed;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    arrayLike  = object && isArrayLike(object);
+    objectLike = object && !arrayLike && isObject(object);
     if (arrayLike) {
       result = [];
     } else if (objectLike) {
@@ -1978,7 +1998,7 @@ update(Pot.Iter, {
     it = function() {
       return iterable(object, function(val, key, obj) {
         var res = callback.call(context, val, key, obj);
-        if (Pot.isDeferred(res)) {
+        if (isDeferred(res)) {
           return res.then(function(rv) {
             if (arrayLike) {
               result[result.length] = rv;
@@ -2051,8 +2071,8 @@ update(Pot.Iter, {
       var result, arrayLike, objectLike, iterateDefer, it, iterable, cb;
       cb = callback || emptyFilter;
       iterateDefer = this && this.iterateSpeed;
-      arrayLike  = object && Pot.isArrayLike(object);
-      objectLike = object && !arrayLike && Pot.isObject(object);
+      arrayLike  = object && isArrayLike(object);
+      objectLike = object && !arrayLike && isObject(object);
       if (arrayLike) {
         result = [];
       } else if (objectLike) {
@@ -2065,7 +2085,7 @@ update(Pot.Iter, {
       it = function() {
         return iterable(object, function(val, key, obj) {
           var res = cb.call(context, val, key, obj);
-          if (Pot.isDeferred(res)) {
+          if (isDeferred(res)) {
             return res.then(function(rv) {
               if (rv) {
                 if (arrayLike) {
@@ -2137,8 +2157,8 @@ update(Pot.Iter, {
   reduce : function(object, callback, initial, context) {
     var arrayLike, objectLike, value, skip, iterateDefer, it, iterable;
     iterateDefer = this && this.iterateSpeed;
-    arrayLike  = object && Pot.isArrayLike(object);
-    objectLike = object && !arrayLike && Pot.isObject(object);
+    arrayLike  = object && isArrayLike(object);
+    objectLike = object && !arrayLike && isObject(object);
     if (initial === void 0) {
       /**@ignore*/
       value = (function() {
@@ -2146,7 +2166,7 @@ update(Pot.Iter, {
         if (arrayLike || objectLike) {
           each(object, function(v) {
             first = v;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           });
         }
         return first;
@@ -2164,7 +2184,7 @@ update(Pot.Iter, {
           skip = false;
         } else {
           res = callback.call(context, value, val, key, obj);
-          if (Pot.isDeferred(res)) {
+          if (isDeferred(res)) {
             return res.then(function(rv) {
               value = rv;
             });
@@ -2219,17 +2239,17 @@ update(Pot.Iter, {
     it = function() {
       return iterable(object, function(val, key, obj) {
         var res = callback.call(context, val, key, obj);
-        if (Pot.isDeferred(res)) {
+        if (isDeferred(res)) {
           return res.then(function(rv) {
             if (!rv) {
               result = false;
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
           });
         } else {
           if (!res) {
             result = false;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }
       }, context);
@@ -2280,17 +2300,17 @@ update(Pot.Iter, {
     it = function() {
       return iterable(object, function(val, key, obj) {
         var res = callback.call(context, val, key, obj);
-        if (Pot.isDeferred(res)) {
+        if (isDeferred(res)) {
           return res.then(function(rv) {
             if (rv) {
               result = true;
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
           });
         } else {
           if (res) {
             result = true;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }
       }, context);
@@ -2338,10 +2358,10 @@ update(Pot.Iter, {
         n, string, iter;
     switch (args.length) {
       case 0:
-          return (void 0);
+          return;
       case 1:
           arg = args[0];
-          if (Pot.isObject(arg)) {
+          if (isObject(arg)) {
             if ('begin' in arg) {
               begin = arg.begin;
             } else if ('start' in arg) {
@@ -2363,15 +2383,13 @@ update(Pot.Iter, {
           begin = args[0];
           end   = args[1];
           break;
-      case 3:
       default:
           begin = args[0];
           end   = args[1];
           step  = args[2];
-          break;
     }
-    if (Pot.isString(begin) && begin.length === 1 &&
-        Pot.isString(end)   && end.length   === 1) {
+    if (isString(begin) && begin.length === 1 &&
+        isString(end)   && end.length   === 1) {
       begin  = begin.charCodeAt(0) || 0;
       end    = end.charCodeAt(0)   || 0;
       string = true;
@@ -2390,12 +2408,12 @@ update(Pot.Iter, {
       begin = end;
       end   = n;
     }
-    iter = new Pot.Iter();
+    iter = new Iter();
     /**@ignore*/
     iter.next = function() {
       if ((step > 0 && begin > end) ||
           (step < 0 && begin < end)) {
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
       result[result.length] = string ? fromUnicode(begin) : begin;
       begin += step;
@@ -2437,13 +2455,13 @@ update(Pot.Iter, {
   indexOf : function(object, subject, from) {
     var result = -1, i, len, val, passed,
         args = arguments, argn = args.length,
-        arrayLike = object && Pot.isArrayLike(object),
-        objectLike = object && !arrayLike && Pot.isObject(object);
+        arrayLike = object && isArrayLike(object),
+        objectLike = object && !arrayLike && isObject(object);
     if (arrayLike) {
       try {
-        if (Pot.System.isBuiltinArrayIndexOf) {
+        if (PotSystem.isBuiltinArrayIndexOf) {
           i = indexOf.apply(object, arrayize(args, 1));
-          if (Pot.isNumeric(i)) {
+          if (isNumeric(i)) {
             result = i;
           } else {
             throw i;
@@ -2487,7 +2505,7 @@ update(Pot.Iter, {
     } else if (object != null) {
       try {
         val = (object.toString && object.toString()) || String(object);
-        result = String.prototype.indexOf.apply(val, arrayize(args, 1));
+        result = StringProto.indexOf.apply(val, arrayize(args, 1));
       } catch (e) {
         result = -1;
       }
@@ -2544,13 +2562,13 @@ update(Pot.Iter, {
   lastIndexOf : function(object, subject, from) {
     var result = -1, i, len,  key, val, passed, pairs,
         args = arguments,
-        arrayLike  = object && Pot.isArrayLike(object),
-        objectLike = object && !arrayLike && Pot.isObject(object);
+        arrayLike  = object && isArrayLike(object),
+        objectLike = object && !arrayLike && isObject(object);
     if (arrayLike) {
       try {
-        if (Pot.System.isBuiltinArrayLastIndexOf) {
+        if (PotSystem.isBuiltinArrayLastIndexOf) {
           i = lastIndexOf.apply(object, arrayize(args, 1));
-          if (Pot.isNumeric(i)) {
+          if (isNumeric(i)) {
             result = i;
           } else {
             throw i;
@@ -2595,7 +2613,7 @@ update(Pot.Iter, {
         }
         if (op === from) {
           passed = true;
-          throw Pot.StopIteration;
+          throw PotStopIteration;
         }
       });
       if (passed) {
@@ -2613,7 +2631,7 @@ update(Pot.Iter, {
     } else if (object != null) {
       try {
         val = (object.toString && object.toString()) || String(object);
-        result = String.prototype.lastIndexOf.apply(val, arrayize(args, 1));
+        result = StringProto.lastIndexOf.apply(val, arrayize(args, 1));
       } catch (e) {
         result = -1;
       }
@@ -2626,14 +2644,14 @@ update(Pot.Iter, {
 
 // Update methods for reference.
 Pot.update({
-  toIter : Pot.Iter.toIter
+  toIter : Iter.toIter
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Update the Pot.Deferred object for iterators.
 
 // Extends the Pot.Deferred object for iterators with speed.
-update(Pot.tmp, {
+update(PotTmp, {
   /**
    * @private
    * @ignore
@@ -2644,9 +2662,9 @@ update(Pot.tmp, {
       /**@ignore*/
       o[iter.NAME] = function() {
         var me = {}, args = arrayize(arguments);
-        me.iterateSpeed = (this && this.iterateSpeed) || Pot.Deferred.iterate;
-        return Pot.Deferred.begin(function() {
-          var d = new Pot.Deferred();
+        me.iterateSpeed = (this && this.iterateSpeed) || Deferred.iterate;
+        return Deferred.begin(function() {
+          var d = new Deferred();
           iter.method.apply(me, args).then(function(res) {
             d.begin(res);
           }, function(err) {
@@ -2655,12 +2673,12 @@ update(Pot.tmp, {
           return d;
         });
       };
-      update(Pot.Deferred, o);
-      Pot.Deferred.extendSpeeds(Pot.Deferred, iter.NAME, function(opts) {
+      update(Deferred, o);
+      Deferred.extendSpeeds(Deferred, iter.NAME, function(opts) {
         var me = {}, args = arrayize(arguments, 1);
-        me.iterateSpeed = Pot.Deferred.iterate[opts.speedName];
-        return Pot.Deferred.begin(function() {
-          var d = new Pot.Deferred();
+        me.iterateSpeed = Deferred.iterate[opts.speedName];
+        return Deferred.begin(function() {
+          var d = new Deferred();
           iter.method.apply(me, args).then(function(res) {
             d.begin(res);
           }, function(err) {
@@ -2668,7 +2686,7 @@ update(Pot.tmp, {
           });
           return d;
         });
-      }, Pot.Internal.LightIterator.speeds);
+      }, LightIterator.speeds);
     });
   },
   /**
@@ -2682,11 +2700,11 @@ update(Pot.tmp, {
       o[iter.NAME] = function() {
         var args = arrayize(arguments), options = update({}, this.options);
         return this.then(function(value) {
-          var d = new Pot.Deferred();
+          var d = new Deferred();
           args = iter.args(value, args);
           iter.method.apply(iter.context, args).ensure(function(res) {
             extendDeferredOptions(d, options);
-            if (Pot.isError(res)) {
+            if (isError(res)) {
               d.raise(res);
             } else {
               d.begin(res);
@@ -2695,7 +2713,7 @@ update(Pot.tmp, {
           return d;
         });
       };
-      update(Pot.Deferred.fn, o);
+      update(Deferred.fn, o);
       if (iter.speed) {
         if (iter.iterable) {
           /**@ignore*/
@@ -2714,16 +2732,16 @@ update(Pot.tmp, {
             };
           };
         }
-        Pot.Deferred.extendSpeeds(Pot.Deferred.fn, iter.NAME, function(opts) {
-          var iterable, options, args = arrayize(arguments, 1);
-          iterable = sp.methods(opts.speedName);
-          options  = update({}, this.options);
+        Deferred.extendSpeeds(Deferred.fn, iter.NAME, function(opts) {
+          var args = arrayize(arguments, 1),
+              iterable = sp.methods(opts.speedName);
+              options  = update({}, this.options);
           return this.then(function(value) {
-            var d = new Pot.Deferred();
+            var d = new Deferred();
             args = iter.args(value, args);
             iterable.iter.apply(iterable.context, args).ensure(function(res) {
               extendDeferredOptions(d, options);
-              if (Pot.isError(res)) {
+              if (isError(res)) {
                 d.raise(res);
               } else {
                 d.begin(res);
@@ -2731,7 +2749,7 @@ update(Pot.tmp, {
             });
             return d;
           });
-        }, Pot.Internal.LightIterator.speeds);
+        }, LightIterator.speeds);
       }
     });
   },
@@ -2741,22 +2759,22 @@ update(Pot.tmp, {
    */
   createSyncIterator : function(creator) {
     var methods, construct,
-    /**@ignore*/
-    create = function(speed) {
-      var key = speed;
-      if (!key) {
-        each(Pot.Internal.LightIterator.speeds, function(v, k) {
-          if (v === Pot.Internal.LightIterator.defaults.speed) {
-            key = k;
-            throw Pot.StopIteration;
+        /**@ignore*/
+        create = function(speed) {
+          var key = speed;
+          if (!key) {
+            each(LightIterator.speeds, function(v, k) {
+              if (v === LightIterator.defaults.speed) {
+                key = k;
+                throw PotStopIteration;
+              }
+            });
           }
-        });
-      }
-      return creator(key);
-    };
+          return creator(key);
+        };
     construct = create();
     methods = {};
-    each(Pot.Internal.LightIterator.speeds, function(v, k) {
+    each(LightIterator.speeds, function(v, k) {
       methods[k] = create(k);
     });
     return update(construct, methods);
@@ -2764,7 +2782,7 @@ update(Pot.tmp, {
 });
 
 // Create iterators to Pot.Deferred.
-Pot.tmp.createIterators([{
+PotTmp.createIterators([{
   /**
    * Creates a new object with the results of calling a
    *   provided function on every element in object.
@@ -2806,7 +2824,7 @@ Pot.tmp.createIterators([{
    */
   NAME   : 'map',
   /**@ignore*/
-  method : Pot.Iter.map
+  method : Iter.map
 }, {
   /**
    * Creates a new object with all elements that
@@ -2849,7 +2867,7 @@ Pot.tmp.createIterators([{
    */
   NAME   : 'filter',
   /**@ignore*/
-  method : Pot.Iter.filter
+  method : Iter.filter
 }, {
   /**
    * Apply a function against an accumulator and each value of
@@ -2897,7 +2915,7 @@ Pot.tmp.createIterators([{
    */
   NAME   : 'reduce',
   /**@ignore*/
-  method : Pot.Iter.reduce
+  method : Iter.reduce
 }, {
   /**
    * Tests whether all elements in the object pass the
@@ -2948,7 +2966,7 @@ Pot.tmp.createIterators([{
    */
   NAME   : 'every',
   /**@ignore*/
-  method : Pot.Iter.every
+  method : Iter.every
 }, {
   /**
    * Tests whether some element in the object passes the
@@ -3001,11 +3019,11 @@ Pot.tmp.createIterators([{
    */
   NAME   : 'some',
   /**@ignore*/
-  method : Pot.Iter.some
+  method : Iter.some
 }]);
 
 // Create iterators to Pot.Deferred.prototype.
-Pot.tmp.createProtoIterators([{
+PotTmp.createProtoIterators([{
   /**
    * Iterates as "for each" loop. (Asynchronous)
    *
@@ -3074,7 +3092,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.forEach,
+  method : Deferred.forEach,
   /**
    * @ignore
    */
@@ -3086,7 +3104,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.forEach,
+  iterable : Deferred.forEach,
   /**
    * @ignore
    */
@@ -3135,7 +3153,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.repeat,
+  method : Deferred.repeat,
   /**
    * @ignore
    */
@@ -3147,18 +3165,18 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.repeat,
+  iterable : Deferred.repeat,
   /**
    * @ignore
    */
   args : function(arg, args) {
-    if (Pot.isNumeric(arg)) {
+    if (isNumeric(arg)) {
       return [arg - 0].concat(args);
     }
-    if (arg && Pot.isNumber(arg.length)) {
+    if (arg && isNumber(arg.length)) {
       return [arg.length].concat(args);
     }
-    if (arg && Pot.isObject(arg) &&
+    if (arg && isObject(arg) &&
         ('end'  in arg || 'begin' in arg || 'step' in arg ||
          'stop' in arg || 'start' in arg)) {
       return [arg].concat(args);
@@ -3206,7 +3224,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.forEver,
+  method : Deferred.forEver,
   /**
    * @ignore
    */
@@ -3218,7 +3236,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.forEver,
+  iterable : Deferred.forEver,
   /**
    * @ignore
    */
@@ -3255,7 +3273,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.iterate,
+  method : Deferred.iterate,
   /**
    * @ignore
    */
@@ -3267,7 +3285,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.iterate,
+  iterable : Deferred.iterate,
   /**
    * @ignore
    */
@@ -3346,7 +3364,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.items,
+  method : Deferred.items,
   /**
    * @ignore
    */
@@ -3358,7 +3376,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.items,
+  iterable : Deferred.items,
   /**
    * @ignore
    */
@@ -3490,7 +3508,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Deferred.zip,
+  method : Deferred.zip,
   /**
    * @ignore
    */
@@ -3502,7 +3520,7 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  iterable : Pot.Deferred.zip,
+  iterable : Deferred.zip,
   /**
    * @ignore
    */
@@ -3552,11 +3570,11 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Iter.map,
+  method : Iter.map,
   /**
    * @ignore
    */
-  context : {iterateSpeed : Pot.Deferred.iterate},
+  context : {iterateSpeed : Deferred.iterate},
   /**
    * @ignore
    */
@@ -3614,11 +3632,11 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Iter.filter,
+  method : Iter.filter,
   /**
    * @ignore
    */
-  context : {iterateSpeed : Pot.Deferred.iterate},
+  context : {iterateSpeed : Deferred.iterate},
   /**
    * @ignore
    */
@@ -3679,11 +3697,11 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Iter.reduce,
+  method : Iter.reduce,
   /**
    * @ignore
    */
-  context : {iterateSpeed : Pot.Deferred.iterate},
+  context : {iterateSpeed : Deferred.iterate},
   /**
    * @ignore
    */
@@ -3748,11 +3766,11 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Iter.every,
+  method : Iter.every,
   /**
    * @ignore
    */
-  context : {iterateSpeed : Pot.Deferred.iterate},
+  context : {iterateSpeed : Deferred.iterate},
   /**
    * @ignore
    */
@@ -3816,11 +3834,11 @@ Pot.tmp.createProtoIterators([{
   /**
    * @ignore
    */
-  method : Pot.Iter.some,
+  method : Iter.some,
   /**
    * @ignore
    */
-  context : {iterateSpeed : Pot.Deferred.iterate},
+  context : {iterateSpeed : Deferred.iterate},
   /**
    * @ignore
    */
@@ -3836,6 +3854,8 @@ Pot.tmp.createProtoIterators([{
     return [arg].concat(args);
   }
 }]);
+
+createSyncIterator = PotTmp.createSyncIterator;
 
 // Update iterator methods for Pot
 Pot.update({
@@ -3877,10 +3897,10 @@ Pot.update({
    * @static
    * @public
    */
-  map : Pot.tmp.createSyncIterator(function(speedKey) {
+  map : createSyncIterator(function(speedKey) {
     return function() {
       var context = {iterateSpeedSync : Pot.iterate[speedKey]};
-      return Pot.Iter.map.apply(context, arguments);
+      return Iter.map.apply(context, arguments);
     };
   }),
   /**
@@ -3920,10 +3940,10 @@ Pot.update({
    * @static
    * @public
    */
-  filter : Pot.tmp.createSyncIterator(function(speedKey) {
+  filter : createSyncIterator(function(speedKey) {
     return function() {
       var context = {iterateSpeedSync : Pot.iterate[speedKey]};
-      return Pot.Iter.filter.apply(context, arguments);
+      return Iter.filter.apply(context, arguments);
     };
   }),
   /**
@@ -3961,10 +3981,10 @@ Pot.update({
    * @static
    * @public
    */
-  reduce : Pot.tmp.createSyncIterator(function(speedKey) {
+  reduce : createSyncIterator(function(speedKey) {
     return function() {
       var context = {iterateSpeedSync : Pot.iterate[speedKey]};
-      return Pot.Iter.reduce.apply(context, arguments);
+      return Iter.reduce.apply(context, arguments);
     };
   }),
   /**
@@ -3994,10 +4014,10 @@ Pot.update({
    * @static
    * @public
    */
-  every : Pot.tmp.createSyncIterator(function(speedKey) {
+  every : createSyncIterator(function(speedKey) {
     return function() {
       var context = {iterateSpeedSync : Pot.iterate[speedKey]};
-      return Pot.Iter.every.apply(context, arguments);
+      return Iter.every.apply(context, arguments);
     };
   }),
   /**
@@ -4028,10 +4048,10 @@ Pot.update({
    * @static
    * @public
    */
-  some : Pot.tmp.createSyncIterator(function(speedKey) {
+  some : createSyncIterator(function(speedKey) {
     return function() {
       var context = {iterateSpeedSync : Pot.iterate[speedKey]};
-      return Pot.Iter.some.apply(context, arguments);
+      return Iter.some.apply(context, arguments);
     };
   }),
   /**
@@ -4060,7 +4080,7 @@ Pot.update({
    * @public
    */
   range : function(/*[begin,] end[, step]*/) {
-    return Pot.Iter.range.apply(null, arguments);
+    return Iter.range.apply(null, arguments);
   },
   /**
    * Returns the first index at which a
@@ -4093,7 +4113,7 @@ Pot.update({
    * @public
    */
   indexOf : function() {
-    return Pot.Iter.indexOf.apply(null, arguments);
+    return Iter.indexOf.apply(null, arguments);
   },
   /**
    * Returns the last index at which a
@@ -4140,12 +4160,12 @@ Pot.update({
    * @public
    */
   lastIndexOf : function() {
-    return Pot.Iter.lastIndexOf.apply(null, arguments);
+    return Iter.lastIndexOf.apply(null, arguments);
   }
 });
 
-update(Pot.Internal, {
-  defineDeferrater : Pot.tmp.createSyncIterator
+update(PotInternal, {
+  defineDeferrater : createSyncIterator
 });
 
 // Definition of deferreed function.
@@ -4169,7 +4189,7 @@ update(Pot.Internal, {
      * @private
      * @ignore
      */
-    id : Pot.Internal.getMagicNumber(),
+    id : PotInternal.getMagicNumber(),
     /**
      * @ignore
      * @private
@@ -4354,7 +4374,7 @@ update(Pot.Internal, {
      */
     toEnd : function(code) {
       var s;
-      if (Pot.isArray(code)) {
+      if (isArray(code)) {
         s = this.joinTokens(code);
       } else {
         s = stringify(code);
@@ -4523,20 +4543,13 @@ update(Pot.Internal, {
      * @ignore
      */
     deferrizeLoop : function() {
-      var result, tokens = this.iteration.loops,
+      var tokens = this.iteration.loops,
           state = tokens.shift();
       switch (state) {
-        case 'for':
-            result = this.parseFor(tokens);
-            break;
-        case 'while':
-            result = this.parseWhile(tokens);
-            break;
-        case 'do':
-            result = this.parseDoWhile(tokens);
-            break;
+        case 'for'   : return this.parseFor(tokens);
+        case 'while' : return this.parseWhile(tokens);
+        case 'do'    : return this.parseDoWhile(tokens);
       }
-      return result;
     },
     /**
      * @internal
@@ -5233,7 +5246,7 @@ update(Pot.Internal, {
     }
   });
   Deferrizer.prototype.init.prototype = Deferrizer.prototype;
-  update(Pot.Internal, {
+  update(PotInternal, {
     /**
      * @lends Pot.Internal
      */
@@ -5247,7 +5260,7 @@ update(Pot.Internal, {
     }
   });
   // Update Pot/Pot.Deferred.
-  update(Pot.Deferred, {
+  update(Deferred, {
     /**
      * @lends Pot.Deferred
      */
@@ -5417,40 +5430,40 @@ update(Pot.Internal, {
               throw false;
           case 1:
               func = object;
-              if (!Pot.isFunction(func)) {
+              if (!isFunction(func)) {
                 throw func;
               }
               proc = func;
               break;
           case 2:
           default:
-              if (Pot.isObject(method)) {
+              if (isObject(method)) {
                 context = method;
                 func    = object;
               } else {
                 func    = method;
                 context = object;
               }
-              if (!Pot.isFunction(context[func])) {
+              if (!isFunction(context[func])) {
                 throw func;
               }
               proc = context[func];
               break;
         }
-        if (!proc || !Pot.isFunction(proc) || Pot.isBuiltinMethod(proc)) {
+        if (!proc || !isFunction(proc) || Pot.isBuiltinMethod(proc)) {
           throw proc;
         }
-        code = Pot.Internal.deferrate(proc);
+        code = PotInternal.deferrate(proc);
         if (!code) {
           throw code;
         }
         if (code === proc) {
-          result = Pot.Deferred.deferrize(proc);
+          result = Deferred.deferrize(proc);
         } else {
-          if (!Pot.isString(code)) {
+          if (!isString(code)) {
             throw code;
           }
-          result = Pot.Internal.defineDeferrater(function(speedKey) {
+          result = PotInternal.defineDeferrater(function(speedKey) {
             var c = code.replace(SPEED, speedKey),
                 f = Pot.localEval(c, context);
             return function() {
@@ -5458,22 +5471,23 @@ update(Pot.Internal, {
             };
           });
         }
-        if (!result || !Pot.isFunction(result)) {
+        if (!result || !isFunction(result)) {
           throw result;
         }
       } catch (e) {
         err = e;
-        throw Pot.isError(err) ? err : new Error(err);
+        throw isError(err) ? err : new Error(err);
       }
       return result;
     }
   });
   // Refer Pot object.
   Pot.update({
-    deferreed : Pot.Deferred.deferreed
+    deferreed : Deferred.deferreed
   });
 }());
 
-delete Pot.tmp.createIterators;
-delete Pot.tmp.createProtoIterators;
-delete Pot.tmp.createSyncIterator;
+delete PotTmp.createIterators;
+delete PotTmp.createProtoIterators;
+delete PotTmp.createSyncIterator;
+}());

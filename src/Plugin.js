@@ -29,7 +29,7 @@ Pot.update({
    */
   deferrizejQueryAjax : (function() {
     if (typeof jQuery !== 'function' || !jQuery.fn) {
-      return Pot.noop;
+      return PotNoop;
     }
     return function() {
       return (function($) {
@@ -40,9 +40,9 @@ Pot.update({
           deferred : function(method) {
             var func, args = arrayize(arguments, 1), exists = false;
             each(args, function(arg) {
-              if (Pot.isFunction(arg)) {
+              if (isFunction(arg)) {
                 exists = true;
-                throw Pot.StopIteration;
+                throw PotStopIteration;
               }
             });
             if (!exists) {
@@ -50,15 +50,15 @@ Pot.update({
                 return arrayize(arguments);
               });
             }
-            func = Pot.Deferred.deferrize(method, this);
+            func = Deferred.deferrize(method, this);
             return func.apply(this, args);
           }
         });
         /**@ignore*/
         $.ajax = function(options) {
-          var d = new Pot.Deferred(), opts, orgs, er;
-          opts = update({}, options || {});
-          orgs = update({}, opts);
+          var er, d = new Deferred(),
+              opts = update({}, options || {}),
+              orgs = update({}, opts);
           update(opts, {
             /**@ignore*/
             success : function() {
@@ -109,8 +109,7 @@ Pot.update({
 });
 
 // Update Pot.Plugin object methods.
-(function(Plugin, Internal) {
-update(Plugin, {
+update(PotPlugin, {
   /**
    * @lends Pot.Plugin
    */
@@ -146,7 +145,7 @@ update(Plugin, {
    */
   add : function(name, method, force) {
     var result = true, pairs, overwrite;
-    if (Pot.isObject(name)) {
+    if (isObject(name)) {
       pairs = name;
       overwrite = !!(force || method);
     } else {
@@ -156,7 +155,7 @@ update(Plugin, {
     }
     each(pairs, function(v, k) {
       var key = stringify(k, true), func;
-      if (Pot.isFunction(v)) {
+      if (isFunction(v)) {
         /**@ignore*/
         func = function() {
           return v.apply(v, arguments);
@@ -164,20 +163,21 @@ update(Plugin, {
         update(func, {
           deferred : (function() {
             try {
-              return Pot.Deferred.deferreed(func);
+              return Deferred.deferreed(func);
             } catch (e) {
-              return Pot.Deferred.deferrize(func);
+              return Deferred.deferrize(func);
             }
           }())
         });
       } else {
         func = v;
       }
-      if (key && (overwrite || !Plugin.has(key))) {
+      if (key && (overwrite || !PotPlugin.has(key))) {
         if (key in Pot) {
-          Plugin.shelter[key] = Pot[key];
+          PotPlugin.shelter[key] = Pot[key];
         }
-        Pot[key] = Plugin.storage[key] = Internal.PotExportProps[key] = func;
+        Pot[key] = PotPlugin.storage[key] =
+                   PotInternal.PotExportProps[key] = func;
       } else {
         result = false;
       }
@@ -207,9 +207,9 @@ update(Plugin, {
     var result = true;
     each(arrayize(name), function(k) {
       var key = stringify(k, true);
-      if (!(key in Plugin.storage)) {
+      if (!(key in PotPlugin.storage)) {
         result = false;
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
     });
     return result;
@@ -236,21 +236,22 @@ update(Plugin, {
     var result = true;
     each(arrayize(name), function(k) {
       var key = stringify(k, true);
-      if (Pot.Plugin.has(key)) {
+      if (PotPlugin.has(key)) {
         try {
-          if (key in Plugin.shelter) {
-            Pot[key] = Internal.PotExportProps[key] = Plugin.shelter[key];
-            delete Plugin.shelter[key];
+          if (key in PotPlugin.shelter) {
+            Pot[key] = PotInternal.PotExportProps[key] =
+                                        PotPlugin.shelter[key];
+            delete PotPlugin.shelter[key];
           } else {
             if (key in Pot) {
               delete Pot[key];
             }
-            if (key in Internal.PotExportProps) {
-              delete Internal.PotExportProps[key];
+            if (key in PotInternal.PotExportProps) {
+              delete PotInternal.PotExportProps[key];
             }
           }
-          delete Plugin.storage[key];
-          if (Plugin.has(key)) {
+          delete PotPlugin.storage[key];
+          if (PotPlugin.has(key)) {
             throw false;
           }
         } catch (e) {
@@ -278,7 +279,7 @@ update(Plugin, {
    * @static
    */
   list : function() {
-    var result = Pot.keys(Plugin.storage);
+    var result = Pot.keys(PotPlugin.storage);
     return result;
   }
 });
@@ -308,7 +309,7 @@ Pot.update({
    * @public
    * @static
    */
-  addPlugin : Plugin.add,
+  addPlugin : PotPlugin.add,
   /**
    * Check whether Pot.Plugin has already specific name.
    *
@@ -328,7 +329,7 @@ Pot.update({
    * @public
    * @static
    */
-  hasPlugin : Plugin.has,
+  hasPlugin : PotPlugin.has,
   /**
    * Removes Pot.Plugin's function.
    *
@@ -347,7 +348,7 @@ Pot.update({
    * @public
    * @static
    */
-  removePlugin : Plugin.remove,
+  removePlugin : PotPlugin.remove,
   /**
    * List the Pot.Plugin function names.
    *
@@ -365,7 +366,5 @@ Pot.update({
    * @public
    * @static
    */
-  listPlugin : Plugin.list
+  listPlugin : PotPlugin.list
 });
-
-}(Pot.Plugin, Pot.Internal));

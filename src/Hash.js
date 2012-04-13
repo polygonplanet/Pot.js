@@ -1,6 +1,7 @@
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Hash.
-(function(PREFIX) {
+(function() {
+var PREFIX = '.', createHashIterator;
 
 Pot.update({
   /**
@@ -56,13 +57,13 @@ Pot.update({
    * @public
    */
   Hash : function() {
-    return Pot.isHash(this) ? this.init(arguments) :
-            new Pot.Hash.fn.init(arguments);
+    return isHash(this) ? this.init(arguments)
+                        : new Hash.fn.init(arguments);
   }
 });
 
 // Definition of the creator method for iterators and iteration speeds.
-update(Pot.tmp, {
+update(PotTmp, {
   /**
    * @ignore
    */
@@ -72,10 +73,10 @@ update(Pot.tmp, {
     create = function(speed) {
       var key = speed;
       if (!key) {
-        each(Pot.Internal.LightIterator.speeds, function(v, k) {
-          if (v === Pot.Internal.LightIterator.defaults.speed) {
+        each(PotInternalLightIterator.speeds, function(v, k) {
+          if (v === PotInternalLightIterator.defaults.speed) {
             key = k;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         });
       }
@@ -83,28 +84,32 @@ update(Pot.tmp, {
     },
     methods = {},
     construct = create();
-    each(Pot.Internal.LightIterator.speeds, function(v, k) {
+    each(PotInternalLightIterator.speeds, function(v, k) {
       methods[k] = create(k);
     });
     return update(construct, methods);
   }
 });
 
+// Refer the Pot properties/functions.
+Hash = Pot.Hash;
+createHashIterator = PotTmp.createHashIterator;
+
 // Define the prototype of Pot.Hash
-Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
+Hash.fn = Hash.prototype = update(Hash.prototype, {
   /**
    * @lends Pot.Hash.prototype
    */
   /**
    * @ignore
    */
-  constructor : Pot.Hash,
+  constructor : Hash,
   /**
    * @const
    * @private
    * @ignore
    */
-  id : Pot.Internal.getMagicNumber(),
+  id : PotInternal.getMagicNumber(),
   /**
    * @const
    * @private
@@ -117,7 +122,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @const
    * @public
    */
-  StopIteration : Pot.StopIteration,
+  StopIteration : PotStopIteration,
   /**
    * @private
    * @ignore
@@ -147,7 +152,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @static
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * isHash.
    *
@@ -156,7 +161,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @static
    * @public
    */
-  isHash : Pot.isHash,
+  isHash : isHash,
   /**
    * Initialization.
    *
@@ -172,14 +177,14 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
     this.length   = 0;
     args = arrayize(argument);
     len = args.length;
-    if (len === 2 && !Pot.isObject(args[0])) {
+    if (len === 2 && !isObject(args[0])) {
       this.set(args[0], args[1]);
     } else if (len) {
       each(args, function(arg) {
         that.set(arg);
       });
     }
-    Pot.Internal.referSpeeds.call(this, Pot.Internal.LightIterator.speeds);
+    PotInternal.referSpeeds.call(this, PotInternalLightIterator.speeds);
     return this;
   },
   /**
@@ -204,11 +209,11 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    */
   set : function(key, value) {
     var that = this;
-    if (Pot.isHash(key)) {
+    if (isHash(key)) {
       key.forEach(function(v, k) {
         that.set(k, v);
       });
-    } else if (key && Pot.isObject(key)) {
+    } else if (key && isObject(key)) {
       each(key, function(v, k) {
         that.set(k, v);
       });
@@ -244,7 +249,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
     each(this._rawData, function(v, k) {
       if (k && k.charAt(0) === PREFIX && v === value) {
         result = true;
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
     });
     return result;
@@ -434,7 +439,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "forEach" loop with faster speed.
    * @property {Function} ninja  Iterates "forEach" loop with fastest speed.
    */
-  forEach : Pot.tmp.createHashIterator(function(speedKey) {
+  forEach : createHashIterator(function(speedKey) {
     return function(callback, context) {
       var me = arguments.callee, that = me.instance || this;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
@@ -483,10 +488,10 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "map" loop with faster speed.
    * @property {Function} ninja  Iterates "map" loop with fastest speed.
    */
-  map : Pot.tmp.createHashIterator(function(speedKey) {
+  map : createHashIterator(function(speedKey) {
     return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this, hash;
-      hash = new Pot.Hash();
+      var me = arguments.callee, that = me.instance || this,
+          hash = new Hash();
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key, result;
         if (k && k.charAt(0) === PREFIX) {
@@ -532,10 +537,10 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "filter" loop with faster speed.
    * @property {Function} ninja  Iterates "filter" loop with fastest speed.
    */
-  filter : Pot.tmp.createHashIterator(function(speedKey) {
+  filter : createHashIterator(function(speedKey) {
     return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this, hash;
-      hash = new Pot.Hash();
+      var me = arguments.callee, that = me.instance || this,
+          hash = new Hash();
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key;
         if (k && k.charAt(0) === PREFIX) {
@@ -584,7 +589,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "reduce" loop with faster speed.
    * @property {Function} ninja  Iterates "reduce" loop with fastest speed.
    */
-  reduce : Pot.tmp.createHashIterator(function(speedKey) {
+  reduce : createHashIterator(function(speedKey) {
     return function(callback, initial, context) {
       var me = arguments.callee, that = me.instance || this,
           value, skip, p, raw = that._rawData;
@@ -654,7 +659,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "every" loop with faster speed.
    * @property {Function} ninja  Iterates "every" loop with fastest speed.
    */
-  every : Pot.tmp.createHashIterator(function(speedKey) {
+  every : createHashIterator(function(speedKey) {
     return function(callback, context) {
       var me = arguments.callee, that = me.instance || this, result = true;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
@@ -663,7 +668,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
           key = k.substring(1);
           if (!callback.call(context, val, key, object)) {
             result = false;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }
       });
@@ -710,7 +715,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
    * @property {Function} rapid  Iterates "some" loop with faster speed.
    * @property {Function} ninja  Iterates "some" loop with fastest speed.
    */
-  some : Pot.tmp.createHashIterator(function(speedKey) {
+  some : createHashIterator(function(speedKey) {
     return function(callback, context) {
       var me = arguments.callee, that = me.instance || this, result = false;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
@@ -719,7 +724,7 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
           key = k.substring(1);
           if (callback.call(context, val, key, object)) {
             result = true;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }
       });
@@ -728,6 +733,6 @@ Pot.Hash.fn = Pot.Hash.prototype = update(Pot.Hash.prototype, {
   })
 });
 
-delete Pot.tmp.createHashIterator;
-Pot.Hash.prototype.init.prototype = Pot.Hash.prototype;
-}('.'));
+delete PotTmp.createHashIterator;
+Hash.fn.init.prototype = Hash.fn;
+}());

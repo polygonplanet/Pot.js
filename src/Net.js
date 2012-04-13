@@ -74,9 +74,9 @@ update(Pot.Net, {
    * @static
    */
   request : function(url, options) {
-    if (Pot.System.isGreasemonkey) {
+    if (PotSystem.isGreasemonkey) {
       return Pot.Net.requestByGreasemonkey(url, options);
-    } else if (Pot.System.isNodeJS) {
+    } else if (PotSystem.isNodeJS) {
       return Pot.Net.requestByNodeJS(url, options);
     } else {
       return Pot.Net.XHR.request(url, options);
@@ -126,7 +126,7 @@ update(Pot.Net, {
       try {
         x = new XMLHttpRequest();
       } catch (e) {}
-      if (!x && Pot.System.hasActiveXObject) {
+      if (!x && PotSystem.hasActiveXObject) {
         each([
           'MSXML2.XMLHTTP.6.0',
           'MSXML2.XMLHTTP.3.0',
@@ -138,7 +138,7 @@ update(Pot.Net, {
             x = new ActiveXObject(prog);
           } catch (e) {}
           if (x) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         });
       }
@@ -227,7 +227,7 @@ update(Pot.Net, {
         doit : function(url, options) {
           var that = this;
           this.url = stringify(url, true);
-          this.deferred = new Pot.Deferred({
+          this.deferred = new Deferred({
             /**@ignore*/
             canceller : function() {
               try {
@@ -290,7 +290,7 @@ update(Pot.Net, {
               'X-Requested-With' : 'XMLHttpRequest'
             }
           };
-          if (Pot.isObject(options)) {
+          if (isObject(options)) {
             opts = update({}, options);
           } else {
             opts = {};
@@ -404,11 +404,11 @@ update(Pot.Net, {
           if (this.options.sync) {
             /**@ignore*/
             flush = function(f) {
-              var d = new Pot.Deferred({async : false});
+              var d = new Deferred({async : false});
               return d.then(f).begin();
             };
           } else {
-            flush = Pot.Deferred.flush;
+            flush = Deferred.flush;
           }
           /**@ignore*/
           this.xhr.onreadystatechange = function() {
@@ -427,7 +427,7 @@ update(Pot.Net, {
               if ((status >= 200 && status < 300) ||
                   status === 304 || status === 1223) {
                 that.assignResponseText();
-                if (Pot.isFunction(that.options.callback)) {
+                if (isFunction(that.options.callback)) {
                   flush(function() {
                     that.options.callback.call(
                       that.xhr, text, that.xhr
@@ -493,7 +493,7 @@ update(Pot.Net, {
             this.xhr.onreadystatechange = null;
           } catch (e) {
             try {
-              this.xhr.onreadystatechange = Pot.noop;
+              this.xhr.onreadystatechange = PotNoop;
             } catch (e) {}
           }
           if (isAbort) {
@@ -530,15 +530,14 @@ update(Pot.Net, {
    * @ignore
    */
   requestByGreasemonkey : function(url, options) {
-    var d, opts, maps, type, lazy;
-    d = new Pot.Deferred();
-    opts = update({cache : true}, options || {});
-    maps = {
-      sendContent : 'data',
-      mimeType    : 'overrideMimeType',
-      username    : 'user',
-      sync        : 'synchronous'
-    };
+    var d = new Deferred(), type, lazy,
+        opts = update({cache : true}, options || {}),
+        maps = {
+          sendContent : 'data',
+          mimeType    : 'overrideMimeType',
+          username    : 'user',
+          sync        : 'synchronous'
+        };
     each(maps, function(gm, org) {
       if (org in opts) {
         opts[gm] = opts[org];
@@ -561,7 +560,7 @@ update(Pot.Net, {
       each(opts.headers, function(v, k) {
         if (!type && /^Content-?Type/i.test(k)) {
           type = v;
-          throw Pot.StopIteration;
+          throw PotStopIteration;
         }
       });
     }
@@ -581,7 +580,7 @@ update(Pot.Net, {
       };
     } else {
       /**@ignore*/
-      lazy = Pot.Deferred.callLazy;
+      lazy = Deferred.callLazy;
     }
     if (opts.onload) {
       d.then(opts.onload);
@@ -746,7 +745,7 @@ update(Pot.Net, {
        */
       doit : function(options) {
         var that = this;
-        this.deferred = new Pot.Deferred({
+        this.deferred = new Deferred({
           /**@ignore*/
           canceller : function() {
             try {
@@ -953,29 +952,29 @@ update(Pot.Net, {
       var d, opts, context, id, callback, key,
           doc, uri, head, script, done, defaults;
       defaults = 'callback';
-      d = new Pot.Deferred();
+      d = new Deferred();
       opts    = update({
         cache : false,
         sync  : false
       }, options || {});
-      context = globals || Pot.Global;
-      doc     = Pot.System.currentDocument;
+      context = globals || PotGlobal;
+      doc     = PotSystem.currentDocument;
       head    = getHead();
       if (!context || !doc || !head || !url) {
         return d.raise(context || url || head || doc);
       }
       try {
         if (opts.callback) {
-          if (Pot.isString(opts.callback)) {
+          if (isString(opts.callback)) {
             id = opts.callback;
-          } else if (Pot.isFunction(opts.callback)) {
+          } else if (isFunction(opts.callback)) {
             callback = opts.callback;
-          } else if (Pot.isObject(opts.callback)) {
+          } else if (isObject(opts.callback)) {
             for (key in opts.callback) {
               defaults = key;
-              if (Pot.isString(opts.callback[key])) {
+              if (isString(opts.callback[key])) {
                 id = opts.callback[key];
-              } else if (Pot.isFunction(opts.callback[key])) {
+              } else if (isFunction(opts.callback[key])) {
                 callback = opts.callback[key];
               }
               break;
@@ -985,12 +984,12 @@ update(Pot.Net, {
           each(opts, function(v, k) {
             if (PATTERNS.KEY.test(k)) {
               defaults = k;
-              if (Pot.isString(v)) {
+              if (isString(v)) {
                 id = v;
-              } else if (Pot.isFunction(v)) {
+              } else if (isFunction(v)) {
                 callback = v;
               }
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
           });
         }
@@ -1006,7 +1005,7 @@ update(Pot.Net, {
         if (!opts.cache) {
           uri = addNoCache(uri);
         }
-        if (Pot.System.isGreasemonkey) {
+        if (PotSystem.isGreasemonkey) {
           return Pot.Net.requestByGreasemonkey(uri, {
             method : 'GET',
             sync   : opts.sync
@@ -1044,7 +1043,7 @@ update(Pot.Net, {
             }
             script = void 0;
           } catch (e) {}
-          if (Pot.isFunction(callback)) {
+          if (isFunction(callback)) {
             callback.apply(callback, args);
           }
           d.begin.apply(d, args);
@@ -1138,7 +1137,7 @@ update(Pot.Net, {
    */
   loadScript : (function() {
     var PATTERNS;
-    if (Pot.System.isNonBrowser || !Pot.System.isNotExtension) {
+    if (PotSystem.isNonBrowser || !PotSystem.isNotExtension) {
       return function(url, options) {
         return Pot.Net.request(url, update({
           method   : 'GET',
@@ -1161,18 +1160,18 @@ update(Pot.Net, {
     };
     return function(url, options) {
       var d, script, opts, doc, head, uri, callback, done;
-      d = new Pot.Deferred();
+      d = new Deferred();
       try {
-        if (Pot.isFunction(options)) {
+        if (isFunction(options)) {
           opts = {callback : opts};
           callback = opts.callback;
         } else {
           opts = update({}, options || {});
           each(opts, function(v, k) {
-            if (Pot.isFunction(v)) {
+            if (isFunction(v)) {
               callback = v;
               if (PATTERNS.CALLBACK.test(k)) {
-                throw Pot.StopIteration;
+                throw PotStopIteration;
               }
             }
           });
@@ -1186,7 +1185,7 @@ update(Pot.Net, {
         if (!opts.cache) {
           uri = addNoCache(uri);
         }
-        doc = Pot.System.currentDocument;
+        doc = PotSystem.currentDocument;
         head = getHead();
         if (!doc || !head || !uri) {
           return d.raise(uri || head || doc);
@@ -1289,15 +1288,15 @@ function addNoCache(uri) {
  * @ignore
  */
 function getHead() {
-  var heads, doc = Pot.System.currentDocument;
+  var heads, doc = PotSystem.currentDocument;
   try {
-    if (doc.head && Pot.isElement(doc.head)) {
+    if (doc.head && isElement(doc.head)) {
       return doc.head;
     }
   } catch (e) {}
   try {
     heads = doc.getElementsByTagName('head');
-    if (heads && Pot.isElement(heads[0])) {
+    if (heads && isElement(heads[0])) {
       return heads[0];
     }
   } catch (e) {}

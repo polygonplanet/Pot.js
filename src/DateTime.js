@@ -221,16 +221,16 @@ update(Pot.DateTime, {
        * @ignore
        */
       format : function(pattern, date) {
-        var result = '', that = this, t, fm, d, o, tr, isString = Pot.isString;
+        var result = '', that = this, t, fm, d, o, tr;
         if (!isString(pattern)) {
           t = pattern;
           pattern = date;
           date = t;
         }
         fm = stringify(pattern);
-        if (Pot.isDate(date)) {
+        if (isDate(date)) {
           d = date;
-        } else if (Pot.isNumeric(date) || (date && isString(date))) {
+        } else if (isNumeric(date) || (date && isString(date))) {
           d = new Date(date);
         } else {
           d = new Date();
@@ -676,9 +676,9 @@ update(Pot.DateTime, {
     relativeDate = function(date, language) {
       var result = '', d, seconds, tail, index, i = 0, f,
           lang = isJa.test(language) ? 'ja' : 'en';
-      if (Pot.isDate(date)) {
+      if (isDate(date)) {
         d = date;
-      } else if (Pot.isNumeric(date) || (date && Pot.isString(date))) {
+      } else if (isNumeric(date) || (date && isString(date))) {
         d = new Date(date);
       } else {
         d = new Date();
@@ -694,7 +694,7 @@ update(Pot.DateTime, {
       }
       while ((f = formats[i++])) {
         if (seconds < f[0]) {
-          if (Pot.isObject(f[2])) {
+          if (isObject(f[2])) {
             result = f[index][lang];
           } else if (i > 1) {
             result = [

@@ -131,7 +131,7 @@ Pot.update({
         var that = this, r = this.results, m = this.maps;
         this.string = Pot.UTF8.encode(this.string);
         this.len = this.string.length;
-        return Pot.Deferred.forEver[speed](function() {
+        return Deferred.forEver[speed](function() {
           if (that.index < that.len || that.pos > -6) {
             if (that.pos < 0) {
               that.peek();
@@ -142,7 +142,7 @@ Pot.update({
             that.pos -= 6;
             that.vol -= 6;
           } else {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }).then(function() {
           return r.join('');
@@ -251,7 +251,7 @@ Pot.update({
        */
       deferred : function(speed) {
         var that = this, m = this.maps;
-        return Pot.Deferred.repeat[speed](this.len, function(i) {
+        return Deferred.repeat[speed](this.len, function(i) {
           var c = m.indexOf(that.string.charAt(i));
           if (~c) {
             that.decode(c);
@@ -387,7 +387,7 @@ Pot.update({
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new Encoder(string, BASE64MAPS)).deferred(speed);
           };
@@ -499,7 +499,7 @@ Pot.update({
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new Decoder(string, BASE64MAPS)).deferred(speed);
           };
@@ -605,7 +605,7 @@ Pot.update({
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new Encoder(string, BASE64URLMAPS)).deferred(speed);
           };
@@ -710,7 +710,7 @@ Pot.update({
          * @property {Function} rapid  Run with faster speed.
          * @property {Function} ninja  Run fastest speed.
          */
-        deferred : Pot.Internal.defineDeferrater(function(speed) {
+        deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
             return (new Decoder(string, BASE64URLMAPS)).deferred(speed);
           };

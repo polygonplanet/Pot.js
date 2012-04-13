@@ -496,7 +496,7 @@ update(Pot.URI, {
           encode = Pot.URI.urlEncode,
           serialize = Pot.Serializer.serializeToQueryString,
           protocol, userinfo, host, pathname, search, hash;
-      if (Pot.isObject(url)) {
+      if (isObject(url)) {
         protocol = stringify(url.protocol);
         if (!protocol) {
           protocol = stringify(url.scheme);
@@ -523,7 +523,7 @@ update(Pot.URI, {
           if (url.hostname != null) {
             host = stringify(url.hostname);
           }
-          if (Pot.isNumeric(url.port)) {
+          if (isNumeric(url.port)) {
             host += ':' + (+url.port);
           }
         }
@@ -537,20 +537,20 @@ update(Pot.URI, {
         if (c !== '/' && c !== '\\') {
           pathname = '/' + pathname;
         }
-        if (Pot.isObject(url.search) || Pot.isArrayLike(url.search)) {
+        if (isObject(url.search) || isArrayLike(url.search)) {
           search = stringify(serialize(url.search));
         } else {
           search = stringify(url.search);
         }
         if (!search) {
           if (url.query != null) {
-            if (Pot.isObject(url.query) || Pot.isArrayLike(url.query)) {
+            if (isObject(url.query) || isArrayLike(url.query)) {
               search = stringify(serialize(url.query));
             } else {
               search = stringify(url.query);
             }
           } else if (queryString != null) {
-            if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+            if (isObject(queryString) || isArrayLike(queryString)) {
               search = stringify(serialize(queryString));
             } else {
               search = stringify(queryString);
@@ -586,7 +586,7 @@ update(Pot.URI, {
         uri = stringify(url);
         query = '';
         if (queryString != null) {
-          if (Pot.isObject(queryString) || Pot.isArrayLike(queryString)) {
+          if (isObject(queryString) || isArrayLike(queryString)) {
             query = stringify(serialize(queryString));
           } else {
             query = stringify(queryString);
@@ -699,7 +699,7 @@ update(Pot.URI, {
     } else {
       sep = '/';
       pos = path.indexOf(sep);
-      if (Pot.OS.win && !~pos && !~cur.indexOf(sep)) {
+      if (PotOS.win && !~pos && !~cur.indexOf(sep)) {
         sep = '\\';
       }
       if (cur) {
@@ -935,7 +935,6 @@ update(Pot.URI, {
                              [, charset
                              [, encoded   ]]]]*/) {
     var uri = '', args = arguments, o = {}, p, lp, s,
-        isObject = Pot.isObject,
         URI      = Pot.URI,
         MimeType = Pot.MimeType,
         Base64   = Pot.Base64,

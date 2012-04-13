@@ -51,7 +51,7 @@ update(Pot.MimeType, {
         mime = String(v).toLowerCase();
         if (mime === type) {
           result = ext;
-          throw Pot.StopIteration;
+          throw PotStopIteration;
         }
       });
       if (!result) {
@@ -60,7 +60,7 @@ update(Pot.MimeType, {
           mime = String(v).toLowerCase().split('/').pop();
           if (~type.indexOf(mime)) {
             result = ext;
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         });
         if (!result) {

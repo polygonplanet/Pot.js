@@ -34,9 +34,9 @@ update(Pot.XPCOM, {
    */
   evalInSandbox : function(code, url) {
     var result, re, src;
-    if (Pot.System.hasComponents) {
+    if (PotSystem.hasComponents) {
       if (!Cu) {
-        Pot.System.isWaitable = Pot.System.hasComponents = false;
+        PotSystem.isWaitable = PotSystem.hasComponents = false;
         return;
       }
       re = /^[\s;]*|[\s;]*$/g;
@@ -58,14 +58,14 @@ update(Pot.XPCOM, {
    */
   throughout : function(cond) {
     var thread;
-    if (Pot.System.hasComponents) {
+    if (PotSystem.hasComponents) {
       try {
         thread = Cc['@mozilla.org/thread-manager;1']
                 .getService(Ci.nsIThreadManager).mainThread;
       } catch (e) {
-        Pot.System.isWaitable = Pot.System.hasComponents = false;
+        PotSystem.isWaitable = PotSystem.hasComponents = false;
       }
-      if (thread && Pot.System.hasComponents) {
+      if (thread && PotSystem.hasComponents) {
         do {
           thread.processNextEvent(true);
         } while (cond && !cond());
@@ -83,13 +83,13 @@ update(Pot.XPCOM, {
    */
   getMostRecentWindow : function() {
     var cwin;
-    if (Pot.System.hasComponents) {
+    if (PotSystem.hasComponents) {
       try {
         cwin = Cc['@mozilla.org/appshell/window-mediator;1']
               .getService(Ci.nsIWindowMediator)
               .getMostRecentWindow('navigator:browser');
       } catch (e) {
-        Pot.System.isWaitable = Pot.System.hasComponents = false;
+        PotSystem.isWaitable = PotSystem.hasComponents = false;
       }
     }
     return cwin;
@@ -107,7 +107,7 @@ update(Pot.XPCOM, {
    */
   getChromeWindow : function(uri) {
     var result, win, wins, pref;
-    if (!Pot.System.hasComponents) {
+    if (!PotSystem.hasComponents) {
       return;
     }
     pref = uri || 'chrome://browser/content/browser.xul';
@@ -116,7 +116,7 @@ update(Pot.XPCOM, {
             .getService(Ci.nsIWindowMediator)
             .getXULWindowEnumerator(null);
     } catch (e) {
-      Pot.System.isWaitable = Pot.System.hasComponents = false;
+      PotSystem.isWaitable = PotSystem.hasComponents = false;
       return;
     }
     while (wins.hasMoreElements()) {

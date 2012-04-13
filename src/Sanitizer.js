@@ -343,7 +343,7 @@ update(Pot.Sanitizer, {
     s = stringify(fileName);
     if (s) {
       re = [{from: /[\u0000-\u0008]+/g, to: ''}];
-      if (Pot.OS.win) {
+      if (PotOS.win) {
         re.push(
           {from: /[\/|\\]+/g, to: '_'},
           {from: /["]+/g,     to: "'"},
@@ -351,7 +351,7 @@ update(Pot.Sanitizer, {
           {from: /[<]+/g,     to: '('},
           {from: /[>]+/g,     to: ')'}
         );
-      } else if (Pot.OS.mac) {
+      } else if (PotOS.mac) {
         re.push({from: /[\/:]+/g, to: '_'});
       }
       re.push(

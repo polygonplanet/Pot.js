@@ -21,8 +21,7 @@ Pot.update({
 });
 
 // Update DOM methods.
-(function(DOM, isWindow, isDocument, isString,
-                isObject, isArray, isArrayLike) {
+(function(DOM) {
 
 update(DOM, {
   /**
@@ -47,7 +46,7 @@ update(DOM, {
    * @static
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * Enumeration for DOM node types (for reference)
    *
@@ -729,7 +728,7 @@ update(DOM, {
       for (i = 0; i < len; i++) {
         elem = elems[i];
         has = false;
-        if (Pot.isElement(elem)) {
+        if (isElement(elem)) {
           if (op != null) {
             aval = DOM.getAttr(elem, name);
             switch (op) {
@@ -759,7 +758,6 @@ update(DOM, {
                   break;
               default:
                   has = false;
-                  break;
             }
           } else {
             has = DOM.hasAttr(elem, name);
@@ -1041,10 +1039,10 @@ update(DOM, {
               );
             } else if (!multi && doc.querySelector) {
               o.elements = doc.querySelector(query) || null;
-              throw Pot.StopIteration;
+              throw PotStopIteration;
             }
           } catch (ex) {
-            if (ex == Pot.StopIteration) {
+            if (ex == PotStopIteration) {
               break;
             }
             do {
@@ -1176,7 +1174,7 @@ update(DOM, {
    * @static
    * @public
    */
-  isElement : Pot.isElement,
+  isElement : isElement,
   /**
    * Check whether the argument object like Node.
    *
@@ -1187,7 +1185,7 @@ update(DOM, {
    * @static
    * @public
    */
-  isNodeLike : Pot.isNodeLike,
+  isNodeLike : isNodeLike,
   /**
    * Check whether the argument object is NodeList.
    *
@@ -1198,7 +1196,7 @@ update(DOM, {
    * @static
    * @public
    */
-  isNodeList : Pot.isNodeList,
+  isNodeList : isNodeList,
   /**
    * Check whether the argument object is XHTML Document.
    *
@@ -1274,7 +1272,7 @@ update(DOM, {
   attr : function(elem, name, value) {
     var result, args = arguments;
     each(arrayize(elem), function(el) {
-      if (Pot.isElement(el) && name != null) {
+      if (isElement(el) && name != null) {
         switch (args.length) {
           case 0:
           case 1:
@@ -1289,7 +1287,6 @@ update(DOM, {
           case 3:
           default:
               result = DOM.setAttr(el, name, value);
-              break;
         }
       }
     });
@@ -1320,7 +1317,6 @@ update(DOM, {
         case 'select':
         default:
             result = elem.value;
-            break;
       }
       if (isString(result)) {
         result = result.replace(/\r/g, '');
@@ -1339,7 +1335,7 @@ update(DOM, {
    * @public
    */
   setValue : function(elem, value) {
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       elem.value = stringify(value, false);
     }
     return elem;
@@ -1356,7 +1352,7 @@ update(DOM, {
    */
   getHTMLString : function(elem) {
     var result;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       try {
         result = elem.innerHTML;
       } catch (e) {}
@@ -1375,7 +1371,7 @@ update(DOM, {
    */
   setHTMLString : function(elem, value) {
     var html;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       html = stringify(value);
       try {
         elem.innerHTML = html;
@@ -1403,7 +1399,7 @@ update(DOM, {
    */
   getOuterHTML : function(elem) {
     var result, doc, div;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       if ('outerHTML' in elem) {
         result = elem.outerHTML;
       } else {
@@ -1427,7 +1423,7 @@ update(DOM, {
    */
   setOuterHTML : function(elem, value) {
     var doc, range, done;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       value = stringify(value);
       if ('outerHTML' in elem) {
         try {
@@ -1463,10 +1459,10 @@ update(DOM, {
    */
   getTextContent : update(function(elem) {
     var result, me = arguments.callee, buffer;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       try {
-        if (Pot.Browser.msie &&
-            Pot.Complex.compareVersions(Pot.Browser.msie.version, '9', '<') &&
+        if (PotBrowser.msie &&
+            Pot.Complex.compareVersions(PotBrowser.msie.version, '9', '<') &&
             ('innerText' in elem)
         ) {
           result = Pot.Text.canonicalizeNL(elem.innerText);
@@ -1565,7 +1561,7 @@ update(DOM, {
    */
   setTextContent : function(elem, value) {
     var text, doc;
-    if (Pot.isElement(elem)) {
+    if (isElement(elem)) {
       try {
         text = stringify(value);
         if ('textContent' in elem) {
@@ -1693,14 +1689,12 @@ update(DOM, {
     if (!node) {
       return node;
     }
-    type = Pot.typeOf(node);
+    type = typeOf(node);
     switch (type) {
       case 'number':
       case 'boolean':
       case 'string':
           return Pot.currentDocument().createTextNode(node.toString());
-      default:
-          break;
     }
     return node;
   },
@@ -2035,7 +2029,7 @@ update(DOM, {
    */
   addClass : function(elem, name) {
     var names, value, sp;
-    if (Pot.isElement(elem) && name && isString(name)) {
+    if (isElement(elem) && name && isString(name)) {
       names = Pot.Text.splitBySpace(name);
       if (!elem.className && names.length === 1) {
         elem.className = names.join(sp);
@@ -2064,7 +2058,7 @@ update(DOM, {
    */
   removeClass : function(elem, name) {
     var names, value, sp;
-    if (Pot.isElement(elem) && elem.className) {
+    if (isElement(elem) && elem.className) {
       if (name === void 0) {
         elem.className = '';
       } else if (name && isString(name)) {
@@ -2095,7 +2089,7 @@ update(DOM, {
    */
   hasClass : function(elem, name) {
     var result = false, sp = ' ', subject;
-    if (Pot.isElement(elem) && elem.className && name) {
+    if (isElement(elem) && elem.className && name) {
       subject = Pot.Text.wrap(name, sp);
       if (~(Pot.Text.wrap(
             Pot.Text.normalizeSpace(elem.className),
@@ -2119,7 +2113,7 @@ update(DOM, {
    * @public
    */
   toggleClass : function(elem, name) {
-    if (Pot.isElement(elem) && elem.className && name) {
+    if (isElement(elem) && elem.className && name) {
       if (DOM.hasClass(elem, name)) {
         DOM.removeClass(elem, name);
       } else {
@@ -2154,7 +2148,7 @@ update(DOM, {
     } else if (context.implementation &&
               context.implementation.createDocument) {
       doc = context.implementation.createDocument(uri, tag, null);
-    } else if (Pot.System.hasActiveXObject) {
+    } else if (PotSystem.hasActiveXObject) {
       doc = DOM.createMSXMLDocument();
       if (doc && tag) {
         doc.appendChild(doc.createNode(
@@ -2206,7 +2200,7 @@ update(DOM, {
     var doc;
     if (typeof DOMParser !== 'undefined') {
       doc = new DOMParser().parseFromString(string, 'application/xml');
-    } else if (Pot.System.hasActiveXObject) {
+    } else if (PotSystem.hasActiveXObject) {
       doc = DOM.createMSXMLDocument();
       doc.loadXML(string);
     }
@@ -2232,7 +2226,7 @@ update(DOM, {
     context || (context = Pot.currentDocument());
     expr = stringify(exp);
     doc = DOM.getOwnerDocument(context);
-    if (Pot.System.hasActiveXObject) {
+    if (PotSystem.hasActiveXObject) {
       // Use JavaScript-XPath library in IE.
       // http://coderepos.org/share/wiki/JavaScript-XPath
       if (!doc.evaluate && Pot.currentDocument().evaluate) {
@@ -2457,7 +2451,7 @@ update(DOM, {
         '<output method="html" />' +
       '</stylesheet>'
     );
-    if (Pot.System.hasActiveXObject) {
+    if (PotSystem.hasActiveXObject) {
       doc = new ActiveXObject('htmlfile');
       doc.open();
       doc.write(html);
@@ -2536,9 +2530,6 @@ update(DOM, {
                 if (/\S/.test(child.nodeValue)) {
                   break HEADING;
                 }
-                break;
-            default:
-                break;
           }
           head.appendChild(child);
         }
@@ -2686,7 +2677,7 @@ update(DOM, {
    */
   createMSXMLDocument : function(count) {
     var result;
-    if (Pot.System.hasActiveXObject) {
+    if (PotSystem.hasActiveXObject) {
       each([
         'Msxml2.DOMDocument.3.0',
         'Msxml2.DOMDocument.6.0',
@@ -2702,7 +2693,7 @@ update(DOM, {
         } catch (e) {}
         if (result) {
           if (count == null || count-- <= 0) {
-            throw Pot.StopIteration;
+            throw PotStopIteration;
           }
         }
       });
@@ -2724,9 +2715,7 @@ update(DOM, {
     return result;
   }
 });
-}(Pot.DOM,
-  Pot.isWindow, Pot.isDocument, Pot.isString,
-  Pot.isObject, Pot.isArray, Pot.isArrayLike));
+}(Pot.DOM));
 
 // Update Pot object.
 Pot.update({

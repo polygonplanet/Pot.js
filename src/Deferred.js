@@ -56,13 +56,16 @@ Pot.update({
    * @public
    */
   Deferred : function() {
-    return Pot.isDeferred(this) ? this.init(arguments) :
-            new Pot.Deferred.fn.init(arguments);
+    return isDeferred(this) ? this.init(arguments)
+                            : new Deferred.fn.init(arguments);
   }
 });
 
+// Refer the Pot properties/functions.
+Deferred = Pot.Deferred;
+
 // Definition of the prototype and static properties.
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * @lends Pot.Deferred
    */
@@ -74,7 +77,7 @@ update(Pot.Deferred, {
    * @const
    * @public
    */
-  StopIteration : Pot.StopIteration,
+  StopIteration : PotStopIteration,
   /**
    * Speeds.
    *
@@ -110,11 +113,11 @@ update(Pot.Deferred, {
   }
 });
 
-each(Pot.Deferred.states, function(n, name) {
-  Pot.Deferred.states[n] = name;
+each(Deferred.states, function(n, name) {
+  Deferred.states[n] = name;
 });
 
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * @lends Pot.Deferred
    */
@@ -128,7 +131,7 @@ update(Pot.Deferred, {
    * @ignore
    */
   defaults : {
-    speed     : Pot.Deferred.speeds.ninja,
+    speed     : Deferred.speeds.ninja,
     canceller : null,
     stopper   : null,
     async     : true
@@ -136,19 +139,19 @@ update(Pot.Deferred, {
 });
 
 // Definition of the prototype.
-Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
+Deferred.fn = Deferred.prototype = update(Deferred.prototype, {
   /**
    * @lends Pot.Deferred.prototype
    */
   /**
    * @ignore
    */
-  constructor : Pot.Deferred,
+  constructor : Deferred,
   /**
    * @private
    * @ignore
    */
-  id : Pot.Internal.getMagicNumber(),
+  id : PotInternal.getMagicNumber(),
   /**
    * A unique strings.
    *
@@ -236,7 +239,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @static
    * @public
    */
-  toString : Pot.toString,
+  toString : PotToString,
   /**
    * isDeferred.
    *
@@ -245,7 +248,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @static
    * @public
    */
-  isDeferred : Pot.isDeferred,
+  isDeferred : isDeferred,
   /**
    * Initialize properties
    *
@@ -258,13 +261,13 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
     }
     this.options = {};
     this.plugins = {};
-    initOptions.call(this, arrayize(args), Pot.Deferred.defaults);
+    initOptions.call(this, arrayize(args), Deferred.defaults);
     update(this, {
       results     : {
         success   : null,
         failure   : null
       },
-      state       : Pot.Deferred.states.unfired,
+      state       : Deferred.states.unfired,
       chains      : [],
       nested      : 0,
       chained     : false,
@@ -275,7 +278,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
       destAssign  : false,
       chainDebris : null
     });
-    Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
+    PotInternal.referSpeeds.call(this, Deferred.speeds);
     return this;
   },
   /**
@@ -328,14 +331,14 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    */
   speed : function(sp) {
     var that = this, args = arguments, value;
-    if (Pot.isNumeric(sp)) {
+    if (isNumeric(sp)) {
       value = sp - 0;
-    } else if (Pot.isNumeric(Pot.Deferred.speeds[sp])) {
-      value = Pot.Deferred.speeds[sp] - 0;
+    } else if (isNumeric(Deferred.speeds[sp])) {
+      value = Deferred.speeds[sp] - 0;
     } else {
       value = this.options.speed;
     }
-    if (this.state === Pot.Deferred.states.unfired && !this.chains.length) {
+    if (this.state === Deferred.states.unfired && !this.chains.length) {
       if (args.length === 0) {
         return this.options.speed;
       }
@@ -392,7 +395,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    */
   async : function(sync) {
     var that = this, args = arguments;
-    if (this.state === Pot.Deferred.states.unfired && !this.chains.length) {
+    if (this.state === Deferred.states.unfired && !this.chains.length) {
       if (args.length === 0) {
         return this.options.async;
       }
@@ -437,11 +440,11 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    */
   canceller : function(func) {
     var args = arguments;
-    if (this.state === Pot.Deferred.states.unfired && !this.chains.length) {
+    if (this.state === Deferred.states.unfired && !this.chains.length) {
       if (args.length === 0) {
         return this.options.cancellers;
       }
-      if (!this.cancelled && Pot.isFunction(func)) {
+      if (!this.cancelled && isFunction(func)) {
         this.options.cancellers.push(func);
       }
     } else {
@@ -464,14 +467,14 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    */
   stopper : function(func) {
     var that = this, args = arguments;
-    if (this.state === Pot.Deferred.states.unfired && !this.chains.length) {
+    if (this.state === Deferred.states.unfired && !this.chains.length) {
       this.canceller.apply(this, args);
     } else {
       this.then(function(reply) {
         if (args.length === 0) {
           return that.options.stoppers;
         }
-        if (!that.cancelled && Pot.isFunction(func)) {
+        if (!that.cancelled && isFunction(func)) {
           that.options.stoppers.push(func);
         }
         return reply;
@@ -508,13 +511,13 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
         success : callback,
         failure : errback
       });
-      if (this.state & Pot.Deferred.states.fired) {
+      if (this.state & Deferred.states.fired) {
         if (!this.freezing && !this.tilling && !this.waiting) {
           fire.call(this);
         }
       }
     }
-    Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
+    PotInternal.referSpeeds.call(this, Deferred.speeds);
     return this;
   },
   /**
@@ -636,23 +639,20 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
     if (!this.cancelled) {
       this.cancelled = true;
       switch (this.state) {
-        case Pot.Deferred.states.unfired:
+        case Deferred.states.unfired:
             cancelize.call(this, 'cancellers');
-            if (this.state === Pot.Deferred.states.unfired) {
+            if (this.state === Deferred.states.unfired) {
               this.raise(new Error(this));
             }
             break;
-        case Pot.Deferred.states.success:
+        case Deferred.states.success:
             cancelize.call(this, 'stoppers');
-            if (Pot.isDeferred(this.results.success)) {
+            if (isDeferred(this.results.success)) {
               this.results.success.cancel();
             }
             break;
-        case Pot.Deferred.states.failure:
+        case Deferred.states.failure:
             cancelize.call(this, 'stoppers');
-            break;
-        default:
-            break;
       }
     }
     return this;
@@ -683,8 +683,8 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
     } else {
       value = args[0];
     }
-    if (!this.cancelled && this.state === Pot.Deferred.states.unfired) {
-      if (Pot.isDeferred(arg) && !arg.cancelled) {
+    if (!this.cancelled && this.state === Deferred.states.unfired) {
+      if (isDeferred(arg) && !arg.cancelled) {
         arg.ensure(function() {
           that.begin.apply(this, arguments);
         });
@@ -693,7 +693,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
         post.call(this, value);
       }
     }
-    Pot.Internal.referSpeeds.call(this, Pot.Deferred.speeds);
+    PotInternal.referSpeeds.call(this, Deferred.speeds);
     return this;
   },
   /**
@@ -720,7 +720,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
   raise : function(/*[ ...args]*/) {
     var args = arrayize(arguments), arg, value;
     arg = args[0];
-    if (!Pot.isError(arg)) {
+    if (!isError(arg)) {
       args[0] = new Error(arg);
     }
     if (args.length > 1) {
@@ -827,16 +827,15 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @public
    */
   wait : function(seconds, value) {
-    var d, that = this, args = arguments;
-    d = new Pot.Deferred();
+    var d = new Deferred(), that = this, args = arguments;
     return this.then(function(reply) {
-      if (Pot.isError(reply)) {
+      if (isError(reply)) {
         throw reply;
       }
       that.waiting = true;
-      Pot.Deferred.wait(seconds).ensure(function(result) {
+      Deferred.wait(seconds).ensure(function(result) {
         that.waiting = false;
-        if (Pot.isError(result)) {
+        if (isError(result)) {
           d.raise(result);
         } else {
           d.begin(args.length >= 2 ? value : reply);
@@ -873,15 +872,15 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @public
    */
   till : function(cond) {
-    var that = this, d = new Pot.Deferred();
+    var that = this, d = new Deferred();
     return this.then(function(reply) {
-      if (Pot.isError(reply)) {
+      if (isError(reply)) {
         throw reply;
       }
       that.tilling = true;
-      Pot.Deferred.till(cond, reply).ensure(function(result) {
+      Deferred.till(cond, reply).ensure(function(result) {
         that.tilling = false;
-        if (Pot.isError(result)) {
+        if (isError(result)) {
           d.raise(result);
         } else {
           d.begin(reply);
@@ -943,7 +942,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
   args : function(/*[... args]*/) {
     var a = arrayize(arguments), len = a.length;
     if (len === 0) {
-      return Pot.Deferred.lastResult(this);
+      return Deferred.lastResult(this);
     } else {
       return this.then(function() {
         var reply, reps = arrayize(arguments);
@@ -955,7 +954,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
         if (len > 1) {
           return a;
         } else {
-          if (Pot.isFunction(a[0])) {
+          if (isFunction(a[0])) {
             return a[0].apply(this, arrayize(reply));
           } else {
             return a[0];
@@ -1029,7 +1028,7 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
         case 1:
             if (args[0] == null) {
               this.options.storage = {};
-            } else if (Pot.isObject(args[0])) {
+            } else if (isObject(args[0])) {
               each(args[0], function(val, key) {
                 that.options.storage[prefix + stringify(key)] = val;
               });
@@ -1045,7 +1044,6 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
             do {
               this.options.storage[prefix + stringify(args[i++])] = args[i++];
             } while (i < len);
-            break;
       }
     }
     return result;
@@ -1081,14 +1079,14 @@ Pot.Deferred.fn = Pot.Deferred.prototype = update(Pot.Deferred.prototype, {
    * @static
    */
   update : function() {
-    var that = Pot.Deferred.fn, args = arrayize(arguments);
+    var that = Deferred.fn, args = arrayize(arguments);
     args.unshift(that);
     update.apply(that, args);
     return this;
   }
 });
 
-Pot.Deferred.prototype.init.prototype = Pot.Deferred.prototype;
+Deferred.fn.init.prototype = Deferred.fn;
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Private methods for Deferred
 /**
@@ -1101,10 +1099,10 @@ Pot.Deferred.prototype.init.prototype = Pot.Deferred.prototype;
  * @ignore
  */
 function setState(value) {
-  if (Pot.isError(value)) {
-    this.state = Pot.Deferred.states.failure;
+  if (isError(value)) {
+    this.state = Deferred.states.failure;
   } else {
-    this.state = Pot.Deferred.states.success;
+    this.state = Deferred.states.success;
   }
   return this.state;
 }
@@ -1117,7 +1115,7 @@ function setState(value) {
  */
 function post(value) {
   setState.call(this, value);
-  this.results[Pot.Deferred.states[this.state]] = value;
+  this.results[Deferred.states[this.state]] = value;
   if (!this.freezing && !this.tilling && !this.waiting) {
     fire.call(this);
   }
@@ -1147,10 +1145,10 @@ function fire(force) {
  */
 function fireAsync() {
   var that = this, speed, callback;
-  if (this.options && Pot.isNumeric(this.options.speed)) {
+  if (this.options && isNumeric(this.options.speed)) {
     speed = this.options.speed;
   } else {
-    speed = Pot.Deferred.defaults.speed;
+    speed = Deferred.defaults.speed;
   }
   this.freezing = true;
   /**@ignore*/
@@ -1167,10 +1165,10 @@ function fireAsync() {
       that.freezing = false;
     }
   };
-  if (!speed && this.state === Pot.Deferred.states.unfired) {
-    Pot.Internal.callInBackground.flush(callback);
+  if (!speed && this.state === Deferred.states.unfired) {
+    PotInternalCallInBackground.flush(callback);
   } else {
-    Pot.Internal.setTimeout(callback, speed);
+    PotInternalSetTimeout(callback, speed);
   }
 }
 
@@ -1194,38 +1192,37 @@ function fireSync() {
  * @ignore
  */
 function fireProcedure() {
-  var that = this, result, reply, callbacks, callback, nesting, isStop;
+  var that = this, result, reply, callbacks, callback, nesting = null, isStop;
   clearChainDebris.call(this);
-  result  = this.results[Pot.Deferred.states[this.state]];
-  nesting = null;
+  result = this.results[Deferred.states[this.state]];
   while (chainsEnabled.call(this)) {
     callbacks = this.chains.shift();
-    callback = callbacks && callbacks[Pot.Deferred.states[this.state]];
-    if (!Pot.isFunction(callback)) {
+    callback = callbacks && callbacks[Deferred.states[this.state]];
+    if (!isFunction(callback)) {
       continue;
     }
     isStop = false;
     try {
       if (this.destAssign ||
-          (Pot.isNumber(callback.length) && callback.length > 1 &&
-           Pot.isArray(result) && result.length === callback.length)) {
+          (isNumber(callback.length) && callback.length > 1 &&
+           isArray(result) && result.length === callback.length)) {
         reply = callback.apply(this, result);
       } else {
         reply = callback.call(this, result);
       }
       // We ignore undefined result when "return" statement is not exists.
       if (reply === void 0 &&
-          this.state !== Pot.Deferred.states.failure &&
-          !Pot.isError(result) && !Pot.hasReturn(callback)) {
+          this.state !== Deferred.states.failure &&
+          !isError(result) && !Pot.hasReturn(callback)) {
         reply = result;
       }
       result = reply;
-      if (Pot.isWorkeroid(result)) {
+      if (isWorkeroid(result)) {
         result = workerMessaging.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
-      if (Pot.isDeferred(result)) {
+      if (isDeferred(result)) {
         /**@ignore*/
         nesting = function(result) {
           return bush.call(that, result);
@@ -1234,18 +1231,18 @@ function fireProcedure() {
       }
     } catch (e) {
       result = e;
-      if (Pot.isStopIter(result)) {
+      if (isStopIter(result)) {
         isStop = true;
       } else {
         setChainDebris.call(this, result);
       }
       this.destAssign = false;
-      this.state = Pot.Deferred.states.failure;
-      if (!Pot.isError(result)) {
+      this.state = Deferred.states.failure;
+      if (!isError(result)) {
         result = new Error(result);
         if (isStop) {
           update(result, {
-            StopIteration : Pot.StopIteration
+            StopIteration : PotStopIteration
           });
         }
       }
@@ -1254,7 +1251,7 @@ function fireProcedure() {
       break;
     }
   }
-  this.results[Pot.Deferred.states[this.state]] = result;
+  this.results[Deferred.states[this.state]] = result;
   if (nesting && this.nested) {
     result.ensure(nesting).end();
   }
@@ -1280,14 +1277,14 @@ function chainsEnabled() {
  */
 function hasErrback() {
   var exists, i, len, key, chains, errback;
-  key = Pot.Deferred.states[Pot.Deferred.states.failure];
+  key = Deferred.states[Deferred.states.failure];
   chains = this.chains;
   len = chains && chains.length;
   if (len) {
     for (i = 0; i < len; i++) {
       if (chains[i]) {
         errback = chains[i][key];
-        if (errback && Pot.isFunction(errback)) {
+        if (errback && isFunction(errback)) {
           exists = true;
           break;
         }
@@ -1323,12 +1320,12 @@ function reserveChainDebris() {
       (this.cancelled || this.chained ||
         (!this.chains || !this.chains.length))
   ) {
-    if (this.options && Pot.isNumeric(this.options.speed)) {
+    if (this.options && isNumeric(this.options.speed)) {
       speed = this.options.speed;
     } else {
-      speed = Pot.Deferred.defaults.speed;
+      speed = Deferred.defaults.speed;
     }
-    this.chainDebris.timerId = Pot.Internal.setTimeout(function() {
+    this.chainDebris.timerId = PotInternalSetTimeout(function() {
       throw that.chainDebris.error;
     }, speed);
   }
@@ -1342,8 +1339,8 @@ function reserveChainDebris() {
  */
 function clearChainDebris() {
   if (this.chainDebris && this.chainDebris.timerId != null &&
-      (this.state & Pot.Deferred.states.fired) && hasErrback.call(this)) {
-    Pot.Internal.clearTimeout(this.chainDebris.timerId);
+      (this.state & Deferred.states.fired) && hasErrback.call(this)) {
+    PotInternalClearTimeout(this.chainDebris.timerId);
     delete this.chainDebris.error;
     delete this.chainDebris.timerId;
     this.chainDebris = null;
@@ -1360,7 +1357,7 @@ function bush(result) {
   post.call(this, result);
   this.nested--;
   if (this.nested === 0 && !this.cancelled &&
-      (this.state & Pot.Deferred.states.fired)) {
+      (this.state & Deferred.states.fired)) {
     fire.call(this);
   }
 }
@@ -1376,9 +1373,9 @@ function workerMessaging(worker) {
   if (this.options && this.options.async) {
     async = true;
   }
-  result = new Pot.Deferred({async : async});
+  result = new Deferred({async : async});
   return result.then(function() {
-    var defer = new Pot.Deferred({async : async}), count = 0;
+    var defer = new Deferred({async : async}), count = 0;
     if (worker && worker.workers) {
       each(worker.workers, function(w, k) {
         if (w && k && k.charAt && k.charAt(0) === '.') {
@@ -1411,7 +1408,7 @@ function workerMessaging(worker) {
 function initOptions(args, defaults) {
   var opts, speed, canceller, stopper, async, nop;
   if (args) {
-    if (args.length === 1 && args[0] && Pot.isObject(args[0])) {
+    if (args.length === 1 && args[0] && isObject(args[0])) {
       opts = args[0];
       if (opts.speed !== nop || opts.canceller !== nop ||
           opts.async !== nop || opts.stopper   !== nop
@@ -1427,23 +1424,23 @@ function initOptions(args, defaults) {
         async     = opts.options && opts.options.async;
       }
     } else {
-      if (args.length === 1 && args[0] && Pot.isArray(args[0])) {
+      if (args.length === 1 && args[0] && isArray(args[0])) {
         opts = args[0];
       } else {
         opts = args;
       }
       each(opts || [], function(opt) {
-        if (speed === nop && Pot.isNumeric(opt)) {
+        if (speed === nop && isNumeric(opt)) {
           speed = opt;
         } else if (speed === nop &&
-                   Pot.isNumeric(Pot.Deferred.speeds[opt])) {
-          speed = Pot.Deferred.speeds[opt];
-        } else if (canceller === nop && Pot.isFunction(opt)) {
+                   isNumeric(Deferred.speeds[opt])) {
+          speed = Deferred.speeds[opt];
+        } else if (canceller === nop && isFunction(opt)) {
           canceller = opt;
-        } else if (async === nop && Pot.isBoolean(opt)) {
+        } else if (async === nop && isBoolean(opt)) {
           async = opt;
         } else if (stopper === nop &&
-                 canceller === nop && Pot.isFunction(opt)) {
+                 canceller === nop && isFunction(opt)) {
           stopper = opt;
         }
       });
@@ -1451,27 +1448,27 @@ function initOptions(args, defaults) {
   }
   this.options = this.options || {};
   this.options.storage = this.options.storage || {};
-  if (!Pot.isArray(this.options.cancellers)) {
+  if (!isArray(this.options.cancellers)) {
     this.options.cancellers = [];
   }
-  if (!Pot.isArray(this.options.stoppers)) {
+  if (!isArray(this.options.stoppers)) {
     this.options.stoppers = [];
   }
-  if (!Pot.isNumeric(speed)) {
-    if (this.options.speed !== nop && Pot.isNumeric(this.options.speed)) {
+  if (!isNumeric(speed)) {
+    if (this.options.speed !== nop && isNumeric(this.options.speed)) {
       speed = this.options.speed - 0;
     } else {
       speed = defaults.speed;
     }
   }
-  if (!Pot.isFunction(canceller)) {
+  if (!isFunction(canceller)) {
     canceller = defaults.canceller;
   }
-  if (!Pot.isFunction(stopper)) {
+  if (!isFunction(stopper)) {
     stopper = defaults.stopper;
   }
-  if (!Pot.isBoolean(async)) {
-    if (this.options.async !== nop && Pot.isBoolean(this.options.async)) {
+  if (!isBoolean(async)) {
+    if (this.options.async !== nop && isBoolean(this.options.async)) {
       async = this.options.async;
     } else {
       async = defaults.async;
@@ -1481,10 +1478,10 @@ function initOptions(args, defaults) {
     speed : speed - 0,
     async : async
   });
-  if (Pot.isFunction(canceller)) {
+  if (isFunction(canceller)) {
     this.options.cancellers.push(canceller);
   }
-  if (Pot.isFunction(stopper)) {
+  if (isFunction(stopper)) {
     this.options.stoppers.push(stopper);
   }
   return this;
@@ -1500,7 +1497,7 @@ function cancelize(type) {
   var func;
   while (this.options[type] && this.options[type].length) {
     func = this.options[type].shift();
-    if (Pot.isFunction(func)) {
+    if (isFunction(func)) {
       func.call(this);
     }
   }
@@ -1509,7 +1506,7 @@ function cancelize(type) {
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Create each speeds constructors (optional)
 
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * @lends Pot.Deferred
    */
@@ -1529,9 +1526,9 @@ update(Pot.Deferred, {
         args = arrayize(args);
         initOptions.call(opts, args, {
           speed     : speed,
-          canceller : Pot.Deferred.defaults.canceller,
-          stopper   : Pot.Deferred.defaults.stopper,
-          async     : Pot.Deferred.defaults.async
+          canceller : Deferred.defaults.canceller,
+          stopper   : Deferred.defaults.stopper,
+          async     : Deferred.defaults.async
         });
         opts.speedName = speedName;
         args.unshift(opts);
@@ -1546,7 +1543,7 @@ update(Pot.Deferred, {
   }
 });
 
-update(Pot.Internal, {
+update(PotInternal, {
   /**
    * Reference to instance of object.
    *
@@ -1631,16 +1628,16 @@ update(Pot.Internal, {
  * @property {Function} ninja
  *           Create new Deferred with fastest speed. (static)
  */
-Pot.Deferred.extendSpeeds(Pot, 'Deferred', function(options) {
-  return Pot.Deferred(options);
-}, Pot.Deferred.speeds);
+Deferred.extendSpeeds(Pot, 'Deferred', function(options) {
+  return Deferred(options);
+}, Deferred.speeds);
 
 }());
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Deferred utilities.
 (function() {
 
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * @lends Pot.Deferred
    */
@@ -1664,7 +1661,7 @@ update(Pot.Deferred, {
    * @public
    * @static
    */
-  isDeferred : Pot.isDeferred,
+  isDeferred : isDeferred,
   /**
    * Return a Deferred that has already had .begin(result) called.
    *
@@ -1702,9 +1699,8 @@ update(Pot.Deferred, {
    * @static
    */
   succeed : function(/*[...args]*/) {
-    var d = new Pot.Deferred();
-    d.begin.apply(d, arguments);
-    return d;
+    var d = new Deferred();
+    return d.begin.apply(d, arguments);
   },
   /**
    * Return a Deferred that has already had .raise(result) called.
@@ -1737,9 +1733,8 @@ update(Pot.Deferred, {
    * @static
    */
   failure : function(/*[...args]*/) {
-    var d = new Pot.Deferred();
-    d.raise.apply(d, arguments);
-    return d;
+    var d = new Deferred();
+    return d.raise.apply(d, arguments);
   },
   /**
    * Return a new cancellable Deferred that will .begin() after
@@ -1766,11 +1761,11 @@ update(Pot.Deferred, {
    * @static
    */
   wait : function(seconds, value) {
-    var timer, d = new Pot.Deferred({
+    var timer, d = new Deferred({
       /**@ignore*/
       canceller : function() {
         try {
-          Pot.Internal.clearTimeout(timer);
+          PotInternalClearTimeout(timer);
         } catch (e) {}
       }
     });
@@ -1779,7 +1774,7 @@ update(Pot.Deferred, {
         return value;
       });
     }
-    timer = Pot.Internal.setTimeout(function() {
+    timer = PotInternalSetTimeout(function() {
       d.begin();
     }, Math.floor(((seconds - 0) || 0) * 1000));
     return d;
@@ -1824,10 +1819,10 @@ update(Pot.Deferred, {
    */
   callLater : function(seconds, callback) {
     var args = arrayize(arguments, 2);
-    return Pot.Deferred.wait(seconds).then(function() {
-      if (Pot.isDeferred(callback)) {
+    return Deferred.wait(seconds).then(function() {
+      if (isDeferred(callback)) {
         return callback.begin.apply(callback, args);
-      } else if (Pot.isFunction(callback)) {
+      } else if (isFunction(callback)) {
         return callback.apply(callback, args);
       } else {
         return callback;
@@ -1873,10 +1868,10 @@ update(Pot.Deferred, {
    */
   callLazy : function(callback) {
     var args = arrayize(arguments, 1);
-    return Pot.Deferred.begin(function() {
-      if (Pot.isDeferred(callback)) {
+    return Deferred.begin(function() {
+      if (isDeferred(callback)) {
         return callback.begin.apply(callback, args);
-      } else if (Pot.isFunction(callback)) {
+      } else if (isFunction(callback)) {
         return callback.apply(callback, args);
       } else {
         return callback;
@@ -1916,16 +1911,16 @@ update(Pot.Deferred, {
    */
   maybeDeferred : function(x) {
     var result;
-    if (Pot.isDeferred(x)) {
-      if (Pot.Deferred.isFired(x)) {
+    if (isDeferred(x)) {
+      if (Deferred.isFired(x)) {
         result = x;
       } else {
         result = x.begin();
       }
-    } else if (Pot.isError(x)) {
-      result = Pot.Deferred.failure(x);
+    } else if (isError(x)) {
+      result = Deferred.failure(x);
     } else {
-      result = Pot.Deferred.succeed(x);
+      result = Deferred.succeed(x);
     }
     return result;
   },
@@ -1953,8 +1948,8 @@ update(Pot.Deferred, {
    * @static
    */
   isFired : function(deferred) {
-    return Pot.isDeferred(deferred) &&
-           ((deferred.state & Pot.Deferred.states.fired) !== 0);
+    return isDeferred(deferred) &&
+           ((deferred.state & Deferred.states.fired) !== 0);
   },
   /**
    * Get the last result of the callback chains.
@@ -1984,9 +1979,9 @@ update(Pot.Deferred, {
    */
   lastResult : function(deferred, value) {
     var result, args = arguments, key;
-    if (Pot.isDeferred(deferred)) {
+    if (isDeferred(deferred)) {
       try {
-        key = Pot.Deferred.states[Pot.Deferred.states.success];
+        key = Deferred.states[Deferred.states.success];
         if (args.length <= 1) {
           result = deferred.results[key];
         } else {
@@ -2025,13 +2020,13 @@ update(Pot.Deferred, {
    */
   lastError : function(deferred, value) {
     var result, args = arguments, key;
-    if (Pot.isDeferred(deferred)) {
+    if (isDeferred(deferred)) {
       try {
-        key = Pot.Deferred.states[Pot.Deferred.states.failure];
+        key = Deferred.states[Deferred.states.failure];
         if (args.length <= 1) {
           result = deferred.results[key];
         } else {
-          if (!Pot.isError(value)) {
+          if (!isError(value)) {
             value = new Error(value);
           }
           deferred.results[key] = value;
@@ -2103,36 +2098,33 @@ update(Pot.Deferred, {
    * @static
    */
   register : function(/*name, func*/) {
-    var result, that = Pot.Deferred.fn, args = arrayize(arguments), methods;
-    result  = 0;
-    methods = [];
+    var result = 0, that = Deferred.fn,
+        args = arrayize(arguments), methods = [];
     switch (args.length) {
       case 0:
           break;
       case 1:
-          if (Pot.isObject(args[0])) {
+          if (isObject(args[0])) {
             each(args[0], function(val, key) {
-              if (Pot.isFunction(val) && Pot.isString(key)) {
+              if (isFunction(val) && isString(key)) {
                 methods.push([key, val]);
-              } else if (Pot.isFunction(key) && Pot.isString(val)) {
+              } else if (isFunction(key) && isString(val)) {
                 methods.push([val, key]);
               }
             });
           }
           break;
-      case 2:
       default:
-          if (Pot.isFunction(args[0])) {
+          if (isFunction(args[0])) {
             methods.push([args[1], args[0]]);
           } else {
             methods.push([args[0], args[1]]);
           }
-          break;
     }
     if (methods && methods.length) {
       each(methods, function(item) {
         var subs = {}, name, func, method;
-        if (item && item.length >= 2 && Pot.isFunction(item[1])) {
+        if (item && item.length >= 2 && isFunction(item[1])) {
           name = stringify(item[0], true);
           func = item[1];
           /**@ignore*/
@@ -2192,8 +2184,7 @@ update(Pot.Deferred, {
    * @static
    */
   unregister : function(/*name*/) {
-    var result, that = Pot.Deferred.fn, args = arrayize(arguments), names;
-    result = 0;
+    var result = 0, that = Deferred.fn, args = arrayize(arguments), names;
     if (args.length > 1) {
       names = args;
     } else {
@@ -2273,32 +2264,29 @@ update(Pot.Deferred, {
         case 1:
             func = object;
             break;
-        case 2:
         default:
-            if (Pot.isObject(method)) {
+            if (isObject(method)) {
               context = method;
               func    = object;
             } else {
               func    = method;
               context = object;
             }
-            break;
       }
       if (!func) {
         throw func;
       }
     } catch (e) {
       err = e;
-      throw (Pot.isError(err) ? err : new Error(err));
+      throw (isError(err) ? err : new Error(err));
     }
     return function() {
-      var that = this, args = arrayize(arguments), d = new Pot.Deferred();
+      var that = this, args = arrayize(arguments), d = new Deferred();
       d.then(function() {
-        var dd, result, params = [], done = false, error,
-            isFired = Pot.Deferred.isFired;
-        dd = new Pot.Deferred();
+        var dd = new Deferred(), result, params = [],
+            done = false, error, isFired = Deferred.isFired;
         each(args, function(val) {
-          if (Pot.isFunction(val)) {
+          if (isFunction(val)) {
             params.push(function() {
               var r, er;
               try {
@@ -2336,7 +2324,7 @@ update(Pot.Deferred, {
           }
         }
         if (error != null) {
-          throw Pot.isError(error) ? error : new Error(error);
+          throw isError(error) ? error : new Error(error);
         }
         return dd;
       }).begin();
@@ -2365,14 +2353,14 @@ update(Pot.Deferred, {
    * @static
    */
   update : function() {
-    var that = Pot.Deferred, args = arrayize(arguments);
+    var that = Deferred, args = arrayize(arguments);
     args.unshift(that);
     return update.apply(that, args);
   }
 });
 
 // Definitions of the loop/iterator methods.
-update(Pot.Deferred, {
+update(Deferred, {
   /**
    * @lends Pot.Deferred
    */
@@ -2398,17 +2386,15 @@ update(Pot.Deferred, {
    * @static
    */
   begin : function(x) {
-    var d, args = arrayize(arguments, 1), isCallable, value;
-    d = new Pot.Deferred();
-    isCallable = (x && Pot.isFunction(x));
-    if (isCallable) {
+    var d = new Deferred(), args = arrayize(arguments, 1), value;
+    if (x && isFunction(x)) {
       d.then(function() {
         return x.apply(this, args);
       });
     } else {
       value = x;
     }
-    Pot.Internal.callInBackground.flush(function() {
+    PotInternalCallInBackground.flush(function() {
       d.begin(value);
     });
     return d;
@@ -2447,10 +2433,10 @@ update(Pot.Deferred, {
    */
   flush : function(callback) {
     var args = arrayize(arguments, 1);
-    return Pot.Deferred.begin(function() {
-      if (Pot.isDeferred(callback)) {
+    return Deferred.begin(function() {
+      if (isDeferred(callback)) {
         return callback.begin.apply(callback, args);
-      } else if (Pot.isFunction(callback)) {
+      } else if (isFunction(callback)) {
         return callback.apply(this, args);
       } else {
         return callback;
@@ -2485,12 +2471,12 @@ update(Pot.Deferred, {
    * @static
    */
   till : function(cond) {
-    var d = new Pot.Deferred(), args = arrayize(arguments, 1), interval = 13;
-    return Pot.Deferred.begin(function() {
-      var that = this, me = arguments.callee, time = now();
+    var d = new Deferred(), args = arrayize(arguments, 1), interval = 13;
+    return Deferred.begin(function till() {
+      var that = this, time = now();
       if (cond && !cond.apply(this, args)) {
-        Pot.Internal.setTimeout(function() {
-          me.call(that);
+        PotInternalSetTimeout(function() {
+          till.call(that);
         }, Math.min(1000, interval + (now() - time)));
       } else {
         d.begin();
@@ -2601,10 +2587,10 @@ update(Pot.Deferred, {
   parallel : function(deferredList) {
     var result, args = arguments, d, deferreds, values, bounds;
     if (args.length === 0) {
-      result = Pot.Deferred.succeed();
+      result = Deferred.succeed();
     } else {
       if (args.length === 1) {
-        if (Pot.isObject(deferredList)) {
+        if (isObject(deferredList)) {
           deferreds = deferredList;
         } else {
           deferreds = arrayize(deferredList);
@@ -2612,43 +2598,43 @@ update(Pot.Deferred, {
       } else {
         deferreds = arrayize(args);
       }
-      result = new Pot.Deferred({
+      result = new Deferred({
         /**@ignore*/
         canceller : function() {
           each(deferreds, function(deferred) {
-            if (Pot.isDeferred(deferred)) {
+            if (isDeferred(deferred)) {
               deferred.cancel();
             }
           });
         }
       });
-      d = new Pot.Deferred();
+      d = new Deferred();
       bounds = [];
-      values = Pot.isObject(deferreds) ? {} : [];
+      values = isObject(deferreds) ? {} : [];
       each(deferreds, function(deferred, key) {
         var defer;
-        if (Pot.isDeferred(deferred)) {
+        if (isDeferred(deferred)) {
           defer = deferred;
-        } else if (Pot.isFunction(deferred)) {
-          defer = new Pot.Deferred();
+        } else if (isFunction(deferred)) {
+          defer = new Deferred();
           defer.then(function() {
             var r = deferred();
-            if (Pot.isDeferred(r) &&
-                r.state === Pot.Deferred.states.unfired) {
+            if (isDeferred(r) &&
+                r.state === Deferred.states.unfired) {
               r.begin();
             }
             return r;
           });
         } else {
-          defer = Pot.Deferred.succeed(deferred);
+          defer = Deferred.succeed(deferred);
         }
-        if (!Pot.isDeferred(defer)) {
-          defer = Pot.Deferred.maybeDeferred(defer);
+        if (!isDeferred(defer)) {
+          defer = Deferred.maybeDeferred(defer);
         }
         bounds[bounds.length] = key;
         d.then(function() {
-          if (defer.state === Pot.Deferred.states.unfired) {
-            Pot.Deferred.flush(defer);
+          if (defer.state === Deferred.states.unfired) {
+            Deferred.flush(defer);
           }
           defer.then(function(value) {
             if (bounds.length) {
@@ -2664,7 +2650,7 @@ update(Pot.Deferred, {
           });
         });
       });
-      Pot.Deferred.flush(d);
+      Deferred.flush(d);
     }
     return result;
   },
@@ -2757,12 +2743,12 @@ update(Pot.Deferred, {
     };
     return function(/*...args*/) {
       var args = arguments, len = args.length, chains,
-          chain = new Pot.Deferred();
+          chain = new Deferred();
       if (len > 0) {
         chains = arrayize((len === 1) ? args[0] : args);
         each(chains, function(o) {
           var name;
-          if (Pot.isFunction(o)) {
+          if (isFunction(o)) {
             try {
               name = Pot.getFunctionCode(o).match(re.funcName)[1];
             } catch (e) {}
@@ -2771,18 +2757,18 @@ update(Pot.Deferred, {
             } else {
               chain.then(o);
             }
-          } else if (Pot.isDeferred(o)) {
+          } else if (isDeferred(o)) {
             chain.then(function(v) {
-              if (o.state === Pot.Deferred.states.unfired) {
+              if (o.state === Deferred.states.unfired) {
                 o.begin(v);
               }
               return o;
             });
-          } else if (Pot.isObject(o) || Pot.isArray(o)) {
+          } else if (isObject(o) || isArray(o)) {
             chain.then(function() {
-              return Pot.Deferred.parallel(o);
+              return Deferred.parallel(o);
             });
-          } else if (Pot.isError(o)) {
+          } else if (isError(o)) {
             chain.then(function() {
               throw o;
             });
@@ -2793,7 +2779,7 @@ update(Pot.Deferred, {
           }
         });
       }
-      Pot.Deferred.callLazy(chain);
+      Deferred.callLazy(chain);
       return chain;
     };
   }())
@@ -2826,21 +2812,22 @@ update(Pot.Deferred, {
  * @property {Function} ninja
  *           Return new Deferred with fastest speed. (static)
  */
-Pot.Deferred.extendSpeeds(Pot.Deferred, 'begin', function(opts, x) {
-  var d, timer, args = arrayize(arguments, 2), isCallable, op, speed, value;
-  isCallable = (x && Pot.isFunction(x));
-  op = opts.options || opts || {};
+Deferred.extendSpeeds(Deferred, 'begin', function(opts, x) {
+  var d, timer, args = arrayize(arguments, 2),
+      isCallable = (x && isFunction(x)),
+      op = opts.options || opts || {},
+      speed, value;
   if (!op.cancellers) {
     op.cancellers = [];
   }
   op.cancellers.push(function() {
     try {
       if (timer != null) {
-        Pot.Internal.clearTimeout(timer);
+        PotInternalClearTimeout(timer);
       }
     } catch (e) {}
   });
-  d = new Pot.Deferred(op);
+  d = new Deferred(op);
   if (isCallable) {
     d.then(function() {
       return x.apply(this, args);
@@ -2849,17 +2836,17 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'begin', function(opts, x) {
     value = x;
   }
   speed = (((opts.options && opts.options.speed) || opts.speed) - 0) || 0;
-  if (Pot.isNumeric(speed) && speed > 0) {
-    timer = Pot.Internal.setTimeout(function() {
+  if (isNumeric(speed) && speed > 0) {
+    timer = PotInternalSetTimeout(function() {
       d.begin(value);
     }, speed);
   } else {
-    Pot.Internal.callInBackground.flush(function() {
+    PotInternalCallInBackground.flush(function() {
       d.begin(value);
     });
   }
   return d;
-}, Pot.Deferred.speeds);
+}, Deferred.speeds);
 
 /**
  * Pot.Deferred.flush.*speed* (limp/doze/slow/normal/fast/rapid/ninja).
@@ -2887,35 +2874,35 @@ Pot.Deferred.extendSpeeds(Pot.Deferred, 'begin', function(opts, x) {
  * @property {Function} ninja
  *           Return new Deferred with fastest speed. (static)
  */
-Pot.Deferred.extendSpeeds(Pot.Deferred, 'flush', function(opts, callback) {
+Deferred.extendSpeeds(Deferred, 'flush', function(opts, callback) {
   var speed, name, method, args = arrayize(arguments, 2);
   speed = opts.options ? opts.options.speed : opts.speed;
-  if (speed in Pot.Deferred.speeds &&
-      Pot.isString(Pot.Deferred.speeds[speed])) {
-    name = Pot.Deferred.speeds[speed];
+  if (speed in Deferred.speeds &&
+      isString(Deferred.speeds[speed])) {
+    name = Deferred.speeds[speed];
   } else {
-    each(Pot.Deferred.speeds, function(val, key) {
+    each(Deferred.speeds, function(val, key) {
       if (val == speed) {
         name = key;
-        throw Pot.StopIteration;
+        throw PotStopIteration;
       }
     });
   }
-  if (name && name in Pot.Deferred.begin) {
-    method = Pot.Deferred.begin[name];
+  if (name && name in Deferred.begin) {
+    method = Deferred.begin[name];
   } else {
-    method = Pot.Deferred.begin;
+    method = Deferred.begin;
   }
   return method(function() {
-    if (Pot.isDeferred(callback)) {
+    if (isDeferred(callback)) {
       return callback.begin.apply(callback, args);
-    } else if (Pot.isFunction(callback)) {
+    } else if (isFunction(callback)) {
       return callback.apply(this, args);
     } else {
       return callback;
     }
   });
-}, Pot.Deferred.speeds);
+}, Deferred.speeds);
 
 // Update Pot object.
 Pot.update({

@@ -66,22 +66,22 @@ Pot.update({
   globalize : function(target, advised) {
     var result = false, args = arrayize(arguments),
         inputs, outputs, len = args.length, noops = [];
-    if (len <= 1 && this === Pot && !Pot.isObject(target)) {
+    if (len <= 1 && this === Pot && !isObject(target)) {
       inputs = this;
-      if (len >= 1 && Pot.isBoolean(target)) {
+      if (len >= 1 && isBoolean(target)) {
         advised = target;
       } else {
         advised = !!target;
       }
-    } else if (target && (Pot.isObject(target) ||
-               Pot.isFunction(target) || Pot.isArray(target))) {
+    } else if (target && (isObject(target) ||
+               isFunction(target) || isArray(target))) {
       inputs = target;
     }
-    outputs = Pot.Internal.getExportObject(true);
+    outputs = PotInternal.getExportObject(true);
     if (inputs && outputs) {
       if (inputs === Pot) {
-        if (Pot.Internal.exportPot && Pot.Internal.PotExportProps) {
-          result = Pot.Internal.exportPot(advised, true, true);
+        if (PotInternal.exportPot && PotInternal.PotExportProps) {
+          result = PotInternal.exportPot(advised, true, true);
         }
       } else {
         each(inputs, function(prop, name) {
@@ -99,7 +99,7 @@ Pot.update({
 });
 
 // Define the export method.
-update(Pot.Internal, {
+update(PotInternal, {
   /**
    * @lends Pot.Internal
    */
@@ -112,10 +112,10 @@ update(Pot.Internal, {
    */
   exportPot : function(advised, forGlobalScope, allProps, initialize) {
     var outputs, noops = [];
-    outputs = Pot.Internal.getExportObject(forGlobalScope);
+    outputs = PotInternal.getExportObject(forGlobalScope);
     if (outputs) {
       if (allProps) {
-        each(Pot.Internal.PotExportProps, function(prop, name) {
+        each(PotInternal.PotExportProps, function(prop, name) {
           if (advised && name in outputs) {
             noops[noops.length] = name;
           } else {
@@ -123,7 +123,7 @@ update(Pot.Internal, {
           }
         });
       } else {
-        each(Pot.Internal.PotExportObject, function(prop, name) {
+        each(PotInternal.PotExportObject, function(prop, name) {
           if (advised && name in outputs) {
             noops[noops.length] = name;
           } else {
@@ -133,15 +133,15 @@ update(Pot.Internal, {
       }
     }
     if (initialize) {
-      outputs = Pot.Internal.getExportObject(
-        Pot.System.isNodeJS ? false : true
+      outputs = PotInternal.getExportObject(
+        PotSystem.isNodeJS ? false : true
       );
       if (outputs) {
-        update(outputs, Pot.Internal.PotExportObject);
+        update(outputs, PotInternal.PotExportObject);
       }
       // for Node.js and CommonJS.
-      if ((Pot.System.isNonBrowser ||
-           !Pot.System.isNotExtension) && typeof exports !== 'undefined') {
+      if ((PotSystem.isNonBrowser ||
+           !PotSystem.isNotExtension) && typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
           exports = module.exports = Pot;
         }
