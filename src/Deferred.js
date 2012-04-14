@@ -1521,8 +1521,9 @@ update(Deferred, {
   extendSpeeds : function(target, name, construct, speeds) {
     /**@ignore*/
     var create = function(speedName, speed) {
-      return function() {
-        var opts = {}, args = arguments, me = args.callee;
+      /**@ignore*/
+      var func = function() {
+        var opts = {}, args = arguments, me = func;
         args = arrayize(args);
         initOptions.call(opts, args, {
           speed     : speed,
@@ -1534,6 +1535,7 @@ update(Deferred, {
         args.unshift(opts);
         return construct.apply(me.instance, args);
       };
+      return func;
     },
     methods = {};
     each(speeds, function(val, key) {
@@ -1551,7 +1553,7 @@ update(PotInternal, {
    * @ignore
    */
   referSpeeds : update(function(speeds) {
-    var me = arguments.callee, prop, speed;
+    var me = PotInternal.referSpeeds, prop, speed;
     if (speeds && this.forEach.fast.instance !== this) {
       for (prop in me.props) {
         if (prop in this && this[prop]) {
