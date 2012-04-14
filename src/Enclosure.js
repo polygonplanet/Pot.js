@@ -91,7 +91,8 @@
 /**
  * @namespace Pot{#if PotLite}Lite{#endif}.js
  */
-(function PotScriptImplementation(globals, undefined) {
+(function PotScriptImplementation(globals) {
+'use strict';
 
 /*{#code}*/
 
