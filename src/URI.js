@@ -683,8 +683,7 @@ update(Pot.URI, {
    * @public
    */
   resolveRelativeURI : update(function(uri, context) {
-    var result = '', args = arguments,
-        me = Pot.URI.resolveRelativeURI,
+    var result = '', me = Pot.URI.resolveRelativeURI,
         sep, cur = '', path, pos, parts, part, subs, len, protocol;
     if (context) {
       cur = context.document || context.ownerDocument;

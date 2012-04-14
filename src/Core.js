@@ -92,7 +92,6 @@ fromUnicode = (function() {
     return maps[c & 0xFFFF];
   };
 }()),
-
 /*{#if Pot}*/
 // Namespace URIs.
 XML_NS_URI   = 'http://www.w3.org/XML/1998/namespace',
