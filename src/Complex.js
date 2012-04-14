@@ -93,7 +93,7 @@ update(Pot.Complex, {
    * @public
    */
   rand : update(function(min, max) {
-    var result = 0, args = arguments, me = args.callee,
+    var result = 0, args = arguments, me = Pot.Complex.rand,
         t, n, x, scale, forString = false;
     if (!me.getScale) {
       /**@ignore*/
@@ -119,7 +119,6 @@ update(Pot.Complex, {
       default:
           n = min - 0;
           x = max - 0;
-          break;
     }
     if (n > x) {
       t = x;
@@ -652,7 +651,7 @@ update(Pot.Complex, {
    * @public
    */
   compareVersions : function(ver1, ver2, operator) {
-    var result = 0, me = arguments.callee, v1, v2, max, i;
+    var result = 0, me = Pot.Complex.compareVersions, v1, v2, max, i;
     if (!me.prep) {
       update(me, {
         versionMapMin : -7,
@@ -772,7 +771,6 @@ update(Pot.Complex, {
         case 'eq':
         default:
             result = (result === 0);
-            break;
       }
     }
     return result;

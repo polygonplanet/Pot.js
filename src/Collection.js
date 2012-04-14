@@ -286,7 +286,8 @@ update(Pot.Collection, {
       }
     };
     return function(object, loose, ignoreCase) {
-      var results = [], args = arguments, me = args.callee, i, j, len,
+      var results = [], args = arguments,
+          me = Pot.Collection.unique, i, j, len,
           array, dups = [];
       args = arrayize(args);
       useStrict = !loose;

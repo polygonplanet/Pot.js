@@ -440,8 +440,9 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "forEach" loop with fastest speed.
    */
   forEach : createHashIterator(function(speedKey) {
-    return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this;
+    /**@ignore*/
+    var func = function(callback, context) {
+      var that = func.instance || this;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key, result;
         if (k && k.charAt(0) === PREFIX) {
@@ -451,6 +452,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return this;
     };
+    return func;
   }),
   /**
    * Creates a new object with the results of calling a
@@ -489,8 +491,9 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "map" loop with fastest speed.
    */
   map : createHashIterator(function(speedKey) {
-    return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this,
+    /**@ignore*/
+    var func = function(callback, context) {
+      var that = func.instance || this,
           hash = new Hash();
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key, result;
@@ -502,6 +505,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return hash;
     };
+    return func;
   }),
   /**
    * Creates a new object with all elements that
@@ -538,8 +542,9 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "filter" loop with fastest speed.
    */
   filter : createHashIterator(function(speedKey) {
-    return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this,
+    /**@ignore*/
+    var func = function(callback, context) {
+      var that = func.instance || this,
           hash = new Hash();
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key;
@@ -552,6 +557,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return hash;
     };
+    return func;
   }),
   /**
    * Apply a function against an accumulator and each value of
@@ -590,8 +596,9 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "reduce" loop with fastest speed.
    */
   reduce : createHashIterator(function(speedKey) {
-    return function(callback, initial, context) {
-      var me = arguments.callee, that = me.instance || this,
+    /**@ignore*/
+    var func = function(callback, initial, context) {
+      var that = func.instance || this,
           value, skip, p, raw = that._rawData;
       if (initial == null) {
         for (p in raw) {
@@ -619,6 +626,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return value;
     };
+    return func;
   }),
   /**
    * Tests whether all elements in the object pass the
@@ -660,8 +668,9 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "every" loop with fastest speed.
    */
   every : createHashIterator(function(speedKey) {
-    return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this, result = true;
+    /**@ignore*/
+    var func = function(callback, context) {
+      var that = func.instance || this, result = true;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key;
         if (k && k.charAt(0) === PREFIX) {
@@ -674,6 +683,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return result;
     };
+    return func;
   }),
   /**
    * Tests whether some element in the object passes the
@@ -716,8 +726,8 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    * @property {Function} ninja  Iterates "some" loop with fastest speed.
    */
   some : createHashIterator(function(speedKey) {
-    return function(callback, context) {
-      var me = arguments.callee, that = me.instance || this, result = false;
+    var func = function(callback, context) {
+      var that = func.instance || this, result = false;
       Pot.forEach[speedKey](that._rawData, function(val, k, object) {
         var key;
         if (k && k.charAt(0) === PREFIX) {
@@ -730,6 +740,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
       });
       return result;
     };
+    return func;
   })
 });
 

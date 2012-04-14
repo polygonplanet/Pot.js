@@ -153,7 +153,7 @@ update(Pot.Format, {
    * @public
    */
   sprintf : function(/*format[, ...args]*/) {
-    var me = arguments.callee;
+    var me = Pot.Format.sprintf;
     if (!me.formatProcedure) {
       /**@ignore*/
       me.formatProcedure = (function() {

@@ -299,7 +299,7 @@ Pot.update({
      * @public
      */
     parseFromJSON : update(function(text/*[, reviver]*/) {
-      var me = arguments.callee, o;
+      var me = Pot.Serializer.parseFromJSON, o;
       o = String(text).replace(me.PATTERNS.CLEAN, '');
       if (me.isValid(me, o)) {
         return Pot.localEval('(' + o + ')');

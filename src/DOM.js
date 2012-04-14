@@ -1458,7 +1458,7 @@ update(DOM, {
    * @public
    */
   getTextContent : update(function(elem) {
-    var result, me = arguments.callee, buffer;
+    var result, me = DOM.getTextContent, buffer;
     if (isElement(elem)) {
       try {
         if (PotBrowser.msie &&
@@ -2221,7 +2221,7 @@ update(DOM, {
    */
   evaluate : update(function(exp, context, all, asis) {
     var doc, expr, xresult = null, result, i, len,
-        me = arguments.callee,
+        me = DOM.evaluate,
         item, evaluator, defaultPrefix;
     context || (context = Pot.currentDocument());
     expr = stringify(exp);
@@ -2433,7 +2433,8 @@ update(DOM, {
    * @public
    */
   convertToHTMLDocument : update(function(htmlString, context) {
-    var me = arguments.callee, doc, html, patterns, xsl, xsltp, range;
+    var me = DOM.convertToHTMLDocument,
+        doc, html, patterns, xsl, xsltp, range;
     patterns = {
       remove : [
         /<\s*!\s*DOCTYPE[^>]*>/gi,
@@ -2445,7 +2446,7 @@ update(DOM, {
     each(patterns.remove, function(re) {
       html = html.replace(re, '');
     });
-    xsl = Pot.DOM.parseFromString(
+    xsl = DOM.parseFromString(
       '<' + '?xml version="1.0"?' + '>' +
       '<stylesheet version="1.0" xmlns="' + XSL_NS_URI + '">' +
         '<output method="html" />' +
@@ -2559,7 +2560,7 @@ update(DOM, {
    * @public
    */
   convertToHTMLString : update(function(context, safe) {
-    var result, me = arguments.callee, node, doc, root,
+    var result, me = DOM.convertToHTMLString, node, doc, root,
         range, uniqid, fragment, re, tag;
     if (!context || (context.getRangeAt && context.isCollapsed)) {
       return '';

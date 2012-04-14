@@ -80,7 +80,7 @@ update(Pot.Sanitizer, {
    * @public
    */
   escapeHTML : function(text) {
-    var me = arguments.callee, s;
+    var me = Pot.Sanitizer.escapeHTML, s;
     if (!me.ENTITIES) {
       update(me, {
         ENTITIES : [
@@ -125,7 +125,7 @@ update(Pot.Sanitizer, {
    * @public
    */
   unescapeHTML : function(text) {
-    var me = arguments.callee, result = '';
+    var me = Pot.Sanitizer.unescapeHTML, result = '';
     if (!me.RE) {
       update(me, {
         /**@ignore*/
@@ -384,7 +384,7 @@ update(Pot.Sanitizer, {
    * @public
    */
   escapeSequence : function(text) {
-    var s, me = arguments.callee;
+    var s, me = Pot.Sanitizer.escapeSequence;
     if (!me.re) {
       me.re = /[^\w!#$()*+,.:;=?@[\]^`|~-]/gi;
       /**@ignore*/
@@ -430,7 +430,7 @@ update(Pot.Sanitizer, {
    * @public
    */
   unescapeSequence : function(text) {
-    var s, me = arguments.callee;
+    var s, me = Pot.Sanitizer.unescapeSequence;
     if (!me.re) {
       /**@ignore*/
       me.re = {

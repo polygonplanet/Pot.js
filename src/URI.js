@@ -33,7 +33,7 @@ update(Pot.URI, {
    * @public
    */
   urlEncode : update(function(string) {
-    var result = '', me = arguments.callee, s;
+    var result = '', me = Pot.URI.urlEncode, s;
     s = stringify(string, true);
     if (s) {
       if (Pot.isPercentEncoded(s)) {
@@ -108,7 +108,7 @@ update(Pot.URI, {
    * @public
    */
   urlDecode : update(function(string) {
-    var result = '', me = arguments.callee, s;
+    var result = '', me = Pot.URI.urlDecode, s;
     s = stringify(string, true);
     if (s) {
       s = s.replace(me.decoder.reSpace.from, me.decoder.reSpace.to);
@@ -298,7 +298,7 @@ update(Pot.URI, {
    * @public
    */
   parseURI : update(function(uri) {
-    var result = {}, me = arguments.callee, p,
+    var result = {}, me = Pot.URI.parseURI, p,
         parts = stringify(uri, true).match(me.parser.pattern) || [];
     for (p in me.parser.capture) {
       result[p] = stringify(parts[me.parser.capture[p]]);
@@ -683,7 +683,8 @@ update(Pot.URI, {
    * @public
    */
   resolveRelativeURI : update(function(uri, context) {
-    var result = '', args = arguments, me = args.callee,
+    var result = '', args = arguments,
+        me = Pot.URI.resolveRelativeURI,
         sep, cur = '', path, pos, parts, part, subs, len, protocol;
     if (context) {
       cur = context.document || context.ownerDocument;
@@ -812,7 +813,7 @@ update(Pot.URI, {
   getExt : update(function(path) {
     var
     result = '',
-    me = arguments.callee,
+    me = Pot.URI.getExt,
     re = me.PATTERNS,
     decode = Pot.URI.urlDecode,
     uri = stringify(

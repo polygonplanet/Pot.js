@@ -888,7 +888,7 @@ update(Pot.Text, {
    */
   wrap : update(function(string, wrapper, right) {
     var w, s = stringify(string),
-        me = arguments.callee, maps = me.PairMaps;
+        me = Pot.Text.wrap, maps = me.PairMaps;
     if (right != null) {
       wrapper = [wrapper, right];
     }
@@ -1601,7 +1601,7 @@ update(Pot.Text, {
    * @public
    */
   br : update(function(string, useXML, all) {
-    var result = '', me = arguments.callee, s, xml, tag;
+    var result = '', me = Pot.Text.br, s, xml, tag;
     s = stringify(string);
     if (s) {
       xml = useXML;
@@ -1735,7 +1735,7 @@ update(Pot.Text, {
    * @public
    */
   stripTags : update(function(text) {
-    var result = '', me = arguments.callee, s, prev, i, limit = 5;
+    var result = '', me = Pot.Text.stripTags, s, prev, i, limit = 5;
     s = stringify(text, true);
     if (s) {
       for (i = 0; i < limit; i++) {

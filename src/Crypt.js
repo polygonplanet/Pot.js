@@ -851,14 +851,16 @@ update(Pot.Crypt, {
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(text) {
-            var me = arguments.callee, that = me.instance;
+          /**@ignore*/
+          var func = function(text) {
+            var that = func.instance;
             return arc4Crypt(
               Pot.UTF8.encode(text),
               that.key,
               that.table
             ).async(speed);
           };
+          return func;
         })
       }),
       /**
@@ -936,8 +938,8 @@ update(Pot.Crypt, {
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(text) {
-            var me = arguments.callee, that = me.instance;
+          var func = function(text) {
+            var that = func.instance;
             return arc4Crypt(
               text,
               that.key,
@@ -946,6 +948,7 @@ update(Pot.Crypt, {
               return Pot.UTF8.decode(res);
             });
           };
+          return func;
         })
       })
     });

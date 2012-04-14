@@ -201,7 +201,7 @@ update(Pot.Style, {
    * @public
    */
   getStyle : update(function(elem, styleName) {
-    var result = '', me = arguments.callee, style, camel, dir, raw, ref;
+    var result = '', me = Pot.Style.getStyle, style, camel, dir, raw, ref;
     dir = Pot.Style.PropMaps.dir;
     raw = Pot.Style.PropMaps.raw;
     ref = Pot.Style.PropMaps.ref;
