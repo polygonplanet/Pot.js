@@ -63,6 +63,7 @@
         "reference.function.Pot.isObject":{"ja":"isObject","en":"isObject"},
         "reference.function.Pot.isError":{"ja":"isError","en":"isError"},
         "reference.function.Pot.isScalar":{"ja":"isScalar","en":"isScalar"},
+        "reference.function.Pot.isArguments":{"ja":"isArguments","en":"isArguments"},
         "reference.function.Pot.isArrayLike":{"ja":"isArrayLike","en":"isArrayLike"},
         "reference.function.Pot.typeOf":{"ja":"typeOf","en":"typeOf"},
         "reference.function.Pot.typeLikeOf":{"ja":"typeLikeOf","en":"typeLikeOf"},

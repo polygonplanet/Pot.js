@@ -9,10 +9,10 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.12
- * @date           2012-04-04
+ * @version        1.13
+ * @date           2012-04-15
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
- * @license        Dual licensed under the MIT and GPL v2 licenses.
+ * @license        Dual licensed under the MIT or GPL v2 licenses.
  */
 var Assert = {
   JSON_URL     : './pot.test.json',
@@ -614,6 +614,20 @@ $(function() {
         false,
         false
       ]
+    }, {
+      title  : 'Pot.isArguments()',
+      code   : function() {
+        var result = [];
+        (function(a, b, c) {
+          var obj = {foo : 1};
+          var arr = [1, 2, 3];
+          result.push(isArguments(obj));
+          result.push(isArguments(arr));
+          result.push(isArguments(arguments));
+        }(1, 2, 3));
+        return result;
+      },
+      expect : [false, false, true]
     }, {
       title  : 'Pot.isArrayLike()',
       code   : function() {
