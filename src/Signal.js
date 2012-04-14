@@ -1637,10 +1637,6 @@ each({
 // Definition of internal signal trappers.
 each({
   /**@ignore*/
-  before     : true,
-  /**@ignore*/
-  after      : true,
-  /**@ignore*/
   normal     : true,
   /**@ignore*/
   before     : true,
@@ -1670,7 +1666,8 @@ each({
  */
 function createListener(object, sigName, callback,
                         useCapture, isDOM, once, advice) {
-  var isLoadEvent = (isDOM && RE.EVENT_ONCE.test(sigName)),
+  var resultFunc,
+      isLoadEvent = (isDOM && RE.EVENT_ONCE.test(sigName)),
       isOnce, onceHandler, fn, ps = Signal, done;
   if (once || isLoadEvent) {
     isOnce = true;
@@ -1711,10 +1708,11 @@ function createListener(object, sigName, callback,
     advice   : advice,
     attached : true
   };
-  return function(ev) {
+  /**@ignore*/
+  resultFunc = function(ev) {
     var d    = newDeferred(),
         args = arguments,
-        me   = args.callee,
+        me   = resultFunc,
         obs  = isDOM ? new Observer(object, ev) : args;
     d.data(errorKey, []);
     trappers.before(d, object, sigName, obs);
@@ -1741,6 +1739,7 @@ function createListener(object, sigName, callback,
       return res;
     }).begin();
   };
+  return resultFunc;
 }
 
 /**
@@ -1782,7 +1781,6 @@ function signalByJoinPoint(deferred, object, signalName, advice, args) {
         break;
     default:
         attached = false;
-        break;
   }
   if (attached) {
     eachHandlers(function(h) {
@@ -1995,13 +1993,15 @@ function attachByJoinPoint(object, signalName, callback, advice, once) {
   }
   /**@ignore*/
   bindListener = function(sig) {
-    return function() {
+    /**@ignore*/
+    var func = function() {
       var args = arguments;
       callback.apply(o, args);
       if (once) {
-        Signal.detach(o, sig, args.callee, false);
+        Signal.detach(o, sig, func, false);
       }
     };
+    return func;
   };
   isDOM = isDOMObject(o);
   if (isArray(signalName)) {
@@ -2043,13 +2043,15 @@ function attachPropByJoinPoint(object, propName, callback, advice, once) {
   }
   /**@ignore*/
   bindListener = function(sigName) {
-    return function() {
+    /**@ignore*/
+    var func = function() {
       var args = arguments;
       callback.apply(object, args);
       if (once) {
-        ps.detach(object, sigName, args.callee, false);
+        ps.detach(object, sigName, func, false);
       }
     };
+    return func;
   };
   props = arrayize(propName);
   each(props, function(p) {

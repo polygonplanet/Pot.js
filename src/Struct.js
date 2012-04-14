@@ -126,7 +126,6 @@ update(Pot.Struct, {
           break;
       default:
           result = x;
-          break;
     }
     return result;
   },
@@ -440,7 +439,6 @@ update(Pot.Struct, {
                       } else {
                         result[pair[0]] = pair[1];
                       }
-                      break;
                 }
               } catch (ex) {}
             });
@@ -728,9 +726,6 @@ update(Pot.Struct, {
                 }
               }
             }
-            break;
-        default:
-            break;
       }
     }
     return r;
@@ -837,9 +832,6 @@ update(Pot.Struct, {
                 r = v;
               }
             });
-            break;
-        default:
-            break;
       }
     }
     return r;
@@ -1121,7 +1113,7 @@ update(Pot.Struct, {
    * @public
    */
   removeAt : function(object, index, length) {
-    var result, me = arguments.callee, idx, len, n, minus;
+    var result, me = Pot.Struct.removeAt, idx, len, n, minus;
     result = object;
     if (object != null) {
       idx = index - 0;
