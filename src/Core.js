@@ -53,20 +53,15 @@ isNodeList,
 isNodeLike,
 
 // Constructors.
-Deferred,
-Hash,
+Deferred,/*{#if Pot}*/
+Hash,/*{#endif}*/
 Iter,
 PotInternalLightIterator,
 Signal,
 DropFile,
 Workeroid,
 
-/*{#if 0}*/
-//XXX: todo;
-// Pot.current*
-// Math.*
-/*{#endif}*/
-// A shortcut of prototype methods.
+// A shortcut of prototype methods/functions.
 ArrayProto     = Array.prototype,
 ObjectProto    = Object.prototype,
 StringProto    = String.prototype,
@@ -801,9 +796,7 @@ update(PotSystem, (function() {
   } catch (e) {}/*{#endif}*/
   try {
     /**@ignore*/
-    g = (function() {
-      yield (0);
-    }());
+    g = (new Function('yield(0);'))();
     if (g && typeof g.next === 'function') {
       o.isYieldable = true;
     }
@@ -1467,6 +1460,42 @@ Pot.update({
     return x != null && (isString(x) || isNumber(x) || isBoolean(x));
   },
   /**
+   * Check whether the argument is Arguments object or not.
+   *
+   *
+   * @example
+   *   (function(a, b, c) {
+   *     var obj = {foo : 1};
+   *     var arr = [1, 2, 3];
+   *     debug(isArguments(obj));       // false
+   *     debug(isArguments(arr));       // false
+   *     debug(isArguments(arguments)); // true
+   *   }(1, 2, 3));
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Arguments object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArguments : function(x) {
+    var result = false;
+    if (x) {
+      if (toString.call(x) == '[object Arguments]') {
+        result = true;
+      } else {
+        try {
+          if ('callee' in x && typeof x.length === 'number') {
+            result = true;
+          }
+        } catch (e) {}
+      }
+    }
+    return result;
+  },
+  /**
    * Return whether the argument object like Array (i.e. iterable)
    *
    *
@@ -1501,7 +1530,7 @@ Pot.update({
     ) {
       return false;
     }
-    if (o.isArray || isFunction(o.callee) || isNodeList(o) ||
+    if (o.isArray || Pot.isArguments(o) || isNodeList(o) ||
         ((typeof o.item === 'function' ||
           typeof o.nextNode === 'function') &&
            o.nodeType != 3 && o.nodeType != 4) ||
@@ -1643,7 +1672,6 @@ Pot.update({
           break;
       default:
           empty = (o == false || !o || o == null || o == 0);
-          break;
     }
     return empty;
   },/*{#endif}*/
@@ -2476,7 +2504,7 @@ Pot.update({
    * @public
    */
   globalEval : update(function(code) {
-    var me = arguments.callee, id, scope, func, doc, script, head;
+    var me = Pot.globalEval, id, scope, func, doc, script, head;
     if (code && me.patterns.valid.test(code)) {
       if (PotSystem.hasActiveXObject) {
         if (typeof execScript !== 'undefined' && execScript &&
@@ -2600,7 +2628,8 @@ Pot.update({
      * @ignore
      */
     doEvalInGlobalNodeJS : function(func, code) {
-      var result, me = arguments.callee, vm, script, scope = PotGlobal, id;
+      var result, me = Pot.globalEval.doEvalInGlobalNodeJS,
+          vm, script, scope = PotGlobal, id;
       if (me.worksForGlobal == null) {
         try {
           me.worksForGlobal = false;
@@ -2653,7 +2682,7 @@ Pot.update({
    * @public
    */
   localEval : update(function(code, scope) {
-    var that = Pot.globalEval, me = arguments.callee, func, context;
+    var that = Pot.globalEval, me = Pot.localEval, func, context;
     if (code && that.patterns.valid.test(code)) {
       func = 'eval';
       if (func in globals && that.test(func, globals)) {
@@ -3322,7 +3351,6 @@ Pot.update({
                     s += c;
                   }
                 }
-                break;
           }
         }
         if (PATTERNS.RETURN.test(s)) {
@@ -3504,8 +3532,8 @@ Pot.update({
             if (isFunction(overrider)) {
               return overrider.call(that, function() {
                 var a = arguments;
-                if (a.length === 1 && a[0] && a[0].callee &&
-                    a[0].callee === args.callee) {
+                if (a.length === 1 && a[0] &&
+                     Pot.isArguments(a[0]) && a[0] === args) {
                   if (canApply) {
                     return method.apply(that, arrayize(a[0]));
                   } else {
@@ -3596,7 +3624,7 @@ function update() {
  * @ignore
  */
 function arrayize(object, index) {
-  var array, i, len, me = arguments.callee, t;
+  var array, i, len, me = arrayize, t;
   if (me.canNodeList == null) {
     // NodeList cannot convert to the Array in the Blackberry, IE browsers.
     if (PotSystem.currentDocument) {
@@ -3647,7 +3675,7 @@ function arrayize(object, index) {
  * @ignore
  */
 function numeric(value, defaults) {
-  var result = 0, def = 0, args = arguments, me = args.callee, s, m;
+  var result = 0, def = 0, args = arguments, me = numeric, s, m;
   if (!me.PATTERNS) {
     me.PATTERNS = {
       BASE36GZ  : /[g-z]/,
@@ -3926,7 +3954,7 @@ function invoke(/*object[, method[, ...args]]*/) {
  * @ignore
  */
 function debug(msg) {
-  var args = arguments, me = args.callee, func, consoleService;
+  var args = arguments, me = debug, func, consoleService;
   try {
     if (!me.firebug('log', args)) {
       if (!PotSystem.hasComponents) {
@@ -3937,15 +3965,12 @@ function debug(msg) {
       consoleService.logStringMessage(String(msg));
     }
   } catch (e) {
-    if (typeof GM_log !== 'undefined') {
-      /**@ignore*/
-      func = GM_log;
-    } else if (typeof console !== 'undefined') {
-      /**@ignore*/
+    if (typeof console !== 'undefined' && console) {
       func = console.debug || console.dir || console.log;
-    } else if (typeof opera !== 'undefined' && opera.postError) {
-      /**@ignore*/
+    } else if (typeof opera !== 'undefined' && opera && opera.postError) {
       func = opera.postError;
+    } else if (typeof GM_log === 'function') {
+      func = GM_log;
     } else {
       /**@ignore*/
       func = function(x) { throw x; };
@@ -4010,10 +4035,10 @@ update(debug, {
    * @ignore
    */
   dump : function(o) {
-    var r, me = arguments.callee, repr;
+    var r, me = debug.dump, repr;
     /**@ignore*/
     repr = function(x) {
-      return (x == null) ? String(x) :
+      return (x == null) ? String(x)    :
               x.toString ? x.toString() : String(x);
     };
     if (o == null) {
@@ -4052,7 +4077,7 @@ update(debug, {
    * @ignore
    */
   divConsole : update(function(msg) {
-    var me = arguments.callee, ie6, doc, de, onResize, onScroll, onClick;
+    var me = debug.divConsole, ie6, doc, de, onResize, onScroll, onClick;
     if (PotSystem.hasActiveXObject && typeof document !== 'undefined') {
       doc = document;
       de = doc.documentElement || {};
