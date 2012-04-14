@@ -2734,7 +2734,7 @@ update(PotTmp, {
         }
         Deferred.extendSpeeds(Deferred.fn, iter.NAME, function(opts) {
           var args = arrayize(arguments, 1),
-              iterable = sp.methods(opts.speedName);
+              iterable = sp.methods(opts.speedName),
               options  = update({}, this.options);
           return this.then(function(value) {
             var d = new Deferred();
