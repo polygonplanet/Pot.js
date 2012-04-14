@@ -51,7 +51,9 @@ For Node.js.
     
     Pot.Deferred.begin(function() {
         Pot.debug('Hello World!');
-    }).then(function() {...})
+    }).then(function() {
+        // ...
+    })
     // ...
 
 Example of Greasemonkey (userscript).
@@ -62,7 +64,8 @@ Example of Greasemonkey (userscript).
     // ...
     // ==/UserScript==
     Pot.Deferred.begin(function() {
-        return Pot.request('http://www.example.com/data.json').then(function(res) {
+        var url = 'http://www.example.com/data.json';
+        return Pot.request(url).then(function(res) {
             return Pot.parseFromJSON(res.responseText);
         });
     }).then(function(res) {
@@ -239,9 +242,9 @@ A simple iterate and Deferred object usage with asynchronous and synchronous.
         
     }).end(); // Chain can be closed by the "end" method on any.
 
-Refer document if you want to need more example and usage.
-
-
+Refer document if you want to need more example and usage.  
+  
+**[Pot.js + PotLite.js - Document and Reference][Reference]**  
 
 
 
