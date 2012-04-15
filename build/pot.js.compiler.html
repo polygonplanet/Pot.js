@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js + PotLite.js - Compiler - JavaScript Library</title>
+<script src="pot.js"></script>
+<script>
+Pot.attach(window, 'load', function() {
+  var BUILD_URL  = 'build.php';
+  var MINIFY_URL = 'minify.php';
+
+  var log = function(msg) {
+    var status = document.getElementById('status');
+    status.textContent += msg + '\n';
+  };
+
+  var script = {
+    full : '',
+    lite : '',
+    minify : {
+      full : '',
+      lite : ''
+    }
+  };
+
+  log('----------------------------');
+  log('[Begin] Compiling.');
+  log('----------------------------');
+
+  Pot.begin(function() {
+    log('Request: ' + BUILD_URL + ': full');
+    return Pot.request(BUILD_URL, {
+      queryString : {
+        debug : false,
+        type  : 'full'
+      }
+    }).then(function(res) {
+      script.full = res.responseText;
+      log(Pot.sprintf('full: %d bytes.', Pot.utf8ByteOf(script.full)));
+    });
+  }).wait(5).speed('slow').then(function() {
+    log('Request: ' + BUILD_URL + ': lite');
+    return Pot.request(BUILD_URL, {
+      queryString : {
+        debug : false,
+        type  : 'lite'
+      }
+    }).then(function(res) {
+      script.lite = res.responseText;
+      log(Pot.sprintf('lite: %d bytes.', Pot.utf8ByteOf(script.lite)));
+    });
+  }).wait(5).then(function() {
+    log('Request: ' + MINIFY_URL + ': full');
+    return Pot.request(MINIFY_URL, {
+      queryString : {
+        type  : 'full'
+      }
+    }).then(function(res) {
+      script.minify.full = res.responseText;
+      log(Pot.sprintf('[minify] full: %s', script.minify.full));
+    });
+  }).wait(3.5).then(function() {
+    log('Request: ' + MINIFY_URL + ': lite');
+    return Pot.request(MINIFY_URL, {
+      queryString : {
+        type  : 'lite'
+      }
+    }).then(function(res) {
+      script.minify.lite = res.responseText;
+      log(Pot.sprintf('[minify] lite: %s', script.minify.lite));
+    });
+  }).wait(1).then(function() {
+    log('----------------------------');
+    log('[End] Complete compiling.');
+    log('----------------------------');
+  }).end();
+});
+</script>
+</head>
+<body>
+ <h1>Pot.js - Compiler - JavaScript Library</h1>
+ <pre id="status"></pre>
+</body>
+</html>
