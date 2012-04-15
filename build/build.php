@@ -4,8 +4,8 @@
 // Simple script compiler
 //
 // Usage:
-//   Run Apache server.
-//   Access http://localhost/{this-directory}/build.php?debug=true&type=lite
+//   Run server.
+//   Access http://localhost/{this-directory}/build.php?debug=true&type=full
 //   Parameters:
 //     - debug:
 //         "true" or "false"
@@ -61,6 +61,7 @@ class Pot_Builder {
     } else {
       $this->debug = false;
     }
+    define('DEBUG', $this->debug, true);
     if (!empty($_GET['version'])) {
       $this->version = $_GET['version'];
     } else if (isset($this->settings->version)) {
