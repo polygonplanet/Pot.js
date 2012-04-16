@@ -43,7 +43,7 @@ var dropFile = new Pot.DropFile(panel, {
   onDrop : function(files) {
     panel.text('dropped');
   },
-  onLoadImage : function(data, name, size) {
+  onLoadImage : function(data, name, size, type) {
     $('<div/>')
       .text('name: ' + name + ', size: ' + size)
       .appendTo('body');
@@ -52,7 +52,7 @@ var dropFile = new Pot.DropFile(panel, {
       .css({maxWidth : 500, maxHeight : 500})
       .appendTo('body');
   },
-  onLoadText : function(data, name, size) {
+  onLoadText : function(data, name, size, type) {
     $('<div/>')
       .text('name: ' + name + ', size: ' + size)
       .appendTo('body');
@@ -61,7 +61,7 @@ var dropFile = new Pot.DropFile(panel, {
       .css({width : '90%', height : 300})
       .appendTo('body');
   },
-  onLoadText : function(data, name, size) {
+  onLoadUnknown : function(data, name, size, type) {
     $('<div/>')
       .text('name: ' + name + ', size: ' + size)
       .appendTo('body');
