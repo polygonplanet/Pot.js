@@ -940,6 +940,21 @@ update(PotSystem, (function() {
       }
     }());
   }
+  try {
+    if (typeof ArrayBuffer !== 'undefined' &&
+        (new ArrayBuffer(10)).byteLength === 10 &&
+        typeof Uint8Array !== 'undefined' &&
+        (new Uint8Array([0, 312])).subarray(1)[0] === 56
+    ) {
+      o.hasTypedArray = true;
+      if (typeof DataView !== 'undefined' &&
+          (new DataView(new Uint8Array([
+            0x10, 0x20, 0x40, 0x80
+          ]).buffer)).getUint32(0) === 0x10204080) {
+        o.hasDataView = true;
+      }
+    }
+  } catch (e) {}
   return o;
 }()));
 
