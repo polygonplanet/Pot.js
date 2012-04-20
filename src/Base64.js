@@ -223,12 +223,32 @@ Pot.update({
       init : function(string, maps) {
         this.maps = maps;
         this.string = stringify(string, true);
+        this.assign();
         this.len = this.string.length;
         this.results = [];
         this.pos = -8;
         this.att = 0;
         return this;
       },
+      /**
+       * @private
+       * @ignore
+       */
+      assign : (function() {
+        var reps = [
+          [/-/g, '+'],
+          [/_/g, '/']
+        ];
+        return function() {
+          var s = this.string;
+          if (~this.maps.indexOf('-')) {
+            each(reps, function(item) {
+              s = s.replace(item[0], item[1]);
+            });
+            this.string = s;
+          }
+        };
+      }()),
       /**
        * @private
        * @ignore
