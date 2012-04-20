@@ -231,6 +231,7 @@ update(Pot.MimeType, {
     mxu  : 'video/vnd.mpegurl',
     m4u  : 'video/vnd.mpegurl',
     avi  : 'video/x-msvideo',
+    ogg  : 'application/ogg',
     // adobe
     pdf  : 'application/pdf',
     psd  : 'image/vnd.adobe.photoshop',
