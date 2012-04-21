@@ -163,7 +163,6 @@ update(Pot.Collection, {
           } else {
             result = args;
           }
-          break;
     }
     return result;
   },
@@ -395,8 +394,18 @@ update(Pot.Collection, {
    *   // @results ['a1', 'a2', 'a10', 'a12', 'a100']
    *
    *
-   * @param  {Array}  array  A target array.
-   * @return {Array}         An array of result `array`.
+   * @example
+   *   var arr = [{v: 'a10'}, {v: 'a2'}, {v: 'a100'}, {v: 'a1'}];
+   *   debug(alphanumSort(arr, function(item) {
+   *     // Specify variable (property name).
+   *     return item.v;
+   *   }));
+   *   // @results [{v: 'a1'}, {v: 'a2'}, {v: 'a10'}, {v: 'a100'}]
+   *
+   *
+   * @param  {Array}     array  A target array.
+   * @param  {Function} (func)  Callback function if need specify arguments.
+   * @return {Array}            An array of result `array`.
    * @type  Function
    * @function
    * @static
@@ -434,9 +443,15 @@ update(Pot.Collection, {
       }
       return aa.length - bb.length;
     }
-    return function(array) {
+    return function(array, func) {
       if (isArray(array)) {
-        array.sort(alphanumCase);
+        if (isFunction(func)) {
+          array.sort(function(a, b) {
+            return alphanumCase(func(a), func(b));
+          });
+        } else {
+          array.sort(alphanumCase);
+        }
       }
       return array;
     };
