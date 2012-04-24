@@ -39,13 +39,15 @@ isDate,
 isRegExp,
 isObject,
 isError,
+isTypedArray,
 isArrayLike,
 isNumeric,
 isStopIter,
 isDeferred,
 isHash,
 isIter,
-isWorkeroid,
+isWorkeroid,/*{#if Pot}*/
+isArrayBufferoid,/*{#endif}*/
 isWindow,
 isDocument,
 isElement,
@@ -59,7 +61,8 @@ Iter,
 PotInternalLightIterator,
 Signal,
 DropFile,
-Workeroid,
+Workeroid,/*{#if Pot}*/
+ArrayBufferoid,/*{#endif}*/
 
 // A shortcut of prototype methods/functions.
 ArrayProto     = Array.prototype,
@@ -1510,6 +1513,39 @@ Pot.update({
     return result;
   },
   /**
+   * Check whether the argument is TypedArray object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isTypedArray(obj)); // false
+   *   debug(isTypedArray(arr)); // false
+   *   debug(isTypedArray(buf)); // true
+   *   debug(isTypedArray(uar)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is TypedArray object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isTypedArray : function(x) {
+    var result = false;
+    if (x && PotSystem.hasTypedArray && 
+        (x.constructor === ArrayBuffer ||
+          (x.buffer && x.buffer.constructor === ArrayBuffer)
+        )
+    ) {
+      result = true;
+    }
+    return result;
+  },
+  /**
    * Return whether the argument object like Array (i.e. iterable)
    *
    *
@@ -1534,13 +1570,14 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (isArray(o) || o instanceof Array || o.constructor === Array) {
+    if (isArray(o) || o instanceof Array || o.constructor === Array ||
+        isTypedArray(o)/*{#if Pot}*/ || isArrayBufferoid(o)/*{#endif}*/) {
       return true;
     }
     len = o.length;
     if (!isNumber(len) || (!isObject(o) && !isArray(o)) ||
-        o === Pot || o === PotGlobal || o === globals ||
-        isWindow(o) || isDocument(o) || isElement(o)
+         o === Pot  || o === PotGlobal || o === globals ||
+        isWindow(o) ||  isDocument(o)  || isElement(o)
     ) {
       return false;
     }
@@ -1764,6 +1801,32 @@ Pot.update({
      (x.id   != null && x.id   === Workeroid.fn.id &&
       x.NAME != null && x.NAME === Workeroid.fn.NAME));
   },/*{#if Pot}*/
+  /**
+   * Check whether the argument object is an instance of Pot.ArrayBufferoid.
+   *
+   *
+   * @example
+   *   var o = {hoge: 1};
+   *   var a = new Pot.ArrayBufferoid();
+   *   debug(isArrayBufferoid(o)); // false
+   *   debug(isArrayBufferoid(a)); // true
+   *
+   *
+   * @param  {Object|*}  x  The target object to test.
+   * @return {Boolean}      Return true if the argument object is an
+   *                          instance of Pot.ArrayBufferoid,
+   *                          otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArrayBufferoid : function(x) {
+    return ArrayBufferoid && x != null &&
+     ((x instanceof ArrayBufferoid) ||
+      (x.id   != null && x.id   === ArrayBufferoid.fn.id &&
+       x.NAME != null && x.NAME === ArrayBufferoid.fn.NAME));
+  },
   /**
    * Check whether the argument object is an instance of Pot.Hash.
    *
@@ -2203,13 +2266,15 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
 
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
+isTypedArray     = Pot.isTypedArray;
 isArrayLike      = Pot.isArrayLike;
 isNumeric        = Pot.isNumeric;
 isStopIter       = Pot.isStopIter;
 isDeferred       = Pot.isDeferred;
 isHash           = Pot.isHash;
 isIter           = Pot.isIter;
-isWorkeroid      = Pot.isWorkeroid;
+isWorkeroid      = Pot.isWorkeroid;/*{#if Pot}*/
+isArrayBufferoid = Pot.isArrayBufferoid;/*{#endif}*/
 isWindow         = Pot.isWindow;
 isDocument       = Pot.isDocument;
 isElement        = Pot.isElement;
@@ -3599,6 +3664,8 @@ Pot.update({
     if (isError(error)) {
       msg = String(error.message  || error.description ||
                   (error.toString && error.toString()) || error);
+    } else {
+      msg = (error && error.toString && error.toString()) || error;
     }
     return stringify(msg) || stringify(defaults) || 'error';
   }
