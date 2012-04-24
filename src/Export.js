@@ -204,12 +204,14 @@ update(PotInternal, {
     isIterable              : Pot.isIterable,
     isScalar                : Pot.isScalar,
     isArguments             : Pot.isArguments,
+    isTypedArray            : Pot.isTypedArray,
     isArrayLike             : Pot.isArrayLike,/*{#if Pot}*/
     isPlainObject           : Pot.isPlainObject,
     isEmpty                 : Pot.isEmpty,/*{#endif}*/
     isDeferred              : Pot.isDeferred,
     isIter                  : Pot.isIter,
     isWorkeroid             : Pot.isWorkeroid,/*{#if Pot}*/
+    isArrayBufferoid        : Pot.isArrayBufferoid,
     isHash                  : Pot.isHash,
     isJSEscaped             : Pot.isJSEscaped,/*{#endif}*/
     isPercentEncoded        : Pot.isPercentEncoded,/*{#if Pot}*/
@@ -299,7 +301,8 @@ update(PotInternal, {
     evalInSandbox           : Pot.XPCOM.evalInSandbox,
     throughout              : Pot.XPCOM.throughout,
     getMostRecentWindow     : Pot.XPCOM.getMostRecentWindow,
-    getChromeWindow         : Pot.XPCOM.getChromeWindow,
+    getChromeWindow         : Pot.XPCOM.getChromeWindow,/*{#if Pot}*/
+    ArrayBufferoid          : Pot.ArrayBufferoid,/*{#endif}*/
     Workeroid               : Pot.Workeroid,
     attach                  : Pot.Signal.attach,
     attachBefore            : Pot.Signal.attachBefore,
