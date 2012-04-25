@@ -43,11 +43,11 @@ Pot.update({
    *
    *
    * @example
-   *  var buffer = new Pot.ArrayBufferoid([1, 2, 3, 4]);
-   *  var uint8Array = buffer.map(function(val) {
-   *    return val + 100;
-   *  }).toUint8Array();
-   *  Pot.debug(uint8Array[0]); // 101
+   *   var buffer = new Pot.ArrayBufferoid([1, 2, 3, 4]);
+   *   var uint8Array = buffer.map(function(val) {
+   *     return val + 100;
+   *   }).toUint8Array();
+   *   Pot.debug(uint8Array[0]); // 101
    *
    *
    * @param  {Array|TypedArray|Pot.ArrayBufferoid|Number|*} args parameters.
@@ -825,15 +825,27 @@ update(ArrayBufferoid, {
    * @public
    */
   copyBuffer : function(buffer) {
-    var result = [];
+    var result = [], a, b, i, len;
     if (buffer) {
       if (isArrayBufferoid(buffer)) {
         result = new ArrayBufferoid(buffer);
       } else {
         if (PotSystem.hasTypedArray) {
-          result = new Uint32Array(
-            new Uint32Array(buffer.buffer || buffer)
-          ).buffer;
+          if (PotSystem.canCopyTypedArray) {
+            result = new Uint8Array(
+              new Uint8Array(
+                buffer.subarray && buffer.subarray(0) || buffer
+              )
+            ).buffer;
+          } else {
+            a = new Uint8Array(buffer);
+            b = [];
+            len = a.length;
+            for (i = 0; i < len; i++) {
+              b[i] = a[i];
+            }
+            result = new Uint8Array(b).buffer;
+          }
         } else {
           result = arrayize(buffer);
         }
@@ -874,11 +886,12 @@ update(ArrayBufferoid, {
    * @public
    */
   bufferToBinary : function(buffer) {
-    var result = '', chars = [], i, len;
+    var result = '', chars = [], i, len, array;
     if (buffer && isArrayLike(buffer)) {
-      len = buffer.length;
+      array = arrayize(buffer);
+      len = array.length;
       for (i = 0; i < len; i++) {
-        chars[i] = fromUnicode(buffer[i]);
+        chars[i] = fromUnicode(array[i]);
       }
       result = chars.join('');
     }
@@ -928,21 +941,22 @@ update(ArrayBufferoid, {
    * @public
    */
   bufferToString : function(buffer) {
-    var result = '', chars = [], i = 0, len, n, c, c2, c3, sc;
+    var result = '', chars = [], i = 0, len, n, c, c2, c3, sc, array;
     if (buffer && isArrayLike(buffer)) {
       sc = fromUnicode;
-      len = buffer.length;
+      array = arrayize(buffer);
+      len = array.length;
       while (i < len) {
-        c = buffer[i++];
+        c = array[i++];
         n = (c >> 4);
         if (0 <= n && n <= 7) {
           chars[chars.length] = sc(c);
         } else if (12 <= n && n <= 13) {
-          c2 = buffer[i++];
+          c2 = array[i++];
           chars[chars.length] = sc(((c & 0x1F) << 6) | (c2 & 0x3F));
         } else if (n === 14) {
-          c2 = buffer[i++];
-          c3 = buffer[i++];
+          c2 = array[i++];
+          c3 = array[i++];
           chars[chars.length] = sc(((c  & 0x0F) << 12) |
                                    ((c2 & 0x3F) <<  6) |
                                    ((c3 & 0x3F) <<  0));
@@ -962,26 +976,28 @@ function createArrayBuffer(type, args) {
   var result, types = ArrayBufferoidTypes, len = args.length, val;
   if (PotSystem.hasTypedArray) {
     switch (true) {
-      case (type & types.ArrayBuffer):
+      case ((type & types.ArrayBuffer) === type):
           return newTypedArray(Float64Array, args).buffer;
-      case (type & types.Uint8Array):
+      case ((type & types.Uint8Array) === type):
           return newTypedArray(Uint8Array, args);
-      case (type & types.Uint16Array):
+      case ((type & types.Uint16Array) === type):
           return newTypedArray(Uint16Array, args);
-      case (type & types.Uint32Array):
+      case ((type & types.Uint32Array) === type):
           return newTypedArray(Uint32Array, args);
-      case (type & types.Int8Array):
+      case ((type & types.Int8Array) === type):
           return newTypedArray(Int8Array, args);
-      case (type & types.Uint8ClampedArray):
-          return newTypedArray(Uint8ClampedArray, args);
-      case (type & types.Int16Array):
+      case ((type & types.Int16Array) === type):
           return newTypedArray(Int16Array, args);
-      case (type & types.Int32Array):
+      case ((type & types.Int32Array) === type):
           return newTypedArray(Int32Array, args);
-      case (type & types.Float32Array):
+      case ((type & types.Float32Array) === type):
           return newTypedArray(Float32Array, args);
-      case (type & types.Float64Array):
+      case ((type & types.Float64Array) === type):
           return newTypedArray(Float64Array, args);
+      case ((type & types.Uint8ClampedArray) === type):
+          if (PotSystem.hasUint8ClampedArray) {
+            return newTypedArray(Uint8ClampedArray, args);
+          }
     }
   }
   if (len) {
