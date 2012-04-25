@@ -222,7 +222,7 @@ ArrayBufferoid.fn = ArrayBufferoid.prototype = {
     var all = null, limit = 5;
     return function() {
       var result = 0, len, len2;
-      if (true || all === null) {
+      if (all === null) {
         len  = sizeOfBufferoid(this, true);
         len2 = sizeOfBufferoid(this);
         if (len) {
