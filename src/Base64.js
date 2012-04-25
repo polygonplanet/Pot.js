@@ -234,21 +234,12 @@ Pot.update({
        * @private
        * @ignore
        */
-      assign : (function() {
-        var reps = [
-          [/-/g, '+'],
-          [/_/g, '/']
-        ];
-        return function() {
-          var s = this.string;
-          if (~this.maps.indexOf('-')) {
-            each(reps, function(item) {
-              s = s.replace(item[0], item[1]);
-            });
-            this.string = s;
-          }
-        };
-      }()),
+      assign : function() {
+        var s = this.string;
+        if (~s.indexOf('-') || ~s.indexOf('_')) {
+          this.maps = BASE64URLMAPS;
+        }
+      },
       /**
        * @private
        * @ignore
