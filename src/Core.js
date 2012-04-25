@@ -698,7 +698,7 @@ Pot.update({
 /*{#endif}*/
 // Definition of System.
 update(PotSystem, (function() {
-  var o = {}, g, ws, b, u/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
+  var o = {}, g, ws, b, u, ua, ca/*{#if Pot}*/, oe, ce, ov, cv, f/*{#endif}*/;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -950,6 +950,21 @@ update(PotSystem, (function() {
         (new Uint8Array([0, 312])).subarray(1)[0] === 56
     ) {
       o.hasTypedArray = true;
+      try {
+        ua = new Uint8Array([1, 2]);
+        ca = new Uint8Array(ua.subarray(0));
+        ca[0] = 5;
+        if (ua[0] === 1 && ca[0] === 5) {
+          o.canCopyTypedArray = true;
+        }
+        ua = ca = null;
+      } catch (ex) {}
+      try {
+        if (typeof Uint8ClampedArray !== 'undefined' &&
+            (new Uint8ClampedArray([0, 312])).subarray(1)[0] === 255) {
+          o.hasUint8ClampedArray = true;
+        }
+      } catch (ex) {}
       if (typeof DataView !== 'undefined' &&
           (new DataView(new Uint8Array([
             0x10, 0x20, 0x40, 0x80
