@@ -218,38 +218,11 @@ ArrayBufferoid.fn = ArrayBufferoid.prototype = {
    * @function
    * @public
    */
-  size : (function() {
-    var all = null, limit = 5;
-    return function() {
-      var result = 0, len, len2;
-      if (all === null) {
-        len  = sizeOfBufferoid(this, true);
-        len2 = sizeOfBufferoid(this);
-        if (len) {
-          if (len > len2) {
-            all = true;
-          } else {
-            all = false;
-          }
-        } else if (len2) {
-          if (len > len2) {
-            all = true;
-          } else {
-            all = false;
-          }
-        } else {
-          if (limit-- < 0) {
-            all = true;
-          }
-        }
-        result = all ? len : len2;
-      } else {
-        result = sizeOfBufferoid(this, all);
-      }
-      this.length = result;
-      return result;
-    };
-  }()),
+  size : function() {
+    var result = sizeOfBufferoid(this, true);
+    this.length = result;
+    return result;
+  },
   /**
    * toString like Array.prototype.toString.
    *
