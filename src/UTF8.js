@@ -200,64 +200,76 @@ update(Pot.UTF8, {
    *     227, 129, 187, 227, 129, 146,
    *     227, 129, 187, 227, 129, 146
    *   ];
-   *   Pot.convertEncodingToUnicode(sjis).then(function(res) {
+   *   Pot.convertEncodingToUnicode(sjis, 'Shift_JIS').then(function(res) {
    *     Pot.debug('SJIS to Unicode:');
    *     Pot.debug(res); // 'こんにちは。ほげほげ'
    *   }).then(function() {
-   *     return Pot.convertEncodingToUnicode(eucjp).then(function(res) {
-   *       Pot.debug('EUC-JP to Unicode');
+   *     return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP')
+   *                                                    .then(function(res) {
+   *       Pot.debug('EUC-JP to Unicode:');
    *       Pot.debug(res); // 'こんにちは。ほげほげ'
    *     });
    *   }).then(function() {
-   *     return Pot.convertEncodingToUnicode(utf8).then(function(res) {
-   *       Pot.debug('UTF-8 to Unicode');
+   *     return Pot.convertEncodingToUnicode(utf8, 'UTF-8')
+   *                                                    .then(function(res) {
+   *       Pot.debug('UTF-8 to Unicode:');
    *       Pot.debug(res); // 'こんにちは。ほげほげ'
    *     });
    *   });
    *
    *
-   * @param  {TypedArray|Array|Blob}  data  The target data.
-   * @return {Pot.Deferred}                 A new instance of
-   *                                          Pot.Deferred that has
-   *                                          Unicode string.
+   * @param  {TypedArray|Array|Blob}  data   The target data.
+   * @param  {(String)}              (from)  (optional) Character
+   *                                           encoding from.
+   * @return {Pot.Deferred}                  A new instance of
+   *                                           Pot.Deferred that has
+   *                                           Unicode string.
    * @type  Function
    * @function
    * @static
    * @public
    */
-  convertEncodingToUnicode : function(data) {
-    var d  = new Deferred(), bb, fl;
-    try {
-      bb = new PotSystem.BlobBuilder();
-      fl = new FileReader();
-      if (isString(data)) {
-        //XXX: String to ArrayBuffer
-        bb.append(data);
-      } else if (isArrayLike(data)) {
-        bb.append(new Uint8Array(data).buffer);
-      } else {
-        bb.append(data);
-      }
-      /**@ignore*/
-      fl.onload = function(ev) {
-        fl.onload = fl.onerror = PotNoop;
-        if (ev && ev.target && ev.target.result != null) {
-          d.begin(ev.target.result);
+  convertEncodingToUnicode : (function() {
+    var isAuto = /^\s*auto\s{0,}/i;
+    return function(data, from) {
+      var d  = new Deferred(), bb, fl, b;
+      try {
+        bb = new PotSystem.BlobBuilder();
+        fl = new FileReader();
+        if (isString(data)) {
+          //XXX: String to ArrayBuffer
+          bb.append(data);
+        } else if (isArrayLike(data)) {
+          bb.append(new Uint8Array(data).buffer);
         } else {
-          d.raise(ev);
+          bb.append(data);
         }
-      };
-      /**@ignore*/
-      fl.onerror = function(e) {
-        fl.onload = fl.onerror = PotNoop;
+        /**@ignore*/
+        fl.onload = function(ev) {
+          fl.onload = fl.onerror = PotNoop;
+          if (ev && ev.target && ev.target.result != null) {
+            d.begin(ev.target.result);
+          } else {
+            d.raise(ev);
+          }
+        };
+        /**@ignore*/
+        fl.onerror = function(e) {
+          fl.onload = fl.onerror = PotNoop;
+          d.raise(e);
+        };
+        b = bb.getBlob('text/plain');
+        if (from == null || isAuto.test(from)) {
+          fl.readAsText(b);
+        } else {
+          fl.readAsText(b, trim(from));
+        }
+      } catch (e) {
         d.raise(e);
-      };
-      fl.readAsText(bb.getBlob('text/plain'));
-    } catch (e) {
-      d.raise(e);
-    }
-    return d;
-  }
+      }
+      return d;
+    };
+  }())
 });
 
 // Update Pot object.
