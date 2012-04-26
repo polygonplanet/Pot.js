@@ -166,12 +166,104 @@ update(Pot.UTF8, {
       }
     }
     return size;
+  },
+  /**
+   * Convert encoding to Unicode string.
+   * This function requires BlobBuilder and FileReader API.
+   * If environment not supported HTML5 API, it will be raised by Deferred.
+   *
+   * @example
+   *   // 'こんにちは。ほげほげ'
+   *   var unicode = [
+   *     12371, 12435, 12395, 12385, 12399, 12290,
+   *     12411, 12370, 12411, 12370
+   *   ];
+   *   // Shift_JIS: 'こんにちは。ほげほげ'
+   *   var sjis = [
+   *     130, 177, 130, 241, 130, 201,
+   *     130, 191, 130, 205, 129, 66,
+   *     130, 217, 130, 176, 130, 217,
+   *     130, 176
+   *   ];
+   *   // EUC-JP: 'こんにちは。ほげほげ'
+   *   var eucjp = [
+   *     164, 179, 164, 243, 164, 203,
+   *     164, 193, 164, 207, 161, 163,
+   *     164, 219, 164, 178, 164, 219,
+   *     164, 178
+   *   ];
+   *   // UTF-8: 'こんにちは。ほげほげ'
+   *   var utf8 = [
+   *     227, 129, 147, 227, 130, 147,
+   *     227, 129, 171, 227, 129, 161,
+   *     227, 129, 175, 227, 128, 130,
+   *     227, 129, 187, 227, 129, 146,
+   *     227, 129, 187, 227, 129, 146
+   *   ];
+   *   Pot.convertEncodingToUnicode(sjis).then(function(res) {
+   *     Pot.debug('SJIS to Unicode:');
+   *     Pot.debug(res); // 'こんにちは。ほげほげ'
+   *   }).then(function() {
+   *     return Pot.convertEncodingToUnicode(eucjp).then(function(res) {
+   *       Pot.debug('EUC-JP to Unicode');
+   *       Pot.debug(res); // 'こんにちは。ほげほげ'
+   *     });
+   *   }).then(function() {
+   *     return Pot.convertEncodingToUnicode(utf8).then(function(res) {
+   *       Pot.debug('UTF-8 to Unicode');
+   *       Pot.debug(res); // 'こんにちは。ほげほげ'
+   *     });
+   *   });
+   *
+   *
+   * @param  {TypedArray|Array|Blob}  data  The target data.
+   * @return {Pot.Deferred}                 A new instance of
+   *                                          Pot.Deferred that has
+   *                                          Unicode string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  convertEncodingToUnicode : function(data) {
+    var d  = new Deferred(), bb, fl;
+    try {
+      bb = new PotSystem.BlobBuilder();
+      fl = new FileReader();
+      if (isString(data)) {
+        //XXX: String to ArrayBuffer
+        bb.append(data);
+      } else if (isArrayLike(data)) {
+        bb.append(new Uint8Array(data).buffer);
+      } else {
+        bb.append(data);
+      }
+      /**@ignore*/
+      fl.onload = function(ev) {
+        fl.onload = fl.onerror = PotNoop;
+        if (ev && ev.target && ev.target.result != null) {
+          d.begin(ev.target.result);
+        } else {
+          d.raise(ev);
+        }
+      };
+      /**@ignore*/
+      fl.onerror = function(e) {
+        fl.onload = fl.onerror = PotNoop;
+        d.raise(e);
+      };
+      fl.readAsText(bb.getBlob('text/plain'));
+    } catch (e) {
+      d.raise(e);
+    }
+    return d;
   }
 });
 
 // Update Pot object.
 Pot.update({
-  utf8Encode : Pot.UTF8.encode,
-  utf8Decode : Pot.UTF8.decode,
-  utf8ByteOf : Pot.UTF8.byteOf
+  utf8Encode               : Pot.UTF8.encode,
+  utf8Decode               : Pot.UTF8.decode,
+  utf8ByteOf               : Pot.UTF8.byteOf,
+  convertEncodingToUnicode : Pot.UTF8.convertEncodingToUnicode
 });
