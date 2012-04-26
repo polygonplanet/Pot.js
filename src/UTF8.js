@@ -230,7 +230,7 @@ update(Pot.UTF8, {
    * @public
    */
   convertEncodingToUnicode : (function() {
-    var isAuto = /^\s*auto\s{0,}/i;
+    var isAuto = /^\s*auto\s*$/i;
     return function(data, from) {
       var d  = new Deferred(), bb, fl, b;
       try {
