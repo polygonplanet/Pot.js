@@ -131,6 +131,10 @@ Documentation And Reference
       * [Pot.js - JsDoc Reference - Index][Pot_JSDoc]
       * [PotLite.js - JsDoc Reference - Index][PotLite_JSDoc]
 
+Blog
+========
+
+  * [Pot.js Blog][Pot.js Blog]
 
 Example
 ========
@@ -259,6 +263,8 @@ Refer document if you want to need more example and usage.
 [Pot.js_TestRun]: http://polygonplanet.github.com/Pot.js/pot.test.html "Pot.js - Test Run - JavaScript Utility Library"
 
 [PotLite.js_TestRun]: http://polygonplanet.github.com/Pot.js/potlite.test.html "PotLite.js - Test Run - JavaScript Async Library"
+
+[Pot.js Blog]: http://potjs.tumblr.com/ "Pot.js Blog"
 
 
 
