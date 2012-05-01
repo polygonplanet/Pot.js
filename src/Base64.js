@@ -22,8 +22,8 @@ Pot.update({
     var BASE64MAPS    = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '+/=',
         BASE64URLMAPS = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '-_=',
         /**@ignore*/
-        Encoder = function(string, maps) {
-          return new Encoder.prototype.init(string, maps);
+        Encoder = function(data, maps) {
+          return new Encoder.prototype.init(data, maps);
         },
         /**@ignore*/
         Decoder = function(string, maps) {
@@ -41,7 +41,13 @@ Pot.update({
        * @ignore
        * @internal
        */
-      string : null,
+      data : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      raw : false,
       /**
        * @private
        * @ignore
@@ -90,10 +96,16 @@ Pot.update({
        * @private
        * @ignore
        */
-      init : function(string, maps) {
+      init : function(data, maps) {
         this.maps = maps;
-        this.string = stringify(string, true);
-        this.len = this.string.length;
+        if (isArrayLike(data)) {
+          this.data = arrayize(data);
+          this.raw = true;
+        } else {
+          this.data = stringify(data, true);
+          this.raw = false;
+        }
+        this.len = this.data.length;
         this.results = [];
         this.pos = -6;
         this.att = 0;
@@ -107,9 +119,11 @@ Pot.update({
        */
       execute : function() {
         var r = this.results, m = this.maps;
-        this.string = Pot.UTF8.encode(this.string);
-        if (this.string) {
-          this.len = this.string.length;
+        if (!this.raw) {
+          this.data = Pot.UTF8.encode(this.data);
+        }
+        if (this.data) {
+          this.len = this.data.length;
           while (this.index < this.len || this.pos > -6) {
             if (this.pos < 0) {
               this.peek();
@@ -129,8 +143,10 @@ Pot.update({
        */
       deferred : function(speed) {
         var that = this, r = this.results, m = this.maps;
-        this.string = Pot.UTF8.encode(this.string);
-        this.len = this.string.length;
+        if (!this.raw) {
+          this.data = Pot.UTF8.encode(this.data);
+        }
+        this.len = this.data.length;
         return Deferred.forEver[speed](function() {
           if (that.index < that.len || that.pos > -6) {
             if (that.pos < 0) {
@@ -155,7 +171,11 @@ Pot.update({
       peek : function() {
         var c;
         if (this.index < this.len) {
-          c = this.string.charCodeAt(this.index++);
+          if (this.raw) {
+            c = this.data[this.index++];
+          } else {
+            c = this.data.charCodeAt(this.index++);
+          }
           this.vol += 8;
         } else {
           c = 0;
@@ -178,6 +198,12 @@ Pot.update({
        * @internal
        */
       string : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      asBuffer : false,
       /**
        * @private
        * @ignore
@@ -222,6 +248,7 @@ Pot.update({
        */
       init : function(string, maps) {
         this.maps = maps;
+        this.asBuffer = false;
         this.string = stringify(string, true);
         this.assign();
         this.len = this.string.length;
@@ -238,6 +265,8 @@ Pot.update({
         var s = this.string;
         if (~s.indexOf('-') || ~s.indexOf('_')) {
           this.maps = BASE64URLMAPS;
+        } else {
+          this.maps = BASE64MAPS;
         }
       },
       /**
@@ -260,6 +289,23 @@ Pot.update({
        * @private
        * @ignore
        */
+      executeAsBuffer : function() {
+        var i, n = this.len, c, m = this.maps;
+        this.asBuffer = true;
+        if (n) {
+          for (i = 0; i < n; i++) {
+            c = m.indexOf(this.string.charAt(i));
+            if (~c) {
+              this.decode(c);
+            }
+          }
+        }
+        return new ArrayBufferoid(this.results);
+      },
+      /**
+       * @private
+       * @ignore
+       */
       deferred : function(speed) {
         var that = this, m = this.maps;
         return Deferred.repeat[speed](this.len, function(i) {
@@ -275,6 +321,22 @@ Pot.update({
        * @private
        * @ignore
        */
+      deferredAsBuffer : function(speed) {
+        var that = this, m = this.maps;
+        this.asBuffer = true;
+        return Deferred.repeat[speed](this.len, function(i) {
+          var c = m.indexOf(that.string.charAt(i));
+          if (~c) {
+            that.decode(c);
+          }
+        }).then(function() {
+          return new ArrayBufferoid(that.results);
+        });
+      },
+      /**
+       * @private
+       * @ignore
+       */
       decode : function(c) {
         var code, r = this.results;
         this.att = (this.att << 6) | (c & 63);
@@ -282,7 +344,7 @@ Pot.update({
         if (this.pos >= 0) {
           code = this.att >> this.pos & 0xFF;
           if (c !== 64) {
-            r[r.length] = fromUnicode(code);
+            r[r.length] = this.asBuffer ? code : fromUnicode(code);
           }
           this.att &= 63;
           this.pos -= 8;
@@ -320,28 +382,29 @@ Pot.update({
        *   //   decoded = にゃふん!
        *
        *
-       * @param  {String}  string   A target string.
-       * @return {String}           A base64 string.
+       * @param  {String|Array}  data   A target data.
+       * @return {String}               A base64 string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      encode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          try {
-            if (typeof btoa === 'undefined') {
-              throw false;
-            }
-            result = btoa(Pot.UTF8.encode(s));
-          } catch (e) {
-            try {
-              result = (new Encoder(s, BASE64MAPS)).execute();
-            } catch (e) {}
-          }
+      encode : update(function(data) {
+        var s;
+        if (!data) {
+          return '';
         }
-        return result;
+        if (isArrayLike(data)) {
+          s = arrayize(data);
+        } else {
+          s = stringify(data, true);
+          try {
+            if (typeof btoa !== 'undefined') {
+              return btoa(Pot.UTF8.encode(s));
+            }
+          } catch (e) {}
+        }
+        return new Encoder(s, BASE64MAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.encode
@@ -381,10 +444,10 @@ Pot.update({
          *   });
          *
          *
-         * @param  {String}        string   A target string.
-         * @return {Pot.Deferred}           Returns new instance of
-         *                                    Pot.Deferred with a
-         *                                    base64 string.
+         * @param  {String|Array}  data   A target data.
+         * @return {Pot.Deferred}         Returns new instance of
+         *                                  Pot.Deferred with a
+         *                                  base64 string.
          * @type  Function
          * @function
          * @static
@@ -399,8 +462,8 @@ Pot.update({
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(string) {
-            return (new Encoder(string, BASE64MAPS)).deferred(speed);
+          return function(data) {
+            return new Encoder(data, BASE64MAPS).deferred(speed);
           };
         })
       }),
@@ -450,7 +513,7 @@ Pot.update({
             result = Pot.UTF8.decode(atob(s));
           } catch (e) {
             try {
-              result = (new Decoder(s, BASE64MAPS)).execute();
+              result = new Decoder(s, BASE64MAPS).execute();
             } catch (e) {}
           }
         }
@@ -459,6 +522,44 @@ Pot.update({
         /**
          * @lends Pot.Base64.decode
          */
+        /**
+         * Decodes a string from base64 as ArrayBuffer.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   var buffer = Pot.base64Decode.asBuffer(b64string);
+         *   Pot.debug(buffer);
+         *   // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'Hello World.'
+         *
+         *
+         * @example
+         *   var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+         *   var buffer = Pot.base64Decode.asBuffer(base64String);
+         *   Pot.debug(buffer);
+         *   // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *   //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *   //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *   //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *   //  165, 239, 190, 159, 239, 189, 165]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *
+         *
+         * @param  {String}              string   A base64 string.
+         * @return {Pot.ArrayBufferoid}           A new instance of
+         *                                          Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         */
+        asBuffer : function(string) {
+          return new Decoder(string, BASE64MAPS).executeAsBuffer();
+        },
         /**
          * Decodes a string from base64 with Deferred.
          *
@@ -512,7 +613,61 @@ Pot.update({
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
-            return (new Decoder(string, BASE64MAPS)).deferred(speed);
+            return new Decoder(string, BASE64MAPS).deferred(speed);
+          };
+        }),
+        /**
+         * Decodes a string from base64 as ArrayBuffer with Deferred.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   Pot.base64Decode.deferredAsBuffer(b64string)
+         *                                    .then(function(buffer) {
+         *     Pot.debug(buffer);
+         *     // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *     // 'Hello World.'
+         *   });
+         *
+         *
+         * @example
+         *   var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+         *   Pot.base64Decode.deferredAsBuffer(base64String)
+         *                               .then(function(res) {
+         *     Pot.debug(res);
+         *     // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *     //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *     //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *     //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *     //  165, 239, 190, 159, 239, 189, 165]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(res));
+         *     // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a
+         *                                    new instance of
+         *                                    Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferredAsBuffer : PotInternal.defineDeferrater(function(speed) {
+          return function(string) {
+            return new Decoder(string, BASE64MAPS).deferredAsBuffer(speed);
           };
         })
       }),
@@ -546,19 +701,15 @@ Pot.update({
        *   //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
        *
        *
-       * @param  {String}  string   A target string.
-       * @return {String}           A base64 string.
+       * @param  {String|Array}  data   A target data.
+       * @return {String}               A base64 string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      urlEncode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          result = (new Encoder(s, BASE64URLMAPS)).execute();
-        }
-        return result;
+      urlEncode : update(function(data) {
+        return new Encoder(data, BASE64URLMAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.urlEncode
@@ -599,10 +750,10 @@ Pot.update({
          *   });
          *
          *
-         * @param  {String}        string   A target string.
-         * @return {Pot.Deferred}           Returns new instance of
-         *                                    Pot.Deferred with a
-         *                                    base64 string.
+         * @param  {String|Array}  data   A target data.
+         * @return {Pot.Deferred}         Returns new instance of
+         *                                  Pot.Deferred with a
+         *                                  base64 string.
          * @type  Function
          * @function
          * @static
@@ -617,8 +768,8 @@ Pot.update({
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(string) {
-            return (new Encoder(string, BASE64URLMAPS)).deferred(speed);
+          return function(data) {
+            return new Encoder(data, BASE64URLMAPS).deferred(speed);
           };
         })
       }),
@@ -660,15 +811,49 @@ Pot.update({
        * @public
        */
       urlDecode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          result = (new Decoder(s, BASE64URLMAPS)).execute();
-        }
-        return result;
+        return new Decoder(string, BASE64URLMAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.urlDecode
          */
+        /**
+         * Decodes a string as ArrayBuffer from base64 for URL safely.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   var buffer = Pot.base64URLDecode.asBuffer(b64string);
+         *   Pot.debug(buffer);
+         *   // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'Hello World.'
+         *
+         *
+         * @example
+         *   var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+         *   var buffer = Pot.base64URLDecode.asBuffer(base64String);
+         *   Pot.debug(buffer);
+         *   // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *   //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *   //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *   //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *   //  165, 239, 190, 159, 239, 189, 165]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *
+         *
+         * @param  {String}              string   A base64 string.
+         * @return {Pot.ArrayBufferoid}           A new instance of
+         *                                          Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         */
+        asBuffer : function(string) {
+          return new Decoder(string, BASE64URLMAPS).executeAsBuffer();
+        },
         /**
          * Decodes a string from base64 for URL safely with Deferred.
          *
@@ -723,7 +908,61 @@ Pot.update({
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
-            return (new Decoder(string, BASE64URLMAPS)).deferred(speed);
+            return new Decoder(string, BASE64URLMAPS).deferred(speed);
+          };
+        }),
+        /**
+         * Decodes a string as ArrayBuffer from base64 for
+         *   URL safely with Deferred.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   Pot.base64URLDecode.deferredAsBuffer(b64string)
+         *                                    .then(function(buffer) {
+         *     Pot.debug(buffer);
+         *     // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *     // 'Hello World.'
+         *   });
+         *
+         *
+         * @example
+         *   var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+         *   Pot.base64URLDecode.deferredAsBuffer(base64String)
+         *                      .then(function(res) {
+         *     Pot.debug(res);
+         *     // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *     //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *     //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *     //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *     //  165, 239, 190, 159, 239, 189, 165]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(res));
+         *     // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a new
+         *                                    instance of Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferredAsBuffer : PotInternal.defineDeferrater(function(speed) {
+          return function(string) {
+            return new Decoder(string, BASE64URLMAPS).deferredAsBuffer(speed);
           };
         })
       })
