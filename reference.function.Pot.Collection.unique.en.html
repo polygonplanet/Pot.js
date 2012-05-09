@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Collection.unique</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Collection.unique';
+</script>
+</head>
+<body>
+<h1>Pot.Collection.unique</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array|*}</em>
+    <dfn id="definition.reference.function.Pot.Collection.unique"><em>Pot.Collection.</em>unique</dfn>
+    (<em>{Array|*}</em> object [, <em>{Boolean}</em> loose = false [, <em>{Boolean}</em> ignoreCase = false]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 object の要素をユニークにして返します。
+    </p>
+    <div>
+      <p>
+ 引数 object の要素をユニークにした、新しい配列またはオブジェクトを生成し 返します。
+ <br>
+ 引数 loose が 真 (true) として渡されると、比較は <code>==</code> で行われます。
+ <br>
+ デフォルトは false で <code>===</code> で比較します。
+ <br>
+ 引数 ignoreCase が 真 (true) として渡されると、比較の際に大文字小文字を区別しません。
+ <br>
+ デフォルトは区別します。
+</p>
+
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.unique() が unique() で実行できます。
+</p>
+<p>
+ object の要素をユニークにした要素を持つ、新しい配列またはオブジェクトを返します。
+</p>
+
+
+<pre>// ----- Array -----
+debug(unique(
+ [1, 2, 3, 4, 5, 3, 5, 'a', 3, 'b', 'a', 'c', 2, 5]
+)); // [1, 2, 3, 4, 5, 'a', 'b', 'c']
+
+debug(unique(
+  [5, 7, 8, 3, 6, 1, 7, 2, 3, 8, 4, 2, 9, 5]
+)); // [5, 7, 8, 3, 6, 1, 2, 4, 9]
+
+debug(unique(
+  ['1', 1, '2', 2, 0, '0', '', null, false, (void 0)],
+  true
+)); // ['1', '2', 0, null]
+
+debug(unique(
+  ['abc', 'ABC', 'Foo', 'bar', 'foO', 'BaR'],
+  false, true
+)); // ['abc', 'Foo', 'bar']
+
+debug(unique(
+  [1, 1, [123], (function(a) { return a;}),
+   [123], {a: 5}, (function(a) { return a; }), {a: 5}]
+)); // [1, [123], (function() { return a; }), {a: 5}]
+
+// ----- Object -----
+debug(unique(
+  {a: 1, b: 2, c: 3, d: 1, e: 3, f: 2}
+)); // {a: 1, b: 2, c: 3}
+
+debug(unique(
+  {foo: 1, bar: 2, FOo: 3, Bar: '1', baZ: '2'},
+  true, true
+)); // {foo: 1, bar: 2, FOo: 3}
+
+debug(unique(
+  {a: 1, b: 2, c: 3, d: '1', e: '3', f: 5},
+  true
+)); // {a: 1, b: 2, c: 3, f: 5}
+
+// ----- String -----
+debug(unique('abcABCabc-----foobarBaZ')); // 'abcABC-forZ'
+debug(unique('abcABCabc-----foobarBaZ', true, true)); // 'abc-forZ'</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
