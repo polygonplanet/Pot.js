@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.UTF8.byteOf</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.UTF8.byteOf';
+</script>
+</head>
+<body>
+<h1>Pot.UTF8.byteOf</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.UTF8.byteOf"><em>Pot.UTF8.</em>byteOf</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{Number}</em>
+    <dfn><em>Pot.</em>utf8ByteOf</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string の UTF-8 としてのバイト数を数えます。
+    </p>
+    <div>
+      <p>
+ 文字列 string のバイト数を UTF-8 として数えます。
+ <br>
+ U+0080 - U+FFFF の一部が含まれている場合、 string.length とは異なった数値になります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.utf8ByteOf() が utf8ByteOf() で実行できます。
+</p>
+<p>
+ string の UTF-8 としてのバイト数が返ります。
+</p>
+
+<pre>var string = 'abc123あいうえお';
+var length = string.length;
+var byteSize = Pot.utf8ByteOf(string);
+
+Pot.debug(string + ' : length = ' + length +
+                   ', byteSize = ' + byteSize);
+// result:
+//   'abc123あいうえお'
+//   length   = 11
+//   byteSize = 21</pre>
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

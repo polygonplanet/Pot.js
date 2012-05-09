@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.UTF8.encode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.UTF8.encode';
+</script>
+</head>
+<body>
+<h1>Pot.UTF8.encode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.UTF8.encode"><em>Pot.UTF8.</em>encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>utf8Encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      UTF-8 エンコードをします。
+    </p>
+    <div>
+      <p>
+ 文字列 string を UTF-8 エンコードして返します。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.utf8Encode() が utf8Encode() で実行できます。
+</p>
+<p>
+ UTF-8 エンコードされた文字列が返ります。
+</p>
+
+
+<pre>var string = 'abcほげ';
+var encoded = Pot.utf8Encode(string);
+var decoded = Pot.utf8Decode(encoded);
+
+var toCharCode = function(s) {
+  return Pot.map(s.split(''), function(c) {
+    return c.charCodeAt(0);
+  });
+};
+
+Pot.debug(toCharCode(string));  // [97, 98, 99, 12411, 12370]
+Pot.debug(toCharCode(encoded)); // [97, 98, 99, 227, 129, 187, 227, 129, 146]
+Pot.debug(string === decoded);  // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
