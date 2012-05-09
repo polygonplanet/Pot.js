@@ -30,27 +30,37 @@ update(Pot.Crypt, {
    * We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
    *
    *
-   * @param  {String|*}  string   A string.
-   * @return {Number}             Hash value for `string`,
-   *                                between 0 (inclusive)
-   *                                 and 2^32 (exclusive).
-   *                              The empty string returns 0.
+   * @example
+   *   Pot.debug( Pot.hashCode('abc') ); // 96354
+   *   Pot.debug( Pot.hashCode([0x61, 0x62, 0x63]) ); // 96354
+   *
+   *
+   * @param  {String|Array|*}  data   A target data.
+   * @return {Number}                 Hash value for `string`,
+   *                                    between 0 (inclusive)
+   *                                    and 2^32 (exclusive).
+   *                                  The empty string returns 0.
    * @based goog.string.hashCode
    * @type Function
    * @function
    * @public
    * @static
    */
-  hashCode : function(string) {
-    var result = 0, s, i, len, max = 0x100000000; // 2^32
-    if (string == null) {
-      s = String(string);
+  hashCode : function(data) {
+    var result = 0, s, i, len,
+        max = 0x100000000, // 2^32
+        arrayLike = false;
+    if (data == null) {
+      s = String(data);
+    } else if (isArrayLike(data)) {
+      s = arrayize(data);
+      arrayLike = true;
     } else {
-      s = string.toString ? string.toString() : String(string);
+      s = data.toString ? data.toString() : String(data);
     }
     len = s.length;
     for (i = 0; i < len; ++i) {
-      result = 31 * result + s.charCodeAt(i);
+      result = 31 * result + (arrayLike ? s[i] : s.charCodeAt(i));
       result %= max;
     }
     return result;
@@ -67,8 +77,8 @@ update(Pot.Crypt, {
    *   // @results '1f3870be274f6c49b3e31a0c6728957f'
    *
    *
-   * @param  {String}  string  The target string.
-   * @return {String}          The result string.
+   * @param  {String|Array}  data  The target data.
+   * @return {String}              The result string.
    * @type  Function
    * @function
    * @static
@@ -129,7 +139,7 @@ update(Pot.Crypt, {
       return au(rl(a, s), b);
     }
     /**@ignore*/
-    function convertToWordArray(s) {
+    function convertToWordArray(s, arrayLike) {
       var wc, ml = s.length, t1 = ml + 8,
           t2 = (t1 - (t1 % 64)) / 64,
           nw = (t2 + 1) * 16,
@@ -138,7 +148,7 @@ update(Pot.Crypt, {
       while (bc < ml) {
         wc = (bc - (bc % 4)) / 4;
         bp = (bc % 4) * 8;
-        wa[wc] = (wa[wc] | (s.charCodeAt(bc) << bp));
+        wa[wc] = (wa[wc] | ((arrayLike ? s[bc] : s.charCodeAt(bc)) << bp));
         bc++;
       }
       wc = (bc - (bc % 4)) / 4;
@@ -171,8 +181,6 @@ update(Pot.Crypt, {
       S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
       S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
       S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21,
-      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true))),
-      xl = x.length,
       a = 0x67452301,
       b = 0xEFCDAB89,
       c = 0x98BADCFE,
@@ -253,7 +261,14 @@ update(Pot.Crypt, {
         b = au(b, BB);
         c = au(c, CC);
         d = au(d, DD);
-      };
+      },
+      x, xl;
+      if (isArrayLike(s)) {
+        x = convertToWordArray(arrayize(s), true);
+      } else {
+        x = convertToWordArray(Pot.UTF8.encode(stringify(s, true)));
+      }
+      xl = x.length;
       return {
         /**@ignore*/
         sync : function() {
@@ -279,8 +294,8 @@ update(Pot.Crypt, {
       };
     }
     /**@ignore*/
-    return update(function(string) {
-      return calc(string).sync();
+    return update(function(data) {
+      return calc(data).sync();
     }, {
       /**
        * @lends Pot.Crypt.md5
@@ -299,7 +314,7 @@ update(Pot.Crypt, {
        *   });
        *
        *
-       * @param  {String}        string  The target string.
+       * @param  {String|Array}   data   The target data.
        * @return {Pot.Deferred}          Return new instance of Pot.Deferred
        *                                   with a result string.
        * @type  Function
@@ -316,8 +331,8 @@ update(Pot.Crypt, {
        * @property {Function} ninja  Run fastest speed.
        */
       deferred : PotInternal.defineDeferrater(function(speed) {
-        return function(string) {
-          return calc(string).async(speed);
+        return function(data) {
+          return calc(data).async(speed);
         };
       })
     });
@@ -334,8 +349,8 @@ update(Pot.Crypt, {
    *   // @results  -821904548
    *
    *
-   * @param  {String}  string   Data.
-   * @return {Number}           CRC checksum.
+   * @param  {String|Array}  data   Data.
+   * @return {Number}               CRC checksum.
    * @type  Function
    * @function
    * @static
@@ -388,13 +403,18 @@ update(Pot.Crypt, {
       0xB40BBE37,0xC30C8EA1,0x5A05DF1B,0x2D02EF8D
     ];
     /**@ignore*/
-    return function(string) {
-      var s, crc = 0, i, n, len;
-      s = Pot.UTF8.encode(stringify(string, true));
+    return function(data) {
+      var s, crc = 0, i, n, len, arrayLike = false;
+      if (isArrayLike(data)) {
+        s = arrayize(data);
+        arrayLike = true;
+      } else {
+        s = Pot.UTF8.encode(stringify(data, true));
+      }
       len = s.length;
       crc = crc ^ -1;
       for (i = 0; i < len; i++) {
-        n = (crc ^ s.charCodeAt(i)) & 0xFF;
+        n = (crc ^ (arrayLike ? s[i] : s.charCodeAt(i))) & 0xFF;
         crc = (crc >>> 8) ^ CRC32MAPS[n];
       }
       return crc ^ -1;
@@ -415,8 +435,8 @@ update(Pot.Crypt, {
    *   // @results 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
    *
    *
-   * @param  {String}  string  The input string.
-   * @return {String}          Returns the sha1 hash as a string.
+   * @param  {String|Array}  data  The input data.
+   * @return {String}              Returns the sha1 hash as a string.
    * @type  Function
    * @function
    * @static
@@ -442,7 +462,7 @@ update(Pot.Crypt, {
       return (hex(a) + hex(b) + hex(c) + hex(d) + hex(e)).toLowerCase();
     }
     /**@ignore*/
-    function calc(string) {
+    function calc(data) {
       var
       bs, i, j,
       A, B, C, D, E, W = new Array(80),
@@ -453,8 +473,6 @@ update(Pot.Crypt, {
       H4 = 0xC3D2E1F0,
       wa = [],
       wal,
-      s = Pot.UTF8.encode(stringify(string, true)),
-      sl = s.length,
       tp,
       /**@ignore*/
       calculate = function() {
@@ -511,12 +529,24 @@ update(Pot.Crypt, {
         H2 = (H2 + C) & 0x0FFFFFFFF;
         H3 = (H3 + D) & 0x0FFFFFFFF;
         H4 = (H4 + E) & 0x0FFFFFFFF;
-      };
+      },
+      /**@ignore*/
+      codeAt = function(idx) {
+        return arrayLike ? s[idx] : s.charCodeAt(idx);
+      },
+      s, sl, arrayLike = false;
+      if (isArrayLike(data)) {
+        s = arrayize(data);
+        arrayLike = true;
+      } else {
+        s = Pot.UTF8.encode(stringify(data, true));
+      }
+      sl = s.length;
       for (i = 0; i < sl - 3; i += 4) {
-        j = s.charCodeAt(i)     << 24 |
-            s.charCodeAt(i + 1) << 16 |
-            s.charCodeAt(i + 2) <<  8 |
-            s.charCodeAt(i + 3);
+        j = codeAt(i)     << 24 |
+            codeAt(i + 1) << 16 |
+            codeAt(i + 2) <<  8 |
+            codeAt(i + 3);
         wa[wa.length] = j;
       }
       switch (sl % 4) {
@@ -524,16 +554,16 @@ update(Pot.Crypt, {
             i = 0x080000000;
             break;
         case 1:
-            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
+            i = codeAt(sl - 1) << 24 | 0x0800000;
             break;
         case 2:
-            i = s.charCodeAt(sl - 2) << 24 |
-                s.charCodeAt(sl - 1) << 16 | 0x08000;
+            i = codeAt(sl - 2) << 24 |
+                codeAt(sl - 1) << 16 | 0x08000;
             break;
         case 3:
-            i = s.charCodeAt(sl - 3) << 24 |
-                s.charCodeAt(sl - 2) << 16 |
-                s.charCodeAt(sl - 1) <<  8 | 0x80;
+            i = codeAt(sl - 3) << 24 |
+                codeAt(sl - 2) << 16 |
+                codeAt(sl - 1) <<  8 | 0x80;
       }
       wa[wa.length] = i;
       while ((wa.length % 16) != 14) {
@@ -567,8 +597,8 @@ update(Pot.Crypt, {
       };
     }
     /**@ignore*/
-    return update(function(string) {
-      return calc(string).sync();
+    return update(function(data) {
+      return calc(data).sync();
     }, {
       /**
        * @lends Pot.Crypt.sha1
@@ -587,7 +617,7 @@ update(Pot.Crypt, {
        *   });
        *
        *
-       * @param  {String}        string  The input string.
+       * @param  {String|Array}   data   The input data.
        * @return {Pot.Deferred}          Returns new instance of Pot.Deferred
        *                                   with the sha1 hash as a string.
        * @type  Function
@@ -604,8 +634,8 @@ update(Pot.Crypt, {
        * @property {Function} ninja  Run fastest speed.
        */
       deferred : PotInternal.defineDeferrater(function(speed) {
-        return function(string) {
-          return calc(string).async(speed);
+        return function(data) {
+          return calc(data).async(speed);
         };
       })
     });
