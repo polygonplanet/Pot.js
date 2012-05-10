@@ -789,6 +789,27 @@ update(ArrayBufferoid, {
   /**
    * Copt the ArrayBuffer/ArrayBufferoid/Array.
    *
+   *
+   * @example
+   *   var buffer = new ArrayBuffer(10);
+   *   var view1 = new Uint8Array(buffer);
+   *   var view2 = new Uint8Array(buffer);
+   *   view1[0] = 10;
+   *   view2[1] = 20;
+   *   Pot.debug(view1[0]); // 10
+   *   Pot.debug(view2[0]); // 10
+   *   Pot.debug(view1[1]); // 20
+   *   Pot.debug(view2[1]); // 20
+   *   var copy = new Uint8Array(Pot.ArrayBufferoid.copyBuffer(buffer));
+   *   copy[1] = 100;
+   *   Pot.debug(copy[0]);  // 10
+   *   Pot.debug(copy[1]);  // 100
+   *   Pot.debug(view1[0]); // 10
+   *   Pot.debug(view1[1]); // 20
+   *   Pot.debug(view2[0]); // 10
+   *   Pot.debug(view2[1]); // 20
+   *
+   *
    * @param  {TypedArray|Pot.ArrayBufferoid|Array}  buffer  Target array.
    * @return {TypedArray|Pot.ArrayBufferoid|Array}          Copy.
    *
@@ -811,7 +832,7 @@ update(ArrayBufferoid, {
               )
             ).buffer;
           } else {
-            a = new Uint8Array(buffer);
+            a = new Uint8Array(buffer.buffer || buffer);
             b = [];
             len = a.length;
             for (i = 0; i < len; i++) {
@@ -829,6 +850,13 @@ update(ArrayBufferoid, {
   /**
    * Convert to ArrayBuffer from raw string.
    *
+   *
+   * @example
+   *   var string = 'abc123';
+   *   var buffer = Pot.ArrayBufferoid.binaryToBuffer(string);
+   *   Pot.debug(buffer); // [97, 98, 99, 49, 50, 51]
+   *
+   *
    * @param  {String}             string  A binary string.
    * @return {Pot.ArrayBufferoid}         A new instance of
    *                                       Pot.ArrayBufferoid.
@@ -837,19 +865,64 @@ update(ArrayBufferoid, {
    * @static
    * @public
    */
-  binaryToBuffer : function(string) {
-    var bytes = [], len, i, c,
+  binaryToBuffer : update(function(string) {
+    var buffer = new ArrayBufferoid(),
+        len, i,
         s = stringify(string);
     if (s) {
       len = s.length;
       for (i = 0; i < len; i++) {
-        bytes[i] = s.charCodeAt(i) & 0xFF;
+        buffer[i] = s.charCodeAt(i) & 0xFF;
+        buffer.length++;
       }
     }
-    return new ArrayBufferoid(bytes);
-  },
+    return buffer;
+  }, {
+    /**
+     * @lends Pot.ArrayBufferoid.binaryToBuffer
+     */
+    /**
+     * Convert to ArrayBuffer from raw string with Deferred.
+     *
+     *
+     * @example
+     *   var s = 'abc123';
+     *   Pot.ArrayBufferoid.binaryToBuffer.deferred(s).then(function(res) {
+     *     Pot.debug(res); // [97, 98, 99, 49, 50, 51]
+     *   });
+     *
+     *
+     * @param  {String}        string  A binary string.
+     * @return {Pot.Deferred} Returns an instance of Pot.Deferred that
+     *               has a result of new instance of Pot.ArrayBufferoid.
+     * @type  Function
+     * @function
+     * @static
+     * @public
+     */
+    deferred : function(string) {
+      var buffer = new ArrayBufferoid(), s = stringify(string);
+      return Deferred.repeat(s.length, function(i) {
+        buffer[i] = s.charCodeAt(i) & 0xFF;
+        buffer.length++;
+      }).then(function() {
+        return buffer;
+      });
+    }
+  }),
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
   /**
    * Convert to raw string from ArrayBuffer.
+   *
+   *
+   * @example
+   *   var view = new Uint8Array([0x61, 0x62, 0x63]);
+   *   Pot.debug(Pot.ArrayBufferoid.bufferToBinary(view)); // 'abc'
+   *   var buffer = new Pot.ArrayBufferoid([0x61, 0x62, 0x63]);
+   *   Pot.debug(Pot.ArrayBufferoid.bufferToBinary(buffer)); // 'abc'
+   *
    *
    * @param  {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer An input bytes.
    * @return {String}                                      A binary string.
@@ -858,7 +931,7 @@ update(ArrayBufferoid, {
    * @static
    * @public
    */
-  bufferToBinary : function(buffer) {
+  bufferToBinary : update(function(buffer) {
     var result = '', chars = [], i, len, array;
     if (buffer && isArrayLike(buffer)) {
       array = arrayize(buffer);
@@ -869,9 +942,80 @@ update(ArrayBufferoid, {
       result = chars.join('');
     }
     return result;
-  },
+  }, {
+    /**
+     * @lends Pot.ArrayBufferoid.bufferToBinary
+     */
+    /**
+     * Convert to raw string from ArrayBuffer with Deferred.
+     *
+     *
+     * @example
+     *   var view = new Uint8Array([0x61, 0x62, 0x63]);
+     *   var buffer = new Pot.ArrayBufferoid([0x61, 0x62, 0x63]);
+     *   Pot.ArrayBufferoid.bufferToBinary.deferred(view)
+     *                                    .then(function(res) {
+     *     Pot.debug(res); // 'abc'
+     *     return Pot.ArrayBufferoid.bufferToBinary.deferred(buffer).
+     *                                              then(function(res) {
+     *       Pot.debug(res); // 'abc'
+     *     });
+     *   });
+     *
+     *
+     * @param  {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer An input buffer.
+     * @return {Pot.Deferred} Returns an instance of Pot.Deferred that has a
+     *                          binary string result.
+     * @type  Function
+     * @function
+     * @static
+     * @public
+     */
+    deferred : function(buffer) {
+      var bb, fl, d = new Deferred();
+      if (buffer && PotSystem.hasFileReader && PotSystem.BlobBuilder) {
+        bb = new PotSystem.BlobBuilder();
+        fl = new FileReader();
+        if (isArrayBufferoid(buffer)) {
+          bb.append(buffer.toArrayBuffer());
+        } else {
+          bb.append(buffer.buffer || buffer);
+        }
+        /**@ignore*/
+        fl.onload = function(ev) {
+          if (ev && ev.target) {
+            d.begin(ev.target.result);
+          } else {
+            d.raise(ev);
+          }
+        };
+        /**@ignore*/
+        fl.onerror = function(er) {
+          d.raise(er);
+        };
+        fl.readAsBinaryString(bb.getBlob());
+      } else {
+        d.begin(ArrayBufferoid.bufferToBinary(string));
+      }
+      return d;
+    }
+  }),
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
   /**
    * Convert to UTF-8 ArrayBuffer from UTF-16 string.
+   *
+   *
+   * @example
+   *   var s = 'hogeほげ';
+   *   var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+   *   var string = Pot.ArrayBufferoid.bufferToString(buffer);
+   *   Pot.debug(buffer);
+   *   // buffer:
+   *   //   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(s === string); // true
+   *
    *
    * @param  {String}             string  UTF-16 string.
    * @return {Pot.ArrayBufferoid}         A new instance of
@@ -883,28 +1027,40 @@ update(ArrayBufferoid, {
    * @public
    */
   stringToBuffer : function(string) {
-    var bytes = [], len, i, c,
+    var buffer = new ArrayBufferoid(),
+        len, i, c,
         s = stringify(string);
     if (s) {
       len = s.length;
       for (i = 0; i < len; i++) {
         c = s.charCodeAt(i);
         if (c < 0x80) {
-          bytes[bytes.length] = c;
+          buffer[buffer.length++] = c;
         } else if (c < 0x800) {
-          bytes[bytes.length] = 0xC0 | ((c >>  6) & 0x1F);
-          bytes[bytes.length] = 0x80 | ((c >>  0) & 0x3F);
+          buffer[buffer.length++] = 0xC0 | ((c >>  6) & 0x1F);
+          buffer[buffer.length++] = 0x80 | ((c >>  0) & 0x3F);
         } else {
-          bytes[bytes.length] = 0xE0 | ((c >> 12) & 0x0F);
-          bytes[bytes.length] = 0x80 | ((c >>  6) & 0x3F);
-          bytes[bytes.length] = 0x80 | ((c >>  0) & 0x3F);
+          buffer[buffer.length++] = 0xE0 | ((c >> 12) & 0x0F);
+          buffer[buffer.length++] = 0x80 | ((c >>  6) & 0x3F);
+          buffer[buffer.length++] = 0x80 | ((c >>  0) & 0x3F);
         }
       }
     }
-    return new ArrayBufferoid(bytes);
+    return buffer;
   },
   /**
    * Convert to UTF-16 string from UTF-8 ArrayBuffer.
+   *
+   *
+   * @example
+   *   var s = 'hogeほげ';
+   *   var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+   *   var string = Pot.ArrayBufferoid.bufferToString(buffer);
+   *   Pot.debug(buffer);
+   *   // buffer:
+   *   //   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(s === string); // true
+   *
    *
    * @param {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer UTF-8 ArrayBuffer.
    * @param {String}                                      UTF-16 string.
@@ -914,7 +1070,8 @@ update(ArrayBufferoid, {
    * @public
    */
   bufferToString : function(buffer) {
-    var result = '', chars = [], i = 0, len, n, c, c2, c3, sc, array;
+    var result = '', chars = [], i = 0, len,
+        n, c, c2, c3, sc, array;
     if (buffer && isArrayLike(buffer)) {
       sc = fromUnicode;
       array = arrayize(buffer);
@@ -950,7 +1107,7 @@ function createArrayBuffer(type, args) {
   if (PotSystem.hasTypedArray) {
     switch (true) {
       case ((type & types.ArrayBuffer) === type):
-          return newTypedArray(Float64Array, args).buffer;
+          return newTypedArray(Uint8Array, args).buffer;
       case ((type & types.Uint8Array) === type):
           return newTypedArray(Uint8Array, args);
       case ((type & types.Uint16Array) === type):
@@ -1092,14 +1249,26 @@ function parseArguments(buffer, args) {
         break;
     case 1:
         val = args[0];
-        if (isNumber(val)) {
+        if (!val) {
+          buffer.length = 0;
+        } else if (isNumber(val)) {
           len = val;
           for (i = 0; i < len; i++) {
             buffer[i] = void 0;
           }
           buffer.length = len;
         } else if (isArrayLike(val)) {
-          a = arrayize(val);
+          
+          if (isTypedArray(val)) {
+            if (isArrayBuffer(val) &&
+                val.byteLength != null && val[0] === void 0) {
+              a = new Uint8Array(val);
+            } else {
+              a = val;
+            }
+          } else {
+            a = arrayize(val);
+          }
           len = a.length;
           for (i = 0; i < len; i++) {
             buffer[i] = a[i];
