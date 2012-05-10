@@ -232,42 +232,50 @@ update(Pot.UTF8, {
   convertEncodingToUnicode : (function() {
     var isAuto = /^\s*auto\s*$/i;
     return function(data, from) {
-      var d  = new Deferred(), bb, fl, b;
-      try {
-        bb = new PotSystem.BlobBuilder();
-        fl = new FileReader();
-        if (isString(data)) {
-          //XXX: String to ArrayBuffer
-          bb.append(data);
-        } else if (isArrayLike(data)) {
-          bb.append(new Uint8Array(data).buffer);
-        } else {
-          bb.append(data);
-        }
-        /**@ignore*/
-        fl.onload = function(ev) {
-          fl.onload = fl.onerror = PotNoop;
-          if (ev && ev.target && ev.target.result != null) {
-            d.begin(ev.target.result);
-          } else {
-            d.raise(ev);
-          }
-        };
-        /**@ignore*/
-        fl.onerror = function(e) {
-          fl.onload = fl.onerror = PotNoop;
-          d.raise(e);
-        };
-        b = bb.getBlob('text/plain');
-        if (from == null || isAuto.test(from)) {
-          fl.readAsText(b);
-        } else {
-          fl.readAsText(b, trim(from));
-        }
-      } catch (e) {
-        d.raise(e);
+      var d, bb, fl, b, dfd;
+      if (isString(data)) {
+        d = ArrayBufferoid.binaryToBuffer.deferred(data);
+      } else {
+        d = Deferred.succeed(data);
       }
-      return d;
+      return d.then(function(res) {
+        dfd = new Deferred();
+        try {
+          bb = new PotSystem.BlobBuilder();
+          fl = new FileReader();
+          if (isArrayBufferoid(res)) {
+            bb.append(res.toArrayBuffer());
+          } else if (isArrayLike(res)) {
+            bb.append(new ArrayBufferoid(res).toArrayBuffer());
+          } else {
+            bb.append(res);
+          }
+          /**@ignore*/
+          fl.onload = function(ev) {
+            fl.onload = fl.onerror = PotNoop;
+            if (ev && ev.target) {
+              dfd.begin(ev.target.result);
+            } else {
+              dfd.raise(ev);
+            }
+          };
+          /**@ignore*/
+          fl.onerror = function(er) {
+            fl.onload = fl.onerror = PotNoop;
+            dfd.raise(er);
+          };
+          b = bb.getBlob('text/plain');
+          if (from == null || isAuto.test(from)) {
+            fl.readAsText(b);
+          } else {
+            //XXX: Assign the encoding names.
+            fl.readAsText(b, trim(from));
+          }
+        } catch (e) {
+          dfd.raise(e);
+        }
+        return dfd;
+      });
     };
   }())
 });
