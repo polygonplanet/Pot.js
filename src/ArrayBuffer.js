@@ -1026,28 +1026,49 @@ update(ArrayBufferoid, {
    * @static
    * @public
    */
-  stringToBuffer : function(string) {
-    var buffer = new ArrayBufferoid(),
-        len, i, c,
-        s = stringify(string);
-    if (s) {
-      len = s.length;
-      for (i = 0; i < len; i++) {
-        c = s.charCodeAt(i);
-        if (c < 0x80) {
-          buffer[buffer.length++] = c;
-        } else if (c < 0x800) {
-          buffer[buffer.length++] = 0xC0 | ((c >>  6) & 0x1F);
-          buffer[buffer.length++] = 0x80 | ((c >>  0) & 0x3F);
-        } else {
-          buffer[buffer.length++] = 0xE0 | ((c >> 12) & 0x0F);
-          buffer[buffer.length++] = 0x80 | ((c >>  6) & 0x3F);
-          buffer[buffer.length++] = 0x80 | ((c >>  0) & 0x3F);
+  stringToBuffer : (function() {
+    /**@ignore*/
+    var add = function(b, c) {
+      if (c < 0x80) {
+        b[b.length++] = c;
+      } else if (c < 0x800) {
+        b[b.length++] = 0xC0 | ((c >>  6) & 0x1F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      } else if (c < 0x10000) {
+        b[b.length++] = 0xE0 | ((c >> 12) & 0x0F);
+        b[b.length++] = 0x80 | ((c >>  6) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      } else {
+        b[b.length++] = 0xF0 | ((c >> 18) & 0x0F);
+        b[b.length++] = 0x80 | ((c >> 12) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  6) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      }
+    };
+    return function(string) {
+      var buffer = new ArrayBufferoid(),
+          len, i, j, ch, c2,
+          s = stringify(string);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          ch = s.charCodeAt(i);
+          if (0xD800 <= ch && ch <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                ch = ((ch & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              }
+            }
+          }
+          add(buffer, ch);
         }
       }
-    }
-    return buffer;
-  },
+      return buffer;
+    };
+  }()),
   /**
    * Convert to UTF-16 string from UTF-8 ArrayBuffer.
    *
@@ -1071,7 +1092,7 @@ update(ArrayBufferoid, {
    */
   bufferToString : function(buffer) {
     var result = '', chars = [], i = 0, len,
-        n, c, c2, c3, sc, array;
+        n, c, c2, c3, c4, code, sc, array;
     if (buffer && isArrayLike(buffer)) {
       sc = fromUnicode;
       array = arrayize(buffer);
@@ -1090,6 +1111,22 @@ update(ArrayBufferoid, {
           chars[chars.length] = sc(((c  & 0x0F) << 12) |
                                    ((c2 & 0x3F) <<  6) |
                                    ((c3 & 0x3F) <<  0));
+        } else if (i + 2 < len) {
+          c2 = array[i++];
+          c3 = array[i++];
+          c4 = array[i++];
+          code = (((c  & 0x07) << 18) |
+                  ((c2 & 0x3F) << 12) |
+                  ((c3 & 0x3F) <<  6) |
+                  ((c4 & 0x3F) <<  0));
+          if (code <= 0xFFFF) {
+            chars[chars.length] = sc(code);
+          } else {
+            chars[chars.length] = fromCharCode(
+              (code >> 10)   + 0xD7C0,
+              (code & 0x3FF) + 0xDC00
+            );
+          }
         }
       }
       result = chars.join('');
