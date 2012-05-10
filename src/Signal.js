@@ -1007,36 +1007,38 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
         if (op.onDrop) {
           op.onDrop.call(that, files);
         }
-        reader = new FileReader();
-        /**@ignore*/
-        reader.onloadend = function(evt) {
-          i--;
-          if (evt && evt.target && evt.target.result != null) {
-            that.loadedFiles.push(evt.target.result);
-            if (i <= 0) {
-              if (op.onLoadEnd) {
-                op.onLoadEnd.call(that, arrayize(that.loadedFiles));
+        if (PotSystem.hasFileReader) {
+          reader = new FileReader();
+          /**@ignore*/
+          reader.onloadend = function(evt) {
+            i--;
+            if (evt && evt.target && evt.target.result != null) {
+              that.loadedFiles.push(evt.target.result);
+              if (i <= 0) {
+                if (op.onLoadEnd) {
+                  op.onLoadEnd.call(that, arrayize(that.loadedFiles));
+                }
               }
             }
-          }
-        };
-        each(files, function(file) {
-          var name, size, type;
-          if (file) {
-            i++;
-            type = file.type;
-            size = file.size;
-            name = file.name;
-            reader.readAsDataURL(file);
-            if (that.isImageFile(type)) {
-              that.loadAsImage(file, name, size, type);
-            } else if (that.isTextFile(type)) {
-              that.loadAsText(file, name, size, type);
-            } else {
-              that.loadAsUnknown(file, name, size, type);
+          };
+          each(files, function(file) {
+            var name, size, type;
+            if (file) {
+              i++;
+              type = file.type;
+              size = file.size;
+              name = file.name;
+              reader.readAsDataURL(file);
+              if (that.isImageFile(type)) {
+                that.loadAsImage(file, name, size, type);
+              } else if (that.isTextFile(type)) {
+                that.loadAsText(file, name, size, type);
+              } else {
+                that.loadAsUnknown(file, name, size, type);
+              }
             }
-          }
-        });
+          });
+        }
       }
     });
     cache[cache.length] = ps.attach(target, 'dragenter', function(ev) {
