@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Base64.encode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Base64.encode';
+</script>
+</head>
+<body>
+<h1>Pot.Base64.encode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Base64.encode"><em>Pot.Base64.</em>encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{String}</em>
+    <dfn><em>Pot.</em>base64Encode</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      string を Base64 エンコードして返します。
+    </p>
+    <div>
+      <p>
+ 引数 string を Base64 エンコードして返します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.base64Encode() が base64Encode() で実行できます。
+</p>
+<p>
+ Base64 エンコードされた文字列が返ります。
+</p>
+
+<pre>var string = 'Hello World.';
+var result = Pot.base64Encode(string);
+Pot.debug(result); // 'SGVsbG8gV29ybGQu'</pre>
+
+<pre>var string = 'にゃふん!';
+var encoded = Pot.base64Encode(string);
+var decoded = Pot.base64Decode(encoded);
+Pot.debug(
+  'string  = ' + string + '\n' +
+  'encoded = ' + encoded + '\n' +
+  'decoded = ' + decoded
+);
+// result:
+//   string  = にゃふん!
+//   encoded = 44Gr44KD44G144KTIQ==
+//   decoded = にゃふん!</pre>
+
+
+<p>
+ Pot.base64Encode() には、いくつかのメソッドがあります。
+ <br>
+ deferred メソッドは、非同期で実行します。
+ <br>
+ 非同期で実行することにより、巨大な文字列に対しても負荷を抑え実行することが可能です。
+</p>
+
+<div style="margin: 1.5em;">
+ <dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.Base64.encode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn><em>Pot.base64Encode.</em>deferred</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+   <p>
+    引数 string を Base64 エンコードします。
+    <br>
+    エンコードされた結果を引数に持つ <a href="#reference.function.Pot.Deferred">Pot.Deferred インスタンス</a> が返ります。
+    <br>
+    Pot.base64Encode.deferred() で実行できます。
+    <br>
+    結果からは <a href="#reference.function.Pot.Deferred.prototype.then">then()</a> などによりチェインを繋げることができます。
+   </p>
+
+<p>
+ <code>Pot.base64Encode.deferred.<strong>slow</strong>()</code> のようにして速度の指定ができます。
+ <br>
+ 指定できる名前は以下の表を参照ください。
+ <br>
+ デフォルトの速度は normal です。
+</p>
+<div>
+  <table class="grid" style="width:300px;">
+    <tr>
+      <td class="marker row-head"><strong>値 / メソッド名</strong></td>
+      <td class="marker row-head"><strong>速度</strong></td>
+    </tr>
+    <tr>
+      <td>limp</td>
+      <td>最も遅い</td>
+    </tr>
+    <tr>
+      <td>doze</td>
+      <td>遅い</td>
+    </tr>
+    <tr>
+      <td>slow</td>
+      <td>遅め</td>
+    </tr>
+    <tr>
+      <td>normal</td>
+      <td>通常</td>
+    </tr>
+    <tr>
+      <td>fast</td>
+      <td>速め</td>
+    </tr>
+    <tr>
+      <td>rapid</td>
+      <td>速い</td>
+    </tr>
+    <tr>
+      <td>ninja</td>
+      <td>最も速い</td>
+    </tr>
+  </table>
+</div>
+
+<p>
+ 非同期実行の例:
+</p>
+
+<pre>var string = 'Hello World.';
+Pot.base64Encode.deferred(string).then(function(encoded) {
+  Pot.debug(encoded); // 'SGVsbG8gV29ybGQu'
+
+  return Pot.base64Decode.deferred(encoded).then(function(decoded) {
+    Pot.debug(decoded); // 'Hello World.'
+  });
+});</pre>
+
+
+<pre>var string = 'にゃふん!';
+Pot.base64Encode.deferred(string).then(function(encoded) {
+  return Pot.base64Decode.deferred(encoded).then(function(decoded) {
+    Pot.debug(
+      'string  = ' + string + '\n' +
+      'encoded = ' + encoded + '\n' +
+      'decoded = ' + decoded
+    );
+    // result:
+    //   string  = にゃふん!
+    //   encoded = 44Gr44KD44G144KTIQ==
+    //   decoded = にゃふん!
+  });
+});</pre>
+
+
+  <!-- {Pot.ArrayBufferoid} asBuffer()-->
+
+
+  </dd>
+ </dl>
+</div>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
