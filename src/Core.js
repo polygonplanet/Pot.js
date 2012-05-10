@@ -40,6 +40,7 @@ isRegExp,
 isObject,
 isError,
 isTypedArray,
+isArrayBuffer,
 isArrayLike,
 isNumeric,
 isStopIter,
@@ -804,6 +805,12 @@ update(PotSystem, (function() {
     }
   } catch (e) {}
   try {
+    if (typeof FileReader !== 'undefined' &&
+        typeof (new FileReader()).readAsText === 'function') {
+      o.hasFileReader = true;
+    }
+  } catch (e) {}
+  try {
     b = (typeof BlobBuilder       !== 'undefined') ? BlobBuilder       :
         (typeof MozBlobBuilder    !== 'undefined') ? MozBlobBuilder    :
         (typeof WebKitBlobBuilder !== 'undefined') ? WebKitBlobBuilder :
@@ -1561,6 +1568,31 @@ Pot.update({
     return result;
   },
   /**
+   * Check whether the argument is ArrayBuffer object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isArrayBuffer(obj)); // false
+   *   debug(isArrayBuffer(arr)); // false
+   *   debug(isArrayBuffer(buf)); // true
+   *   debug(isArrayBuffer(uar)); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is ArrayBuffer object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArrayBuffer : function(x) {
+    return !!(PotSystem.hasTypedArray && x && x.constructor === ArrayBuffer);
+  },
+  /**
    * Return whether the argument object like Array (i.e. iterable)
    *
    *
@@ -2282,6 +2314,7 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
 isTypedArray     = Pot.isTypedArray;
+isArrayBuffer    = Pot.isArrayBuffer;
 isArrayLike      = Pot.isArrayLike;
 isNumeric        = Pot.isNumeric;
 isStopIter       = Pot.isStopIter;

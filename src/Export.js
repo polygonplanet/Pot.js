@@ -205,6 +205,7 @@ update(PotInternal, {
     isScalar                 : Pot.isScalar,
     isArguments              : Pot.isArguments,
     isTypedArray             : Pot.isTypedArray,
+    isArrayBuffer            : Pot.isArrayBuffer,
     isArrayLike              : Pot.isArrayLike,/*{#if Pot}*/
     isPlainObject            : Pot.isPlainObject,
     isEmpty                  : Pot.isEmpty,/*{#endif}*/
