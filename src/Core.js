@@ -806,6 +806,7 @@ update(PotSystem, (function() {
   } catch (e) {}
   try {
     if (typeof FileReader !== 'undefined' &&
+        typeof FileReader.LOADING !== 'undefined' &&
         typeof (new FileReader()).readAsText === 'function') {
       o.hasFileReader = true;
     }
@@ -1499,6 +1500,50 @@ Pot.update({
     return x != null && (isString(x) || isNumber(x) || isBoolean(x));
   },
   /**
+   * Check whether the argument is Blob or not.
+   *
+   *
+   * @example
+   *   var bb = new Pot.System.BlobBuilder();
+   *   bb.append('hoge');
+   *   var blob = bb.getBlob();
+   *   Pot.debug(Pot.isBlob(blob));   // true
+   *   Pot.debug(Pot.isBlob({}));     // false
+   *   Pot.debug(Pot.isBlob('hoge')); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Blob.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isBlob : function(x) {
+    return !!(x && toString.call(x) === '[object Blob]');
+  },
+  /**
+   * Check whether the argument is a instance of FileReader or not.
+   *
+   *
+   * @example
+   *   var object = {hoge : 1};
+   *   var reader = new FileReader();
+   *   Pot.debug(Pot.isFileReader(object)); // false
+   *   Pot.debug(Pot.isFileReader(reader)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is FileReader.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isFileReader : function(x) {
+    return !!(PotSystem.hasFileReader && x && x.constructor === FileReader);
+  },
+  /**
    * Check whether the argument is Arguments object or not.
    *
    *
@@ -1522,7 +1567,7 @@ Pot.update({
   isArguments : function(x) {
     var result = false;
     if (x) {
-      if (toString.call(x) == '[object Arguments]') {
+      if (toString.call(x) === '[object Arguments]') {
         result = true;
       } else {
         try {
