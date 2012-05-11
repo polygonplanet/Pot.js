@@ -919,20 +919,31 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    */
   defaultOptions : {
-    onShow        : null,
-    onHide        : null,
-    onDrop        : null,
-    onLoadImage   : null,
-    onLoadText    : null,
-    onLoadUnknown : null,
-    onLoadEnd     : null
+    onShow         : null,
+    onHide         : null,
+    onDrop         : null,
+    onLoadImage    : null,
+    onLoadText     : null,
+    onLoadUnknown  : null,
+    onLoadEnd      : null,
+    onProgress     : null,
+    onProgressFile : null,
+    // readAs:
+    //  - 'text'
+    //  - 'binary'
+    //  - 'arraybuffer'
+    //  - 'datauri'
+    //  or null (auto)
+    readAs         : null,
+    encoding       : null
   },
   /**
-   * Text encoding. (default = 'UTF-8')
+   * Text encoding.
    *
    * @type  String
+   * @ignore
    */
-  encoding : 'UTF-8',
+  encoding : null,
   /**
    * @ignore
    * @private
@@ -974,6 +985,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     if (this.options.encoding) {
       this.encoding = this.options.encoding;
     }
+    this.assignReadType();
     if (this.target) {
       this.initEvents();
     }
@@ -1000,43 +1012,87 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     var that = this, target = this.target, html,
         cache = this.handleCache, op = this.options, ps = Signal;
     cache[cache.length] = ps.attach(target, 'drop', function(ev) {
-      var files, reader, i = 0;
+      var files, reader, i = 0, total, fileList,
+          deferreds = {
+            seek   : new Deferred(),
+            files  : [],
+            steps  : [],
+            ends   : [true],
+            done   : false
+          },
+          /**@ignore*/
+          pushFiles = function(evt) {
+            if (evt && evt.target && evt.target.result != null) {
+              that.loadedFiles.push(evt.target.result);
+              return true;
+            } else {
+              return false;
+            }
+          };
       that.isShow = false;
-      files = ev.dataTransfer && ev.dataTransfer.files;
-      if (files) {
+      fileList = ev.dataTransfer && ev.dataTransfer.files;
+      if (fileList) {
+        total = 0;
+        files = [];
+        each(fileList, function(file) {
+          if (file) {
+            files[total++] = file;
+          }
+        });
         if (op.onDrop) {
-          op.onDrop.call(that, files);
+          op.onDrop.call(that, files, total);
         }
         if (PotSystem.hasFileReader) {
           reader = new FileReader();
           /**@ignore*/
           reader.onloadend = function(evt) {
-            i--;
-            if (evt && evt.target && evt.target.result != null) {
-              that.loadedFiles.push(evt.target.result);
-              if (i <= 0) {
+            if (pushFiles(evt)) {
+              if (deferreds.files[i] && !deferreds.ends[i]) {
+                deferreds.files[i].begin();
+              }
+            }
+          };
+          Deferred.forEach(files, function(file) {
+            if (file) {
+              deferreds.seek.then(function() {
+                var fileinfo = update({}, file, {index : i++});
+                return Deferred.till(function() {
+                  return !Pot.some(deferreds.ends, function(end) {
+                    return end === false;
+                  });
+                }).then(function() {
+                  deferreds.ends[i] = false;
+                  deferreds.steps[i] = new Deferred();
+                  deferreds.files[i] = new Deferred().then(function() {
+                    if (that.isImageFile(fileinfo.type)) {
+                      that.loadAsImage(deferreds, i, total, file, fileinfo);
+                    } else if (that.isTextFile(fileinfo.type)) {
+                      that.loadAsText(deferreds, i, total, file, fileinfo);
+                    } else {
+                      that.loadAsUnknown(deferreds, i, total, file, fileinfo);
+                    }
+                    return deferreds.steps[i];
+                  });
+                  that.readFile(reader, file);
+                  return deferreds.files[i];
+                });
+              });
+            }
+          }).then(function() {
+            deferreds.seek.then(function() {
+              var done = Pot.every(deferreds.ends, function(end) {
+                return end === true;
+              });
+              if (done && !deferreds.done) {
+                deferreds.done = true;
+                if (op.onProgress) {
+                  that.updateProgressEnd();
+                }
                 if (op.onLoadEnd) {
                   op.onLoadEnd.call(that, arrayize(that.loadedFiles));
                 }
               }
-            }
-          };
-          each(files, function(file) {
-            var name, size, type;
-            if (file) {
-              i++;
-              type = file.type;
-              size = file.size;
-              name = file.name;
-              reader.readAsDataURL(file);
-              if (that.isImageFile(type)) {
-                that.loadAsImage(file, name, size, type);
-              } else if (that.isTextFile(type)) {
-                that.loadAsText(file, name, size, type);
-              } else {
-                that.loadAsUnknown(file, name, size, type);
-              }
-            }
+            }).begin();
           });
         }
       }
@@ -1108,6 +1164,59 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
+  readFile : function(reader, file, isText) {
+    switch (this.options.readAs) {
+      case 'text':
+          if (this.encoding) {
+            reader.readAsText(file, this.encoding);
+          } else {
+            reader.readAsText(file);
+          }
+          break;
+      case 'binary':
+          reader.readAsBinaryString(file);
+          break;
+      case 'arraybuffer':
+          reader.readAsArrayBuffer(file);
+          break;
+      case 'datauri':
+          reader.readAsDataURL(file);
+          break;
+      default:
+          if (isText) {
+            if (this.encoding) {
+              reader.readAsText(file, this.encoding);
+            } else {
+              reader.readAsText(file);
+            }
+          } else {
+            reader.readAsDataURL(file);
+          }
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  assignReadType : function() {
+    var res, type = stringify(this.options.readAs).toLowerCase();
+    if (~type.indexOf('text')) {
+      res = 'text';
+    } else if (~type.indexOf('bin')) {
+      res = 'binary';
+    } else if (~type.indexOf('arr') || ~type.indexOf('buf')) {
+      res = 'arraybuffer';
+    } else if (~type.indexOf('data') || ~type.indexOf('ur')) {
+      res = 'datauri';
+    } else {
+      res = null;
+    }
+    this.options.readAs = res;
+  },
+  /**
+   * @private
+   * @ignore
+   */
   isImageFile : function(type) {
     return /image/i.test(type);
   },
@@ -1116,7 +1225,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @ignore
    */
   isTextFile : function(type) {
-    return !/image|audio|video|zip|compress/i.test(type);
+    return !/image|audio|video|zip|compress|stream/i.test(type);
   },
   /**
    * Upload the dropped files with specified options.
@@ -1221,58 +1330,166 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsImage : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadImage;
+  loadAsImage : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadImage;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsText : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadText;
+  loadAsText : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadText;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsText(file, this.encoding);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file, true);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsUnknown : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadUnknown;
+  loadAsUnknown : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadUnknown;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgress : function(index, total) {
+    var per, callback = this.options.onProgress;
+    if (callback) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((index / total) * 100)
+              )
+      );
+      callback.call(this, per);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressEnd : function() {
+    var callback = this.options.onProgress;
+    if (callback) {
+      callback.call(this, 100);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFile : function(evt, fileinfo, total) {
+    var per, op = this.options, callback = op.onProgressFile;
+    if (callback &&
+        evt && evt.lengthComputable && evt.loaded != null) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((evt.loaded / evt.total) * 100)
+              )
+      );
+      callback.call(this, per, fileinfo);
+    }
+    if (op.onProgress) {
+      this.updateProgress(fileinfo.index, total);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFileEnd : function(fileinfo) {
+    var callback = this.options.onProgressFile;
+    if (callback) {
+      callback.call(this, 100, fileinfo);
+    }
   }
 });
 DropFile.fn.init.prototype = DropFile.fn;
