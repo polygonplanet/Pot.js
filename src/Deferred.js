@@ -1219,6 +1219,8 @@ function fireProcedure() {
       result = reply;
       if (isWorkeroid(result)) {
         result = workerMessaging.call(this, result);
+      } else if (Pot.isFileReader(result)) {
+        result = readerPolling.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
@@ -1397,6 +1399,52 @@ function workerMessaging(worker) {
     }
     return defer;
   }).begin();
+}
+
+/**
+ * Observe FileReader state.
+ *
+ * @private
+ * @ignore
+ */
+function readerPolling(reader) {
+  var d, done, async = false,
+      orgLoad = reader.onload,
+      orgLoadEnd = reader.onloadend,
+      orgError = reader.onerror;
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  d = new Deferred({async : async});
+  if (reader.readyState === FileReader.LOADING) {
+    /**@ignore*/
+    reader.onload = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoad && orgLoad.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onloadend = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoadEnd && orgLoadEnd.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onerror = function(e) {
+      if (!done) {
+        done = true;
+        d.raise(e);
+      }
+      orgError && orgError.apply(this, arguments);
+    };
+  } else {
+    d.begin(reader.result);
+  }
+  return d;
 }
 
 /**
