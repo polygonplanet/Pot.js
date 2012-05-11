@@ -52,6 +52,22 @@ update(Pot.UTF8, {
   /**
    * Convert to UTF-8 string from UTF-16 string.
    *
+   *
+   * @example
+   *   var string = 'hogeほげ';
+   *   var encoded = Pot.utf8Encode(string);
+   *   var decoded = Pot.utf8Decode(encoded);
+   *   var toCharCode = function(s) {
+   *     return Pot.map(s.split(''), function(c) {
+   *       return c.charCodeAt(0);
+   *     });
+   *   };
+   *   Pot.debug(toCharCode(encoded));
+   *   // [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(decoded); // 'hogeほげ'
+   *   Pot.debug(decoded === string); // true
+   *
+   *
    * @param  {String}  string  UTF-16 string.
    * @return {String}          UTF-8 string.
    * @type  Function
@@ -59,31 +75,68 @@ update(Pot.UTF8, {
    * @static
    * @public
    */
-  encode : function(string) {
-    var result = '', chars = [], len, i, c, s, sc;
-    s = stringify(string);
-    if (s) {
-      sc = fromUnicode;
-      len = s.length;
-      for (i = 0; i < len; i++) {
-        c = s.charCodeAt(i);
-        if (c < 0x80) {
-          chars[chars.length] = sc(c);
-        } else if (c > 0x7FF) {
-          chars[chars.length] = sc(0xE0 | ((c >> 12) & 0x0F)) +
-                                sc(0x80 | ((c >>  6) & 0x3F)) +
-                                sc(0x80 | ((c >>  0) & 0x3F));
-        } else {
-          chars[chars.length] = sc(0xC0 | ((c >>  6) & 0x1F)) +
-                                sc(0x80 | ((c >>  0) & 0x3F));
+  encode : (function() {
+    var sc = fromUnicode,
+        /**@ignore*/
+        add = function(b, c) {
+          var l = b.length;
+          if (c < 0x80) {
+            b[l] = sc(c);
+          } else if (c < 0x800) {
+            b[l] = sc(0xC0 | ((c >>  6) & 0x1F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          } else if (c < 0x10000) {
+            b[l] = sc(0xE0 | ((c >> 12) & 0x0F)) +
+                   sc(0x80 | ((c >>  6) & 0x3F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          } else {
+            b[l] = sc(0xF0 | ((c >> 18) & 0x0F)) +
+                   sc(0x80 | ((c >> 12) & 0x3F)) +
+                   sc(0x80 | ((c >>  6) & 0x3F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          }
+        };
+    return function(string) {
+      var chars = [],  len, i, j, ch, c2,
+          s = stringify(string);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          ch = s.charCodeAt(i);
+          if (0xD800 <= ch && ch <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                ch = ((ch & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              }
+            }
+          }
+          add(chars, ch);
         }
       }
-      result = chars.join('');
-    }
-    return result;
-  },
+      return chars.join('');
+    };
+  }()),
   /**
    * Convert to UTF-16 string from UTF-8 string.
+   *
+   *
+   * @example
+   *   var string = 'hogeほげ';
+   *   var encoded = Pot.utf8Encode(string);
+   *   var decoded = Pot.utf8Decode(encoded);
+   *   var toCharCode = function(s) {
+   *     return Pot.map(s.split(''), function(c) {
+   *       return c.charCodeAt(0);
+   *     });
+   *   };
+   *   Pot.debug(toCharCode(encoded));
+   *   // [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(decoded); // 'hogeほげ'
+   *   Pot.debug(decoded === string); // true
+   *
    *
    * @param  {String}  string  UTF-8 string.
    * @return {String}          UTF-16 string.
@@ -93,11 +146,10 @@ update(Pot.UTF8, {
    * @public
    */
   decode : function(string) {
-    var result = '', chars = [], i, len, s, n, c, c2, c3, sc;
-    s = stringify(string);
+    var result = '', chars = [], i = 0, j, len,
+        n, c, c2, c3, c4, code, sc = fromUnicode,
+        s = stringify(string);
     if (s) {
-      sc = fromUnicode;
-      i = 0;
       len = s.length;
       while (i < len) {
         c = s.charCodeAt(i++);
@@ -119,6 +171,23 @@ update(Pot.UTF8, {
           chars[chars.length] = sc(((c  & 0x0F) << 12) |
                                    ((c2 & 0x3F) <<  6) |
                                    ((c3 & 0x3F) <<  0));
+        } else if (i + 2 < len) {
+          // 1111 0xxx ...
+          c2 = s.charCodeAt(i++);
+          c3 = s.charCodeAt(i++);
+          c4 = s.charCodeAt(i++);
+          code = (((c  & 0x07) << 18) |
+                  ((c2 & 0x3F) << 12) |
+                  ((c3 & 0x3F) <<  6) |
+                  ((c4 & 0x3F) <<  0));
+          if (code <= 0xFFFF) {
+            chars[chars.length] = sc(code);
+          } else {
+            chars[chars.length] = fromCharCode(
+              (code >> 10)   + 0xD7C0,
+              (code & 0x3FF) + 0xDC00
+            );
+          }
         }
       }
       result = chars.join('');
@@ -146,27 +215,55 @@ update(Pot.UTF8, {
    * @static
    * @public
    */
-  byteOf : function(string) {
-    var size = 0, s, i, c;
-    s = stringify(string, true);
-    if (s) {
-      i = s.length;
-      while (--i >= 0) {
-        c = s.charCodeAt(i);
-        if (c < 0x80) {
-          size++;
-        } else if (c < 0x800 ||
-                  // We ignore UTF-8 Surrogate Pair, for the binary data.
-                  (c > 0xD7FF && c < 0xE000)
-        ) {
-          size += 2;
-        } else {
-          size += 3;
+  byteOf : (function() {
+    var s, i, len,
+        /**@ignore*/
+        toCharCode = function() {
+          var c1 = s.charCodeAt(i), c2, j;
+          if (0xD800 <= c1 && c1 <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          }
+          return c1;
+        };
+    return function(string) {
+      var size = 0, c;
+      s = stringify(string, true);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          c = toCharCode();
+          if (c !== false) {
+            if (c < 0x80) {
+              size += 1;
+            } else if (c < 0x800) {
+              size += 2;
+            } else if (c < 0x10000) {
+              size += 3;
+            } else if (c < 0x200000) {
+              size += 4;
+            } else if (c < 0x4000000) {
+              size += 5;
+            } else {
+              size += 6;
+            }
+          }
         }
       }
-    }
-    return size;
-  },
+      s = i = len = null;
+      return size;
+    };
+  }()),
   /**
    * Convert encoding to Unicode string.
    * This function requires BlobBuilder and FileReader API.
@@ -204,14 +301,14 @@ update(Pot.UTF8, {
    *     Pot.debug('SJIS to Unicode:');
    *     Pot.debug(res); // 'こんにちは。ほげほげ'
    *   }).then(function() {
-   *     return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP')
-   *                                                    .then(function(res) {
+   *     return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP').
+   *                                                     then(function(res) {
    *       Pot.debug('EUC-JP to Unicode:');
    *       Pot.debug(res); // 'こんにちは。ほげほげ'
    *     });
    *   }).then(function() {
-   *     return Pot.convertEncodingToUnicode(utf8, 'UTF-8')
-   *                                                    .then(function(res) {
+   *     return Pot.convertEncodingToUnicode(utf8, 'UTF-8').
+   *                                                    then(function(res) {
    *       Pot.debug('UTF-8 to Unicode:');
    *       Pot.debug(res); // 'こんにちは。ほげほげ'
    *     });
