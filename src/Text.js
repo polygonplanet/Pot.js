@@ -1894,6 +1894,43 @@ update(Pot.Text, {
     return result;
   },
   /**
+   * Convert to character code array from a string.
+   *
+   *
+   * @example
+   *   var string = 'foo bar ほげ';
+   *   var result = Pot.toCharCode(string);
+   *   Pot.debug(result);
+   *   // [102, 111, 111, 32, 98, 97, 114, 32, 12411, 12370]
+   *
+   *
+   * @example
+   *   var string = 'abc';
+   *   var result = Pot.toCharCode(string, function(code) {
+   *     return code.toString(16);
+   *   });
+   *   Pot.debug(result);
+   *   // ['61', '62', '63']
+   *
+   *
+   * @param  {String}    string     A target string.
+   * @param  {Function} (callback)  (Optional) A callback function for code.
+   * @return {Array} A result array.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  toCharCode : function(string, callback) {
+    return Pot.map(stringify(string).split(''), function(c) {
+      var code = c.charCodeAt(0);
+      if (callback) {
+        code = callback(code);
+      }
+      return code;
+    });
+  },
+  /**
    * 全角英数記号文字を半角英数記号文字に変換
    * Convert the ascii symbols and alphanumeric characters to
    *   the zenkaku symbols and alphanumeric characters.
@@ -2243,6 +2280,7 @@ Pot.update({
   stripTags      : Pot.Text.stripTags,
   truncate       : Pot.Text.truncate,
   truncateMiddle : Pot.Text.truncateMiddle,
+  toCharCode     : Pot.Text.toCharCode,
   toHankakuCase  : Pot.Text.toHankakuCase,
   toZenkakuCase  : Pot.Text.toZenkakuCase,
   toHanSpaceCase : Pot.Text.toHanSpaceCase,

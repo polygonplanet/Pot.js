@@ -404,6 +404,7 @@ update(PotInternal, {
     stripTags                : Pot.Text.stripTags,
     truncate                 : Pot.Text.truncate,
     truncateMiddle           : Pot.Text.truncateMiddle,
+    toCharCode               : Pot.Text.toCharCode,
     toHankakuCase            : Pot.Text.toHankakuCase,
     toZenkakuCase            : Pot.Text.toZenkakuCase,
     toHanSpaceCase           : Pot.Text.toHanSpaceCase,
