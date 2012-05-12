@@ -4,9 +4,10 @@
  * PotLite.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.35, 2012-04-15
+ * Version 1.36, 2012-05-13
  * Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
+ * https://github.com/polygonplanet/Pot.js
  * http://polygonplanet.github.com/Pot.js/
  */
 /**
@@ -67,8 +68,9 @@
  *
  * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.35
- * @date           2012-04-15
+ * @version        1.36
+ * @date           2012-05-13
+ * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
@@ -103,7 +105,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.35', TYPE : 'lite'},
+var Pot = {VERSION : '1.36', TYPE : 'lite'},
 
 // Refer the Pot properties/functions.
 PotSystem,
@@ -135,6 +137,8 @@ isDate,
 isRegExp,
 isObject,
 isError,
+isTypedArray,
+isArrayBuffer,
 isArrayLike,
 isNumeric,
 isStopIter,
@@ -679,7 +683,7 @@ PotInternal = Pot.Internal;
 
 // Definition of System.
 update(PotSystem, (function() {
-  var o = {}, g, ws, b, u;
+  var o = {}, g, ws, b, u, ua, ca;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -759,6 +763,13 @@ update(PotSystem, (function() {
     g = (new Function('yield(0);'))();
     if (g && typeof g.next === 'function') {
       o.isYieldable = true;
+    }
+  } catch (e) {}
+  try {
+    if (typeof FileReader !== 'undefined' &&
+        typeof FileReader.LOADING !== 'undefined' &&
+        typeof (new FileReader()).readAsText === 'function') {
+      o.hasFileReader = true;
     }
   } catch (e) {}
   try {
@@ -901,6 +912,36 @@ update(PotSystem, (function() {
       }
     }());
   }
+  try {
+    if (typeof ArrayBuffer !== 'undefined' &&
+        (new ArrayBuffer(10)).byteLength === 10 &&
+        typeof Uint8Array !== 'undefined' &&
+        (new Uint8Array([0, 312])).subarray(1)[0] === 56
+    ) {
+      o.hasTypedArray = true;
+      try {
+        ua = new Uint8Array([1, 2]);
+        ca = new Uint8Array(ua.subarray(0));
+        ca[0] = 5;
+        if (ua[0] === 1 && ca[0] === 5) {
+          o.canCopyTypedArray = true;
+        }
+        ua = ca = null;
+      } catch (ex) {}
+      try {
+        if (typeof Uint8ClampedArray !== 'undefined' &&
+            (new Uint8ClampedArray([0, 312])).subarray(1)[0] === 255) {
+          o.hasUint8ClampedArray = true;
+        }
+      } catch (ex) {}
+      if (typeof DataView !== 'undefined' &&
+          (new DataView(new Uint8Array([
+            0x10, 0x20, 0x40, 0x80
+          ]).buffer)).getUint32(0) === 0x10204080) {
+        o.hasDataView = true;
+      }
+    }
+  } catch (e) {}
   return o;
 }()));
 
@@ -1420,6 +1461,50 @@ Pot.update({
     return x != null && (isString(x) || isNumber(x) || isBoolean(x));
   },
   /**
+   * Check whether the argument is Blob or not.
+   *
+   *
+   * @example
+   *   var bb = new Pot.System.BlobBuilder();
+   *   bb.append('hoge');
+   *   var blob = bb.getBlob();
+   *   Pot.debug(Pot.isBlob(blob));   // true
+   *   Pot.debug(Pot.isBlob({}));     // false
+   *   Pot.debug(Pot.isBlob('hoge')); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Blob.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isBlob : function(x) {
+    return !!(x && toString.call(x) === '[object Blob]');
+  },
+  /**
+   * Check whether the argument is a instance of FileReader or not.
+   *
+   *
+   * @example
+   *   var object = {hoge : 1};
+   *   var reader = new FileReader();
+   *   Pot.debug(Pot.isFileReader(object)); // false
+   *   Pot.debug(Pot.isFileReader(reader)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is FileReader.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isFileReader : function(x) {
+    return !!(PotSystem.hasFileReader && x && x.constructor === FileReader);
+  },
+  /**
    * Check whether the argument is Arguments object or not.
    *
    *
@@ -1443,7 +1528,7 @@ Pot.update({
   isArguments : function(x) {
     var result = false;
     if (x) {
-      if (toString.call(x) == '[object Arguments]') {
+      if (toString.call(x) === '[object Arguments]') {
         result = true;
       } else {
         try {
@@ -1454,6 +1539,64 @@ Pot.update({
       }
     }
     return result;
+  },
+  /**
+   * Check whether the argument is TypedArray object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isTypedArray(obj)); // false
+   *   debug(isTypedArray(arr)); // false
+   *   debug(isTypedArray(buf)); // true
+   *   debug(isTypedArray(uar)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is TypedArray object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isTypedArray : function(x) {
+    var result = false;
+    if (x && PotSystem.hasTypedArray && 
+        (x.constructor === ArrayBuffer ||
+          (x.buffer && x.buffer.constructor === ArrayBuffer)
+        )
+    ) {
+      result = true;
+    }
+    return result;
+  },
+  /**
+   * Check whether the argument is ArrayBuffer object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isArrayBuffer(obj)); // false
+   *   debug(isArrayBuffer(arr)); // false
+   *   debug(isArrayBuffer(buf)); // true
+   *   debug(isArrayBuffer(uar)); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is ArrayBuffer object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArrayBuffer : function(x) {
+    return !!(PotSystem.hasTypedArray && x && x.constructor === ArrayBuffer);
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -1480,13 +1623,14 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (isArray(o) || o instanceof Array || o.constructor === Array) {
+    if (isArray(o) || o instanceof Array || o.constructor === Array ||
+        isTypedArray(o)) {
       return true;
     }
     len = o.length;
     if (!isNumber(len) || (!isObject(o) && !isArray(o)) ||
-        o === Pot || o === PotGlobal || o === globals ||
-        isWindow(o) || isDocument(o) || isElement(o)
+         o === Pot  || o === PotGlobal || o === globals ||
+        isWindow(o) ||  isDocument(o)  || isElement(o)
     ) {
       return false;
     }
@@ -1894,6 +2038,8 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
 
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
+isTypedArray     = Pot.isTypedArray;
+isArrayBuffer    = Pot.isArrayBuffer;
 isArrayLike      = Pot.isArrayLike;
 isNumeric        = Pot.isNumeric;
 isStopIter       = Pot.isStopIter;
@@ -3290,6 +3436,8 @@ Pot.update({
     if (isError(error)) {
       msg = String(error.message  || error.description ||
                   (error.toString && error.toString()) || error);
+    } else {
+      msg = (error && error.toString && error.toString()) || error;
     }
     return stringify(msg) || stringify(defaults) || 'error';
   }
@@ -5493,6 +5641,8 @@ function fireProcedure() {
       result = reply;
       if (isWorkeroid(result)) {
         result = workerMessaging.call(this, result);
+      } else if (Pot.isFileReader(result)) {
+        result = readerPolling.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
@@ -5671,6 +5821,52 @@ function workerMessaging(worker) {
     }
     return defer;
   }).begin();
+}
+
+/**
+ * Observe FileReader state.
+ *
+ * @private
+ * @ignore
+ */
+function readerPolling(reader) {
+  var d, done, async = false,
+      orgLoad = reader.onload,
+      orgLoadEnd = reader.onloadend,
+      orgError = reader.onerror;
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  d = new Deferred({async : async});
+  if (reader.readyState === FileReader.LOADING) {
+    /**@ignore*/
+    reader.onload = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoad && orgLoad.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onloadend = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoadEnd && orgLoadEnd.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onerror = function(e) {
+      if (!done) {
+        done = true;
+        d.raise(e);
+      }
+      orgError && orgError.apply(this, arguments);
+    };
+  } else {
+    d.begin(reader.result);
+  }
+  return d;
 }
 
 /**
@@ -15135,27 +15331,37 @@ update(Pot.Crypt, {
    * We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
    *
    *
-   * @param  {String|*}  string   A string.
-   * @return {Number}             Hash value for `string`,
-   *                                between 0 (inclusive)
-   *                                 and 2^32 (exclusive).
-   *                              The empty string returns 0.
+   * @example
+   *   Pot.debug( Pot.hashCode('abc') ); // 96354
+   *   Pot.debug( Pot.hashCode([0x61, 0x62, 0x63]) ); // 96354
+   *
+   *
+   * @param  {String|Array|*}  data   A target data.
+   * @return {Number}                 Hash value for `string`,
+   *                                    between 0 (inclusive)
+   *                                    and 2^32 (exclusive).
+   *                                  The empty string returns 0.
    * @based goog.string.hashCode
    * @type Function
    * @function
    * @public
    * @static
    */
-  hashCode : function(string) {
-    var result = 0, s, i, len, max = 0x100000000; // 2^32
-    if (string == null) {
-      s = String(string);
+  hashCode : function(data) {
+    var result = 0, s, i, len,
+        max = 0x100000000, // 2^32
+        arrayLike = false;
+    if (data == null) {
+      s = String(data);
+    } else if (isArrayLike(data)) {
+      s = arrayize(data);
+      arrayLike = true;
     } else {
-      s = string.toString ? string.toString() : String(string);
+      s = data.toString ? data.toString() : String(data);
     }
     len = s.length;
     for (i = 0; i < len; ++i) {
-      result = 31 * result + s.charCodeAt(i);
+      result = 31 * result + (arrayLike ? s[i] : s.charCodeAt(i));
       result %= max;
     }
     return result;
@@ -17570,20 +17776,31 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    */
   defaultOptions : {
-    onShow        : null,
-    onHide        : null,
-    onDrop        : null,
-    onLoadImage   : null,
-    onLoadText    : null,
-    onLoadUnknown : null,
-    onLoadEnd     : null
+    onShow         : null,
+    onHide         : null,
+    onDrop         : null,
+    onLoadImage    : null,
+    onLoadText     : null,
+    onLoadUnknown  : null,
+    onLoadEnd      : null,
+    onProgress     : null,
+    onProgressFile : null,
+    // readAs:
+    //  - 'text'
+    //  - 'binary'
+    //  - 'arraybuffer'
+    //  - 'datauri'
+    //  or null (auto)
+    readAs         : null,
+    encoding       : null
   },
   /**
-   * Text encoding. (default = 'UTF-8')
+   * Text encoding.
    *
    * @type  String
+   * @ignore
    */
-  encoding : 'UTF-8',
+  encoding : null,
   /**
    * @ignore
    * @private
@@ -17625,6 +17842,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     if (this.options.encoding) {
       this.encoding = this.options.encoding;
     }
+    this.assignReadType();
     if (this.target) {
       this.initEvents();
     }
@@ -17651,43 +17869,89 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     var that = this, target = this.target, html,
         cache = this.handleCache, op = this.options, ps = Signal;
     cache[cache.length] = ps.attach(target, 'drop', function(ev) {
-      var files, reader, i = 0;
-      that.isShow = false;
-      files = ev.dataTransfer && ev.dataTransfer.files;
-      if (files) {
-        if (op.onDrop) {
-          op.onDrop.call(that, files);
-        }
-        reader = new FileReader();
-        /**@ignore*/
-        reader.onloadend = function(evt) {
-          i--;
-          if (evt && evt.target && evt.target.result != null) {
-            that.loadedFiles.push(evt.target.result);
-            if (i <= 0) {
-              if (op.onLoadEnd) {
-                op.onLoadEnd.call(that, arrayize(that.loadedFiles));
-              }
-            }
-          }
-        };
-        each(files, function(file) {
-          var name, size, type;
-          if (file) {
-            i++;
-            type = file.type;
-            size = file.size;
-            name = file.name;
-            reader.readAsDataURL(file);
-            if (that.isImageFile(type)) {
-              that.loadAsImage(file, name, size, type);
-            } else if (that.isTextFile(type)) {
-              that.loadAsText(file, name, size, type);
+      var files, reader, i = 0, total, fileList,
+          deferreds = {
+            seek   : new Deferred(),
+            files  : [],
+            steps  : [],
+            ends   : [true],
+            done   : false
+          },
+          /**@ignore*/
+          pushFiles = function(evt) {
+            if (evt && evt.target && evt.target.result != null) {
+              that.loadedFiles.push(evt.target.result);
+              return true;
             } else {
-              that.loadAsUnknown(file, name, size, type);
+              return false;
             }
+          };
+      that.isShow = false;
+      fileList = ev.dataTransfer && ev.dataTransfer.files;
+      if (fileList) {
+        total = 0;
+        files = [];
+        each(fileList, function(file) {
+          if (file) {
+            files[total++] = file;
           }
         });
+        if (op.onDrop) {
+          op.onDrop.call(that, files, total);
+        }
+        if (PotSystem.hasFileReader) {
+          reader = new FileReader();
+          /**@ignore*/
+          reader.onloadend = function(evt) {
+            if (pushFiles(evt)) {
+              if (deferreds.files[i] && !deferreds.ends[i]) {
+                deferreds.files[i].begin();
+              }
+            }
+          };
+          Deferred.forEach(files, function(file) {
+            if (file) {
+              deferreds.seek.then(function() {
+                var fileinfo = update({}, file, {index : i++});
+                return Deferred.till(function() {
+                  return !Pot.some(deferreds.ends, function(end) {
+                    return end === false;
+                  });
+                }).then(function() {
+                  deferreds.ends[i] = false;
+                  deferreds.steps[i] = new Deferred();
+                  deferreds.files[i] = new Deferred().then(function() {
+                    if (that.isImageFile(fileinfo.type)) {
+                      that.loadAsImage(deferreds, i, total, file, fileinfo);
+                    } else if (that.isTextFile(fileinfo.type)) {
+                      that.loadAsText(deferreds, i, total, file, fileinfo);
+                    } else {
+                      that.loadAsUnknown(deferreds, i, total, file, fileinfo);
+                    }
+                    return deferreds.steps[i];
+                  });
+                  that.readFile(reader, file);
+                  return deferreds.files[i];
+                });
+              });
+            }
+          }).then(function() {
+            deferreds.seek.then(function() {
+              var done = Pot.every(deferreds.ends, function(end) {
+                return end === true;
+              });
+              if (done && !deferreds.done) {
+                deferreds.done = true;
+                if (op.onProgress) {
+                  that.updateProgressEnd();
+                }
+                if (op.onLoadEnd) {
+                  op.onLoadEnd.call(that, arrayize(that.loadedFiles));
+                }
+              }
+            }).begin();
+          });
+        }
       }
     });
     cache[cache.length] = ps.attach(target, 'dragenter', function(ev) {
@@ -17757,6 +18021,59 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
+  readFile : function(reader, file, isText) {
+    switch (this.options.readAs) {
+      case 'text':
+          if (this.encoding) {
+            reader.readAsText(file, this.encoding);
+          } else {
+            reader.readAsText(file);
+          }
+          break;
+      case 'binary':
+          reader.readAsBinaryString(file);
+          break;
+      case 'arraybuffer':
+          reader.readAsArrayBuffer(file);
+          break;
+      case 'datauri':
+          reader.readAsDataURL(file);
+          break;
+      default:
+          if (isText) {
+            if (this.encoding) {
+              reader.readAsText(file, this.encoding);
+            } else {
+              reader.readAsText(file);
+            }
+          } else {
+            reader.readAsDataURL(file);
+          }
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  assignReadType : function() {
+    var res, type = stringify(this.options.readAs).toLowerCase();
+    if (~type.indexOf('text')) {
+      res = 'text';
+    } else if (~type.indexOf('bin')) {
+      res = 'binary';
+    } else if (~type.indexOf('arr') || ~type.indexOf('buf')) {
+      res = 'arraybuffer';
+    } else if (~type.indexOf('data') || ~type.indexOf('ur')) {
+      res = 'datauri';
+    } else {
+      res = null;
+    }
+    this.options.readAs = res;
+  },
+  /**
+   * @private
+   * @ignore
+   */
   isImageFile : function(type) {
     return /image/i.test(type);
   },
@@ -17765,7 +18082,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @ignore
    */
   isTextFile : function(type) {
-    return !/image|audio|video|zip|compress/i.test(type);
+    return !/image|audio|video|zip|compress|stream/i.test(type);
   },
   /**
    * Upload the dropped files with specified options.
@@ -17870,58 +18187,166 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsImage : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadImage;
+  loadAsImage : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadImage;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsText : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadText;
+  loadAsText : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadText;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsText(file, this.encoding);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file, true);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsUnknown : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadUnknown;
+  loadAsUnknown : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadUnknown;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgress : function(index, total) {
+    var per, callback = this.options.onProgress;
+    if (callback) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((index / total) * 100)
+              )
+      );
+      callback.call(this, per);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressEnd : function() {
+    var callback = this.options.onProgress;
+    if (callback) {
+      callback.call(this, 100);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFile : function(evt, fileinfo, total) {
+    var per, op = this.options, callback = op.onProgressFile;
+    if (callback &&
+        evt && evt.lengthComputable && evt.loaded != null) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((evt.loaded / evt.total) * 100)
+              )
+      );
+      callback.call(this, per, fileinfo);
+    }
+    if (op.onProgress) {
+      this.updateProgress(fileinfo.index, total);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFileEnd : function(fileinfo) {
+    var callback = this.options.onProgressFile;
+    if (callback) {
+      callback.call(this, 100, fileinfo);
+    }
   }
 });
 DropFile.fn.init.prototype = DropFile.fn;
@@ -19550,128 +19975,132 @@ update(PotInternal, {
    * @internal
    */
   PotExportProps : {
-    Pot                     : Pot,
-    update                  : update,
-    isBoolean               : Pot.isBoolean,
-    isNumber                : Pot.isNumber,
-    isString                : Pot.isString,
-    isFunction              : Pot.isFunction,
-    isArray                 : Pot.isArray,
-    isDate                  : Pot.isDate,
-    isRegExp                : Pot.isRegExp,
-    isObject                : Pot.isObject,
-    isError                 : Pot.isError,
-    typeOf                  : Pot.typeOf,
-    typeLikeOf              : Pot.typeLikeOf,
-    StopIteration           : Pot.StopIteration,
-    isStopIter              : Pot.isStopIter,
-    isIterable              : Pot.isIterable,
-    isScalar                : Pot.isScalar,
-    isArguments             : Pot.isArguments,
-    isArrayLike             : Pot.isArrayLike,
-    isDeferred              : Pot.isDeferred,
-    isIter                  : Pot.isIter,
-    isWorkeroid             : Pot.isWorkeroid,
-    isPercentEncoded        : Pot.isPercentEncoded,
-    isNumeric               : Pot.isNumeric,
-    isInt                   : Pot.isInt,
-    isNativeCode            : Pot.isNativeCode,
-    isBuiltinMethod         : Pot.isBuiltinMethod,
-    isWindow                : Pot.isWindow,
-    isDocument              : Pot.isDocument,
-    isElement               : Pot.isElement,
-    isNodeLike              : Pot.isNodeLike,
-    isNodeList              : Pot.isNodeList,
-    Cc                      : Pot.Cc,
-    Ci                      : Pot.Ci,
-    Cr                      : Pot.Cr,
-    Cu                      : Pot.Cu,
-    Deferred                : Pot.Deferred,
-    succeed                 : Pot.Deferred.succeed,
-    failure                 : Pot.Deferred.failure,
-    wait                    : Pot.Deferred.wait,
-    callLater               : Pot.Deferred.callLater,
-    callLazy                : Pot.Deferred.callLazy,
-    maybeDeferred           : Pot.Deferred.maybeDeferred,
-    isFired                 : Pot.Deferred.isFired,
-    lastResult              : Pot.Deferred.lastResult,
-    lastError               : Pot.Deferred.lastError,
-    register                : Pot.Deferred.register,
-    unregister              : Pot.Deferred.unregister,
-    deferrize               : Pot.Deferred.deferrize,
-    deferreed               : Pot.Deferred.deferreed,
-    begin                   : Pot.Deferred.begin,
-    flush                   : Pot.Deferred.flush,
-    till                    : Pot.Deferred.till,
-    parallel                : Pot.Deferred.parallel,
-    chain                   : Pot.Deferred.chain,
-    forEach                 : Pot.forEach,
-    repeat                  : Pot.repeat,
-    forEver                 : Pot.forEver,
-    iterate                 : Pot.iterate,
-    items                   : Pot.items,
-    zip                     : Pot.zip,
-    Iter                    : Pot.Iter,
-    toIter                  : Pot.Iter.toIter,
-    map                     : Pot.map,
-    filter                  : Pot.filter,
-    reduce                  : Pot.reduce,
-    every                   : Pot.every,
-    some                    : Pot.some,
-    range                   : Pot.range,
-    indexOf                 : Pot.indexOf,
-    lastIndexOf             : Pot.lastIndexOf,
-    globalEval              : Pot.globalEval,
-    localEval               : Pot.localEval,
-    tokenize                : Pot.tokenize,
-    joinTokens              : Pot.joinTokens,
-    isWords                 : Pot.isWords,
-    isNL                    : Pot.isNL,
-    hasReturn               : Pot.hasReturn,
-    override                : Pot.override,
-    getErrorMessage         : Pot.getErrorMessage,
-    getFunctionCode         : Pot.getFunctionCode,
-    currentWindow           : Pot.currentWindow,
-    currentDocument         : Pot.currentDocument,
-    currentURI              : Pot.currentURI,
-    serializeToJSON         : Pot.Serializer.serializeToJSON,
-    parseFromJSON           : Pot.Serializer.parseFromJSON,
-    serializeToQueryString  : Pot.Serializer.serializeToQueryString,
-    parseFromQueryString    : Pot.Serializer.parseFromQueryString,
-    urlEncode               : Pot.URI.urlEncode,
-    urlDecode               : Pot.URI.urlDecode,
-    request                 : Pot.Net.request,
-    jsonp                   : Pot.Net.requestByJSONP,
-    getJSON                 : Pot.Net.getJSON,
-    loadScript              : Pot.Net.loadScript,
-    hashCode                : Pot.Crypt.hashCode,
-    evalInSandbox           : Pot.XPCOM.evalInSandbox,
-    throughout              : Pot.XPCOM.throughout,
-    getMostRecentWindow     : Pot.XPCOM.getMostRecentWindow,
-    getChromeWindow         : Pot.XPCOM.getChromeWindow,
-    Workeroid               : Pot.Workeroid,
-    attach                  : Pot.Signal.attach,
-    attachBefore            : Pot.Signal.attachBefore,
-    attachAfter             : Pot.Signal.attachAfter,
-    attachPropBefore        : Pot.Signal.attachPropBefore,
-    attachPropAfter         : Pot.Signal.attachPropAfter,
-    detach                  : Pot.Signal.detach,
-    detachAll               : Pot.Signal.detachAll,
-    signal                  : Pot.Signal.signal,
-    cancelEvent             : Pot.Signal.cancelEvent,
-    DropFile                : Pot.Signal.DropFile,
-    rescape                 : rescape,
-    arrayize                : arrayize,
-    invoke                  : invoke,
-    stringify               : stringify,
-    trim                    : trim,
-    now                     : now,
-    globalize               : Pot.globalize,
-    debug                   : Pot.Debug.debug,
-    addPlugin               : Pot.Plugin.add,
-    hasPlugin               : Pot.Plugin.has,
-    removePlugin            : Pot.Plugin.remove,
-    listPlugin              : Pot.Plugin.list
+    Pot                      : Pot,
+    update                   : update,
+    isBoolean                : Pot.isBoolean,
+    isNumber                 : Pot.isNumber,
+    isString                 : Pot.isString,
+    isFunction               : Pot.isFunction,
+    isArray                  : Pot.isArray,
+    isDate                   : Pot.isDate,
+    isRegExp                 : Pot.isRegExp,
+    isObject                 : Pot.isObject,
+    isError                  : Pot.isError,
+    typeOf                   : Pot.typeOf,
+    typeLikeOf               : Pot.typeLikeOf,
+    StopIteration            : Pot.StopIteration,
+    isStopIter               : Pot.isStopIter,
+    isIterable               : Pot.isIterable,
+    isScalar                 : Pot.isScalar,
+    isBlob                   : Pot.isBlob,
+    isFileReader             : Pot.isFileReader,
+    isArguments              : Pot.isArguments,
+    isTypedArray             : Pot.isTypedArray,
+    isArrayBuffer            : Pot.isArrayBuffer,
+    isArrayLike              : Pot.isArrayLike,
+    isDeferred               : Pot.isDeferred,
+    isIter                   : Pot.isIter,
+    isWorkeroid              : Pot.isWorkeroid,
+    isPercentEncoded         : Pot.isPercentEncoded,
+    isNumeric                : Pot.isNumeric,
+    isInt                    : Pot.isInt,
+    isNativeCode             : Pot.isNativeCode,
+    isBuiltinMethod          : Pot.isBuiltinMethod,
+    isWindow                 : Pot.isWindow,
+    isDocument               : Pot.isDocument,
+    isElement                : Pot.isElement,
+    isNodeLike               : Pot.isNodeLike,
+    isNodeList               : Pot.isNodeList,
+    Cc                       : Pot.Cc,
+    Ci                       : Pot.Ci,
+    Cr                       : Pot.Cr,
+    Cu                       : Pot.Cu,
+    Deferred                 : Pot.Deferred,
+    succeed                  : Pot.Deferred.succeed,
+    failure                  : Pot.Deferred.failure,
+    wait                     : Pot.Deferred.wait,
+    callLater                : Pot.Deferred.callLater,
+    callLazy                 : Pot.Deferred.callLazy,
+    maybeDeferred            : Pot.Deferred.maybeDeferred,
+    isFired                  : Pot.Deferred.isFired,
+    lastResult               : Pot.Deferred.lastResult,
+    lastError                : Pot.Deferred.lastError,
+    register                 : Pot.Deferred.register,
+    unregister               : Pot.Deferred.unregister,
+    deferrize                : Pot.Deferred.deferrize,
+    deferreed                : Pot.Deferred.deferreed,
+    begin                    : Pot.Deferred.begin,
+    flush                    : Pot.Deferred.flush,
+    till                     : Pot.Deferred.till,
+    parallel                 : Pot.Deferred.parallel,
+    chain                    : Pot.Deferred.chain,
+    forEach                  : Pot.forEach,
+    repeat                   : Pot.repeat,
+    forEver                  : Pot.forEver,
+    iterate                  : Pot.iterate,
+    items                    : Pot.items,
+    zip                      : Pot.zip,
+    Iter                     : Pot.Iter,
+    toIter                   : Pot.Iter.toIter,
+    map                      : Pot.map,
+    filter                   : Pot.filter,
+    reduce                   : Pot.reduce,
+    every                    : Pot.every,
+    some                     : Pot.some,
+    range                    : Pot.range,
+    indexOf                  : Pot.indexOf,
+    lastIndexOf              : Pot.lastIndexOf,
+    globalEval               : Pot.globalEval,
+    localEval                : Pot.localEval,
+    tokenize                 : Pot.tokenize,
+    joinTokens               : Pot.joinTokens,
+    isWords                  : Pot.isWords,
+    isNL                     : Pot.isNL,
+    hasReturn                : Pot.hasReturn,
+    override                 : Pot.override,
+    getErrorMessage          : Pot.getErrorMessage,
+    getFunctionCode          : Pot.getFunctionCode,
+    currentWindow            : Pot.currentWindow,
+    currentDocument          : Pot.currentDocument,
+    currentURI               : Pot.currentURI,
+    serializeToJSON          : Pot.Serializer.serializeToJSON,
+    parseFromJSON            : Pot.Serializer.parseFromJSON,
+    serializeToQueryString   : Pot.Serializer.serializeToQueryString,
+    parseFromQueryString     : Pot.Serializer.parseFromQueryString,
+    urlEncode                : Pot.URI.urlEncode,
+    urlDecode                : Pot.URI.urlDecode,
+    request                  : Pot.Net.request,
+    jsonp                    : Pot.Net.requestByJSONP,
+    getJSON                  : Pot.Net.getJSON,
+    loadScript               : Pot.Net.loadScript,
+    hashCode                 : Pot.Crypt.hashCode,
+    evalInSandbox            : Pot.XPCOM.evalInSandbox,
+    throughout               : Pot.XPCOM.throughout,
+    getMostRecentWindow      : Pot.XPCOM.getMostRecentWindow,
+    getChromeWindow          : Pot.XPCOM.getChromeWindow,
+    Workeroid                : Pot.Workeroid,
+    attach                   : Pot.Signal.attach,
+    attachBefore             : Pot.Signal.attachBefore,
+    attachAfter              : Pot.Signal.attachAfter,
+    attachPropBefore         : Pot.Signal.attachPropBefore,
+    attachPropAfter          : Pot.Signal.attachPropAfter,
+    detach                   : Pot.Signal.detach,
+    detachAll                : Pot.Signal.detachAll,
+    signal                   : Pot.Signal.signal,
+    cancelEvent              : Pot.Signal.cancelEvent,
+    DropFile                 : Pot.Signal.DropFile,
+    rescape                  : rescape,
+    arrayize                 : arrayize,
+    invoke                   : invoke,
+    stringify                : stringify,
+    trim                     : trim,
+    now                      : now,
+    globalize                : Pot.globalize,
+    debug                    : Pot.Debug.debug,
+    addPlugin                : Pot.Plugin.add,
+    hasPlugin                : Pot.Plugin.has,
+    removePlugin             : Pot.Plugin.remove,
+    listPlugin               : Pot.Plugin.list
   }
 });
 
