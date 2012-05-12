@@ -18,7 +18,7 @@ location.href = './#reference.function.Pot.Collection.alphanumSort';
   <dt>
     <em>{Array}</em>
     <dfn id="definition.reference.function.Pot.Collection.alphanumSort"><em>Pot.Collection.</em>alphanumSort</dfn>
-    (<em>{Array}</em> array)
+    (<em>{Array}</em> array [, {Function} func])
   </dt>
   <dd>
     <p class="potjs-reference-compatibility">
@@ -30,6 +30,12 @@ location.href = './#reference.function.Pot.Collection.alphanumSort';
     <div>
       <p>
  引数 array を、人間がソートするような自然な順序でソートします。
+ <br>
+ 配列の要素がオブジェクトなどの場合、
+ <br>
+ 引数 func を関数で渡し、要素の添字を指定することができます。
+ <br>
+ func は省略可能です。
 </p>
 
 
@@ -45,6 +51,16 @@ location.href = './#reference.function.Pot.Collection.alphanumSort';
    ['a10', 'a2', 'a100', 'a1', 'a12']
 ));
 // ['a1', 'a2', 'a10', 'a12', 'a100']</pre>
+
+<p>
+  添字/プロパティ名を指定する場合:
+</p>
+
+<pre>var arr = [{v: 'a10'}, {v: 'a2'}, {v: 'a100'}, {v: 'a1'}];
+Pot.debug(Pot.alphanumSort(arr, function(item) {
+  return item.v;
+}));
+// [{v: 'a1'}, {v: 'a2'}, {v: 'a10'}, {v: 'a100'}]</pre>
 
 
     </div>

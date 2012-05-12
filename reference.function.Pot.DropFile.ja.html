@@ -40,6 +40,24 @@ location.href = './#reference.function.Pot.DropFile';
 </p>
 <div style="margin: 1.5em;">
  <dl>
+  <dt><em>{String}</em> <dfn>encoding</dfn></dt>
+  <dd>
+   テキストとして読み込むときのエンコーディングを指定できます。
+   <br>
+   デフォルトは、UTF-8 として読み込みます。
+  </dd>
+  <dt><em>{String}</em> <dfn>readAs</dfn></dt>
+  <dd>
+   読み込む形式を指定できます。
+   <br>
+   デフォルト (null) は、テキストファイルは 'text'、それ以外は 'datauri' として読み込みます。
+   <pre>readAs :
+    - 'text'        : テキストとして読み込みます (readAsText)。encoding が有効になります。
+    - 'binary'      : バイナリとして読み込みます (readAsBinaryString)。
+    - 'arraybuffer' : ArrayBufferとして読み込みます (readAsArrayBuffer)。
+    - 'datauri'     : DataURIとして読み込みます (readAsDataURL)。
+    - null          : テキストファイルは 'text'、それ以外は 'datauri' で読み込みます (デフォルト)。</pre>
+  </dd>
   <dt><em>{Function}</em> <dfn>onShow</dfn></dt>
   <dd>
    ドロップ可能であることをユーザーに示すべき時に呼ばれます。
@@ -58,45 +76,73 @@ location.href = './#reference.function.Pot.DropFile';
     this : Pot.DropFile インスタンス自身。
 }</pre>
   </dd>
+  <dt><em>{Function}</em> <dfn>onProgress</dfn></dt>
+  <dd>
+   ドロップされたファイルすべての読み込みの進歩時に呼ばれます。
+   <pre>onProgress : function(percent) {
+    this    : Pot.DropFile インスタンス自身。
+    percent : <em class="var-type">{Number}</em> : 0 - 100 までの進歩状況。
+}</pre>
+  </dd>
+  <dt><em>{Function}</em> <dfn>onProgressFile</dfn></dt>
+  <dd>
+   ドロップされたファイル 1 つに対する読み込みの進歩時に呼ばれます。
+   <pre>onProgress : function(percent, fileinfo) {
+    this     : Pot.DropFile インスタンス自身。
+    percent  : <em class="var-type">{Number}</em> : 0 - 100 までの進歩状況。
+    fileinfo : <em class="var-type">{Object}</em> : name, size, type, index を持つファイル情報。
+      - fileinfo.name  : <em class="var-type">{String}</em> : ファイル名
+      - fileinfo.size  : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)
+      - fileinfo.type  : <em class="var-type">{String}</em> : ファイルタイプ (MIME)
+      - fileinfo.index : <em class="var-type">{Number}</em> : ファイルのインデックス番号 (0 - ファイル総数)
+}</pre>
+  </dd>
   <dt><em>{Function}</em> <dfn>onDrop</dfn></dt>
   <dd>
    ファイルがドロップされた時に呼ばれます。
-   <pre>onDrop : function(files) {
+   <pre>onDrop : function(files, total) {
     this  : Pot.DropFile インスタンス自身。
-    files : <em class="var-type">{Array|*}</em> : ドロップされたファイルの配列 (event.dataTransfer.files)。
+    files : <em class="var-type">{Array}</em>  : ドロップされたファイルの配列 (event.dataTransfer.files)。
+    total : <em class="var-type">{Number}</em> : files の総数。
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadImage</dfn></dt>
   <dd>
    画像ファイルがドロップされ、読み込みが完了した時に呼ばれます。
-   <pre>onLoadImage : function(data, name, size, type) {
-    this : Pot.DropFile インスタンス自身。
-    data : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
-    name : <em class="var-type">{String}</em> : ファイル名。
-    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+   <pre>onLoadImage : function(data, fileinfo) {
+    this     : Pot.DropFile インスタンス自身。
+    data     : <em class="var-type">{String|*}</em> : ファイルのデータ (readAs の形式)。
+    fileinfo : <em class="var-type">{Object}</em>   : name, size, type, index を持つファイル情報。
+      - fileinfo.name  : <em class="var-type">{String}</em> : ファイル名
+      - fileinfo.size  : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)
+      - fileinfo.type  : <em class="var-type">{String}</em> : ファイルタイプ (MIME)
+      - fileinfo.index : <em class="var-type">{Number}</em> : ファイルのインデックス番号 (0 - ファイル総数)
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadText</dfn></dt>
   <dd>
    テキストファイルがドロップされ、読み込み完了した時に呼ばれます。
-   <pre>onLoadText : function(data, name, size, type) {
-    this : Pot.DropFile インスタンス自身。
-    data : <em class="var-type">{String}</em> : ファイルのデータ。
-    name : <em class="var-type">{String}</em> : ファイル名。
-    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+   <pre>onLoadText : function(data, fileinfo) {
+    this     : Pot.DropFile インスタンス自身。
+    data     : <em class="var-type">{String|*}</em> : ファイルのデータ (readAs の形式)。
+    fileinfo : <em class="var-type">{Object}</em>   : name, size, type, index を持つファイル情報。
+      - fileinfo.name  : <em class="var-type">{String}</em> : ファイル名
+      - fileinfo.size  : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)
+      - fileinfo.type  : <em class="var-type">{String}</em> : ファイルタイプ (MIME)
+      - fileinfo.index : <em class="var-type">{Number}</em> : ファイルのインデックス番号 (0 - ファイル総数)
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadUnknown</dfn></dt>
   <dd>
    不明なファイル (画像、テキスト以外のファイル) がドロップされ、読み込み完了した時に呼ばれます。
-   <pre>onLoadUnknown : function(data, name, size, type) {
-    this : Pot.DropFile インスタンス自身。
-    data : <em class="var-type">{String}</em> : ファイルのデータ (DataURI)。
-    name : <em class="var-type">{String}</em> : ファイル名。
-    size : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)。
-    type : <em class="var-type">{String}</em> : ファイルのタイプ (MIMEType)。
+   <pre>onLoadUnknown : function(data, fileinfo) {
+    this     : Pot.DropFile インスタンス自身。
+    data     : <em class="var-type">{String|*}</em> : ファイルのデータ (readAs の形式)。
+    fileinfo : <em class="var-type">{Object}</em>   : name, size, type, index を持つファイル情報。
+      - fileinfo.name  : <em class="var-type">{String}</em> : ファイル名
+      - fileinfo.size  : <em class="var-type">{Number}</em> : ファイルサイズ (Byte)
+      - fileinfo.type  : <em class="var-type">{String}</em> : ファイルタイプ (MIME)
+      - fileinfo.index : <em class="var-type">{Number}</em> : ファイルのインデックス番号 (0 - ファイル総数)
 }</pre>
   </dd>
   <dt><em>{Function}</em> <dfn>onLoadEnd</dfn></dt>
@@ -108,12 +154,6 @@ location.href = './#reference.function.Pot.DropFile';
     this  : Pot.DropFile インスタンス自身。
     files : <em class="var-type">{Array}</em> : 読み込んだファイルデータの配列。
 }</pre>
-  </dd>
-  <dt><em>{String}</em> <dfn>encoding</dfn> = 'UTF-8'</dt>
-  <dd>
-   テキストファイルを読み込むときの文字コードが指定できます。
-   <br>
-   デフォルトは、'UTF-8' です。
   </dd>
  </dl>
 </div>
@@ -155,34 +195,36 @@ var dropFile = new Pot.DropFile(panel, {
     onHide : function() { panel.hide() },
 
     // ファイルがドロップされた時
-    onDrop : function(files) {
+    onDrop : function(files, total) {
         panel.text('dropped');
     },
 
     // 画像がドロップされた時
-    onLoadImage : function(data, name, size, type) {
+    onLoadImage : function(data, fileinfo) {
         $('&lt;img/&gt;').attr('src', data).appendTo('body');
     },
 
     // テキストがドロップされた時
-    onLoadText : function(data, name, size, type) {
+    onLoadText : function(data, fileinfo) {
         $('&lt;textarea/&gt;').val(data).appendTo('body');
     },
 
     // それ以外のファイルがドロップされた時
-    onLoadUnknown : function(data, name, size) {
+    onLoadUnknown : function(data, fileinfo) {
         $('&lt;textarea/&gt;').val(data).appendTo('body');
     },
 
     // ファイルがドロップされてロード完了した時
     onLoadEnd : function(files) {
         // このタイミングでアップロードが可能
+        /*
         this.upload(
             'http://www.example.com/uplaod',
             'dropfiles'
         ).then(function() {
             alert('アップロード完了');
         });
+        */
     }
 });
 
@@ -192,12 +234,14 @@ $('#clear-drop-events').click(function() {
 });</pre>
 
 <p>
- 動作については、サンプルを含む記事があるので参照ください。
+ 動作については、jsFiddle サンプルを参照ください。
 </p>
 <div>
  <ul>
   <li>
-    <a href="http://polygon-planet-log.blogspot.com/2012/01/html5-file-api-potjspotlitejs_11.html" title="HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子精神音楽浮遊構造体">HTML5 File APIでドラッグ＆ドロップのサンプル-Pot.js+PotLite.jsリリースノート | 圧縮電子精神音楽浮遊構造体</a>
+    <a href="http://jsfiddle.net/polygonplanet/zPZNG/show/"
+       title="Pot.js - Drag and Drop File Example - jsFiddle demo by polygonplanet"
+       target="_blank">Pot.js - Drag and Drop File Example - jsFiddle demo</a>
   </li>
  </ul>
 </div>

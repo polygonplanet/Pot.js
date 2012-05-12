@@ -64,7 +64,11 @@
         "reference.function.Pot.isObject":{"ja":"isObject","en":"isObject"},
         "reference.function.Pot.isError":{"ja":"isError","en":"isError"},
         "reference.function.Pot.isScalar":{"ja":"isScalar","en":"isScalar"},
+        "reference.function.Pot.isBlob":{"ja":"isBlob","en":"isBlob"},
+        "reference.function.Pot.isFileReader":{"ja":"isFileReader","en":"isFileReader"},
         "reference.function.Pot.isArguments":{"ja":"isArguments","en":"isArguments"},
+        "reference.function.Pot.isTypedArray":{"ja":"isTypedArray","en":"isTypedArray"},
+        "reference.function.Pot.isArrayBuffer":{"ja":"isArrayBuffer","en":"isArrayBuffer"},
         "reference.function.Pot.isArrayLike":{"ja":"isArrayLike","en":"isArrayLike"},
         "reference.function.Pot.typeOf":{"ja":"typeOf","en":"typeOf"},
         "reference.function.Pot.typeLikeOf":{"ja":"typeLikeOf","en":"typeLikeOf"},
@@ -73,6 +77,7 @@
         "reference.function.Pot.isIterable":{"ja":"isIterable","en":"isIterable"},
         "reference.function.Pot.isDeferred":{"ja":"isDeferred","en":"isDeferred"},
         "reference.function.Pot.isWorkeroid":{"ja":"isWorkeroid","en":"isWorkeroid"},
+        "reference.function.Pot.isArrayBufferoid":{"ja":"isArrayBufferoid","en":"isArrayBufferoid"},
         "reference.function.Pot.isHash":{"ja":"isHash","en":"isHash"},
         "reference.function.Pot.isIter":{"ja":"isIter","en":"isIter"},
         "reference.function.Pot.isNumeric":{"ja":"isNumeric","en":"isNumeric"},
@@ -186,6 +191,46 @@
         "reference.function.Pot.Workeroid.prototype.importScripts":{"ja":"importScripts","en":"importScripts"}
       }
     },
+    "reference.Pot.ArrayBufferoid.methods":{
+      "title":{"ja":"Pot.ArrayBufferoid.prototype","en":"Pot.ArrayBufferoid.prototype"},
+      "items":{
+        "reference.function.Pot.ArrayBufferoid":{"ja":"new ArrayBufferoid","en":"new ArrayBufferoid"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toArrayBuffer":{"ja":"toArrayBuffer","en":"toArrayBuffer"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toInt8Array":{"ja":"toInt8Array","en":"toInt8Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toUint8Array":{"ja":"toUint8Array","en":"toUint8Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toUint8ClampedArray":{"ja":"toUint8ClampedArray","en":"toUint8ClampedArray"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toInt16Array":{"ja":"toInt16Array","en":"toInt16Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toUint16Array":{"ja":"toUint16Array","en":"toUint16Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toInt32Array":{"ja":"toInt32Array","en":"toInt32Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toUint32Array":{"ja":"toUint32Array","en":"toUint32Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toFloat32Array":{"ja":"toFloat32Array","en":"toFloat32Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toFloat64Array":{"ja":"toFloat64Array","en":"toFloat64Array"},
+        "reference.function.Pot.ArrayBufferoid.prototype.toArray":{"ja":"toArray","en":"toArray"},
+        "reference.function.Pot.ArrayBufferoid.prototype.size":{"ja":"size","en":"size"},
+        "reference.function.Pot.ArrayBufferoid.prototype.seek":{"ja":"seek","en":"seek"},
+        "reference.function.Pot.ArrayBufferoid.prototype.tell":{"ja":"tell","en":"tell"},
+        "reference.function.Pot.ArrayBufferoid.prototype.read":{"ja":"read","en":"read"},
+        "reference.function.Pot.ArrayBufferoid.prototype.write":{"ja":"write","en":"write"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getInt8":{"ja":"getInt8","en":"getInt8"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getUint8":{"ja":"getUint8","en":"getUint8"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getInt16":{"ja":"getInt16","en":"getInt16"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getUint16":{"ja":"getUint16","en":"getUint16"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getInt32":{"ja":"getInt32","en":"getInt32"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getUint32":{"ja":"getUint32","en":"getUint32"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getFloat32":{"ja":"getFloat32","en":"getFloat32"},
+        "reference.function.Pot.ArrayBufferoid.prototype.getFloat64":{"ja":"getFloat64","en":"getFloat64"}
+      }
+    },
+    "reference.Pot.ArrayBufferoid.functions":{
+      "title":{"ja":"Pot.ArrayBufferoid","en":"Pot.ArrayBufferoid"},
+      "items":{
+        "reference.function.Pot.ArrayBufferoid.copyBuffer":{"ja":"copyBuffer","en":"copyBuffer"},
+        "reference.function.Pot.ArrayBufferoid.binaryToBuffer":{"ja":"binaryToBuffer","en":"binaryToBuffer"},
+        "reference.function.Pot.ArrayBufferoid.bufferToBinary":{"ja":"bufferToBinary","en":"bufferToBinary"},
+        "reference.function.Pot.ArrayBufferoid.stringToBuffer":{"ja":"stringToBuffer","en":"stringToBuffer"},
+        "reference.function.Pot.ArrayBufferoid.bufferToString":{"ja":"bufferToString","en":"bufferToString"}
+      }
+    },
     "reference.Pot.Signal.functions":{
       "title":{"ja":"Pot.Signal","en":"Pot.Signal"},
       "items":{
@@ -229,6 +274,7 @@
         "reference.function.Pot.Text.stripTags":{"ja":"stripTags","en":"stripTags"},
         "reference.function.Pot.Text.truncate":{"ja":"truncate","en":"truncate"},
         "reference.function.Pot.Text.truncateMiddle":{"ja":"truncateMiddle","en":"truncateMiddle"},
+        "reference.function.Pot.Text.toCharCode":{"ja":"toCharCode","en":"toCharCode"},
         "reference.function.Pot.Text.toHankakuCase":{"ja":"toHankakuCase","en":"toHankakuCase"},
         "reference.function.Pot.Text.toZenkakuCase":{"ja":"toZenkakuCase","en":"toZenkakuCase"},
         "reference.function.Pot.Text.toHanSpaceCase":{"ja":"toHanSpaceCase","en":"toHanSpaceCase"},
@@ -350,7 +396,8 @@
       "items":{
         "reference.function.Pot.UTF8.encode":{"ja":"encode","en":"encode"},
         "reference.function.Pot.UTF8.decode":{"ja":"decode","en":"decode"},
-        "reference.function.Pot.UTF8.byteOf":{"ja":"byteOf","en":"byteOf"}
+        "reference.function.Pot.UTF8.byteOf":{"ja":"byteOf","en":"byteOf"},
+        "reference.function.Pot.UTF8.convertEncodingToUnicode":{"ja":"convertEncodingToUnicode","en":"convertEncodingToUnicode"}
       }
     },
     "reference.Pot.Base64.functions":{
