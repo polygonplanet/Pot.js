@@ -1,11 +1,12 @@
 {
   "fileName": "pot.js",
   "debug": false,
-  "version": "1.18",
+  "version": "1.19",
   "files": [
     "Core.js",
     "Deferred.js",
     "Iterator.js",
+    "ArrayBuffer.js",
     "Worker.js",
     "Serializer.js",
     "URI.js",
