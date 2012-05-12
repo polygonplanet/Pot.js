@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.23
- * @date           2012-04-15
+ * @version        1.24
+ * @date           2012-05-13
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
  */
@@ -559,6 +559,38 @@ $(function() {
         false
       ]
     }, {
+      title  : 'Pot.isBlob()',
+      code   : function() {
+        if (!Pot.System.BlobBuilder) {
+          return [true, false, false];
+        } else {
+          var bb = new Pot.System.BlobBuilder();
+          bb.append('hoge');
+          var blob = bb.getBlob();
+          return [
+            isBlob(blob),
+            isBlob({}),
+            isBlob('hoge')
+          ];
+        }
+      },
+      expect : [true, false, false]
+    }, {
+      title  : 'Pot.isFileReader()',
+      code   : function() {
+        if (!Pot.System.hasFileReader) {
+          return [false, true];
+        } else {
+          var object = {hoge : 1};
+          var reader = new FileReader();
+          return [
+            isFileReader(object),
+            isFileReader(reader)
+          ];
+        }
+      },
+      expect : [false, true]
+    }, {
       title  : 'Pot.isArguments()',
       code   : function() {
         var result = [];
@@ -572,6 +604,42 @@ $(function() {
         return result;
       },
       expect : [false, false, true]
+    }, {
+      title  : 'Pot.isTypedArray()',
+      code   : function() {
+        var result = [];
+        var obj = {foo : 1};
+        var arr = [1, 2, 3];
+        result.push(isTypedArray(obj));
+        result.push(isTypedArray(arr));
+        if (PotSystem.hasTypedArray) {
+          result.push(isTypedArray(new ArrayBuffer(10)));
+          result.push(isTypedArray(new Uint8Array(10)));
+        } else {
+          result.push(true, true);
+        }
+        return result;
+      },
+      expect : [false, false, true, true]
+    }, {
+      title  : 'Pot.isArrayBuffer()',
+      code   : function() {
+        if (!Pot.System.hasTypedArray) {
+          return [false, false, true, false];
+        } else {
+          var obj = {foo : 1};
+          var arr = [1, 2, 3];
+          var buf = new ArrayBuffer(10);
+          var uar = new Uint8Array(10);
+          return [
+            isArrayBuffer(obj),
+            isArrayBuffer(arr),
+            isArrayBuffer(buf),
+            isArrayBuffer(uar)
+          ];
+        }
+      },
+      expect : [false, false, true, false]
     }, {
       title  : 'Pot.isArrayLike()',
       code   : function() {
@@ -2494,6 +2562,22 @@ $(function() {
         }).begin();
       },
       expect : 2
+    }, {
+      title : 'Deferred callback with FileReader',
+      code  : function() {
+        return begin(function() {
+          if (Pot.System.hasFileReader && Pot.System.BlobBuilder) {
+            var bb = new Pot.System.BlobBuilder();
+            var fl = new FileReader();
+            bb.append('hoge');
+            fl.readAsText(bb.getBlob());
+            return fl;
+          } else {
+            return 'hoge';
+          }
+        });
+      },
+      expect : 'hoge'
     }, {
       title : 'Iterate with specific speed for synchronous',
       code  : function() {

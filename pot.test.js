@@ -9,8 +9,8 @@
  *
  * @fileoverview   Pot.js Run test
  * @author         polygon planet
- * @version        1.13
- * @date           2012-04-15
+ * @version        1.14
+ * @date           2012-05-13
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
  */
@@ -615,6 +615,38 @@ $(function() {
         false
       ]
     }, {
+      title  : 'Pot.isBlob()',
+      code   : function() {
+        if (!Pot.System.BlobBuilder) {
+          return [true, false, false];
+        } else {
+          var bb = new Pot.System.BlobBuilder();
+          bb.append('hoge');
+          var blob = bb.getBlob();
+          return [
+            isBlob(blob),
+            isBlob({}),
+            isBlob('hoge')
+          ];
+        }
+      },
+      expect : [true, false, false]
+    }, {
+      title  : 'Pot.isFileReader()',
+      code   : function() {
+        if (!Pot.System.hasFileReader) {
+          return [false, true];
+        } else {
+          var object = {hoge : 1};
+          var reader = new FileReader();
+          return [
+            isFileReader(object),
+            isFileReader(reader)
+          ];
+        }
+      },
+      expect : [false, true]
+    }, {
       title  : 'Pot.isArguments()',
       code   : function() {
         var result = [];
@@ -628,6 +660,42 @@ $(function() {
         return result;
       },
       expect : [false, false, true]
+    }, {
+      title  : 'Pot.isTypedArray()',
+      code   : function() {
+        var result = [];
+        var obj = {foo : 1};
+        var arr = [1, 2, 3];
+        result.push(isTypedArray(obj));
+        result.push(isTypedArray(arr));
+        if (Pot.System.hasTypedArray) {
+          result.push(isTypedArray(new ArrayBuffer(10)));
+          result.push(isTypedArray(new Uint8Array(10)));
+        } else {
+          result.push(true, true);
+        }
+        return result;
+      },
+      expect : [false, false, true, true]
+    }, {
+      title  : 'Pot.isArrayBuffer()',
+      code   : function() {
+        if (!Pot.System.hasTypedArray) {
+          return [false, false, true, false];
+        } else {
+          var obj = {foo : 1};
+          var arr = [1, 2, 3];
+          var buf = new ArrayBuffer(10);
+          var uar = new Uint8Array(10);
+          return [
+            isArrayBuffer(obj),
+            isArrayBuffer(arr),
+            isArrayBuffer(buf),
+            isArrayBuffer(uar)
+          ];
+        }
+      },
+      expect : [false, false, true, false]
     }, {
       title  : 'Pot.isArrayLike()',
       code   : function() {
@@ -721,6 +789,14 @@ $(function() {
         var o = {hoge : 1};
         var w = new Workeroid();
         return [isWorkeroid(o), isWorkeroid(w)];
+      },
+      expect : [false, true]
+    }, {
+      title  : 'Pot.isArrayBufferoid()',
+      code   : function() {
+        var o = {hoge: 1};
+        var a = new Pot.ArrayBufferoid();
+        return [isArrayBufferoid(o), isArrayBufferoid(a)];
       },
       expect : [false, true]
     }, {
@@ -2816,6 +2892,22 @@ $(function() {
       },
       expect : 2
     }, {
+      title : 'Deferred callback with FileReader',
+      code  : function() {
+        return begin(function() {
+          if (Pot.System.hasFileReader && Pot.System.BlobBuilder) {
+            var bb = new Pot.System.BlobBuilder();
+            var fl = new FileReader();
+            bb.append('hoge');
+            fl.readAsText(bb.getBlob());
+            return fl;
+          } else {
+            return 'hoge';
+          }
+        });
+      },
+      expect : 'hoge'
+    }, {
       title : 'Iterate with specific speed for synchronous',
       code  : function() {
         var array = ['foo', 'bar', 'baz'];
@@ -3096,6 +3188,1073 @@ $(function() {
       },
       expect : ['foo!', 'bar!', 'baz!']
     }, {
+      title  : 'Pot.ArrayBufferoid Basic',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid();
+        var i = 0;
+        buffer[i++] = 255;
+        buffer[i++] = 254;
+        buffer.push(253);
+        buffer.push(252);
+        result.push(buffer.getUint16(0, true));
+        result.push(buffer.size());
+        var arrayBuffer = buffer.toArrayBuffer();
+        var uint8Array = buffer.toUint8Array();
+        result.push(uint8Array[0]);
+        buffer.seek(0);
+        var data1 = buffer.read(1);
+        result.push(data1[0]);
+        result.push(buffer.tell());
+        var data2 = buffer.read(2);
+        result.push(data2[0], data2[1]);
+        buffer.seek(0);
+        buffer.write([100, 101]);
+        result.push(buffer[0], buffer[1], buffer[2], buffer[3]);
+        return result;
+      },
+      expect : [
+        65279, 4, 255, 255, 1, 254, 253, 100, 101, 253, 252
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid with Iterate',
+      code   : function() {
+        var buffer = new ArrayBufferoid([1, 2, 3, 4]);
+        var uint8Array = buffer.map(function(val) {
+          return val + 100;
+        }).toUint8Array();
+        return uint8Array[0];
+      },
+      expect : 101
+    }, {
+      title  : 'Pot.ArrayBufferoid to TypedArray',
+      code   : function() {
+        if (Pot.System.hasTypedArray) {
+          return [
+            isTypedArray(ArrayBufferoid.toArrayBuffer(10)),
+            ArrayBufferoid.toInt8Array([0xFF])[0] === new Int8Array([0xFF])[0],
+            ArrayBufferoid.toUint8Array([0xFF])[0] === new Uint8Array([0xFF])[0],
+            Pot.System.hasUint8ClampedArray ?
+              (ArrayBufferoid.toUint8ClampedArray([0xFF])[0] === new Uint8ClampedArray([0xFF])[0]) :
+              (ArrayBufferoid.toUint8ClampedArray([0xFF])[0] === [0xFF][0]),
+            ArrayBufferoid.toInt16Array([0xFFFF])[0] === new Int16Array([0xFFFF])[0],
+            ArrayBufferoid.toUint16Array([0xFFFF])[0] === new Uint16Array([0xFFFF])[0],
+            ArrayBufferoid.toInt32Array([0xFFFFFFFF])[0] === new Int32Array([0xFFFFFFFF])[0],
+            ArrayBufferoid.toUint32Array([0xFFFFFFFF])[0] === new Uint32Array([0xFFFFFFFF])[0],
+            ArrayBufferoid.toFloat32Array([Math.pow(2, 48)])[0] === new Float32Array([Math.pow(2, 48)])[0],
+            ArrayBufferoid.toFloat64Array([Math.pow(2, 48)])[0] === new Float64Array([Math.pow(2, 48)])[0]
+          ];
+        } else {
+          return [
+            true, true, true, true, true, true, true, true, true, true
+          ];
+        }
+      },
+      expect : [
+        true, true, true, true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.size() and push()',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid();
+        var i = 0;
+        result.push(buffer.size());
+        buffer[i++] = 10;
+        result.push(buffer.size());
+        buffer[i++] = 20;
+        result.push(buffer.size());
+        buffer[i++] = 30;
+        result.push(buffer.size());
+        buffer.push(40);
+        result.push(buffer.size());
+        buffer.push(50, 60);
+        result.push(buffer.size());
+        buffer.unshift(1);
+        result.push(buffer.size());
+        buffer[buffer.size()] = 70;
+        result.push(buffer.size());
+        buffer[buffer.size()] = 80;
+        result.push(buffer.size());
+        return result;
+      },
+      expect : [0, 1, 2, 3, 4, 6, 7, 8, 9]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.join()',
+      code   : function() {
+        return [
+          (new ArrayBufferoid([1, 2, 3, 4, 5])).join(''),
+          (new ArrayBufferoid([1, 2, 3, 4, 5])).join('-'),
+          (new ArrayBufferoid([1])).join(''),
+          (new ArrayBufferoid([1])).join('1'),
+        ];
+      },
+      expect : ['12345', '1-2-3-4-5', '1', '1']
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.pop()',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid([1, 2, 3, 4, 5]);
+        result.push(buffer.pop());
+        result.push(buffer.size());
+        result.push(buffer.pop());
+        buffer.push(10);
+        result.push(buffer.size());
+        result.push(buffer.pop());
+        return result;
+      },
+      expect : [5, 4, 4, 4, 10]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.shift()',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid([1, 2, 3, 4, 5]);
+        result.push(buffer.shift());
+        result.push(buffer.size());
+        result.push(buffer.shift());
+        buffer.unshift(10);
+        result.push(buffer.size());
+        result.push(buffer.shift());
+        return result;
+      },
+      expect : [1, 4, 2, 4, 10]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.unshift()',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid();
+        result.push(buffer.size());
+        buffer.unshift(1);
+        result.push(buffer[0]);
+        buffer.unshift(2);
+        buffer.unshift(3);
+        result.push(buffer[0]);
+        buffer.unshift(4);
+        result.push(buffer.size());
+        result.push(buffer[0]);
+        buffer.unshift(6);
+        result.push(buffer[0]);
+        return result;
+      },
+      expect : [0, 1, 3, 4, 4, 6]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.reverse()',
+      code   : function() {
+        return [
+          (new ArrayBufferoid([1, 2, 3, 4, 5])).reverse().toArray(),
+          (new ArrayBufferoid([1, 2, 3, 4])).reverse().toArray(),
+          (new ArrayBufferoid([1, 2, 3])).reverse().toArray(),
+          (new ArrayBufferoid([1, 2])).reverse().toArray(),
+          (new ArrayBufferoid([1])).reverse().toArray()
+        ];
+      },
+      expect : [
+        [5, 4, 3, 2, 1],
+        [4, 3, 2, 1],
+        [3, 2, 1],
+        [2, 1],
+        [1]
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.sort()',
+      code   : function() {
+        return [
+          (new ArrayBufferoid([5, 4, 3, 2, 1])).sort().toArray(),
+          (new ArrayBufferoid([4, 3, 2, 1])).sort().toArray(),
+          (new ArrayBufferoid([3, 2, 1])).sort().toArray(),
+          (new ArrayBufferoid([2, 1])).sort().toArray(),
+          (new ArrayBufferoid([1])).sort().toArray(),
+          (new ArrayBufferoid([1, 2, 3, 4, 5])).sort(function(a, b) {
+            return a > b ? -1 :
+                   a < b ?  1 : 0;
+          }).toArray()
+        ];
+      },
+      expect : [
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4],
+        [1, 2, 3],
+        [1, 2],
+        [1],
+        [5, 4, 3, 2, 1]
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.concat()',
+      code   : function() {
+        return [
+          new ArrayBufferoid([1, 2, 3]).concat([4, 5, 6], [7, 8, 9]).toArray(),
+          new ArrayBufferoid([1, 2]).concat([3, 4], [5, 6]).toArray(),
+          new ArrayBufferoid([1]).concat([2], [3]).toArray(),
+          new ArrayBufferoid([]).concat([1], [2]).toArray(),
+          new ArrayBufferoid([]).concat([1, 2]).toArray(),
+          new ArrayBufferoid([]).concat([1]).toArray(),
+          new ArrayBufferoid([1]).concat([2]).toArray(),
+          new ArrayBufferoid([1]).concat([2], [3]).toArray()
+        ]
+      },
+      expect : [
+        [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 2, 3, 4, 5, 6],
+        [1, 2, 3],
+        [1, 2],
+        [1, 2],
+        [1],
+        [1, 2],
+        [1, 2, 3]
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.slice()',
+      code   : function() {
+        return [
+          new ArrayBufferoid([1, 2, 3]).slice(0).toArray(),
+          new ArrayBufferoid([1, 2, 3]).slice(0, -1).toArray(),
+          new ArrayBufferoid([1, 2, 3]).slice(1).toArray(),
+          new ArrayBufferoid([1, 2, 3]).slice(-1).toArray()
+        ];
+      },
+      expect : [
+        [1, 2, 3],
+        [1, 2],
+        [2, 3],
+        [3]
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.splice()',
+      code   : function() {
+        var result = [];
+        var buffer = new ArrayBufferoid([1, 2, 3]);
+        result.push(buffer.splice(0, 1).toArray());
+        result.push(buffer.toArray());
+        buffer = new ArrayBufferoid([1, 2, 3]);
+        result.push(buffer.splice(0, buffer.size()).toArray());
+        result.push(buffer.toArray());
+        buffer = new ArrayBufferoid([1, 2, 3]);
+        result.push(buffer.splice(-1, 1).toArray());
+        result.push(buffer.toArray());
+        return result;
+      },
+      expect : [
+        [1],
+        [2, 3],
+        [1, 2, 3],
+        [],
+        [3],
+        [1, 2]
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.indexOf()',
+      code   : function() {
+        var buffer = new ArrayBufferoid([2, 5, 9, 5, 1]);
+        return [
+          buffer.indexOf(2),
+          buffer.indexOf(7),
+          buffer.indexOf(5, 3)
+        ];
+      },
+      expect : [
+        0, -1, 3
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.lastIndexOf()',
+      code   : function() {
+        var buffer = new ArrayBufferoid([2, 5, 9, 2, 1]);
+        return [
+          buffer.lastIndexOf(2),
+          buffer.lastIndexOf(7),
+          buffer.lastIndexOf(2, 3),
+          buffer.lastIndexOf(2, 2),
+          buffer.lastIndexOf(2, -3),
+          buffer.lastIndexOf(2, -2)
+        ];
+      },
+      expect : [3, -1, 3, 0, 0, 3]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.filter()',
+      code   : function() {
+        return new ArrayBufferoid([12, 5, 8, 130, 44]).filter(function(value, index) {
+          return (value >= 10);
+        }).toArray();
+      },
+      expect : [12, 130, 44]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.forEach()',
+      code   : function() {
+        var result = 0;
+        new ArrayBufferoid([1, 2, 3]).forEach(function(value, i) {
+          result += value;
+        });
+        return result;
+      },
+      expect : 6
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.map()',
+      code   : function() {
+        return new ArrayBufferoid([1, 2, 3]).map(function(value, i) {
+          return value + 100;
+        }).toArray();
+      },
+      expect : [101, 102, 103]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.reduce()',
+      code   : function() {
+        return new ArrayBufferoid([1, 2, 3]).reduce(function(a, b) {
+          return a + b;
+        });
+      },
+      expect : 6
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.every()',
+      code   : function() {
+        function isBigEnough(value, index, array) {
+          return (value >= 10);
+        }
+        var buf1 = new ArrayBufferoid([12, 5, 8, 130, 44]);
+        var result1 = buf1.every(isBigEnough);
+        var buf2 = new ArrayBufferoid([12, 54, 18, 130, 44]);
+        var result2 = buf2.every(isBigEnough);
+        return [result1, result2];
+      },
+      expect : [false, true]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.some()',
+      code   : function() {
+        function isBigEnough(value, index, array) {
+          return (value >= 10);
+        }
+        var result1 = new ArrayBufferoid([2, 5, 8, 1, 4]).some(isBigEnough);
+        var result2 = new ArrayBufferoid([12, 5, 8, 1, 4]).some(isBigEnough);
+        return [result1, result2];
+      },
+      expect : [false, true]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype to TypedArray',
+      code   : function() {
+        if (Pot.System.hasTypedArray) {
+          return [
+            isTypedArray(ArrayBufferoid.toArrayBuffer(10)),
+            new ArrayBufferoid([0xFF]).toInt8Array()[0] === new Int8Array([0xFF])[0],
+            new ArrayBufferoid([0xFF]).toUint8Array()[0] === new Uint8Array([0xFF])[0],
+            Pot.System.hasUint8ClampedArray ?
+              (new ArrayBufferoid([0xFF]).toUint8ClampedArray()[0] === new Uint8ClampedArray([0xFF])[0]) :
+              (new ArrayBufferoid([0xFF]).toUint8ClampedArray()[0] === [0xFF][0]),
+            new ArrayBufferoid([0xFFFF]).toInt16Array()[0] === new Int16Array([0xFFFF])[0],
+            new ArrayBufferoid([0xFFFF]).toUint16Array()[0] === new Uint16Array([0xFFFF])[0],
+            new ArrayBufferoid([0xFFFFFFFF]).toInt32Array()[0] === new Int32Array([0xFFFFFFFF])[0],
+            new ArrayBufferoid([0xFFFFFFFF]).toUint32Array()[0] === new Uint32Array([0xFFFFFFFF])[0],
+            new ArrayBufferoid([Math.pow(2, 48)]).toFloat32Array()[0] === new Float32Array([Math.pow(2, 48)])[0],
+            new ArrayBufferoid([Math.pow(2, 48)]).toFloat64Array()[0] === new Float64Array([Math.pow(2, 48)])[0]
+          ];
+        } else {
+          return [
+            true, true, true, true, true, true, true, true, true, true
+          ];
+        }
+      },
+      expect : [
+        true, true, true, true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getInt8()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getInt8(0), -1),
+          equal(buffer.getInt8(1), -2),
+          equal(buffer.getInt8(2), -3),
+          equal(buffer.getInt8(3), -4),
+          equal(buffer.getInt8(4), -6),
+          equal(buffer.getInt8(5), 0),
+          equal(buffer.getInt8(6), -70),
+          equal(buffer.getInt8(7), 1),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(0, true),
+            -1
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(0, false),
+            -1
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(1, true),
+            -2
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(1, false),
+            -2
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(2, true),
+            -3
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(2, false),
+            -3
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(3, true),
+            -4
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(3, false),
+            -4
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(4, true),
+            -6
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt8(4, false),
+            -6
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getUint8()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getUint8(0), 255),
+          equal(buffer.getUint8(1), 254),
+          equal(buffer.getUint8(2), 253),
+          equal(buffer.getUint8(3), 252),
+          equal(buffer.getUint8(4), 250),
+          equal(buffer.getUint8(5), 0),
+          equal(buffer.getUint8(6), 186),
+          equal(buffer.getUint8(7), 1),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(0, true),
+            255
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(0, false),
+            255
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(1, true),
+            254
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(1, false),
+            254
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(2, true),
+            253
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(2, false),
+            253
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(3, true),
+            252
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(3, false),
+            252
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(4, true),
+            250
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(4, false),
+            250
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(5, true),
+            0
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint8(5, false),
+            0
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getInt16()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getInt16(0), -257),
+          equal(buffer.getInt16(1), -514),
+          equal(buffer.getInt16(2), -771),
+          equal(buffer.getInt16(3), -1284),
+          equal(buffer.getInt16(4), 250),
+          equal(buffer.getInt16(5), -17920),
+          equal(buffer.getInt16(6), 442),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(0, true),
+            -257
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(0, false),
+            -2
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(1, true),
+            -514
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(1, false),
+            -259
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(2, true),
+            -771
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(2, false),
+            -516
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(3, true),
+            -1284
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(3, false),
+            -774
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(4, true),
+            250
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(4, false),
+            -1536
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(5, true),
+            -17920
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt16(5, false),
+            186
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true, true,
+        true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getUint16()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getUint16(0), 65279),
+          equal(buffer.getUint16(1), 65022),
+          equal(buffer.getUint16(2), 64765),
+          equal(buffer.getUint16(3), 64252),
+          equal(buffer.getUint16(4), 250),
+          equal(buffer.getUint16(5), 47616),
+          equal(buffer.getUint16(6), 442),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(0, true),
+            65279
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(0, false),
+            65534
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(1, true),
+            65022
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(1, false),
+            65277
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(2, true),
+            64765
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(2, false),
+            65020
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(3, true),
+            64252
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(3, false),
+            64762
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(4, true),
+            250
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(4, false),
+            64000
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(5, true),
+            47616
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint16(5, false),
+            186
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true, true,
+        true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getUint32()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getUint32(0), 4244504319),
+          equal(buffer.getUint32(1), 4210884094),
+          equal(buffer.getUint32(2), 16448765),
+          equal(buffer.getUint32(3), 3120626428),
+          equal(buffer.getUint32(4), 28967162),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(0, true),
+            4244504319
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(0, false),
+            4294901244
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(1, true),
+            4210884094
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(1, false),
+            4278058234
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(2, true),
+            16448765
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(2, false),
+            4261214720
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(3, true),
+            3120626428
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(3, false),
+            4244242618
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(4, true),
+            28967162
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getUint32(4, false),
+            4194351617
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getInt32()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getInt32(0), -50462977),
+          equal(buffer.getInt32(1), -84083202),
+          equal(buffer.getInt32(2), 16448765),
+          equal(buffer.getInt32(3), -1174340868),
+          equal(buffer.getInt32(4), 28967162),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(0, true),
+            -50462977
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(0, false),
+            -66052
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(1, true),
+            -84083202
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(1, false),
+            -16909062
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(2, true),
+            16448765
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(2, false),
+            -33752576
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(3, true),
+            -1174340868
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(3, false),
+            -50724678
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(4, true),
+            28967162
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xfe, 0xfd, 0xfc, 0xfa, 0x00, 0xba, 0x01]).getInt32(4, false),
+            -100615679
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true,
+        true, true, true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getFloat32()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getFloat32(0), -1.055058432344064e+37),
+          equal(buffer.getFloat32(1), -6.568051909668895e+35),
+          equal(buffer.getFloat32(2), 2.30496291345398e-38),
+          equal(buffer.getFloat32(3), -0.0004920212086290121),
+          equal(buffer.getFloat32(4), 6.832701044000979e-38),
+          equal(
+            new Pot.ArrayBufferoid([0x7f, 0x80, 0x00, 0x00]).getFloat32(0, true),
+            4.609571298396486e-41
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0x80, 0x00, 0x00]).getFloat32(0, true),
+            4.627507918739843e-41
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00]).getFloat32(0, true),
+            0
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0x80, 0x00, 0x01]).getFloat32(0, true),
+            2.3602437174820547e-38
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x7f, 0x80, 0x00, 0x00]).getFloat32(0, false),
+            Infinity
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0x80, 0x00, 0x00]).getFloat32(0, false),
+            -Infinity
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00]).getFloat32(0, false),
+            0
+          ),
+          isNaN(new Pot.ArrayBufferoid([0xff, 0x80, 0x00, 0x01]).getFloat32(0, false))
+        ];
+      },
+      expect : [
+        true, true, true, true, true, true, true, true,
+        true, true, true, true, true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.prototype.getFloat64()',
+      code   : function() {
+        var buffer = new Pot.ArrayBufferoid([0xFF, 0xFE, 0xFD, 0xFC, 0xFA, 0x00, 0xBA, 0x01]);
+        function equal(a, b) {
+          return (a === b);
+        }
+        return [
+          equal(buffer.getFloat64(0), 2.426842827241402e-300),
+          equal(
+            new Pot.ArrayBufferoid([0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            3.0418e-319
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            3.04814e-319
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            0
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            6.3e-322
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            3.03865e-319
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, true),
+            7.291122019655968e-304
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02]).getFloat64(0, true),
+            4.778309726801735e-299
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            3.16e-322
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            9.5e-322
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, true),
+            7.291122019556398e-304
+          ),
+          isNaN(
+            new Pot.ArrayBufferoid([0x00, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]).getFloat64(0, true)
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, true),
+            2.0237e-320
+          ),
+          isNaN(
+            new Pot.ArrayBufferoid([0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]).getFloat64(0, true)
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, true),
+            7.291122019656279e-304
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x7f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            Infinity
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            -Infinity
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            0
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            0
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            1
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, false),
+            1.0000000000000002
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02]).getFloat64(0, false),
+            1.0000000000000004
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            2
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            -2
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, false),
+            5e-324
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]).getFloat64(0, false),
+            2.225073858507201e-308
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]).getFloat64(0, false),
+            2.2250738585072014e-308
+          ),
+          equal(
+            new Pot.ArrayBufferoid([0x7f, 0xef, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]).getFloat64(0, false),
+            1.7976931348623157e+308
+          ),
+          isNaN(
+            new Pot.ArrayBufferoid([0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]).getFloat64(0, false)
+          )
+        ];
+      },
+      expect : [
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true, true, true, true,
+        true
+      ]
+    }, {
+      title  : 'Pot.ArrayBufferoid.copyBuffer()',
+      code   : function() {
+        var result = [];
+        var arr = [1, 2, 3];
+        var copyArr = ArrayBufferoid.copyBuffer(arr);
+        copyArr[0] = 100;
+        result.push(arr[0] === 1);
+        var buffer = new ArrayBufferoid([1, 2, 3]);
+        var copyBuffer = ArrayBufferoid.copyBuffer(buffer);
+        copyBuffer[0] = 100;
+        result.push(buffer[0] === 1);
+        if (Pot.System.hasTypedArray) {
+          var uint8Array = new Uint8Array([1, 2, 3]);
+          var copyArrayBuffer = ArrayBufferoid.copyBuffer(uint8Array);
+          var copyUint8Array = new Uint8Array(copyArrayBuffer);
+          copyUint8Array[0] = 100;
+          result.push(uint8Array[0] === 1);
+        } else {
+          result.push(true);
+        }
+        return result;
+      },
+      expect : [true, true, true]
+    }, {
+      title  : 'Pot.ArrayBufferoid.copyBuffer() and ArrayBuffer',
+      code   : function() {
+        var result = [];
+        if (Pot.System.hasTypedArray) {
+          var buffer = new ArrayBuffer(10);
+          var view1 = new Uint8Array(buffer);
+          var view2 = new Uint8Array(buffer);
+          view1[0] = 10;
+          view2[1] = 20;
+          result.push(view1[0]);
+          result.push(view2[0]);
+          result.push(view1[1]);
+          result.push(view2[1]);
+          var copy = new Uint8Array(ArrayBufferoid.copyBuffer(buffer));
+          copy[1] = 100;
+          result.push(copy[0]);
+          result.push(copy[1]);
+          result.push(view1[0]);
+          result.push(view1[1]);
+          result.push(view2[0]);
+          result.push(view2[1]);
+        } else {
+          result = [10, 10, 20, 20, 10, 100, 10, 20, 10, 20];
+        }
+        return result;
+      },
+      expect : [10, 10, 20, 20, 10, 100, 10, 20, 10, 20]
+    }, {
+      title  : 'Pot.ArrayBufferoid.binaryToBuffer() and bufferToBinary()',
+      code   : function() {
+        var string = 'abc';
+        var buffer = ArrayBufferoid.binaryToBuffer(string);
+        var result = ArrayBufferoid.bufferToBinary(buffer);
+        return [
+          result === string,
+          buffer[0] === 'a'.charCodeAt(0),
+          buffer[1] === 'b'.charCodeAt(0)
+        ];
+      },
+      expect : [true, true, true]
+    }, {
+      title  : 'Pot.ArrayBufferoid.binaryToBuffer()',
+      code   : function() {
+        var string = 'abc123';
+        var buffer = ArrayBufferoid.binaryToBuffer(string);
+        return buffer.toArray();
+      },
+      expect : [97, 98, 99, 49, 50, 51]
+    }, {
+      title  : 'Pot.ArrayBufferoid.binaryToBuffer.deferred()',
+      code   : function() {
+        var s = 'abc123';
+        return ArrayBufferoid.binaryToBuffer.deferred(s).then(function(res) {
+          return res.toArray();
+        });
+      },
+      expect : [97, 98, 99, 49, 50, 51]
+    }, {
+      title  : 'Pot.ArrayBufferoid.bufferToBinary()',
+      code   : function() {
+        var result = [];
+        if (Pot.System.hasTypedArray) {
+          var view = new Uint8Array([0x61, 0x62, 0x63]);
+          result.push(ArrayBufferoid.bufferToBinary(view));
+        } else {
+          result.push('abc');
+        }
+        var buffer = new ArrayBufferoid([0x61, 0x62, 0x63]);
+        result.push(ArrayBufferoid.bufferToBinary(buffer));
+        return result;
+      },
+      expect : ['abc', 'abc']
+    }, {
+      title  : 'Pot.ArrayBufferoid.bufferToBinary.deferred()',
+      code   : function() {
+        var result = [], view;
+        if (Pot.System.hasTypedArray) {
+          view = new Uint8Array([0x61, 0x62, 0x63]);
+        } else {
+          view = [0x61, 0x62, 0x63];
+        }
+        var buffer = new ArrayBufferoid([0x61, 0x62, 0x63]);
+        return ArrayBufferoid.bufferToBinary.deferred(view).then(function(res) {
+          result.push(res);
+          return ArrayBufferoid.bufferToBinary.deferred(buffer).then(function(res) {
+            result.push(res);
+            return result;
+          });
+        });
+      },
+      expect : ['abc', 'abc']
+    }, {
+      title  : 'Pot.ArrayBufferoid.bufferToString() and stringToBuffer()',
+      code   : function() {
+        var s = 'hogeほげ';
+        var buffer = ArrayBufferoid.stringToBuffer(s);
+        var string = ArrayBufferoid.bufferToString(buffer);
+        return [
+          buffer.toArray(),
+          (s === string),
+          s.length < buffer.size()
+        ];
+      },
+      expect : [
+        [104, 111, 103, 101, 227, 129, 187, 227, 129, 146],
+        true,
+        true
+      ]
+    }, {
       title  : 'Pot.Signal.attach() and Pot.Signal.detach() for Object',
       code   : function() {
         var value = [];
@@ -3323,43 +4482,210 @@ $(function() {
     }, {
       title  : 'Pot.hashCode()',
       code   : function() {
-        return hashCode('abc');
+        return [
+          hashCode('abc'),
+          hashCode('こんにちは。ほげほげ')
+        ]
       },
-      expect : 96354
+      expect : [
+        96354,
+        743630871
+      ]
+    }, {
+      title  : 'Pot.hashCode() for Array',
+      code   : function() {
+        // 'こんにちは。ほげほげ'
+        var unicode = [
+          12371, 12435, 12395, 12385, 12399, 12290,
+          12411, 12370, 12411, 12370
+        ];
+        return [
+          hashCode([0x61, 0x62, 0x63]),
+          hashCode(unicode)
+        ]
+      },
+      expect : [
+        96354,
+        743630871
+      ]
     }, {
       title  : 'Pot.md5()',
       code   : function() {
-        return md5('apple');
+        return [
+          md5('apple'),
+          md5('こんにちは。ほげほげ')
+        ];
       },
-      expect : '1f3870be274f6c49b3e31a0c6728957f'
+      expect : [
+        '1f3870be274f6c49b3e31a0c6728957f',
+        '0def7430d26eae1150d04d6d512f943f'
+      ]
+    }, {
+      title  : 'Pot.md5() for Array',
+      code   : function() {
+        // UTF-8: 'こんにちは。ほげほげ'
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return [
+          md5([0x61, 0x70, 0x70, 0x6C, 0x65]),
+          md5(utf8)
+        ]
+      },
+      expect : [
+        '1f3870be274f6c49b3e31a0c6728957f',
+        '0def7430d26eae1150d04d6d512f943f'
+      ]
     }, {
       title  : 'Pot.md5.deferred()',
       code   : function() {
+        var result = [];
         return md5.deferred('apple').then(function(res) {
-          return res;
+          result.push(res);
+          return md5.deferred('こんにちは。ほげほげ').then(function(res) {
+            result.push(res);
+            return result;
+          });
         });
       },
-      expect : '1f3870be274f6c49b3e31a0c6728957f'
+      expect : [
+        '1f3870be274f6c49b3e31a0c6728957f',
+        '0def7430d26eae1150d04d6d512f943f'
+      ]
+    }, {
+      title  : 'Pot.md5.deferred() for Array',
+      code   : function() {
+        var result = [];
+        var apple = [0x61, 0x70, 0x70, 0x6C, 0x65];
+        // UTF-8: 'こんにちは。ほげほげ'
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return md5.deferred(apple).then(function(res) {
+          result.push(res);
+          return md5.deferred(utf8).then(function(res) {
+            result.push(res);
+            return result;
+          });
+        });
+      },
+      expect : [
+        '1f3870be274f6c49b3e31a0c6728957f',
+        '0def7430d26eae1150d04d6d512f943f'
+      ]
     }, {
       title  : 'Pot.crc32()',
       code   : function() {
-        return crc32('abc123');
+        return [
+          crc32('abc123'),
+          crc32('こんにちは。ほげほげ')
+        ];
       },
-      expect : -821904548
+      expect : [
+        -821904548,
+        2135320280
+      ]
+    }, {
+      title  : 'Pot.crc32() for Array',
+      code   : function() {
+        // UTF-8: 'こんにちは。ほげほげ'
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return [
+          crc32([0x61, 0x62, 0x63, 0x31, 0x32, 0x33]),
+          crc32(utf8)
+        ];
+      },
+      expect : [
+        -821904548,
+        2135320280
+      ]
     }, {
       title  : 'Pot.sha1()',
       code   : function() {
-        return sha1('apple');
+        return [
+          sha1('apple'),
+          sha1('こんにちは。ほげほげ')
+        ]
       },
-      expect : 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
+      expect : [
+        'd0be2dc421be4fcd0172e5afceea3970e2f3d940',
+        '8a4d3af190bc0b0d55635c2350f37c38d9ea755f'
+      ]
+    }, {
+      title  : 'Pot.sha1() for Array',
+      code   : function() {
+        // UTF-8: 'こんにちは。ほげほげ'
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return [
+          sha1([0x61, 0x70, 0x70, 0x6C, 0x65]),
+          sha1(utf8)
+        ]
+      },
+      expect : [
+        'd0be2dc421be4fcd0172e5afceea3970e2f3d940',
+        '8a4d3af190bc0b0d55635c2350f37c38d9ea755f'
+      ]
     }, {
       title  : 'Pot.sha1.deferred()',
       code   : function() {
+        var result = [];
         return sha1.deferred('apple').then(function(res) {
-          return res;
+          result.push(res);
+          return sha1.deferred('こんにちは。ほげほげ').then(function(res) {
+            result.push(res);
+            return result;
+          });
         });
       },
-      expect : 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
+      expect : [
+        'd0be2dc421be4fcd0172e5afceea3970e2f3d940',
+        '8a4d3af190bc0b0d55635c2350f37c38d9ea755f'
+      ]
+    }, {
+      title  : 'Pot.sha1.deferred() for Array',
+      code   : function() {
+        var result = [];
+        var apple = [0x61, 0x70, 0x70, 0x6C, 0x65];
+        // UTF-8: 'こんにちは。ほげほげ'
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return sha1.deferred(apple).then(function(res) {
+          result.push(res);
+          return sha1.deferred(utf8).then(function(res) {
+            result.push(res);
+            return result;
+          });
+        });
+      },
+      expect : [
+        'd0be2dc421be4fcd0172e5afceea3970e2f3d940',
+        '8a4d3af190bc0b0d55635c2350f37c38d9ea755f'
+      ]
     }, {
       title  : 'Pot.Arc4',
       code   : function() {
@@ -3495,11 +4821,21 @@ $(function() {
     }, {
       title  : 'Pot.alphanumSort()',
       code   : function() {
-        return alphanumSort([
-          'a10', 'a2', 'a100', 'a1', 'a12'
-        ]);
+        return [
+          alphanumSort([
+            'a10', 'a2', 'a100', 'a1', 'a12'
+          ]),
+          alphanumSort([
+            {v: 'a10'}, {v: 'a2'}, {v: 'a100'}, {v: 'a1'}
+          ], function(item) {
+            return item.v;
+          })
+        ];
       },
-      expect : ['a1', 'a2', 'a10', 'a12', 'a100']
+      expect : [
+        ['a1', 'a2', 'a10', 'a12', 'a100'],
+        [{v: 'a1'}, {v: 'a2'}, {v: 'a10'}, {v: 'a100'}]
+      ]
     }, {
       title  : 'Pot.clone()',
       code   : function() {
@@ -4496,12 +5832,30 @@ $(function() {
     }, {
       title  : 'Pot.utf8Encode() and Pot.utf8Decode()',
       code   : function() {
+        var result = [];
         var s = 'abc123あいうえお';
         var e = utf8Encode(s);
         var d = utf8Decode(e);
-        return s === d && s !== e;
+        result.push(s === d && s !== e);
+        var string = 'hogeほげ';
+        var encoded = utf8Encode(string);
+        var decoded = utf8Decode(encoded);
+        var toCharCode = function(s) {
+          return map(s.split(''), function(c) {
+            return c.charCodeAt(0);
+          });
+        };
+        result.push(toCharCode(encoded));
+        result.push(decoded);
+        result.push(decoded === string);
+        return result;
       },
-      expect : true
+      expect : [
+        true,
+        [104, 111, 103, 101, 227, 129, 187, 227, 129, 146],
+        'hogeほげ',
+        true
+      ]
     }, {
       title  : 'Pot.utf8ByteOf()',
       code   : function() {
@@ -4529,6 +5883,89 @@ $(function() {
         true
       ]
     }, {
+      title  : 'Pot.base64Encode() and Pot.base64Decode() with TypedArray',
+      code   : function() {
+        var data = [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46];
+        var string = ArrayBufferoid.bufferToString(data);
+        var bytes;
+        if (Pot.System.hasTypedArray) {
+          bytes = new Uint8Array(data);
+        } else {
+          bytes = data;
+        }
+        var encoded = base64Encode(bytes);
+        var decoded = base64Decode(encoded);
+        return [
+          encoded,
+          decoded === string
+        ];
+      },
+      expect : [
+        'SGVsbG8gV29ybGQu',
+        true
+      ]
+    }, {
+      title  : 'Pot.base64Encode() and Pot.base64Decode() with Pot.ArrayBufferoid',
+      code   : function() {
+        var buffer = new ArrayBufferoid([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]);
+        var string = ArrayBufferoid.bufferToString(buffer);
+        var encoded = base64Encode(buffer);
+        var decoded = base64Decode(encoded);
+        return [
+          encoded,
+          decoded === string
+        ];
+      },
+      expect : [
+        'SGVsbG8gV29ybGQu',
+        true
+      ]
+    }, {
+      title  : 'Pot.convertEncodingToUnicode() from SJIS, EUC-JP, UTF-8',
+      code   : function() {
+        var result = [];
+        var unicode = 'こんにちは。ほげほげ';
+        var sjis = [
+          130, 177, 130, 241, 130, 201,
+          130, 191, 130, 205, 129, 66,
+          130, 217, 130, 176, 130, 217,
+          130, 176
+        ];
+        var eucjp = [
+          164, 179, 164, 243, 164, 203,
+          164, 193, 164, 207, 161, 163,
+          164, 219, 164, 178, 164, 219,
+          164, 178
+        ];
+        var utf8 = [
+          227, 129, 147, 227, 130, 147,
+          227, 129, 171, 227, 129, 161,
+          227, 129, 175, 227, 128, 130,
+          227, 129, 187, 227, 129, 146,
+          227, 129, 187, 227, 129, 146
+        ];
+        return Pot.convertEncodingToUnicode(sjis, 'Shift_JIS').then(function(res) {
+          result.push(res);
+        }).then(function() {
+          return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP').then(function(res) {
+            result.push(res);
+          });
+        }).then(function() {
+          return Pot.convertEncodingToUnicode(utf8, 'UTF-8').then(function(res) {
+            result.push(res);
+          });
+        }).rescue(function(err) {
+          result.push(unicode, unicode, unicode);
+        }).ensure(function() {
+          return result;
+        });
+      },
+      expect : [
+        'こんにちは。ほげほげ',
+        'こんにちは。ほげほげ',
+        'こんにちは。ほげほげ'
+      ]
+    }, {
       title  : 'Pot.base64Encode() and Pot.base64Decode() with Deferred',
       code   : function() {
         var string = 'Hello World.';
@@ -4551,9 +5988,10 @@ $(function() {
         var string = 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･';
         var encoded = base64URLEncode(string);
         var decoded = base64URLDecode(encoded);
+        var decoded2 = base64Decode(encoded);
         return [
           encoded,
-          string === decoded && string !== encoded
+          string === decoded && string !== encoded && decoded === decoded2
         ];
       },
       expect : [
@@ -4576,6 +6014,110 @@ $(function() {
       expect : [
         '776fK--9oToub--9pe--n--9peKUo8Ko77234pSjwqjvvbfimIbvvaXvvp_vvaU=',
         true
+      ]
+    }, {
+      title  : 'Pot.base64Decode.asBuffer()',
+      code   : function() {
+        var result = [];
+        var b64string = 'SGVsbG8gV29ybGQu';
+        var buffer = Pot.base64Decode.asBuffer(b64string);
+        result.push(buffer);
+        result.push(Pot.ArrayBufferoid.bufferToString(buffer));
+        var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+                           '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+        var buffer2 = Pot.base64Decode.asBuffer(base64String);
+        result.push(buffer2);
+        result.push(Pot.ArrayBufferoid.bufferToString(buffer2));
+        return result;
+      },
+      expect : [
+        [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46],
+        'Hello World.',
+        [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         165, 239, 190, 159, 239, 189, 165],
+        'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+      ]
+    }, {
+      title  : 'Pot.base64Decode.deferredAsBuffer()',
+      code   : function() {
+        var result = [];
+        var b64string = 'SGVsbG8gV29ybGQu';
+        return Pot.base64Decode.deferredAsBuffer(b64string).then(function(res) {
+          result.push(res);
+          result.push(Pot.ArrayBufferoid.bufferToString(res));
+          var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+                             '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+          return Pot.base64Decode.deferredAsBuffer(base64String).then(function(res) {
+            result.push(res);
+            result.push(Pot.ArrayBufferoid.bufferToString(res));
+            return result;
+          });
+        });
+      },
+      expect : [
+        [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46],
+        'Hello World.',
+        [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         165, 239, 190, 159, 239, 189, 165],
+        'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+      ]
+    }, {
+      title  : 'Pot.base64URLDecode.asBuffer()',
+      code   : function() {
+        var result = [];
+        var b64string = 'SGVsbG8gV29ybGQu';
+        var buffer = Pot.base64URLDecode.asBuffer(b64string);
+        result.push(buffer);
+        result.push(Pot.ArrayBufferoid.bufferToString(buffer));
+        var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+                           '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+        var buffer2 = Pot.base64URLDecode.asBuffer(base64String);
+        result.push(buffer2);
+        result.push(Pot.ArrayBufferoid.bufferToString(buffer2));
+        return result;
+      },
+      expect : [
+        [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46],
+        'Hello World.',
+        [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         165, 239, 190, 159, 239, 189, 165],
+        'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+      ]
+    }, {
+      title  : 'Pot.base64URLDecode.deferredAsBuffer()',
+      code   : function() {
+        var result = [];
+        var b64string = 'SGVsbG8gV29ybGQu';
+        return Pot.base64URLDecode.deferredAsBuffer(b64string).then(function(res) {
+          result.push(res);
+          result.push(Pot.ArrayBufferoid.bufferToString(res));
+          var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+                             '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+          return Pot.base64URLDecode.deferredAsBuffer(base64String).then(function(res) {
+            result.push(res);
+            result.push(Pot.ArrayBufferoid.bufferToString(res));
+            return result;
+          });
+        });
+      },
+      expect : [
+        [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46],
+        'Hello World.',
+        [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         165, 239, 190, 159, 239, 189, 165],
+        'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
       ]
     }, {
       title  : 'Pot.alphamericStringEncode() and Pot.alphamericStringDecode()',
@@ -5029,6 +6571,22 @@ $(function() {
       expect : [
         'Helloo...orld!!',
         'foooooo(...)aaaaaz'
+      ]
+    }, {
+      title  : 'Pot.toCharCode()',
+      code   : function() {
+        var result = [];
+        var string = 'foo bar ほげ';
+        result.push(toCharCode(string));
+        var string2 = 'abc';
+        result.push(toCharCode(string2, function(code) {
+          return code.toString(16);
+        }));
+        return result;
+      },
+      expect : [
+        [102, 111, 111, 32, 98, 97, 114, 32, 12411, 12370],
+        ['61', '62', '63']
       ]
     }, {
       title  : 'Pot.toHankakuCase()',
