@@ -4,9 +4,10 @@
  * Pot.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.18, 2012-04-15
+ * Version 1.19, 2012-05-13
  * Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
+ * https://github.com/polygonplanet/Pot.js
  * http://polygonplanet.github.com/Pot.js/
  */
 /**
@@ -67,8 +68,9 @@
  *
  * @fileoverview   Pot.js library
  * @author         polygon planet
- * @version        1.18
- * @date           2012-04-15
+ * @version        1.19
+ * @date           2012-05-13
+ * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
@@ -103,7 +105,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.18', TYPE : 'full'},
+var Pot = {VERSION : '1.19', TYPE : 'full'},
 
 // Refer the Pot properties/functions.
 PotSystem,
@@ -135,6 +137,8 @@ isDate,
 isRegExp,
 isObject,
 isError,
+isTypedArray,
+isArrayBuffer,
 isArrayLike,
 isNumeric,
 isStopIter,
@@ -142,6 +146,7 @@ isDeferred,
 isHash,
 isIter,
 isWorkeroid,
+isArrayBufferoid,
 isWindow,
 isDocument,
 isElement,
@@ -156,6 +161,7 @@ PotInternalLightIterator,
 Signal,
 DropFile,
 Workeroid,
+ArrayBufferoid,
 
 // A shortcut of prototype methods/functions.
 ArrayProto     = Array.prototype,
@@ -791,7 +797,7 @@ Pot.update({
 
 // Definition of System.
 update(PotSystem, (function() {
-  var o = {}, g, ws, b, u, oe, ce, ov, cv, f;
+  var o = {}, g, ws, b, u, ua, ca, oe, ce, ov, cv, f;
   o.isWaitable = false;
   if (typeof window === 'object' && 'setTimeout' in window &&
       window.window == window &&
@@ -894,6 +900,13 @@ update(PotSystem, (function() {
     g = (new Function('yield(0);'))();
     if (g && typeof g.next === 'function') {
       o.isYieldable = true;
+    }
+  } catch (e) {}
+  try {
+    if (typeof FileReader !== 'undefined' &&
+        typeof FileReader.LOADING !== 'undefined' &&
+        typeof (new FileReader()).readAsText === 'function') {
+      o.hasFileReader = true;
     }
   } catch (e) {}
   try {
@@ -1036,6 +1049,36 @@ update(PotSystem, (function() {
       }
     }());
   }
+  try {
+    if (typeof ArrayBuffer !== 'undefined' &&
+        (new ArrayBuffer(10)).byteLength === 10 &&
+        typeof Uint8Array !== 'undefined' &&
+        (new Uint8Array([0, 312])).subarray(1)[0] === 56
+    ) {
+      o.hasTypedArray = true;
+      try {
+        ua = new Uint8Array([1, 2]);
+        ca = new Uint8Array(ua.subarray(0));
+        ca[0] = 5;
+        if (ua[0] === 1 && ca[0] === 5) {
+          o.canCopyTypedArray = true;
+        }
+        ua = ca = null;
+      } catch (ex) {}
+      try {
+        if (typeof Uint8ClampedArray !== 'undefined' &&
+            (new Uint8ClampedArray([0, 312])).subarray(1)[0] === 255) {
+          o.hasUint8ClampedArray = true;
+        }
+      } catch (ex) {}
+      if (typeof DataView !== 'undefined' &&
+          (new DataView(new Uint8Array([
+            0x10, 0x20, 0x40, 0x80
+          ]).buffer)).getUint32(0) === 0x10204080) {
+        o.hasDataView = true;
+      }
+    }
+  } catch (e) {}
   return o;
 }()));
 
@@ -1555,6 +1598,50 @@ Pot.update({
     return x != null && (isString(x) || isNumber(x) || isBoolean(x));
   },
   /**
+   * Check whether the argument is Blob or not.
+   *
+   *
+   * @example
+   *   var bb = new Pot.System.BlobBuilder();
+   *   bb.append('hoge');
+   *   var blob = bb.getBlob();
+   *   Pot.debug(Pot.isBlob(blob));   // true
+   *   Pot.debug(Pot.isBlob({}));     // false
+   *   Pot.debug(Pot.isBlob('hoge')); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Blob.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isBlob : function(x) {
+    return !!(x && toString.call(x) === '[object Blob]');
+  },
+  /**
+   * Check whether the argument is a instance of FileReader or not.
+   *
+   *
+   * @example
+   *   var object = {hoge : 1};
+   *   var reader = new FileReader();
+   *   Pot.debug(Pot.isFileReader(object)); // false
+   *   Pot.debug(Pot.isFileReader(reader)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is FileReader.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isFileReader : function(x) {
+    return !!(PotSystem.hasFileReader && x && x.constructor === FileReader);
+  },
+  /**
    * Check whether the argument is Arguments object or not.
    *
    *
@@ -1578,7 +1665,7 @@ Pot.update({
   isArguments : function(x) {
     var result = false;
     if (x) {
-      if (toString.call(x) == '[object Arguments]') {
+      if (toString.call(x) === '[object Arguments]') {
         result = true;
       } else {
         try {
@@ -1589,6 +1676,64 @@ Pot.update({
       }
     }
     return result;
+  },
+  /**
+   * Check whether the argument is TypedArray object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isTypedArray(obj)); // false
+   *   debug(isTypedArray(arr)); // false
+   *   debug(isTypedArray(buf)); // true
+   *   debug(isTypedArray(uar)); // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is TypedArray object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isTypedArray : function(x) {
+    var result = false;
+    if (x && PotSystem.hasTypedArray && 
+        (x.constructor === ArrayBuffer ||
+          (x.buffer && x.buffer.constructor === ArrayBuffer)
+        )
+    ) {
+      result = true;
+    }
+    return result;
+  },
+  /**
+   * Check whether the argument is ArrayBuffer object or not.
+   *
+   *
+   * @example
+   *   var obj = {foo : 1};
+   *   var arr = [1, 2, 3];
+   *   var buf = new ArrayBuffer(10);
+   *   var uar = new Uint8Array(10);
+   *   debug(isArrayBuffer(obj)); // false
+   *   debug(isArrayBuffer(arr)); // false
+   *   debug(isArrayBuffer(buf)); // true
+   *   debug(isArrayBuffer(uar)); // false
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is ArrayBuffer object.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArrayBuffer : function(x) {
+    return !!(PotSystem.hasTypedArray && x && x.constructor === ArrayBuffer);
   },
   /**
    * Return whether the argument object like Array (i.e. iterable)
@@ -1615,13 +1760,14 @@ Pot.update({
     if (!o) {
       return false;
     }
-    if (isArray(o) || o instanceof Array || o.constructor === Array) {
+    if (isArray(o) || o instanceof Array || o.constructor === Array ||
+        isTypedArray(o) || isArrayBufferoid(o)) {
       return true;
     }
     len = o.length;
     if (!isNumber(len) || (!isObject(o) && !isArray(o)) ||
-        o === Pot || o === PotGlobal || o === globals ||
-        isWindow(o) || isDocument(o) || isElement(o)
+         o === Pot  || o === PotGlobal || o === globals ||
+        isWindow(o) ||  isDocument(o)  || isElement(o)
     ) {
       return false;
     }
@@ -1844,6 +1990,32 @@ Pot.update({
     return x != null && ((x instanceof Workeroid) ||
      (x.id   != null && x.id   === Workeroid.fn.id &&
       x.NAME != null && x.NAME === Workeroid.fn.NAME));
+  },
+  /**
+   * Check whether the argument object is an instance of Pot.ArrayBufferoid.
+   *
+   *
+   * @example
+   *   var o = {hoge: 1};
+   *   var a = new Pot.ArrayBufferoid();
+   *   debug(isArrayBufferoid(o)); // false
+   *   debug(isArrayBufferoid(a)); // true
+   *
+   *
+   * @param  {Object|*}  x  The target object to test.
+   * @return {Boolean}      Return true if the argument object is an
+   *                          instance of Pot.ArrayBufferoid,
+   *                          otherwise return false.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isArrayBufferoid : function(x) {
+    return ArrayBufferoid && x != null &&
+     ((x instanceof ArrayBufferoid) ||
+      (x.id   != null && x.id   === ArrayBufferoid.fn.id &&
+       x.NAME != null && x.NAME === ArrayBufferoid.fn.NAME));
   },
   /**
    * Check whether the argument object is an instance of Pot.Hash.
@@ -2284,6 +2456,8 @@ if (typeof StopIteration === 'undefined' || !StopIteration) {
 
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
+isTypedArray     = Pot.isTypedArray;
+isArrayBuffer    = Pot.isArrayBuffer;
 isArrayLike      = Pot.isArrayLike;
 isNumeric        = Pot.isNumeric;
 isStopIter       = Pot.isStopIter;
@@ -2291,6 +2465,7 @@ isDeferred       = Pot.isDeferred;
 isHash           = Pot.isHash;
 isIter           = Pot.isIter;
 isWorkeroid      = Pot.isWorkeroid;
+isArrayBufferoid = Pot.isArrayBufferoid;
 isWindow         = Pot.isWindow;
 isDocument       = Pot.isDocument;
 isElement        = Pot.isElement;
@@ -3680,6 +3855,8 @@ Pot.update({
     if (isError(error)) {
       msg = String(error.message  || error.description ||
                   (error.toString && error.toString()) || error);
+    } else {
+      msg = (error && error.toString && error.toString()) || error;
     }
     return stringify(msg) || stringify(defaults) || 'error';
   }
@@ -6044,6 +6221,8 @@ function fireProcedure() {
       result = reply;
       if (isWorkeroid(result)) {
         result = workerMessaging.call(this, result);
+      } else if (Pot.isFileReader(result)) {
+        result = readerPolling.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
@@ -6222,6 +6401,52 @@ function workerMessaging(worker) {
     }
     return defer;
   }).begin();
+}
+
+/**
+ * Observe FileReader state.
+ *
+ * @private
+ * @ignore
+ */
+function readerPolling(reader) {
+  var d, done, async = false,
+      orgLoad = reader.onload,
+      orgLoadEnd = reader.onloadend,
+      orgError = reader.onerror;
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  d = new Deferred({async : async});
+  if (reader.readyState === FileReader.LOADING) {
+    /**@ignore*/
+    reader.onload = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoad && orgLoad.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onloadend = function(ev) {
+      if (!done) {
+        done = true;
+        d.begin(ev && ev.target && ev.target.result);
+      }
+      orgLoadEnd && orgLoadEnd.apply(this, arguments);
+    };
+    /**@ignore*/
+    reader.onerror = function(e) {
+      if (!done) {
+        done = true;
+        d.raise(e);
+      }
+      orgError && orgError.apply(this, arguments);
+    };
+  } else {
+    d.begin(reader.result);
+  }
+  return d;
 }
 
 /**
@@ -13249,6 +13474,1360 @@ delete PotTmp.createSyncIterator;
 }());
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+// Definition of Pot.ArrayBufferoid (ArrayBuffer).
+(function() {
+var ArrayBufferoidTypes;
+
+Pot.update({
+  /**
+   * @lends Pot
+   */
+  /**
+   * Pot.ArrayBufferoid is object like TypedArray that
+   *  has DataView and Array prototype methods.
+   * That is able to cast to the each TypedArray.
+   * If environment not supported TypedArray, it will use native Array.
+   * Pot.ArrayBufferoid can coding that
+   *  is compatible with other environments.
+   *
+   *
+   * @example
+   *   var buffer = new Pot.ArrayBufferoid();
+   *   var i = 0;
+   *   buffer[i++] = 255;
+   *   buffer[i++] = 254;
+   *   buffer.push(253);
+   *   buffer.push(252);
+   *   // like DataView.
+   *   Pot.debug(buffer.getUint16(0, true)); // 65279
+   *   // length.
+   *   Pot.debug('buffer.length = ' + buffer.size()); // 4
+   *   // convert to typed array.
+   *   var arrayBuffer = buffer.toArrayBuffer();
+   *   var uint8Array = buffer.toUint8Array();
+   *   // stream.
+   *   buffer.seek(0);
+   *   var data1 = buffer.read(1);
+   *   Pot.debug(data1[0]); // 255
+   *   Pot.debug(buffer.tell()); // 1
+   *   var data2 = buffer.read(2);
+   *   Pot.debug(data2); // [254, 253]
+   *   buffer.seek(0);
+   *   buffer.write([100, 101]);
+   *   Pot.debug(buffer); // [100, 101, 253, 252]
+   *
+   *
+   * @example
+   *   var buffer = new Pot.ArrayBufferoid([1, 2, 3, 4]);
+   *   var uint8Array = buffer.map(function(val) {
+   *     return val + 100;
+   *   }).toUint8Array();
+   *   Pot.debug(uint8Array[0]); // 101
+   *
+   *
+   * @param  {Array|TypedArray|Pot.ArrayBufferoid|Number|*} args parameters.
+   * @return {Pot.ArrayBufferoid} A new instance of Pot.ArrayBufferoid.
+   *
+   * @name  Pot.ArrayBufferoid
+   * @class
+   * @constructor
+   * @public
+   */
+  ArrayBufferoid : update(function() {
+    return isArrayBufferoid(this) ? this.init(arguments)
+                                  : new ArrayBufferoid.fn.init(arguments);
+  }, {
+    /**
+     * @lends Pot.ArrayBufferoid
+     */
+    /**
+     * @type Object
+     * @const
+     */
+    types : {}
+  })
+});
+
+// Refer the Pot properties/functions.
+ArrayBufferoid      = Pot.ArrayBufferoid;
+ArrayBufferoidTypes = ArrayBufferoid.types;
+
+each({
+  /**
+   * @lends Pot.ArrayBufferoid.types
+   */
+  /**
+   * @type Number
+   */
+  ArrayBuffer       : 1,
+  Int8Array         : 2,
+  Uint8Array        : 4,
+  Uint8ClampedArray : 8,
+  Int16Array        : 0x10,
+  Uint16Array       : 0x20,
+  Int32Array        : 0x40,
+  Uint32Array       : 0x80,
+  Float32Array      : 0x100,
+  Float64Array      : 0x200
+}, function(n, name) {
+  ArrayBufferoidTypes[name] = n;
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
+  /**
+   * @property {Function} toArrayBuffer
+   *           Create a new ArrayBuffer with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt8Array
+   *           Create a new Int8Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint8Array
+   *           Create a new Uint8Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint8ClampedArray
+   *           Create a new Uint8ClampedArray with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt16Array
+   *           Create a new Int16Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint16Array
+   *           Create a new Uint16Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt32Array
+   *           Create a new Int32Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint32Array
+   *           Create a new Uint32Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toFloat32Array
+   *           Create a new Float32Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toFloat64Array
+   *           Create a new Float64Array with arguments.
+   *           If Typed Array not supported will returns Array.
+   */
+  ArrayBufferoid['to' + name] = function() {
+    return createArrayBuffer(n, arguments);
+  };
+});
+
+ArrayBufferoid.fn = ArrayBufferoid.prototype = {
+  /**
+   * @lends Pot.ArrayBufferoid.prototype
+   */
+  /**
+   * @ignore
+   */
+  constructor : ArrayBufferoid,
+  /**
+   * @private
+   * @ignore
+   */
+  id : PotInternal.getMagicNumber(),
+  /**
+   * A unique strings.
+   *
+   * @type  String
+   * @const
+   */
+  serial : null,
+  /**
+   * @private
+   * @ignore
+   * @const
+   */
+  NAME : 'ArrayBufferoid',
+  /**
+   * isArrayBufferoid.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  isArrayBufferoid : isArrayBufferoid,
+  /**
+   * length.
+   *
+   * @type Number
+   * @ignore
+   */
+  length : 0,
+  /**
+   * offset (byteOffset).
+   *
+   * @type Number
+   * @public
+   */
+  offset : 0,
+  /**
+   * Initialize properties.
+   *
+   * @private
+   * @ignore
+   */
+  init : function(args) {
+    if (!this.serial) {
+      this.serial = buildSerial(this);
+    }
+    this.length = 0;
+    this.offset = 0;
+    parseArguments(this, args);
+    return this;
+  },
+  /**
+   * Get the object length.
+   *
+   * @return {Number}    Max length of object.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  size : function() {
+    var result = sizeOfBufferoid(this, true);
+    this.length = result;
+    return result;
+  },
+  /**
+   * toString like Array.prototype.toString.
+   *
+   * @return {String}
+   */
+  toString : function() {
+    var array = bufferoidToArray(this);
+    return ArrayProto.toString.call(array);
+  },
+  /**
+   * join like Array.prototype.join.
+   *
+   * @param  {String}
+   * @return {String}
+   */
+  join : function(separator) {
+    var array = bufferoidToArray(this);
+    return ArrayProto.join.apply(array, arguments);
+  },
+  /**
+   * push like Array.prototype.push.
+   *
+   * @param  {...args}
+   * @return {Number}
+   */
+  push : function() {
+    var array = bufferoidToArray(this, true),
+        result = push.apply(array, arguments);
+    arrayToBufferoid(this, array);
+    return result;
+  },
+  /**
+   * pop like Array.prototype.pop.
+   *
+   * @return {*}
+   */
+  pop : function() {
+    var array = bufferoidToArray(this, true),
+        result = ArrayProto.pop.apply(array, arguments);
+    arrayToBufferoid(this, array);
+    return result;
+  },
+  /**
+   * shift like Array.prototype.shift.
+   *
+   * @return {*}
+   */
+  shift : function() {
+    var array = bufferoidToArray(this, true),
+        result = ArrayProto.shift.apply(array, arguments);
+    arrayToBufferoid(this, array);
+    return result;
+  },
+  /**
+   * unshift like Array.prototype.unshift.
+   *
+   * @return {Number}
+   */
+  unshift : function() {
+    var array = bufferoidToArray(this, true),
+        result = unshift.apply(array, arguments);
+    arrayToBufferoid(this, array);
+    return result;
+  },
+  /**
+   * reverse like Array.prototype.reverse.
+   *
+   * @return {Pot.ArrayBufferoid}
+   */
+  reverse : function() {
+    var array = bufferoidToArray(this);
+    return new ArrayBufferoid(ArrayProto.reverse.apply(array, arguments));
+  },
+  /**
+   * sort like Array.prototype.sort.
+   *
+   * @param  {(Function)}
+   * @return {Pot.ArrayBufferoid}
+   */
+  sort : function() {
+    var array = bufferoidToArray(this, true);
+    ArrayProto.sort.apply(array, arguments);
+    arrayToBufferoid(this, array);
+    return new ArrayBufferoid(array);
+  },
+  /**
+   * concat like Array.prototype.concat.
+   *
+   * @param  {...args}
+   * @return {Pot.ArrayBufferoid}
+   */
+  concat : function() {
+    var array = bufferoidToArray(this);
+    return new ArrayBufferoid(concat.apply(array, arguments));
+  },
+  /**
+   * slice like Array.prototype.slice.
+   *
+   * @param  {Number}
+   * @param  {(Number)}
+   * @return {Pot.ArrayBufferoid}
+   */
+  slice : function() {
+    var array = bufferoidToArray(this);
+    return new ArrayBufferoid(slice.apply(array, arguments));
+  },
+  /**
+   * splice like Array.prototype.splice.
+   *
+   * @param  {Number}
+   * @param  {Number}
+   * @param  {...args}
+   * @return {*}
+   */
+  splice : function() {
+    var array = bufferoidToArray(this, true),
+        result = new ArrayBufferoid(splice.apply(array, arguments));
+    arrayToBufferoid(this, array);
+    return result;
+  },
+  /**
+   * indexOf like Array.prototype.indexOf.
+   *
+   * @param  {*}
+   * @param  {(Number)}
+   * @return {Number}
+   */
+  indexOf : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    return Pot.indexOf.apply(null, args);
+  },
+  /**
+   * lastIndexOf like Array.prototype.lastIndexOf.
+   *
+   * @param  {*}
+   * @param  {(Number)}
+   * @return {Number}
+   */
+  lastIndexOf : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    return Pot.lastIndexOf.apply(null, args);
+  },
+  /**
+   * filter like Array.prototype.filter.
+   *
+   * @param  {Function}
+   * @return {Pot.ArrayBufferoid}
+   */
+  filter : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[2] === void 0) {
+      args[2] = this;
+    }
+    return new ArrayBufferoid(Pot.filter.apply(null, args));
+  },
+  /**
+   * forEach like Array.prototype.forEach.
+   *
+   * @param  {Function}
+   * @return {*}
+   */
+  forEach : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[2] === void 0) {
+      args[2] = this;
+    }
+    return Pot.forEach.apply(null, args);
+  },
+  /**
+   * map like Array.prototype.map.
+   *
+   * @param  {Function}
+   * @return {Pot.ArrayBufferoid}
+   */
+  map : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[2] === void 0) {
+      args[2] = this;
+    }
+    return new ArrayBufferoid(Pot.map.apply(null, args));
+  },
+  /**
+   * reduce like Array.prototype.reduce.
+   *
+   * @param  {Function}
+   * @return {*}
+   */
+  reduce : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[3] === void 0) {
+      args[3] = this;
+    }
+    return Pot.reduce.apply(null, args);
+  },
+  /**
+   * every like Array.prototype.every.
+   *
+   * @param  {Function}
+   * @return {Boolean}
+   */
+  every : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[2] === void 0) {
+      args[2] = this;
+    }
+    return Pot.every.apply(null, args);
+  },
+  /**
+   * some like Array.prototype.some.
+   *
+   * @param  {Function}
+   * @return {Boolean}
+   */
+  some : function() {
+    var args = arrayize(arguments);
+    args.unshift(this);
+    if (args[2] === void 0) {
+      args[2] = this;
+    }
+    return Pot.some.apply(null, args);
+  }
+};
+
+each(ArrayBufferoidTypes, function(n, k) {
+  var name = 'to' + k;
+  /**
+   * @lends Pot.ArrayBufferoid.prototype
+   */
+  /**
+   * @property {Function} toArrayBuffer
+   *           Create a new ArrayBuffer with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt8Array
+   *           Create a new Int8Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint8Array
+   *           Create a new Uint8Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint8ClampedArray
+   *           Create a new Uint8ClampedArray with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt16Array
+   *           Create a new Int16Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint16Array
+   *           Create a new Uint16Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toInt32Array
+   *           Create a new Int32Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toUint32Array
+   *           Create a new Uint32Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toFloat32Array
+   *           Create a new Float32Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   *
+   * @property {Function} toFloat64Array
+   *           Create a new Float64Array with buffer.
+   *           If Typed Array not supported will returns Array.
+   */
+  ArrayBufferoid.fn[name] = function() {
+    return ArrayBufferoid[name](bufferoidToArray(this));
+  };
+});
+
+// Definition of stream methods.
+update(ArrayBufferoid.fn, {
+  /**
+   * @lends Pot.ArrayBufferoid.prototype
+   */
+  /**
+   * Get the Array of this buffer.
+   *
+   * @return {Array}   Array of this buffer.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  toArray : function() {
+    return bufferoidToArray(this);
+  },
+  /**
+   * Seek offset.
+   *
+   * @param  {Number}  offset  Seek offset.
+   * @return {Number}          Current offset.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  seek : function(offset) {
+    this.offset = (offset - 0) || 0;
+    return this.offset;
+  },
+  /**
+   * Get the current offset.
+   *
+   * @return {Number} Current offset.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  tell : function() {
+    return this.offset;
+  },
+  /**
+   * Read the buffer.
+   *
+   * @param  {Number}             size  Reading length.
+   * @return {Pot.ArrayBufferoid}       A new instance of Pot.ArrayBufferoid.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  read : function(size) {
+    var sz = (size - 0) || 0,
+        result = this.slice(this.offset, this.offset + sz);
+    this.offset += sz;
+    return result;
+  },
+  /**
+   * Write the buffer.
+   *
+   * @param  {Array|*} data  Data to write.
+   * @return {Number}        Written length.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  write : function(data) {
+    var result = 0, array = arrayize(data), i = 0, len = array.length;
+    for (; i < len; i++) {
+      this[this.offset++] = array[i];
+      result++;
+    }
+    return result;
+  }
+});
+
+// Definition of DataView interface/methods.
+// http://www.khronos.org/registry/typedarray/specs/latest/#8
+// based: jDataView
+update(ArrayBufferoid.fn, {
+  /**
+   * @lends Pot.ArrayBufferoid.prototype
+   */
+  /**
+   * Get the Int8.
+   *
+   * <pre>
+   * byte getInt8(unsigned long byteOffset);
+   * </pre>
+   *
+   * @param  {Number} byteOffset
+   * @return {Number} byte.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getInt8 : function (byteOffset) {
+    var b = this.getUint8(byteOffset);
+    return (b < 0x80) ? b : b - 0x100;
+  },
+  /**
+   * Get the Uint8.
+   *
+   * <pre>
+   * octet getUint8(unsigned long byteOffset);
+   * </pre>
+   *
+   * @param  {Number} byteOffset
+   * @return {Number} octet.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getUint8 : function(byteOffset) {
+    var c;
+    if (byteOffset != null) {
+      this.offset = (byteOffset - 0) || 0;
+    }
+    c = this[this.offset++];
+    if (isString(c)) {
+      c = c.charCodeAt(0);
+    }
+    return c & 0xFF;
+  },
+  /**
+   * Get the Int16.
+   *
+   * <pre>
+   * short getInt16(unsigned long byteOffset,
+   *                optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} short.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getInt16 : function(byteOffset, littleEndian) {
+    var b = this.getUint16(byteOffset, littleEndian);
+    return (b < 0x800) ? b : b - 0x10000;
+  },
+  /**
+   * Get the Uint16.
+   *
+   * <pre>
+   * unsigned short getUint16(unsigned long byteOffset,
+   *                          optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} unsigned short.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getUint16 : function(byteOffset, littleEndian) {
+    var b = getUint8EndianizeArray(this, byteOffset, 2, littleEndian);
+    return (b[0] << 8) + b[1];
+  },
+  /**
+   * Get the Int32.
+   *
+   * <pre>
+   * long getInt32(unsigned long byteOffset,
+   *               optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} long.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getInt32 : function(byteOffset, littleEndian) {
+    var b = this.getUint32(byteOffset, littleEndian);
+    return (b > 0x7FFFFFFF) ? b - Math.pow(2, 32) : b;
+  },
+  /**
+   * Get the Uint32.
+   *
+   * <pre>
+   * unsigned long getUint32(unsigned long byteOffset,
+   *                         optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} unsigned long.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getUint32 : function(byteOffset, littleEndian) {
+    var b = getUint8EndianizeArray(this, byteOffset, 4, littleEndian);
+    return (b[0] * 0x1000000) + (b[1] << 16) + (b[2] << 8) + b[3];
+  },
+  /**
+   * Get the Float32.
+   *
+   * <pre>
+   * float getFloat32(unsigned long byteOffset,
+   *                  optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} float.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getFloat32 : function(byteOffset, littleEndian) {
+    var b = getUint8EndianizeArray(this, byteOffset, 4, littleEndian),
+        sign = 1 - (2 * (b[0] >> 7)),
+        expo = (((b[0] << 1) & 0xFF) | (b[1] >> 7)) - 0x7F,
+        mant = ((b[1] & 0x7F) << 16) | (b[2] << 8) | b[3];
+    if (expo === 0x80) {
+      return (mant === 0) ? sign * Infinity : NaN;
+    } else if (expo === -127) {
+      return sign * mant * Math.pow(2, -126 - 23);
+    } else {
+      return sign * (1 + mant * Math.pow(2, -23)) * Math.pow(2, expo);
+    }
+  },
+  /**
+   * Get the Float64.
+   *
+   * <pre>
+   * double getFloat64(unsigned long byteOffset,
+   *                   optional boolean littleEndian);
+   * </pre>
+   *
+   * @param  {Number}     byteOffset
+   * @param  {(Boolean)} (littleEndian)
+   * @return {Number} double.
+   *
+   * @type Function
+   * @function
+   * @public
+   */
+  getFloat64 : function(byteOffset, littleEndian) {
+    var b = getUint8EndianizeArray(this, byteOffset, 8, littleEndian),
+        sign = 1 - (2 * (b[0] >> 7)),
+        expo = ((((b[0] << 1) & 0xFF) << 3) | (b[1] >> 4)) - 0x3FF,
+        mant = ((b[1] & 0x0F) * Math.pow(2, 48)) +
+                (b[2] * Math.pow(2, 40)) +
+                (b[3] * Math.pow(2, 32)) +
+                (b[4] * 0x1000000) +
+                (b[5] * 0x10000) +
+                (b[6] * 0x100) + b[7];
+    if (expo === 0x400) {
+      return (mant === 0) ? sign * Infinity : NaN;
+    } else if (expo === -1023) {
+      return sign * mant * Math.pow(2, -1022 - 52);
+    } else {
+      return sign * (1 + mant * Math.pow(2, -52)) * Math.pow(2, expo);
+    }
+  }
+  //XXX: implements set* methods.
+});
+
+ArrayBufferoid.fn.init.prototype = ArrayBufferoid.fn;
+
+// Static methods.
+update(ArrayBufferoid, {
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
+  /**
+   * Copt the ArrayBuffer/ArrayBufferoid/Array.
+   *
+   *
+   * @example
+   *   var buffer = new ArrayBuffer(10);
+   *   var view1 = new Uint8Array(buffer);
+   *   var view2 = new Uint8Array(buffer);
+   *   view1[0] = 10;
+   *   view2[1] = 20;
+   *   Pot.debug(view1[0]); // 10
+   *   Pot.debug(view2[0]); // 10
+   *   Pot.debug(view1[1]); // 20
+   *   Pot.debug(view2[1]); // 20
+   *   var copy = new Uint8Array(Pot.ArrayBufferoid.copyBuffer(buffer));
+   *   copy[1] = 100;
+   *   Pot.debug(copy[0]);  // 10
+   *   Pot.debug(copy[1]);  // 100
+   *   Pot.debug(view1[0]); // 10
+   *   Pot.debug(view1[1]); // 20
+   *   Pot.debug(view2[0]); // 10
+   *   Pot.debug(view2[1]); // 20
+   *
+   *
+   * @param  {TypedArray|Pot.ArrayBufferoid|Array}  buffer  Target array.
+   * @return {TypedArray|Pot.ArrayBufferoid|Array}          Copy.
+   *
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  copyBuffer : function(buffer) {
+    var result = [], a, b, i, len;
+    if (buffer) {
+      if (isArrayBufferoid(buffer)) {
+        result = new ArrayBufferoid(buffer);
+      } else {
+        if (PotSystem.hasTypedArray) {
+          if (PotSystem.canCopyTypedArray) {
+            result = new Uint8Array(
+              new Uint8Array(
+                buffer.subarray && buffer.subarray(0) || buffer
+              )
+            ).buffer;
+          } else {
+            a = new Uint8Array(buffer.buffer || buffer);
+            b = [];
+            len = a.length;
+            for (i = 0; i < len; i++) {
+              b[i] = a[i];
+            }
+            result = new Uint8Array(b).buffer;
+          }
+        } else {
+          result = arrayize(buffer);
+        }
+      }
+    }
+    return result;
+  },
+  /**
+   * Convert to ArrayBuffer from raw string.
+   *
+   *
+   * @example
+   *   var string = 'abc123';
+   *   var buffer = Pot.ArrayBufferoid.binaryToBuffer(string);
+   *   Pot.debug(buffer); // [97, 98, 99, 49, 50, 51]
+   *
+   *
+   * @param  {String}             string  A binary string.
+   * @return {Pot.ArrayBufferoid}         A new instance of
+   *                                       Pot.ArrayBufferoid.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  binaryToBuffer : update(function(string) {
+    var buffer = new ArrayBufferoid(),
+        len, i,
+        s = stringify(string);
+    if (s) {
+      len = s.length;
+      for (i = 0; i < len; i++) {
+        buffer[i] = s.charCodeAt(i) & 0xFF;
+        buffer.length++;
+      }
+    }
+    return buffer;
+  }, {
+    /**
+     * @lends Pot.ArrayBufferoid.binaryToBuffer
+     */
+    /**
+     * Convert to ArrayBuffer from raw string with Deferred.
+     *
+     *
+     * @example
+     *   var s = 'abc123';
+     *   Pot.ArrayBufferoid.binaryToBuffer.deferred(s).then(function(res) {
+     *     Pot.debug(res); // [97, 98, 99, 49, 50, 51]
+     *   });
+     *
+     *
+     * @param  {String}        string  A binary string.
+     * @return {Pot.Deferred} Returns an instance of Pot.Deferred that
+     *               has a result of new instance of Pot.ArrayBufferoid.
+     * @type  Function
+     * @function
+     * @static
+     * @public
+     */
+    deferred : function(string) {
+      var buffer = new ArrayBufferoid(), s = stringify(string);
+      return Deferred.repeat(s.length, function(i) {
+        buffer[i] = s.charCodeAt(i) & 0xFF;
+        buffer.length++;
+      }).then(function() {
+        return buffer;
+      });
+    }
+  }),
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
+  /**
+   * Convert to raw string from ArrayBuffer.
+   *
+   *
+   * @example
+   *   var view = new Uint8Array([0x61, 0x62, 0x63]);
+   *   Pot.debug(Pot.ArrayBufferoid.bufferToBinary(view)); // 'abc'
+   *   var buffer = new Pot.ArrayBufferoid([0x61, 0x62, 0x63]);
+   *   Pot.debug(Pot.ArrayBufferoid.bufferToBinary(buffer)); // 'abc'
+   *
+   *
+   * @param  {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer An input bytes.
+   * @return {String}                                      A binary string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  bufferToBinary : update(function(buffer) {
+    var result = '', chars = [], i, len, array;
+    if (buffer && isArrayLike(buffer)) {
+      array = arrayize(buffer);
+      len = array.length;
+      for (i = 0; i < len; i++) {
+        chars[i] = fromUnicode(array[i]);
+      }
+      result = chars.join('');
+    }
+    return result;
+  }, {
+    /**
+     * @lends Pot.ArrayBufferoid.bufferToBinary
+     */
+    /**
+     * Convert to raw string from ArrayBuffer with Deferred.
+     *
+     *
+     * @example
+     *   var view = new Uint8Array([0x61, 0x62, 0x63]);
+     *   var buffer = new Pot.ArrayBufferoid([0x61, 0x62, 0x63]);
+     *   Pot.ArrayBufferoid.bufferToBinary.deferred(view)
+     *                                    .then(function(res) {
+     *     Pot.debug(res); // 'abc'
+     *     return Pot.ArrayBufferoid.bufferToBinary.deferred(buffer).
+     *                                              then(function(res) {
+     *       Pot.debug(res); // 'abc'
+     *     });
+     *   });
+     *
+     *
+     * @param  {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer An input buffer.
+     * @return {Pot.Deferred} Returns an instance of Pot.Deferred that has a
+     *                          binary string result.
+     * @type  Function
+     * @function
+     * @static
+     * @public
+     */
+    deferred : function(buffer) {
+      var bb, fl, d = new Deferred();
+      if (buffer && PotSystem.hasFileReader && PotSystem.BlobBuilder) {
+        bb = new PotSystem.BlobBuilder();
+        fl = new FileReader();
+        if (isArrayBufferoid(buffer)) {
+          bb.append(buffer.toArrayBuffer());
+        } else {
+          bb.append(buffer.buffer || buffer);
+        }
+        /**@ignore*/
+        fl.onload = function(ev) {
+          if (ev && ev.target) {
+            d.begin(ev.target.result);
+          } else {
+            d.raise(ev);
+          }
+        };
+        /**@ignore*/
+        fl.onerror = function(er) {
+          d.raise(er);
+        };
+        fl.readAsBinaryString(bb.getBlob());
+      } else {
+        d.begin(ArrayBufferoid.bufferToBinary(buffer));
+      }
+      return d;
+    }
+  }),
+  /**
+   * @lends Pot.ArrayBufferoid
+   */
+  /**
+   * Convert to UTF-8 ArrayBuffer from UTF-16 string.
+   *
+   *
+   * @example
+   *   var s = 'hogeほげ';
+   *   var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+   *   var string = Pot.ArrayBufferoid.bufferToString(buffer);
+   *   Pot.debug(buffer);
+   *   // buffer:
+   *   //   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(s === string); // true
+   *
+   *
+   * @param  {String}             string  UTF-16 string.
+   * @return {Pot.ArrayBufferoid}         A new instance of
+   *                                       Pot.ArrayBufferoid that
+   *                                       UTF-8 ArrayBuffer.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  stringToBuffer : (function() {
+    /**@ignore*/
+    var add = function(b, c) {
+      if (c < 0x80) {
+        b[b.length++] = c;
+      } else if (c < 0x800) {
+        b[b.length++] = 0xC0 | ((c >>  6) & 0x1F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      } else if (c < 0x10000) {
+        b[b.length++] = 0xE0 | ((c >> 12) & 0x0F);
+        b[b.length++] = 0x80 | ((c >>  6) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      } else {
+        b[b.length++] = 0xF0 | ((c >> 18) & 0x0F);
+        b[b.length++] = 0x80 | ((c >> 12) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  6) & 0x3F);
+        b[b.length++] = 0x80 | ((c >>  0) & 0x3F);
+      }
+    };
+    return function(string) {
+      var buffer = new ArrayBufferoid(),
+          len, i, j, ch, c2,
+          s = stringify(string);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          ch = s.charCodeAt(i);
+          if (0xD800 <= ch && ch <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                ch = ((ch & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              }
+            }
+          }
+          add(buffer, ch);
+        }
+      }
+      return buffer;
+    };
+  }()),
+  /**
+   * Convert to UTF-16 string from UTF-8 ArrayBuffer.
+   *
+   *
+   * @example
+   *   var s = 'hogeほげ';
+   *   var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+   *   var string = Pot.ArrayBufferoid.bufferToString(buffer);
+   *   Pot.debug(buffer);
+   *   // buffer:
+   *   //   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(s === string); // true
+   *
+   *
+   * @param {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer UTF-8 ArrayBuffer.
+   * @param {String}                                      UTF-16 string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  bufferToString : function(buffer) {
+    var result = '', chars = [], i = 0, len,
+        n, c, c2, c3, c4, code, sc, array;
+    if (buffer && isArrayLike(buffer)) {
+      sc = fromUnicode;
+      array = arrayize(buffer);
+      len = array.length;
+      while (i < len) {
+        c = array[i++];
+        n = (c >> 4);
+        if (0 <= n && n <= 7) {
+          chars[chars.length] = sc(c);
+        } else if (12 <= n && n <= 13) {
+          c2 = array[i++];
+          chars[chars.length] = sc(((c & 0x1F) << 6) | (c2 & 0x3F));
+        } else if (n === 14) {
+          c2 = array[i++];
+          c3 = array[i++];
+          chars[chars.length] = sc(((c  & 0x0F) << 12) |
+                                   ((c2 & 0x3F) <<  6) |
+                                   ((c3 & 0x3F) <<  0));
+        } else if (i + 2 < len) {
+          c2 = array[i++];
+          c3 = array[i++];
+          c4 = array[i++];
+          code = (((c  & 0x07) << 18) |
+                  ((c2 & 0x3F) << 12) |
+                  ((c3 & 0x3F) <<  6) |
+                  ((c4 & 0x3F) <<  0));
+          if (code <= 0xFFFF) {
+            chars[chars.length] = sc(code);
+          } else {
+            chars[chars.length] = fromCharCode(
+              (code >> 10)   + 0xD7C0,
+              (code & 0x3FF) + 0xDC00
+            );
+          }
+        }
+      }
+      result = chars.join('');
+    }
+    return result;
+  }
+});
+
+/**
+ * @private
+ * @ignore
+ */
+function createArrayBuffer(type, args) {
+  var types = ArrayBufferoidTypes, len = args.length, val;
+  if (PotSystem.hasTypedArray) {
+    switch (true) {
+      case ((type & types.ArrayBuffer) === type):
+          return newTypedArray(Uint8Array, args).buffer;
+      case ((type & types.Uint8Array) === type):
+          return newTypedArray(Uint8Array, args);
+      case ((type & types.Uint16Array) === type):
+          return newTypedArray(Uint16Array, args);
+      case ((type & types.Uint32Array) === type):
+          return newTypedArray(Uint32Array, args);
+      case ((type & types.Int8Array) === type):
+          return newTypedArray(Int8Array, args);
+      case ((type & types.Int16Array) === type):
+          return newTypedArray(Int16Array, args);
+      case ((type & types.Int32Array) === type):
+          return newTypedArray(Int32Array, args);
+      case ((type & types.Float32Array) === type):
+          return newTypedArray(Float32Array, args);
+      case ((type & types.Float64Array) === type):
+          return newTypedArray(Float64Array, args);
+      case ((type & types.Uint8ClampedArray) === type):
+          if (PotSystem.hasUint8ClampedArray) {
+            return newTypedArray(Uint8ClampedArray, args);
+          }
+    }
+  }
+  if (len) {
+    if (len === 1) {
+      val = args[0];
+      if (isNumber(val)) {
+        return new Array(val);
+      } else if (isArrayLike(val)) {
+        return arrayize(val);
+      } else {
+        return [val];
+      }
+    } else {
+      return arrayize(args);
+    }
+  }
+  return [];
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function newTypedArray(co, args) {
+  var a, i, len;
+  switch (args.length) {
+    case 0:
+        return new co();
+    case 1:
+        return new co(args[0]);
+    case 2:
+        return new co(args[0], args[1]);
+    case 3:
+        return new co(args[0], args[1], args[2]);
+    default:
+        a = [];
+        len = args.length;
+        for (i = 0; i < len; i++) {
+          a[i] = 'a[' + i + ']';
+        }
+        return (new Function(
+          'a,c',
+          Pot.format('return new c(#1);', a.join(','))
+        ))(args, co);
+  }
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function bufferoidToArray(buffer, clear) {
+  var r = [], i = 0, len = buffer.size();
+  for (; i < len; i++) {
+    r[i] = buffer[i];
+    if (clear) {
+      delete buffer[i];
+    }
+  }
+  if (clear) {
+    buffer.length = 0;
+  }
+  return r;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function arrayToBufferoid(buffer, array) {
+  var i = 0, len = array.length;
+  for (; i < len; i++) {
+    buffer[i] = array[i];
+  }
+  buffer.length = len;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function sizeOfBufferoid(buffer, all) {
+  var max = -1, keys, i = 0, k, p, len;
+  if (all) {
+    keys = [];
+    for (p in buffer) {
+      if (+p >= 0) {
+        keys[keys.length] = p;
+      }
+    }
+  } else {
+    keys = Pot.keys(buffer);
+  }
+  len = keys.length;
+  for (; i < len; i++) {
+    k = +keys[i];
+    if (k > max) {
+      max = k;
+    }
+  }
+  if (max >= 0) {
+    max++;
+  } else {
+    max = 0;
+  }
+  buffer.length = max;
+  return max;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function parseArguments(buffer, args) {
+  var argn = args.length, val, i, len, a;
+  switch (argn) {
+    case 0:
+        buffer.length = 0;
+        break;
+    case 1:
+        val = args[0];
+        if (!val) {
+          buffer.length = 0;
+        } else if (isNumber(val)) {
+          len = val;
+          for (i = 0; i < len; i++) {
+            buffer[i] = void 0;
+          }
+          buffer.length = len;
+        } else if (isArrayLike(val)) {
+          
+          if (isTypedArray(val)) {
+            if (isArrayBuffer(val) &&
+                val.byteLength != null && val[0] === void 0) {
+              a = new Uint8Array(val);
+            } else {
+              a = val;
+            }
+          } else {
+            a = arrayize(val);
+          }
+          len = a.length;
+          for (i = 0; i < len; i++) {
+            buffer[i] = a[i];
+          }
+          buffer.length = len;
+        } else {
+          buffer[0] = val;
+          buffer.length = 1;
+        }
+        break;
+    default:
+        len = args.length;
+        for (i = 0; i < len; i++) {
+          buffer[i] = args[i];
+        }
+        buffer.length = len;
+  }
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function getUint8EndianizeArray(buffer, byteOffset, size, littleEndian) {
+  var r = [], i = 0;
+  for (; i < size; i++) {
+    r[i] = buffer.getUint8(
+      endianize(buffer, byteOffset, i, size, littleEndian)
+    );
+  }
+  return r;
+}
+
+/**
+ * @private
+ * @ignore
+ */
+function endianize(buffer, byteOffset, pos, size, littleEndian) {
+  var le = (littleEndian == null) ? true : littleEndian;
+  if (byteOffset != null) {
+    buffer.offset = (byteOffset - 0) || 0;
+  }
+  return buffer.offset + (le ? size - pos - 1 : pos);
+}
+
+}());
+
+//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // Definition of Web Worker.
 (function() {
 var WorkerServer,
@@ -16516,27 +18095,37 @@ update(Pot.Crypt, {
    * We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
    *
    *
-   * @param  {String|*}  string   A string.
-   * @return {Number}             Hash value for `string`,
-   *                                between 0 (inclusive)
-   *                                 and 2^32 (exclusive).
-   *                              The empty string returns 0.
+   * @example
+   *   Pot.debug( Pot.hashCode('abc') ); // 96354
+   *   Pot.debug( Pot.hashCode([0x61, 0x62, 0x63]) ); // 96354
+   *
+   *
+   * @param  {String|Array|*}  data   A target data.
+   * @return {Number}                 Hash value for `string`,
+   *                                    between 0 (inclusive)
+   *                                    and 2^32 (exclusive).
+   *                                  The empty string returns 0.
    * @based goog.string.hashCode
    * @type Function
    * @function
    * @public
    * @static
    */
-  hashCode : function(string) {
-    var result = 0, s, i, len, max = 0x100000000; // 2^32
-    if (string == null) {
-      s = String(string);
+  hashCode : function(data) {
+    var result = 0, s, i, len,
+        max = 0x100000000, // 2^32
+        arrayLike = false;
+    if (data == null) {
+      s = String(data);
+    } else if (isArrayLike(data)) {
+      s = arrayize(data);
+      arrayLike = true;
     } else {
-      s = string.toString ? string.toString() : String(string);
+      s = data.toString ? data.toString() : String(data);
     }
     len = s.length;
     for (i = 0; i < len; ++i) {
-      result = 31 * result + s.charCodeAt(i);
+      result = 31 * result + (arrayLike ? s[i] : s.charCodeAt(i));
       result %= max;
     }
     return result;
@@ -16553,8 +18142,8 @@ update(Pot.Crypt, {
    *   // @results '1f3870be274f6c49b3e31a0c6728957f'
    *
    *
-   * @param  {String}  string  The target string.
-   * @return {String}          The result string.
+   * @param  {String|Array}  data  The target data.
+   * @return {String}              The result string.
    * @type  Function
    * @function
    * @static
@@ -16615,7 +18204,7 @@ update(Pot.Crypt, {
       return au(rl(a, s), b);
     }
     /**@ignore*/
-    function convertToWordArray(s) {
+    function convertToWordArray(s, arrayLike) {
       var wc, ml = s.length, t1 = ml + 8,
           t2 = (t1 - (t1 % 64)) / 64,
           nw = (t2 + 1) * 16,
@@ -16624,7 +18213,7 @@ update(Pot.Crypt, {
       while (bc < ml) {
         wc = (bc - (bc % 4)) / 4;
         bp = (bc % 4) * 8;
-        wa[wc] = (wa[wc] | (s.charCodeAt(bc) << bp));
+        wa[wc] = (wa[wc] | ((arrayLike ? s[bc] : s.charCodeAt(bc)) << bp));
         bc++;
       }
       wc = (bc - (bc % 4)) / 4;
@@ -16657,8 +18246,6 @@ update(Pot.Crypt, {
       S12 = 12, S13 = 17, S14 = 22, S21 = 5,  S22 = 9,
       S23 = 14, S24 = 20, S31 = 4,  S32 = 11, S33 = 16,
       S34 = 23, S41 = 6,  S42 = 10, S43 = 15, S44 = 21,
-      x = convertToWordArray(Pot.UTF8.encode(stringify(s, true))),
-      xl = x.length,
       a = 0x67452301,
       b = 0xEFCDAB89,
       c = 0x98BADCFE,
@@ -16739,7 +18326,14 @@ update(Pot.Crypt, {
         b = au(b, BB);
         c = au(c, CC);
         d = au(d, DD);
-      };
+      },
+      x, xl;
+      if (isArrayLike(s)) {
+        x = convertToWordArray(arrayize(s), true);
+      } else {
+        x = convertToWordArray(Pot.UTF8.encode(stringify(s, true)));
+      }
+      xl = x.length;
       return {
         /**@ignore*/
         sync : function() {
@@ -16765,8 +18359,8 @@ update(Pot.Crypt, {
       };
     }
     /**@ignore*/
-    return update(function(string) {
-      return calc(string).sync();
+    return update(function(data) {
+      return calc(data).sync();
     }, {
       /**
        * @lends Pot.Crypt.md5
@@ -16785,7 +18379,7 @@ update(Pot.Crypt, {
        *   });
        *
        *
-       * @param  {String}        string  The target string.
+       * @param  {String|Array}   data   The target data.
        * @return {Pot.Deferred}          Return new instance of Pot.Deferred
        *                                   with a result string.
        * @type  Function
@@ -16802,8 +18396,8 @@ update(Pot.Crypt, {
        * @property {Function} ninja  Run fastest speed.
        */
       deferred : PotInternal.defineDeferrater(function(speed) {
-        return function(string) {
-          return calc(string).async(speed);
+        return function(data) {
+          return calc(data).async(speed);
         };
       })
     });
@@ -16820,8 +18414,8 @@ update(Pot.Crypt, {
    *   // @results  -821904548
    *
    *
-   * @param  {String}  string   Data.
-   * @return {Number}           CRC checksum.
+   * @param  {String|Array}  data   Data.
+   * @return {Number}               CRC checksum.
    * @type  Function
    * @function
    * @static
@@ -16874,13 +18468,18 @@ update(Pot.Crypt, {
       0xB40BBE37,0xC30C8EA1,0x5A05DF1B,0x2D02EF8D
     ];
     /**@ignore*/
-    return function(string) {
-      var s, crc = 0, i, n, len;
-      s = Pot.UTF8.encode(stringify(string, true));
+    return function(data) {
+      var s, crc = 0, i, n, len, arrayLike = false;
+      if (isArrayLike(data)) {
+        s = arrayize(data);
+        arrayLike = true;
+      } else {
+        s = Pot.UTF8.encode(stringify(data, true));
+      }
       len = s.length;
       crc = crc ^ -1;
       for (i = 0; i < len; i++) {
-        n = (crc ^ s.charCodeAt(i)) & 0xFF;
+        n = (crc ^ (arrayLike ? s[i] : s.charCodeAt(i))) & 0xFF;
         crc = (crc >>> 8) ^ CRC32MAPS[n];
       }
       return crc ^ -1;
@@ -16901,8 +18500,8 @@ update(Pot.Crypt, {
    *   // @results 'd0be2dc421be4fcd0172e5afceea3970e2f3d940'
    *
    *
-   * @param  {String}  string  The input string.
-   * @return {String}          Returns the sha1 hash as a string.
+   * @param  {String|Array}  data  The input data.
+   * @return {String}              Returns the sha1 hash as a string.
    * @type  Function
    * @function
    * @static
@@ -16928,7 +18527,7 @@ update(Pot.Crypt, {
       return (hex(a) + hex(b) + hex(c) + hex(d) + hex(e)).toLowerCase();
     }
     /**@ignore*/
-    function calc(string) {
+    function calc(data) {
       var
       bs, i, j,
       A, B, C, D, E, W = new Array(80),
@@ -16939,8 +18538,6 @@ update(Pot.Crypt, {
       H4 = 0xC3D2E1F0,
       wa = [],
       wal,
-      s = Pot.UTF8.encode(stringify(string, true)),
-      sl = s.length,
       tp,
       /**@ignore*/
       calculate = function() {
@@ -16997,12 +18594,24 @@ update(Pot.Crypt, {
         H2 = (H2 + C) & 0x0FFFFFFFF;
         H3 = (H3 + D) & 0x0FFFFFFFF;
         H4 = (H4 + E) & 0x0FFFFFFFF;
-      };
+      },
+      /**@ignore*/
+      codeAt = function(idx) {
+        return arrayLike ? s[idx] : s.charCodeAt(idx);
+      },
+      s, sl, arrayLike = false;
+      if (isArrayLike(data)) {
+        s = arrayize(data);
+        arrayLike = true;
+      } else {
+        s = Pot.UTF8.encode(stringify(data, true));
+      }
+      sl = s.length;
       for (i = 0; i < sl - 3; i += 4) {
-        j = s.charCodeAt(i)     << 24 |
-            s.charCodeAt(i + 1) << 16 |
-            s.charCodeAt(i + 2) <<  8 |
-            s.charCodeAt(i + 3);
+        j = codeAt(i)     << 24 |
+            codeAt(i + 1) << 16 |
+            codeAt(i + 2) <<  8 |
+            codeAt(i + 3);
         wa[wa.length] = j;
       }
       switch (sl % 4) {
@@ -17010,16 +18619,16 @@ update(Pot.Crypt, {
             i = 0x080000000;
             break;
         case 1:
-            i = s.charCodeAt(sl - 1) << 24 | 0x0800000;
+            i = codeAt(sl - 1) << 24 | 0x0800000;
             break;
         case 2:
-            i = s.charCodeAt(sl - 2) << 24 |
-                s.charCodeAt(sl - 1) << 16 | 0x08000;
+            i = codeAt(sl - 2) << 24 |
+                codeAt(sl - 1) << 16 | 0x08000;
             break;
         case 3:
-            i = s.charCodeAt(sl - 3) << 24 |
-                s.charCodeAt(sl - 2) << 16 |
-                s.charCodeAt(sl - 1) <<  8 | 0x80;
+            i = codeAt(sl - 3) << 24 |
+                codeAt(sl - 2) << 16 |
+                codeAt(sl - 1) <<  8 | 0x80;
       }
       wa[wa.length] = i;
       while ((wa.length % 16) != 14) {
@@ -17053,8 +18662,8 @@ update(Pot.Crypt, {
       };
     }
     /**@ignore*/
-    return update(function(string) {
-      return calc(string).sync();
+    return update(function(data) {
+      return calc(data).sync();
     }, {
       /**
        * @lends Pot.Crypt.sha1
@@ -17073,7 +18682,7 @@ update(Pot.Crypt, {
        *   });
        *
        *
-       * @param  {String}        string  The input string.
+       * @param  {String|Array}   data   The input data.
        * @return {Pot.Deferred}          Returns new instance of Pot.Deferred
        *                                   with the sha1 hash as a string.
        * @type  Function
@@ -17090,8 +18699,8 @@ update(Pot.Crypt, {
        * @property {Function} ninja  Run fastest speed.
        */
       deferred : PotInternal.defineDeferrater(function(speed) {
-        return function(string) {
-          return calc(string).async(speed);
+        return function(data) {
+          return calc(data).async(speed);
         };
       })
     });
@@ -19855,20 +21464,31 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    */
   defaultOptions : {
-    onShow        : null,
-    onHide        : null,
-    onDrop        : null,
-    onLoadImage   : null,
-    onLoadText    : null,
-    onLoadUnknown : null,
-    onLoadEnd     : null
+    onShow         : null,
+    onHide         : null,
+    onDrop         : null,
+    onLoadImage    : null,
+    onLoadText     : null,
+    onLoadUnknown  : null,
+    onLoadEnd      : null,
+    onProgress     : null,
+    onProgressFile : null,
+    // readAs:
+    //  - 'text'
+    //  - 'binary'
+    //  - 'arraybuffer'
+    //  - 'datauri'
+    //  or null (auto)
+    readAs         : null,
+    encoding       : null
   },
   /**
-   * Text encoding. (default = 'UTF-8')
+   * Text encoding.
    *
    * @type  String
+   * @ignore
    */
-  encoding : 'UTF-8',
+  encoding : null,
   /**
    * @ignore
    * @private
@@ -19910,6 +21530,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     if (this.options.encoding) {
       this.encoding = this.options.encoding;
     }
+    this.assignReadType();
     if (this.target) {
       this.initEvents();
     }
@@ -19936,43 +21557,89 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     var that = this, target = this.target, html,
         cache = this.handleCache, op = this.options, ps = Signal;
     cache[cache.length] = ps.attach(target, 'drop', function(ev) {
-      var files, reader, i = 0;
-      that.isShow = false;
-      files = ev.dataTransfer && ev.dataTransfer.files;
-      if (files) {
-        if (op.onDrop) {
-          op.onDrop.call(that, files);
-        }
-        reader = new FileReader();
-        /**@ignore*/
-        reader.onloadend = function(evt) {
-          i--;
-          if (evt && evt.target && evt.target.result != null) {
-            that.loadedFiles.push(evt.target.result);
-            if (i <= 0) {
-              if (op.onLoadEnd) {
-                op.onLoadEnd.call(that, arrayize(that.loadedFiles));
-              }
-            }
-          }
-        };
-        each(files, function(file) {
-          var name, size, type;
-          if (file) {
-            i++;
-            type = file.type;
-            size = file.size;
-            name = file.name;
-            reader.readAsDataURL(file);
-            if (that.isImageFile(type)) {
-              that.loadAsImage(file, name, size, type);
-            } else if (that.isTextFile(type)) {
-              that.loadAsText(file, name, size, type);
+      var files, reader, i = 0, total, fileList,
+          deferreds = {
+            seek   : new Deferred(),
+            files  : [],
+            steps  : [],
+            ends   : [true],
+            done   : false
+          },
+          /**@ignore*/
+          pushFiles = function(evt) {
+            if (evt && evt.target && evt.target.result != null) {
+              that.loadedFiles.push(evt.target.result);
+              return true;
             } else {
-              that.loadAsUnknown(file, name, size, type);
+              return false;
             }
+          };
+      that.isShow = false;
+      fileList = ev.dataTransfer && ev.dataTransfer.files;
+      if (fileList) {
+        total = 0;
+        files = [];
+        each(fileList, function(file) {
+          if (file) {
+            files[total++] = file;
           }
         });
+        if (op.onDrop) {
+          op.onDrop.call(that, files, total);
+        }
+        if (PotSystem.hasFileReader) {
+          reader = new FileReader();
+          /**@ignore*/
+          reader.onloadend = function(evt) {
+            if (pushFiles(evt)) {
+              if (deferreds.files[i] && !deferreds.ends[i]) {
+                deferreds.files[i].begin();
+              }
+            }
+          };
+          Deferred.forEach(files, function(file) {
+            if (file) {
+              deferreds.seek.then(function() {
+                var fileinfo = update({}, file, {index : i++});
+                return Deferred.till(function() {
+                  return !Pot.some(deferreds.ends, function(end) {
+                    return end === false;
+                  });
+                }).then(function() {
+                  deferreds.ends[i] = false;
+                  deferreds.steps[i] = new Deferred();
+                  deferreds.files[i] = new Deferred().then(function() {
+                    if (that.isImageFile(fileinfo.type)) {
+                      that.loadAsImage(deferreds, i, total, file, fileinfo);
+                    } else if (that.isTextFile(fileinfo.type)) {
+                      that.loadAsText(deferreds, i, total, file, fileinfo);
+                    } else {
+                      that.loadAsUnknown(deferreds, i, total, file, fileinfo);
+                    }
+                    return deferreds.steps[i];
+                  });
+                  that.readFile(reader, file);
+                  return deferreds.files[i];
+                });
+              });
+            }
+          }).then(function() {
+            deferreds.seek.then(function() {
+              var done = Pot.every(deferreds.ends, function(end) {
+                return end === true;
+              });
+              if (done && !deferreds.done) {
+                deferreds.done = true;
+                if (op.onProgress) {
+                  that.updateProgressEnd();
+                }
+                if (op.onLoadEnd) {
+                  op.onLoadEnd.call(that, arrayize(that.loadedFiles));
+                }
+              }
+            }).begin();
+          });
+        }
       }
     });
     cache[cache.length] = ps.attach(target, 'dragenter', function(ev) {
@@ -20042,6 +21709,59 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
+  readFile : function(reader, file, isText) {
+    switch (this.options.readAs) {
+      case 'text':
+          if (this.encoding) {
+            reader.readAsText(file, this.encoding);
+          } else {
+            reader.readAsText(file);
+          }
+          break;
+      case 'binary':
+          reader.readAsBinaryString(file);
+          break;
+      case 'arraybuffer':
+          reader.readAsArrayBuffer(file);
+          break;
+      case 'datauri':
+          reader.readAsDataURL(file);
+          break;
+      default:
+          if (isText) {
+            if (this.encoding) {
+              reader.readAsText(file, this.encoding);
+            } else {
+              reader.readAsText(file);
+            }
+          } else {
+            reader.readAsDataURL(file);
+          }
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  assignReadType : function() {
+    var res, type = stringify(this.options.readAs).toLowerCase();
+    if (~type.indexOf('text')) {
+      res = 'text';
+    } else if (~type.indexOf('bin')) {
+      res = 'binary';
+    } else if (~type.indexOf('arr') || ~type.indexOf('buf')) {
+      res = 'arraybuffer';
+    } else if (~type.indexOf('data') || ~type.indexOf('ur')) {
+      res = 'datauri';
+    } else {
+      res = null;
+    }
+    this.options.readAs = res;
+  },
+  /**
+   * @private
+   * @ignore
+   */
   isImageFile : function(type) {
     return /image/i.test(type);
   },
@@ -20050,7 +21770,7 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @ignore
    */
   isTextFile : function(type) {
-    return !/image|audio|video|zip|compress/i.test(type);
+    return !/image|audio|video|zip|compress|stream/i.test(type);
   },
   /**
    * Upload the dropped files with specified options.
@@ -20155,58 +21875,166 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
    * @private
    * @ignore
    */
-  loadAsImage : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadImage;
+  loadAsImage : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadImage;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsText : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadText;
+  loadAsText : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadText;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsText(file, this.encoding);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file, true);
   },
   /**
    * @private
    * @ignore
    */
-  loadAsUnknown : function(file, name, size, type) {
-    var that = this, reader = new FileReader(),
-        callback = this.options.onLoadUnknown;
+  loadAsUnknown : function(deferreds, i, total, file, fileinfo) {
+    var that = this,
+        op = this.options,
+        reader = new FileReader(),
+        callback = op.onLoadUnknown;
+    if (op.onProgressFile) {
+      /**@ignore*/
+      reader.onprogress = function(ev) {
+        that.updateProgressFile(ev, fileinfo, total);
+      };
+    }
     /**@ignore*/
     reader.onload = function(ev) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].begin();
+      if (op.onProgressFile) {
+        that.updateProgressFileEnd(fileinfo);
+      }
       if (callback) {
         callback.call(
           that,
           ev && ev.target && ev.target.result,
-          name, size, type
+          fileinfo
         );
       }
     };
-    reader.readAsDataURL(file);
+    /**@ignore*/
+    reader.onerror = function(err) {
+      deferreds.ends[i] = true;
+      deferreds.steps[i].raise(err);
+    };
+    this.readFile(reader, file);
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgress : function(index, total) {
+    var per, callback = this.options.onProgress;
+    if (callback) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((index / total) * 100)
+              )
+      );
+      callback.call(this, per);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressEnd : function() {
+    var callback = this.options.onProgress;
+    if (callback) {
+      callback.call(this, 100);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFile : function(evt, fileinfo, total) {
+    var per, op = this.options, callback = op.onProgressFile;
+    if (callback &&
+        evt && evt.lengthComputable && evt.loaded != null) {
+      per = Math.max(0,
+              Math.min(100,
+                Math.round((evt.loaded / evt.total) * 100)
+              )
+      );
+      callback.call(this, per, fileinfo);
+    }
+    if (op.onProgress) {
+      this.updateProgress(fileinfo.index, total);
+    }
+  },
+  /**
+   * @private
+   * @ignore
+   */
+  updateProgressFileEnd : function(fileinfo) {
+    var callback = this.options.onProgressFile;
+    if (callback) {
+      callback.call(this, 100, fileinfo);
+    }
   }
 });
 DropFile.fn.init.prototype = DropFile.fn;
@@ -22161,7 +23989,6 @@ update(Pot.Collection, {
           } else {
             result = args;
           }
-          break;
     }
     return result;
   },
@@ -22393,8 +24220,18 @@ update(Pot.Collection, {
    *   // @results ['a1', 'a2', 'a10', 'a12', 'a100']
    *
    *
-   * @param  {Array}  array  A target array.
-   * @return {Array}         An array of result `array`.
+   * @example
+   *   var arr = [{v: 'a10'}, {v: 'a2'}, {v: 'a100'}, {v: 'a1'}];
+   *   debug(alphanumSort(arr, function(item) {
+   *     // Specify variable (property name).
+   *     return item.v;
+   *   }));
+   *   // @results [{v: 'a1'}, {v: 'a2'}, {v: 'a10'}, {v: 'a100'}]
+   *
+   *
+   * @param  {Array}     array  A target array.
+   * @param  {Function} (func)  Callback function if need specify arguments.
+   * @return {Array}            An array of result `array`.
    * @type  Function
    * @function
    * @static
@@ -22432,9 +24269,15 @@ update(Pot.Collection, {
       }
       return aa.length - bb.length;
     }
-    return function(array) {
+    return function(array, func) {
       if (isArray(array)) {
-        array.sort(alphanumCase);
+        if (isFunction(func)) {
+          array.sort(function(a, b) {
+            return alphanumCase(func(a), func(b));
+          });
+        } else {
+          array.sort(alphanumCase);
+        }
       }
       return array;
     };
@@ -26559,6 +28402,22 @@ update(Pot.UTF8, {
   /**
    * Convert to UTF-8 string from UTF-16 string.
    *
+   *
+   * @example
+   *   var string = 'hogeほげ';
+   *   var encoded = Pot.utf8Encode(string);
+   *   var decoded = Pot.utf8Decode(encoded);
+   *   var toCharCode = function(s) {
+   *     return Pot.map(s.split(''), function(c) {
+   *       return c.charCodeAt(0);
+   *     });
+   *   };
+   *   Pot.debug(toCharCode(encoded));
+   *   // [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(decoded); // 'hogeほげ'
+   *   Pot.debug(decoded === string); // true
+   *
+   *
    * @param  {String}  string  UTF-16 string.
    * @return {String}          UTF-8 string.
    * @type  Function
@@ -26566,31 +28425,68 @@ update(Pot.UTF8, {
    * @static
    * @public
    */
-  encode : function(string) {
-    var result = '', chars = [], len, i, c, s, sc;
-    s = stringify(string);
-    if (s) {
-      sc = fromUnicode;
-      len = s.length;
-      for (i = 0; i < len; i++) {
-        c = s.charCodeAt(i);
-        if (c < 0x80) {
-          chars[chars.length] = sc(c);
-        } else if (c > 0x7FF) {
-          chars[chars.length] = sc(0xE0 | ((c >> 12) & 0x0F)) +
-                                sc(0x80 | ((c >>  6) & 0x3F)) +
-                                sc(0x80 | ((c >>  0) & 0x3F));
-        } else {
-          chars[chars.length] = sc(0xC0 | ((c >>  6) & 0x1F)) +
-                                sc(0x80 | ((c >>  0) & 0x3F));
+  encode : (function() {
+    var sc = fromUnicode,
+        /**@ignore*/
+        add = function(b, c) {
+          var l = b.length;
+          if (c < 0x80) {
+            b[l] = sc(c);
+          } else if (c < 0x800) {
+            b[l] = sc(0xC0 | ((c >>  6) & 0x1F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          } else if (c < 0x10000) {
+            b[l] = sc(0xE0 | ((c >> 12) & 0x0F)) +
+                   sc(0x80 | ((c >>  6) & 0x3F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          } else {
+            b[l] = sc(0xF0 | ((c >> 18) & 0x0F)) +
+                   sc(0x80 | ((c >> 12) & 0x3F)) +
+                   sc(0x80 | ((c >>  6) & 0x3F)) +
+                   sc(0x80 | ((c >>  0) & 0x3F));
+          }
+        };
+    return function(string) {
+      var chars = [],  len, i, j, ch, c2,
+          s = stringify(string);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          ch = s.charCodeAt(i);
+          if (0xD800 <= ch && ch <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                ch = ((ch & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              }
+            }
+          }
+          add(chars, ch);
         }
       }
-      result = chars.join('');
-    }
-    return result;
-  },
+      return chars.join('');
+    };
+  }()),
   /**
    * Convert to UTF-16 string from UTF-8 string.
+   *
+   *
+   * @example
+   *   var string = 'hogeほげ';
+   *   var encoded = Pot.utf8Encode(string);
+   *   var decoded = Pot.utf8Decode(encoded);
+   *   var toCharCode = function(s) {
+   *     return Pot.map(s.split(''), function(c) {
+   *       return c.charCodeAt(0);
+   *     });
+   *   };
+   *   Pot.debug(toCharCode(encoded));
+   *   // [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+   *   Pot.debug(decoded); // 'hogeほげ'
+   *   Pot.debug(decoded === string); // true
+   *
    *
    * @param  {String}  string  UTF-8 string.
    * @return {String}          UTF-16 string.
@@ -26600,11 +28496,10 @@ update(Pot.UTF8, {
    * @public
    */
   decode : function(string) {
-    var result = '', chars = [], i, len, s, n, c, c2, c3, sc;
-    s = stringify(string);
+    var result = '', chars = [], i = 0, len,
+        n, c, c2, c3, c4, code, sc = fromUnicode,
+        s = stringify(string);
     if (s) {
-      sc = fromUnicode;
-      i = 0;
       len = s.length;
       while (i < len) {
         c = s.charCodeAt(i++);
@@ -26626,6 +28521,23 @@ update(Pot.UTF8, {
           chars[chars.length] = sc(((c  & 0x0F) << 12) |
                                    ((c2 & 0x3F) <<  6) |
                                    ((c3 & 0x3F) <<  0));
+        } else if (i + 2 < len) {
+          // 1111 0xxx ...
+          c2 = s.charCodeAt(i++);
+          c3 = s.charCodeAt(i++);
+          c4 = s.charCodeAt(i++);
+          code = (((c  & 0x07) << 18) |
+                  ((c2 & 0x3F) << 12) |
+                  ((c3 & 0x3F) <<  6) |
+                  ((c4 & 0x3F) <<  0));
+          if (code <= 0xFFFF) {
+            chars[chars.length] = sc(code);
+          } else {
+            chars[chars.length] = fromCharCode(
+              (code >> 10)   + 0xD7C0,
+              (code & 0x3FF) + 0xDC00
+            );
+          }
         }
       }
       result = chars.join('');
@@ -26653,34 +28565,174 @@ update(Pot.UTF8, {
    * @static
    * @public
    */
-  byteOf : function(string) {
-    var size = 0, s, i, c;
-    s = stringify(string, true);
-    if (s) {
-      i = s.length;
-      while (--i >= 0) {
-        c = s.charCodeAt(i);
-        if (c < 0x80) {
-          size++;
-        } else if (c < 0x800 ||
-                  // We ignore UTF-8 Surrogate Pair, for the binary data.
-                  (c > 0xD7FF && c < 0xE000)
-        ) {
-          size += 2;
-        } else {
-          size += 3;
+  byteOf : (function() {
+    var s, i, len,
+        /**@ignore*/
+        toCharCode = function() {
+          var c1 = s.charCodeAt(i), c2, j;
+          if (0xD800 <= c1 && c1 <= 0xD8FF) {
+            j = i + 1;
+            if (j < len) {
+              c2 = s.charCodeAt(j);
+              if (0xDC00 <= c2 && c2 <= 0xDFFF) {
+                c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+                i = j;
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          }
+          return c1;
+        };
+    return function(string) {
+      var size = 0, c;
+      s = stringify(string, true);
+      if (s) {
+        len = s.length;
+        for (i = 0; i < len; i++) {
+          c = toCharCode();
+          if (c !== false) {
+            if (c < 0x80) {
+              size += 1;
+            } else if (c < 0x800) {
+              size += 2;
+            } else if (c < 0x10000) {
+              size += 3;
+            } else if (c < 0x200000) {
+              size += 4;
+            } else if (c < 0x4000000) {
+              size += 5;
+            } else {
+              size += 6;
+            }
+          }
         }
       }
-    }
-    return size;
-  }
+      s = i = len = null;
+      return size;
+    };
+  }()),
+  /**
+   * Convert encoding to Unicode string.
+   * This function requires BlobBuilder and FileReader API.
+   * If environment not supported HTML5 API, it will be raised by Deferred.
+   *
+   * @example
+   *   // 'こんにちは。ほげほげ'
+   *   var unicode = [
+   *     12371, 12435, 12395, 12385, 12399, 12290,
+   *     12411, 12370, 12411, 12370
+   *   ];
+   *   // Shift_JIS: 'こんにちは。ほげほげ'
+   *   var sjis = [
+   *     130, 177, 130, 241, 130, 201,
+   *     130, 191, 130, 205, 129, 66,
+   *     130, 217, 130, 176, 130, 217,
+   *     130, 176
+   *   ];
+   *   // EUC-JP: 'こんにちは。ほげほげ'
+   *   var eucjp = [
+   *     164, 179, 164, 243, 164, 203,
+   *     164, 193, 164, 207, 161, 163,
+   *     164, 219, 164, 178, 164, 219,
+   *     164, 178
+   *   ];
+   *   // UTF-8: 'こんにちは。ほげほげ'
+   *   var utf8 = [
+   *     227, 129, 147, 227, 130, 147,
+   *     227, 129, 171, 227, 129, 161,
+   *     227, 129, 175, 227, 128, 130,
+   *     227, 129, 187, 227, 129, 146,
+   *     227, 129, 187, 227, 129, 146
+   *   ];
+   *   Pot.convertEncodingToUnicode(sjis, 'Shift_JIS').then(function(res) {
+   *     Pot.debug('SJIS to Unicode:');
+   *     Pot.debug(res); // 'こんにちは。ほげほげ'
+   *   }).then(function() {
+   *     return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP').
+   *                                                     then(function(res) {
+   *       Pot.debug('EUC-JP to Unicode:');
+   *       Pot.debug(res); // 'こんにちは。ほげほげ'
+   *     });
+   *   }).then(function() {
+   *     return Pot.convertEncodingToUnicode(utf8, 'UTF-8').
+   *                                                    then(function(res) {
+   *       Pot.debug('UTF-8 to Unicode:');
+   *       Pot.debug(res); // 'こんにちは。ほげほげ'
+   *     });
+   *   });
+   *
+   *
+   * @param  {TypedArray|Array|Blob}  data   The target data.
+   * @param  {(String)}              (from)  (optional) Character
+   *                                           encoding from.
+   * @return {Pot.Deferred}                  A new instance of
+   *                                           Pot.Deferred that has
+   *                                           Unicode string.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  convertEncodingToUnicode : (function() {
+    var isAuto = /^\s*auto\s*$/i;
+    return function(data, from) {
+      var d, bb, fl, b, dfd;
+      if (isString(data)) {
+        d = ArrayBufferoid.binaryToBuffer.deferred(data);
+      } else {
+        d = Deferred.succeed(data);
+      }
+      return d.then(function(res) {
+        dfd = new Deferred();
+        try {
+          bb = new PotSystem.BlobBuilder();
+          fl = new FileReader();
+          if (isArrayBufferoid(res)) {
+            bb.append(res.toArrayBuffer());
+          } else if (isArrayLike(res)) {
+            bb.append(new ArrayBufferoid(res).toArrayBuffer());
+          } else {
+            bb.append(res);
+          }
+          /**@ignore*/
+          fl.onload = function(ev) {
+            fl.onload = fl.onerror = PotNoop;
+            if (ev && ev.target) {
+              dfd.begin(ev.target.result);
+            } else {
+              dfd.raise(ev);
+            }
+          };
+          /**@ignore*/
+          fl.onerror = function(er) {
+            fl.onload = fl.onerror = PotNoop;
+            dfd.raise(er);
+          };
+          b = bb.getBlob('text/plain');
+          if (from == null || isAuto.test(from)) {
+            fl.readAsText(b);
+          } else {
+            //XXX: Assign the encoding names.
+            fl.readAsText(b, trim(from));
+          }
+        } catch (e) {
+          dfd.raise(e);
+        }
+        return dfd;
+      });
+    };
+  }())
 });
 
 // Update Pot object.
 Pot.update({
-  utf8Encode : Pot.UTF8.encode,
-  utf8Decode : Pot.UTF8.decode,
-  utf8ByteOf : Pot.UTF8.byteOf
+  utf8Encode               : Pot.UTF8.encode,
+  utf8Decode               : Pot.UTF8.decode,
+  utf8ByteOf               : Pot.UTF8.byteOf,
+  convertEncodingToUnicode : Pot.UTF8.convertEncodingToUnicode
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -26707,8 +28759,8 @@ Pot.update({
     var BASE64MAPS    = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '+/=',
         BASE64URLMAPS = UPPER_ALPHAS + LOWER_ALPHAS + DIGITS + '-_=',
         /**@ignore*/
-        Encoder = function(string, maps) {
-          return new Encoder.prototype.init(string, maps);
+        Encoder = function(data, maps) {
+          return new Encoder.prototype.init(data, maps);
         },
         /**@ignore*/
         Decoder = function(string, maps) {
@@ -26726,7 +28778,13 @@ Pot.update({
        * @ignore
        * @internal
        */
-      string : null,
+      data : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      raw : false,
       /**
        * @private
        * @ignore
@@ -26775,10 +28833,16 @@ Pot.update({
        * @private
        * @ignore
        */
-      init : function(string, maps) {
+      init : function(data, maps) {
         this.maps = maps;
-        this.string = stringify(string, true);
-        this.len = this.string.length;
+        if (isArrayLike(data)) {
+          this.data = arrayize(data);
+          this.raw = true;
+        } else {
+          this.data = stringify(data, true);
+          this.raw = false;
+        }
+        this.len = this.data.length;
         this.results = [];
         this.pos = -6;
         this.att = 0;
@@ -26792,9 +28856,11 @@ Pot.update({
        */
       execute : function() {
         var r = this.results, m = this.maps;
-        this.string = Pot.UTF8.encode(this.string);
-        if (this.string) {
-          this.len = this.string.length;
+        if (!this.raw) {
+          this.data = Pot.UTF8.encode(this.data);
+        }
+        if (this.data) {
+          this.len = this.data.length;
           while (this.index < this.len || this.pos > -6) {
             if (this.pos < 0) {
               this.peek();
@@ -26814,8 +28880,10 @@ Pot.update({
        */
       deferred : function(speed) {
         var that = this, r = this.results, m = this.maps;
-        this.string = Pot.UTF8.encode(this.string);
-        this.len = this.string.length;
+        if (!this.raw) {
+          this.data = Pot.UTF8.encode(this.data);
+        }
+        this.len = this.data.length;
         return Deferred.forEver[speed](function() {
           if (that.index < that.len || that.pos > -6) {
             if (that.pos < 0) {
@@ -26840,7 +28908,11 @@ Pot.update({
       peek : function() {
         var c;
         if (this.index < this.len) {
-          c = this.string.charCodeAt(this.index++);
+          if (this.raw) {
+            c = this.data[this.index++];
+          } else {
+            c = this.data.charCodeAt(this.index++);
+          }
           this.vol += 8;
         } else {
           c = 0;
@@ -26863,6 +28935,12 @@ Pot.update({
        * @internal
        */
       string : null,
+      /**
+       * @private
+       * @ignore
+       * @internal
+       */
+      asBuffer : false,
       /**
        * @private
        * @ignore
@@ -26907,12 +28985,26 @@ Pot.update({
        */
       init : function(string, maps) {
         this.maps = maps;
+        this.asBuffer = false;
         this.string = stringify(string, true);
+        this.assign();
         this.len = this.string.length;
         this.results = [];
         this.pos = -8;
         this.att = 0;
         return this;
+      },
+      /**
+       * @private
+       * @ignore
+       */
+      assign : function() {
+        var s = this.string;
+        if (~s.indexOf('-') || ~s.indexOf('_')) {
+          this.maps = BASE64URLMAPS;
+        } else {
+          this.maps = BASE64MAPS;
+        }
       },
       /**
        * @private
@@ -26934,6 +29026,23 @@ Pot.update({
        * @private
        * @ignore
        */
+      executeAsBuffer : function() {
+        var i, n = this.len, c, m = this.maps;
+        this.asBuffer = true;
+        if (n) {
+          for (i = 0; i < n; i++) {
+            c = m.indexOf(this.string.charAt(i));
+            if (~c) {
+              this.decode(c);
+            }
+          }
+        }
+        return new ArrayBufferoid(this.results);
+      },
+      /**
+       * @private
+       * @ignore
+       */
       deferred : function(speed) {
         var that = this, m = this.maps;
         return Deferred.repeat[speed](this.len, function(i) {
@@ -26949,6 +29058,22 @@ Pot.update({
        * @private
        * @ignore
        */
+      deferredAsBuffer : function(speed) {
+        var that = this, m = this.maps;
+        this.asBuffer = true;
+        return Deferred.repeat[speed](this.len, function(i) {
+          var c = m.indexOf(that.string.charAt(i));
+          if (~c) {
+            that.decode(c);
+          }
+        }).then(function() {
+          return new ArrayBufferoid(that.results);
+        });
+      },
+      /**
+       * @private
+       * @ignore
+       */
       decode : function(c) {
         var code, r = this.results;
         this.att = (this.att << 6) | (c & 63);
@@ -26956,7 +29081,7 @@ Pot.update({
         if (this.pos >= 0) {
           code = this.att >> this.pos & 0xFF;
           if (c !== 64) {
-            r[r.length] = fromUnicode(code);
+            r[r.length] = this.asBuffer ? code : fromUnicode(code);
           }
           this.att &= 63;
           this.pos -= 8;
@@ -26994,28 +29119,29 @@ Pot.update({
        *   //   decoded = にゃふん!
        *
        *
-       * @param  {String}  string   A target string.
-       * @return {String}           A base64 string.
+       * @param  {String|Array}  data   A target data.
+       * @return {String}               A base64 string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      encode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          try {
-            if (typeof btoa === 'undefined') {
-              throw false;
-            }
-            result = btoa(Pot.UTF8.encode(s));
-          } catch (e) {
-            try {
-              result = (new Encoder(s, BASE64MAPS)).execute();
-            } catch (e) {}
-          }
+      encode : update(function(data) {
+        var s;
+        if (!data) {
+          return '';
         }
-        return result;
+        if (isArrayLike(data)) {
+          s = arrayize(data);
+        } else {
+          s = stringify(data, true);
+          try {
+            if (typeof btoa !== 'undefined') {
+              return btoa(Pot.UTF8.encode(s));
+            }
+          } catch (e) {}
+        }
+        return new Encoder(s, BASE64MAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.encode
@@ -27055,10 +29181,10 @@ Pot.update({
          *   });
          *
          *
-         * @param  {String}        string   A target string.
-         * @return {Pot.Deferred}           Returns new instance of
-         *                                    Pot.Deferred with a
-         *                                    base64 string.
+         * @param  {String|Array}  data   A target data.
+         * @return {Pot.Deferred}         Returns new instance of
+         *                                  Pot.Deferred with a
+         *                                  base64 string.
          * @type  Function
          * @function
          * @static
@@ -27073,8 +29199,8 @@ Pot.update({
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(string) {
-            return (new Encoder(string, BASE64MAPS)).deferred(speed);
+          return function(data) {
+            return new Encoder(data, BASE64MAPS).deferred(speed);
           };
         })
       }),
@@ -27124,7 +29250,7 @@ Pot.update({
             result = Pot.UTF8.decode(atob(s));
           } catch (e) {
             try {
-              result = (new Decoder(s, BASE64MAPS)).execute();
+              result = new Decoder(s, BASE64MAPS).execute();
             } catch (e) {}
           }
         }
@@ -27133,6 +29259,44 @@ Pot.update({
         /**
          * @lends Pot.Base64.decode
          */
+        /**
+         * Decodes a string from base64 as ArrayBuffer.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   var buffer = Pot.base64Decode.asBuffer(b64string);
+         *   Pot.debug(buffer);
+         *   // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'Hello World.'
+         *
+         *
+         * @example
+         *   var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+         *   var buffer = Pot.base64Decode.asBuffer(base64String);
+         *   Pot.debug(buffer);
+         *   // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *   //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *   //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *   //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *   //  165, 239, 190, 159, 239, 189, 165]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *
+         *
+         * @param  {String}              string   A base64 string.
+         * @return {Pot.ArrayBufferoid}           A new instance of
+         *                                          Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         */
+        asBuffer : function(string) {
+          return new Decoder(string, BASE64MAPS).executeAsBuffer();
+        },
         /**
          * Decodes a string from base64 with Deferred.
          *
@@ -27186,7 +29350,61 @@ Pot.update({
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
-            return (new Decoder(string, BASE64MAPS)).deferred(speed);
+            return new Decoder(string, BASE64MAPS).deferred(speed);
+          };
+        }),
+        /**
+         * Decodes a string from base64 as ArrayBuffer with Deferred.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   Pot.base64Decode.deferredAsBuffer(b64string)
+         *                                    .then(function(buffer) {
+         *     Pot.debug(buffer);
+         *     // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *     // 'Hello World.'
+         *   });
+         *
+         *
+         * @example
+         *   var base64String = '776fK++9oToub++9pe++n++9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp/vvaU=';
+         *   Pot.base64Decode.deferredAsBuffer(base64String)
+         *                               .then(function(res) {
+         *     Pot.debug(res);
+         *     // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *     //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *     //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *     //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *     //  165, 239, 190, 159, 239, 189, 165]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(res));
+         *     // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a
+         *                                    new instance of
+         *                                    Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferredAsBuffer : PotInternal.defineDeferrater(function(speed) {
+          return function(string) {
+            return new Decoder(string, BASE64MAPS).deferredAsBuffer(speed);
           };
         })
       }),
@@ -27220,19 +29438,15 @@ Pot.update({
        *   //   decoded = ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･
        *
        *
-       * @param  {String}  string   A target string.
-       * @return {String}           A base64 string.
+       * @param  {String|Array}  data   A target data.
+       * @return {String}               A base64 string.
        * @type  Function
        * @function
        * @static
        * @public
        */
-      urlEncode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          result = (new Encoder(s, BASE64URLMAPS)).execute();
-        }
-        return result;
+      urlEncode : update(function(data) {
+        return new Encoder(data, BASE64URLMAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.urlEncode
@@ -27273,10 +29487,10 @@ Pot.update({
          *   });
          *
          *
-         * @param  {String}        string   A target string.
-         * @return {Pot.Deferred}           Returns new instance of
-         *                                    Pot.Deferred with a
-         *                                    base64 string.
+         * @param  {String|Array}  data   A target data.
+         * @return {Pot.Deferred}         Returns new instance of
+         *                                  Pot.Deferred with a
+         *                                  base64 string.
          * @type  Function
          * @function
          * @static
@@ -27291,8 +29505,8 @@ Pot.update({
          * @property {Function} ninja  Run fastest speed.
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
-          return function(string) {
-            return (new Encoder(string, BASE64URLMAPS)).deferred(speed);
+          return function(data) {
+            return new Encoder(data, BASE64URLMAPS).deferred(speed);
           };
         })
       }),
@@ -27334,15 +29548,49 @@ Pot.update({
        * @public
        */
       urlDecode : update(function(string) {
-        var result = '', s = stringify(string, true);
-        if (s) {
-          result = (new Decoder(s, BASE64URLMAPS)).execute();
-        }
-        return result;
+        return new Decoder(string, BASE64URLMAPS).execute();
       }, {
         /**
          * @lends Pot.Base64.urlDecode
          */
+        /**
+         * Decodes a string as ArrayBuffer from base64 for URL safely.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   var buffer = Pot.base64URLDecode.asBuffer(b64string);
+         *   Pot.debug(buffer);
+         *   // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'Hello World.'
+         *
+         *
+         * @example
+         *   var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+         *   var buffer = Pot.base64URLDecode.asBuffer(base64String);
+         *   Pot.debug(buffer);
+         *   // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *   //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *   //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *   //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *   //  165, 239, 190, 159, 239, 189, 165]
+         *   Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *   // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *
+         *
+         * @param  {String}              string   A base64 string.
+         * @return {Pot.ArrayBufferoid}           A new instance of
+         *                                          Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         */
+        asBuffer : function(string) {
+          return new Decoder(string, BASE64URLMAPS).executeAsBuffer();
+        },
         /**
          * Decodes a string from base64 for URL safely with Deferred.
          *
@@ -27397,7 +29645,61 @@ Pot.update({
          */
         deferred : PotInternal.defineDeferrater(function(speed) {
           return function(string) {
-            return (new Decoder(string, BASE64URLMAPS)).deferred(speed);
+            return new Decoder(string, BASE64URLMAPS).deferred(speed);
+          };
+        }),
+        /**
+         * Decodes a string as ArrayBuffer from base64 for
+         *   URL safely with Deferred.
+         *
+         *
+         * @example
+         *   var b64string = 'SGVsbG8gV29ybGQu';
+         *   Pot.base64URLDecode.deferredAsBuffer(b64string)
+         *                                    .then(function(buffer) {
+         *     Pot.debug(buffer);
+         *     // [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 46]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(buffer));
+         *     // 'Hello World.'
+         *   });
+         *
+         *
+         * @example
+         *   var base64String = '776fK--9oToub--9pe--n--9peKUo8Ko' +
+         *                      '77234pSjwqjvvbfimIbvvaXvvp_vvaU=';
+         *   Pot.base64URLDecode.deferredAsBuffer(base64String)
+         *                      .then(function(res) {
+         *     Pot.debug(res);
+         *     // [239, 190, 159,  43, 239, 189, 161,  58,  46, 111,
+         *     //  239, 189, 165, 239, 190, 159, 239, 189, 165, 226,
+         *     //  148, 163, 194, 168, 239, 189, 183, 226, 148, 163,
+         *     //  194, 168, 239, 189, 183, 226, 152, 134, 239, 189,
+         *     //  165, 239, 190, 159, 239, 189, 165]
+         *     Pot.debug(Pot.ArrayBufferoid.bufferToString(res));
+         *     // 'ﾟ+｡:.o･ﾟ･┣¨ｷ┣¨ｷ☆･ﾟ･'
+         *   });
+         *
+         *
+         * @param  {String}        string   A base64 string.
+         * @return {Pot.Deferred}           Returns new instance of
+         *                                    Pot.Deferred with a new
+         *                                    instance of Pot.ArrayBufferoid.
+         * @type  Function
+         * @function
+         * @static
+         * @public
+         *
+         * @property {Function} limp   Run with slowest speed.
+         * @property {Function} doze   Run with slower speed.
+         * @property {Function} slow   Run with slow speed.
+         * @property {Function} normal Run with default speed.
+         * @property {Function} fast   Run with fast speed.
+         * @property {Function} rapid  Run with faster speed.
+         * @property {Function} ninja  Run fastest speed.
+         */
+        deferredAsBuffer : PotInternal.defineDeferrater(function(speed) {
+          return function(string) {
+            return new Decoder(string, BASE64URLMAPS).deferredAsBuffer(speed);
           };
         })
       })
@@ -28756,6 +31058,7 @@ update(Pot.MimeType, {
     mxu  : 'video/vnd.mpegurl',
     m4u  : 'video/vnd.mpegurl',
     avi  : 'video/x-msvideo',
+    ogg  : 'application/ogg',
     // adobe
     pdf  : 'application/pdf',
     psd  : 'image/vnd.adobe.photoshop',
@@ -30675,6 +32978,43 @@ update(Pot.Text, {
     return result;
   },
   /**
+   * Convert to character code array from a string.
+   *
+   *
+   * @example
+   *   var string = 'foo bar ほげ';
+   *   var result = Pot.toCharCode(string);
+   *   Pot.debug(result);
+   *   // [102, 111, 111, 32, 98, 97, 114, 32, 12411, 12370]
+   *
+   *
+   * @example
+   *   var string = 'abc';
+   *   var result = Pot.toCharCode(string, function(code) {
+   *     return code.toString(16);
+   *   });
+   *   Pot.debug(result);
+   *   // ['61', '62', '63']
+   *
+   *
+   * @param  {String}    string     A target string.
+   * @param  {Function} (callback)  (Optional) A callback function for code.
+   * @return {Array} A result array.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  toCharCode : function(string, callback) {
+    return Pot.map(stringify(string).split(''), function(c) {
+      var code = c.charCodeAt(0);
+      if (callback) {
+        code = callback(code);
+      }
+      return code;
+    });
+  },
+  /**
    * 全角英数記号文字を半角英数記号文字に変換
    * Convert the ascii symbols and alphanumeric characters to
    *   the zenkaku symbols and alphanumeric characters.
@@ -31024,6 +33364,7 @@ Pot.update({
   stripTags      : Pot.Text.stripTags,
   truncate       : Pot.Text.truncate,
   truncateMiddle : Pot.Text.truncateMiddle,
+  toCharCode     : Pot.Text.toCharCode,
   toHankakuCase  : Pot.Text.toHankakuCase,
   toZenkakuCase  : Pot.Text.toZenkakuCase,
   toHanSpaceCase : Pot.Text.toHanSpaceCase,
@@ -35050,302 +37391,310 @@ update(PotInternal, {
    * @internal
    */
   PotExportProps : {
-    Pot                     : Pot,
-    update                  : update,
-    PATH_DELIMITER          : Pot.PATH_DELIMITER,
-    DIR_DELIMITER           : Pot.DIR_DELIMITER,
-    XML_NS_URI              : Pot.XML_NS_URI,
-    HTML_NS_URI             : Pot.HTML_NS_URI,
-    XHTML_NS_URI            : Pot.XHTML_NS_URI,
-    XLINK_NS_URI            : Pot.XLINK_NS_URI,
-    XSL_NS_URI              : Pot.XSL_NS_URI,
-    SVG_NS_URI              : Pot.SVG_NS_URI,
-    XUL_NS_URI              : Pot.XUL_NS_URI,
-    JS_VOID_URI             : Pot.JS_VOID_URI,
-    isBoolean               : Pot.isBoolean,
-    isNumber                : Pot.isNumber,
-    isString                : Pot.isString,
-    isFunction              : Pot.isFunction,
-    isArray                 : Pot.isArray,
-    isDate                  : Pot.isDate,
-    isRegExp                : Pot.isRegExp,
-    isObject                : Pot.isObject,
-    isError                 : Pot.isError,
-    typeOf                  : Pot.typeOf,
-    typeLikeOf              : Pot.typeLikeOf,
-    StopIteration           : Pot.StopIteration,
-    isStopIter              : Pot.isStopIter,
-    isIterable              : Pot.isIterable,
-    isScalar                : Pot.isScalar,
-    isArguments             : Pot.isArguments,
-    isArrayLike             : Pot.isArrayLike,
-    isPlainObject           : Pot.isPlainObject,
-    isEmpty                 : Pot.isEmpty,
-    isDeferred              : Pot.isDeferred,
-    isIter                  : Pot.isIter,
-    isWorkeroid             : Pot.isWorkeroid,
-    isHash                  : Pot.isHash,
-    isJSEscaped             : Pot.isJSEscaped,
-    isPercentEncoded        : Pot.isPercentEncoded,
-    isHTMLEscaped           : Pot.isHTMLEscaped,
-    isNumeric               : Pot.isNumeric,
-    isInt                   : Pot.isInt,
-    isNativeCode            : Pot.isNativeCode,
-    isBuiltinMethod         : Pot.isBuiltinMethod,
-    isWindow                : Pot.isWindow,
-    isDocument              : Pot.isDocument,
-    isElement               : Pot.isElement,
-    isNodeLike              : Pot.isNodeLike,
-    isNodeList              : Pot.isNodeList,
-    isDOMLike               : Pot.isDOMLike,
-    Cc                      : Pot.Cc,
-    Ci                      : Pot.Ci,
-    Cr                      : Pot.Cr,
-    Cu                      : Pot.Cu,
-    Deferred                : Pot.Deferred,
-    succeed                 : Pot.Deferred.succeed,
-    failure                 : Pot.Deferred.failure,
-    wait                    : Pot.Deferred.wait,
-    callLater               : Pot.Deferred.callLater,
-    callLazy                : Pot.Deferred.callLazy,
-    maybeDeferred           : Pot.Deferred.maybeDeferred,
-    isFired                 : Pot.Deferred.isFired,
-    lastResult              : Pot.Deferred.lastResult,
-    lastError               : Pot.Deferred.lastError,
-    register                : Pot.Deferred.register,
-    unregister              : Pot.Deferred.unregister,
-    deferrize               : Pot.Deferred.deferrize,
-    deferreed               : Pot.Deferred.deferreed,
-    begin                   : Pot.Deferred.begin,
-    flush                   : Pot.Deferred.flush,
-    till                    : Pot.Deferred.till,
-    parallel                : Pot.Deferred.parallel,
-    chain                   : Pot.Deferred.chain,
-    forEach                 : Pot.forEach,
-    repeat                  : Pot.repeat,
-    forEver                 : Pot.forEver,
-    iterate                 : Pot.iterate,
-    items                   : Pot.items,
-    zip                     : Pot.zip,
-    Iter                    : Pot.Iter,
-    toIter                  : Pot.Iter.toIter,
-    map                     : Pot.map,
-    filter                  : Pot.filter,
-    reduce                  : Pot.reduce,
-    every                   : Pot.every,
-    some                    : Pot.some,
-    range                   : Pot.range,
-    indexOf                 : Pot.indexOf,
-    lastIndexOf             : Pot.lastIndexOf,
-    globalEval              : Pot.globalEval,
-    localEval               : Pot.localEval,
-    tokenize                : Pot.tokenize,
-    joinTokens              : Pot.joinTokens,
-    isWords                 : Pot.isWords,
-    isNL                    : Pot.isNL,
-    hasReturn               : Pot.hasReturn,
-    override                : Pot.override,
-    getErrorMessage         : Pot.getErrorMessage,
-    getFunctionCode         : Pot.getFunctionCode,
-    currentWindow           : Pot.currentWindow,
-    currentDocument         : Pot.currentDocument,
-    currentURI              : Pot.currentURI,
-    serializeToJSON         : Pot.Serializer.serializeToJSON,
-    parseFromJSON           : Pot.Serializer.parseFromJSON,
-    serializeToQueryString  : Pot.Serializer.serializeToQueryString,
-    parseFromQueryString    : Pot.Serializer.parseFromQueryString,
-    urlEncode               : Pot.URI.urlEncode,
-    urlDecode               : Pot.URI.urlDecode,
-    parseURI                : Pot.URI.parseURI,
-    buildURI                : Pot.URI.buildURI,
-    resolveRelativeURI      : Pot.URI.resolveRelativeURI,
-    getExt                  : Pot.URI.getExt,
-    toDataURI               : Pot.URI.toDataURI,
-    request                 : Pot.Net.request,
-    jsonp                   : Pot.Net.requestByJSONP,
-    getJSON                 : Pot.Net.getJSON,
-    loadScript              : Pot.Net.loadScript,
-    hashCode                : Pot.Crypt.hashCode,
-    md5                     : Pot.Crypt.md5,
-    crc32                   : Pot.Crypt.crc32,
-    sha1                    : Pot.Crypt.sha1,
-    Arc4                    : Pot.Crypt.Arc4,
-    evalInSandbox           : Pot.XPCOM.evalInSandbox,
-    throughout              : Pot.XPCOM.throughout,
-    getMostRecentWindow     : Pot.XPCOM.getMostRecentWindow,
-    getChromeWindow         : Pot.XPCOM.getChromeWindow,
-    Workeroid               : Pot.Workeroid,
-    attach                  : Pot.Signal.attach,
-    attachBefore            : Pot.Signal.attachBefore,
-    attachAfter             : Pot.Signal.attachAfter,
-    attachPropBefore        : Pot.Signal.attachPropBefore,
-    attachPropAfter         : Pot.Signal.attachPropAfter,
-    detach                  : Pot.Signal.detach,
-    detachAll               : Pot.Signal.detachAll,
-    signal                  : Pot.Signal.signal,
-    cancelEvent             : Pot.Signal.cancelEvent,
-    DropFile                : Pot.Signal.DropFile,
-    Hash                    : Pot.Hash,
-    merge                   : Pot.Collection.merge,
-    unique                  : Pot.Collection.unique,
-    flatten                 : Pot.Collection.flatten,
-    alphanumSort            : Pot.Collection.alphanumSort,
-    clone                   : Pot.Struct.clone,
-    bind                    : Pot.Struct.bind,
-    partial                 : Pot.Struct.partial,
-    keys                    : Pot.Struct.keys,
-    values                  : Pot.Struct.values,
-    tuple                   : Pot.Struct.tuple,
-    unzip                   : Pot.Struct.unzip,
-    pairs                   : Pot.Struct.pairs,
-    count                   : Pot.Struct.count,
-    first                   : Pot.Struct.first,
-    firstKey                : Pot.Struct.firstKey,
-    last                    : Pot.Struct.last,
-    lastKey                 : Pot.Struct.lastKey,
-    contains                : Pot.Struct.contains,
-    remove                  : Pot.Struct.remove,
-    removeAll               : Pot.Struct.removeAll,
-    removeAt                : Pot.Struct.removeAt,
-    equals                  : Pot.Struct.equals,
-    reverse                 : Pot.Struct.reverse,
-    flip                    : Pot.Struct.flip,
-    shuffle                 : Pot.Struct.shuffle,
-    fill                    : Pot.Struct.fill,
-    implode                 : Pot.Struct.implode,
-    explode                 : Pot.Struct.explode,
-    glue                    : Pot.Struct.glue,
-    clearObject             : Pot.Struct.clearObject,
-    time                    : Pot.DateTime.time,
-    date                    : Pot.DateTime.format,
-    prettyDate              : Pot.DateTime.prettyDate,
-    rand                    : Pot.Complex.rand,
-    limit                   : Pot.Complex.limit,
-    convertToBase           : Pot.Complex.convertToBase,
-    compareVersions         : Pot.Complex.compareVersions,
-    escapeRegExp            : Pot.Sanitizer.escapeRegExp,
-    escapeHTML              : Pot.Sanitizer.escapeHTML,
-    unescapeHTML            : Pot.Sanitizer.unescapeHTML,
-    escapeXPathText         : Pot.Sanitizer.escapeXPathText,
-    escapeAppleScriptString : Pot.Sanitizer.escapeAppleScriptString,
-    escapeString            : Pot.Sanitizer.escapeString,
-    unescapeString          : Pot.Sanitizer.unescapeString,
-    escapeFileName          : Pot.Sanitizer.escapeFileName,
-    escapeSequence          : Pot.Sanitizer.escapeSequence,
-    unescapeSequence        : Pot.Sanitizer.unescapeSequence,
-    utf8Encode              : Pot.UTF8.encode,
-    utf8Decode              : Pot.UTF8.decode,
-    utf8ByteOf              : Pot.UTF8.byteOf,
-    base64Encode            : Pot.Base64.encode,
-    base64Decode            : Pot.Base64.decode,
-    base64URLEncode         : Pot.Base64.urlEncode,
-    base64URLDecode         : Pot.Base64.urlDecode,
-    alphamericStringEncode  : Pot.Archive.AlphamericString.encode,
-    alphamericStringDecode  : Pot.Archive.AlphamericString.decode,
-    sprintf                 : Pot.Format.sprintf,
-    format                  : Pot.Format.format,
-    getExtByMimeType        : Pot.MimeType.getExtByMimeType,
-    getMimeTypeByExt        : Pot.MimeType.getMimeTypeByExt,
-    ReplaceSaver            : Pot.Text.ReplaceSaver,
-    chr                     : Pot.Text.chr,
-    ord                     : Pot.Text.ord,
-    ltrim                   : Pot.Text.ltrim,
-    rtrim                   : Pot.Text.rtrim,
-    strip                   : Pot.Text.strip,
-    indent                  : Pot.Text.indent,
-    unindent                : Pot.Text.unindent,
-    normalizeSpace          : Pot.Text.normalizeSpace,
-    splitBySpace            : Pot.Text.splitBySpace,
-    canonicalizeNL          : Pot.Text.canonicalizeNL,
-    wrap                    : Pot.Text.wrap,
-    unwrap                  : Pot.Text.unwrap,
-    startsWith              : Pot.Text.startsWith,
-    endsWith                : Pot.Text.endsWith,
-    lower                   : Pot.Text.lower,
-    upper                   : Pot.Text.upper,
-    camelize                : Pot.Text.camelize,
-    hyphenize               : Pot.Text.hyphenize,
-    underscore              : Pot.Text.underscore,
-    extract                 : Pot.Text.extract,
-    inc                     : Pot.Text.inc,
-    dec                     : Pot.Text.dec,
-    br                      : Pot.Text.br,
-    stripTags               : Pot.Text.stripTags,
-    truncate                : Pot.Text.truncate,
-    truncateMiddle          : Pot.Text.truncateMiddle,
-    toHankakuCase           : Pot.Text.toHankakuCase,
-    toZenkakuCase           : Pot.Text.toZenkakuCase,
-    toHanSpaceCase          : Pot.Text.toHanSpaceCase,
-    toZenSpaceCase          : Pot.Text.toZenSpaceCase,
-    toHiraganaCase          : Pot.Text.toHiraganaCase,
-    toKatakanaCase          : Pot.Text.toKatakanaCase,
-    toHankanaCase           : Pot.Text.toHankanaCase,
-    toZenkanaCase           : Pot.Text.toZenkanaCase,
-    detectWindow            : Pot.DOM.detectWindow,
-    detectDocument          : Pot.DOM.detectDocument,
-    getOwnerDocument        : Pot.DOM.getOwnerDocument,
-    getElement              : Pot.DOM.getElement,
-    getElements             : Pot.DOM.getElements,
-    isXHTML                 : Pot.DOM.isXHTML,
-    isXML                   : Pot.DOM.isXML,
-    tagNameOf               : Pot.DOM.tagNameOf,
-    getNodeValue            : Pot.DOM.getValue,
-    setNodeValue            : Pot.DOM.setValue,
-    getHTMLString           : Pot.DOM.getHTMLString,
-    setHTMLString           : Pot.DOM.setHTMLString,
-    getOuterHTML            : Pot.DOM.getOuterHTML,
-    setOuterHTML            : Pot.DOM.setOuterHTML,
-    getTextContent          : Pot.DOM.getTextContent,
-    setTextContent          : Pot.DOM.setTextContent,
-    getSelectionObject      : Pot.DOM.getSelectionObject,
-    getSelectionContents    : Pot.DOM.getSelectionContents,
-    getSelectionText        : Pot.DOM.getSelectionText,
-    getSelectionHTML        : Pot.DOM.getSelectionHTML,
-    coerceToNode            : Pot.DOM.coerceToNode,
-    removeElement           : Pot.DOM.removeElement,
-    appendChilds            : Pot.DOM.appendChilds,
-    prependChilds           : Pot.DOM.prependChilds,
-    removeChilds            : Pot.DOM.removeChilds,
-    getAttr                 : Pot.DOM.getAttr,
-    setAttr                 : Pot.DOM.setAttr,
-    hasAttr                 : Pot.DOM.hasAttr,
-    removeAttr              : Pot.DOM.removeAttr,
-    addClass                : Pot.DOM.addClass,
-    removeClass             : Pot.DOM.removeClass,
-    hasClass                : Pot.DOM.hasClass,
-    toggleClass             : Pot.DOM.toggleClass,
-    serializeToXMLString    : Pot.DOM.serializeToString,
-    parseFromXMLString      : Pot.DOM.parseFromString,
-    evaluate                : Pot.DOM.evaluate,
-    attr                    : Pot.DOM.attr,
-    convertToHTMLDocument   : Pot.DOM.convertToHTMLDocument,
-    convertToHTMLString     : Pot.DOM.convertToHTMLString,
-    css                     : Pot.Style.css,
-    getStyle                : Pot.Style.getStyle,
-    setStyle                : Pot.Style.setStyle,
-    isShown                 : Pot.Style.isShown,
-    isVisible               : Pot.Style.isVisible,
-    pxize                   : Pot.Style.pxize,
-    getSizePos              : Pot.Style.getSizePos,
-    getPixelSize            : Pot.Style.getPixelSize,
-    setSize                 : Pot.Style.setSize,
-    getWidth                : Pot.Style.getWidth,
-    setWidth                : Pot.Style.setWidth,
-    getHeight               : Pot.Style.getHeight,
-    setHeight               : Pot.Style.setHeight,
-    rescape                 : rescape,
-    arrayize                : arrayize,
-    numeric                 : numeric,
-    invoke                  : invoke,
-    stringify               : stringify,
-    trim                    : trim,
-    now                     : now,
-    globalize               : Pot.globalize,
-    debug                   : Pot.Debug.debug,
-    addPlugin               : Pot.Plugin.add,
-    hasPlugin               : Pot.Plugin.has,
-    removePlugin            : Pot.Plugin.remove,
-    listPlugin              : Pot.Plugin.list
+    Pot                      : Pot,
+    update                   : update,
+    PATH_DELIMITER           : Pot.PATH_DELIMITER,
+    DIR_DELIMITER            : Pot.DIR_DELIMITER,
+    XML_NS_URI               : Pot.XML_NS_URI,
+    HTML_NS_URI              : Pot.HTML_NS_URI,
+    XHTML_NS_URI             : Pot.XHTML_NS_URI,
+    XLINK_NS_URI             : Pot.XLINK_NS_URI,
+    XSL_NS_URI               : Pot.XSL_NS_URI,
+    SVG_NS_URI               : Pot.SVG_NS_URI,
+    XUL_NS_URI               : Pot.XUL_NS_URI,
+    JS_VOID_URI              : Pot.JS_VOID_URI,
+    isBoolean                : Pot.isBoolean,
+    isNumber                 : Pot.isNumber,
+    isString                 : Pot.isString,
+    isFunction               : Pot.isFunction,
+    isArray                  : Pot.isArray,
+    isDate                   : Pot.isDate,
+    isRegExp                 : Pot.isRegExp,
+    isObject                 : Pot.isObject,
+    isError                  : Pot.isError,
+    typeOf                   : Pot.typeOf,
+    typeLikeOf               : Pot.typeLikeOf,
+    StopIteration            : Pot.StopIteration,
+    isStopIter               : Pot.isStopIter,
+    isIterable               : Pot.isIterable,
+    isScalar                 : Pot.isScalar,
+    isBlob                   : Pot.isBlob,
+    isFileReader             : Pot.isFileReader,
+    isArguments              : Pot.isArguments,
+    isTypedArray             : Pot.isTypedArray,
+    isArrayBuffer            : Pot.isArrayBuffer,
+    isArrayLike              : Pot.isArrayLike,
+    isPlainObject            : Pot.isPlainObject,
+    isEmpty                  : Pot.isEmpty,
+    isDeferred               : Pot.isDeferred,
+    isIter                   : Pot.isIter,
+    isWorkeroid              : Pot.isWorkeroid,
+    isArrayBufferoid         : Pot.isArrayBufferoid,
+    isHash                   : Pot.isHash,
+    isJSEscaped              : Pot.isJSEscaped,
+    isPercentEncoded         : Pot.isPercentEncoded,
+    isHTMLEscaped            : Pot.isHTMLEscaped,
+    isNumeric                : Pot.isNumeric,
+    isInt                    : Pot.isInt,
+    isNativeCode             : Pot.isNativeCode,
+    isBuiltinMethod          : Pot.isBuiltinMethod,
+    isWindow                 : Pot.isWindow,
+    isDocument               : Pot.isDocument,
+    isElement                : Pot.isElement,
+    isNodeLike               : Pot.isNodeLike,
+    isNodeList               : Pot.isNodeList,
+    isDOMLike                : Pot.isDOMLike,
+    Cc                       : Pot.Cc,
+    Ci                       : Pot.Ci,
+    Cr                       : Pot.Cr,
+    Cu                       : Pot.Cu,
+    Deferred                 : Pot.Deferred,
+    succeed                  : Pot.Deferred.succeed,
+    failure                  : Pot.Deferred.failure,
+    wait                     : Pot.Deferred.wait,
+    callLater                : Pot.Deferred.callLater,
+    callLazy                 : Pot.Deferred.callLazy,
+    maybeDeferred            : Pot.Deferred.maybeDeferred,
+    isFired                  : Pot.Deferred.isFired,
+    lastResult               : Pot.Deferred.lastResult,
+    lastError                : Pot.Deferred.lastError,
+    register                 : Pot.Deferred.register,
+    unregister               : Pot.Deferred.unregister,
+    deferrize                : Pot.Deferred.deferrize,
+    deferreed                : Pot.Deferred.deferreed,
+    begin                    : Pot.Deferred.begin,
+    flush                    : Pot.Deferred.flush,
+    till                     : Pot.Deferred.till,
+    parallel                 : Pot.Deferred.parallel,
+    chain                    : Pot.Deferred.chain,
+    forEach                  : Pot.forEach,
+    repeat                   : Pot.repeat,
+    forEver                  : Pot.forEver,
+    iterate                  : Pot.iterate,
+    items                    : Pot.items,
+    zip                      : Pot.zip,
+    Iter                     : Pot.Iter,
+    toIter                   : Pot.Iter.toIter,
+    map                      : Pot.map,
+    filter                   : Pot.filter,
+    reduce                   : Pot.reduce,
+    every                    : Pot.every,
+    some                     : Pot.some,
+    range                    : Pot.range,
+    indexOf                  : Pot.indexOf,
+    lastIndexOf              : Pot.lastIndexOf,
+    globalEval               : Pot.globalEval,
+    localEval                : Pot.localEval,
+    tokenize                 : Pot.tokenize,
+    joinTokens               : Pot.joinTokens,
+    isWords                  : Pot.isWords,
+    isNL                     : Pot.isNL,
+    hasReturn                : Pot.hasReturn,
+    override                 : Pot.override,
+    getErrorMessage          : Pot.getErrorMessage,
+    getFunctionCode          : Pot.getFunctionCode,
+    currentWindow            : Pot.currentWindow,
+    currentDocument          : Pot.currentDocument,
+    currentURI               : Pot.currentURI,
+    serializeToJSON          : Pot.Serializer.serializeToJSON,
+    parseFromJSON            : Pot.Serializer.parseFromJSON,
+    serializeToQueryString   : Pot.Serializer.serializeToQueryString,
+    parseFromQueryString     : Pot.Serializer.parseFromQueryString,
+    urlEncode                : Pot.URI.urlEncode,
+    urlDecode                : Pot.URI.urlDecode,
+    parseURI                 : Pot.URI.parseURI,
+    buildURI                 : Pot.URI.buildURI,
+    resolveRelativeURI       : Pot.URI.resolveRelativeURI,
+    getExt                   : Pot.URI.getExt,
+    toDataURI                : Pot.URI.toDataURI,
+    request                  : Pot.Net.request,
+    jsonp                    : Pot.Net.requestByJSONP,
+    getJSON                  : Pot.Net.getJSON,
+    loadScript               : Pot.Net.loadScript,
+    hashCode                 : Pot.Crypt.hashCode,
+    md5                      : Pot.Crypt.md5,
+    crc32                    : Pot.Crypt.crc32,
+    sha1                     : Pot.Crypt.sha1,
+    Arc4                     : Pot.Crypt.Arc4,
+    evalInSandbox            : Pot.XPCOM.evalInSandbox,
+    throughout               : Pot.XPCOM.throughout,
+    getMostRecentWindow      : Pot.XPCOM.getMostRecentWindow,
+    getChromeWindow          : Pot.XPCOM.getChromeWindow,
+    ArrayBufferoid           : Pot.ArrayBufferoid,
+    Workeroid                : Pot.Workeroid,
+    attach                   : Pot.Signal.attach,
+    attachBefore             : Pot.Signal.attachBefore,
+    attachAfter              : Pot.Signal.attachAfter,
+    attachPropBefore         : Pot.Signal.attachPropBefore,
+    attachPropAfter          : Pot.Signal.attachPropAfter,
+    detach                   : Pot.Signal.detach,
+    detachAll                : Pot.Signal.detachAll,
+    signal                   : Pot.Signal.signal,
+    cancelEvent              : Pot.Signal.cancelEvent,
+    DropFile                 : Pot.Signal.DropFile,
+    Hash                     : Pot.Hash,
+    merge                    : Pot.Collection.merge,
+    unique                   : Pot.Collection.unique,
+    flatten                  : Pot.Collection.flatten,
+    alphanumSort             : Pot.Collection.alphanumSort,
+    clone                    : Pot.Struct.clone,
+    bind                     : Pot.Struct.bind,
+    partial                  : Pot.Struct.partial,
+    keys                     : Pot.Struct.keys,
+    values                   : Pot.Struct.values,
+    tuple                    : Pot.Struct.tuple,
+    unzip                    : Pot.Struct.unzip,
+    pairs                    : Pot.Struct.pairs,
+    count                    : Pot.Struct.count,
+    first                    : Pot.Struct.first,
+    firstKey                 : Pot.Struct.firstKey,
+    last                     : Pot.Struct.last,
+    lastKey                  : Pot.Struct.lastKey,
+    contains                 : Pot.Struct.contains,
+    remove                   : Pot.Struct.remove,
+    removeAll                : Pot.Struct.removeAll,
+    removeAt                 : Pot.Struct.removeAt,
+    equals                   : Pot.Struct.equals,
+    reverse                  : Pot.Struct.reverse,
+    flip                     : Pot.Struct.flip,
+    shuffle                  : Pot.Struct.shuffle,
+    fill                     : Pot.Struct.fill,
+    implode                  : Pot.Struct.implode,
+    explode                  : Pot.Struct.explode,
+    glue                     : Pot.Struct.glue,
+    clearObject              : Pot.Struct.clearObject,
+    time                     : Pot.DateTime.time,
+    date                     : Pot.DateTime.format,
+    prettyDate               : Pot.DateTime.prettyDate,
+    rand                     : Pot.Complex.rand,
+    limit                    : Pot.Complex.limit,
+    convertToBase            : Pot.Complex.convertToBase,
+    compareVersions          : Pot.Complex.compareVersions,
+    escapeRegExp             : Pot.Sanitizer.escapeRegExp,
+    escapeHTML               : Pot.Sanitizer.escapeHTML,
+    unescapeHTML             : Pot.Sanitizer.unescapeHTML,
+    escapeXPathText          : Pot.Sanitizer.escapeXPathText,
+    escapeAppleScriptString  : Pot.Sanitizer.escapeAppleScriptString,
+    escapeString             : Pot.Sanitizer.escapeString,
+    unescapeString           : Pot.Sanitizer.unescapeString,
+    escapeFileName           : Pot.Sanitizer.escapeFileName,
+    escapeSequence           : Pot.Sanitizer.escapeSequence,
+    unescapeSequence         : Pot.Sanitizer.unescapeSequence,
+    utf8Encode               : Pot.UTF8.encode,
+    utf8Decode               : Pot.UTF8.decode,
+    utf8ByteOf               : Pot.UTF8.byteOf,
+    convertEncodingToUnicode : Pot.UTF8.convertEncodingToUnicode,
+    base64Encode             : Pot.Base64.encode,
+    base64Decode             : Pot.Base64.decode,
+    base64URLEncode          : Pot.Base64.urlEncode,
+    base64URLDecode          : Pot.Base64.urlDecode,
+    alphamericStringEncode   : Pot.Archive.AlphamericString.encode,
+    alphamericStringDecode   : Pot.Archive.AlphamericString.decode,
+    sprintf                  : Pot.Format.sprintf,
+    format                   : Pot.Format.format,
+    getExtByMimeType         : Pot.MimeType.getExtByMimeType,
+    getMimeTypeByExt         : Pot.MimeType.getMimeTypeByExt,
+    ReplaceSaver             : Pot.Text.ReplaceSaver,
+    chr                      : Pot.Text.chr,
+    ord                      : Pot.Text.ord,
+    ltrim                    : Pot.Text.ltrim,
+    rtrim                    : Pot.Text.rtrim,
+    strip                    : Pot.Text.strip,
+    indent                   : Pot.Text.indent,
+    unindent                 : Pot.Text.unindent,
+    normalizeSpace           : Pot.Text.normalizeSpace,
+    splitBySpace             : Pot.Text.splitBySpace,
+    canonicalizeNL           : Pot.Text.canonicalizeNL,
+    wrap                     : Pot.Text.wrap,
+    unwrap                   : Pot.Text.unwrap,
+    startsWith               : Pot.Text.startsWith,
+    endsWith                 : Pot.Text.endsWith,
+    lower                    : Pot.Text.lower,
+    upper                    : Pot.Text.upper,
+    camelize                 : Pot.Text.camelize,
+    hyphenize                : Pot.Text.hyphenize,
+    underscore               : Pot.Text.underscore,
+    extract                  : Pot.Text.extract,
+    inc                      : Pot.Text.inc,
+    dec                      : Pot.Text.dec,
+    br                       : Pot.Text.br,
+    stripTags                : Pot.Text.stripTags,
+    truncate                 : Pot.Text.truncate,
+    truncateMiddle           : Pot.Text.truncateMiddle,
+    toCharCode               : Pot.Text.toCharCode,
+    toHankakuCase            : Pot.Text.toHankakuCase,
+    toZenkakuCase            : Pot.Text.toZenkakuCase,
+    toHanSpaceCase           : Pot.Text.toHanSpaceCase,
+    toZenSpaceCase           : Pot.Text.toZenSpaceCase,
+    toHiraganaCase           : Pot.Text.toHiraganaCase,
+    toKatakanaCase           : Pot.Text.toKatakanaCase,
+    toHankanaCase            : Pot.Text.toHankanaCase,
+    toZenkanaCase            : Pot.Text.toZenkanaCase,
+    detectWindow             : Pot.DOM.detectWindow,
+    detectDocument           : Pot.DOM.detectDocument,
+    getOwnerDocument         : Pot.DOM.getOwnerDocument,
+    getElement               : Pot.DOM.getElement,
+    getElements              : Pot.DOM.getElements,
+    isXHTML                  : Pot.DOM.isXHTML,
+    isXML                    : Pot.DOM.isXML,
+    tagNameOf                : Pot.DOM.tagNameOf,
+    getNodeValue             : Pot.DOM.getValue,
+    setNodeValue             : Pot.DOM.setValue,
+    getHTMLString            : Pot.DOM.getHTMLString,
+    setHTMLString            : Pot.DOM.setHTMLString,
+    getOuterHTML             : Pot.DOM.getOuterHTML,
+    setOuterHTML             : Pot.DOM.setOuterHTML,
+    getTextContent           : Pot.DOM.getTextContent,
+    setTextContent           : Pot.DOM.setTextContent,
+    getSelectionObject       : Pot.DOM.getSelectionObject,
+    getSelectionContents     : Pot.DOM.getSelectionContents,
+    getSelectionText         : Pot.DOM.getSelectionText,
+    getSelectionHTML         : Pot.DOM.getSelectionHTML,
+    coerceToNode             : Pot.DOM.coerceToNode,
+    removeElement            : Pot.DOM.removeElement,
+    appendChilds             : Pot.DOM.appendChilds,
+    prependChilds            : Pot.DOM.prependChilds,
+    removeChilds             : Pot.DOM.removeChilds,
+    getAttr                  : Pot.DOM.getAttr,
+    setAttr                  : Pot.DOM.setAttr,
+    hasAttr                  : Pot.DOM.hasAttr,
+    removeAttr               : Pot.DOM.removeAttr,
+    addClass                 : Pot.DOM.addClass,
+    removeClass              : Pot.DOM.removeClass,
+    hasClass                 : Pot.DOM.hasClass,
+    toggleClass              : Pot.DOM.toggleClass,
+    serializeToXMLString     : Pot.DOM.serializeToString,
+    parseFromXMLString       : Pot.DOM.parseFromString,
+    evaluate                 : Pot.DOM.evaluate,
+    attr                     : Pot.DOM.attr,
+    convertToHTMLDocument    : Pot.DOM.convertToHTMLDocument,
+    convertToHTMLString      : Pot.DOM.convertToHTMLString,
+    css                      : Pot.Style.css,
+    getStyle                 : Pot.Style.getStyle,
+    setStyle                 : Pot.Style.setStyle,
+    isShown                  : Pot.Style.isShown,
+    isVisible                : Pot.Style.isVisible,
+    pxize                    : Pot.Style.pxize,
+    getSizePos               : Pot.Style.getSizePos,
+    getPixelSize             : Pot.Style.getPixelSize,
+    setSize                  : Pot.Style.setSize,
+    getWidth                 : Pot.Style.getWidth,
+    setWidth                 : Pot.Style.setWidth,
+    getHeight                : Pot.Style.getHeight,
+    setHeight                : Pot.Style.setHeight,
+    rescape                  : rescape,
+    arrayize                 : arrayize,
+    numeric                  : numeric,
+    invoke                   : invoke,
+    stringify                : stringify,
+    trim                     : trim,
+    now                      : now,
+    globalize                : Pot.globalize,
+    debug                    : Pot.Debug.debug,
+    addPlugin                : Pot.Plugin.add,
+    hasPlugin                : Pot.Plugin.has,
+    removePlugin             : Pot.Plugin.remove,
+    listPlugin               : Pot.Plugin.list
   }
 });
 
