@@ -7,6 +7,7 @@
  * Version {#$version}, {#$date}
  * Copyright (c) {#$year} polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
+ * https://github.com/polygonplanet/Pot.js
  * http://polygonplanet.github.com/Pot.js/
  */
 /**
@@ -69,6 +70,7 @@
  * @author         polygon planet
  * @version        {#$version}
  * @date           {#$date}
+ * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
  * @copyright      Copyright (c) {#$year} polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
