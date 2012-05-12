@@ -994,7 +994,7 @@ update(ArrayBufferoid, {
         };
         fl.readAsBinaryString(bb.getBlob());
       } else {
-        d.begin(ArrayBufferoid.bufferToBinary(string));
+        d.begin(ArrayBufferoid.bufferToBinary(buffer));
       }
       return d;
     }
