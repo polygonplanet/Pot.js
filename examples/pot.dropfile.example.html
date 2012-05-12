@@ -3,103 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <title>Pot.js (PotLite.js) Drag and Drop File Example - JavaScript Library</title>
-<script>
-// IE SUCKS
-if (window.ActiveXObject) {
-    window.onerror = function(msg, uri, line) {
-        alert([
-            'Error!',
-            'message: ' + msg,
-            'URI: ' + uri,
-            'line: ' + line
-        ].join('\n'));
-    };
-}
-</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script type="text/javascript" src="../pot.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="../pot.min.js"></script>
 <script>
 $(function () {
 
 // This example using jQuery.
 var panel = $('<div/>')
-  .css({
-    position   : 'fixed',
-    left       : '10%',
-    top        : '10%',
-    width      : '80%',
-    height     : '80%',
-    minHeight  : 200,
-    background : '#ccc',
-    border     : '2px solid #999',
-    zIndex     : 9999999
-  })
-  .hide()
+  .addClass('drop-panel')
   .text('Drop here')
+  .hide()
   .appendTo('body');
+
+var baseProgress = $('.progress').clone();
+
+$('.drop-field').height($(window).height() / 1.7);
+
+var scrollToBottom = function() {
+  var field = $('.drop-field').get(0);
+  Pot.callLazy(function() {
+    field.scrollTop = field.scrollHeight;
+  });
+};
+
+
+// Create DropFile instance with event handlers.
 var dropFile = new Pot.DropFile(panel, {
-  onShow : function() { panel.show() },
-  onHide : function() { panel.hide() },
-  onDrop : function(files) {
-    panel.text('dropped');
+
+  //readAs : 'datauri',
+
+  onShow : function() {
+    panel.show();
   },
-  onLoadImage : function(data, name, size, type) {
+
+  onHide : function() {
+    panel.hide();
+  },
+
+  onProgress : function(percent) {
+    $('.progress .text').text(percent + '%');
+    $('.progress .bar').css({width : percent + '%'});
+  },
+
+  onProgressFile : function(percent, fileinfo) {
+    var className = 'progress-bar-' + fileinfo.index,
+        bar = $('.' + className),
+        item = $('.drop-file-' + fileinfo.index);
+
+    if (bar.length === 0) {
+      baseProgress
+        .clone()
+        .removeClass('progress')
+        .addClass(className)
+        .appendTo(item);
+
+      scrollToBottom();
+    }
+
+    bar.find('.bar').css({width : percent + '%'});
+    bar.find('.text').text(percent + '%');
+
+    if (percent === 100) {
+      bar.remove();
+    }
+  },
+
+  onDrop : function(files, len) {
+    Pot.repeat(len, function(index) {
+      $('<div/>')
+        .addClass('drop-file-' + index)
+        .addClass('drop-item')
+        .appendTo('.drop-field');
+    });
+  },
+
+  // image file: jpg, png, gif etc.
+  onLoadImage : function(data, fileinfo) {
+    var className = 'drop-file-' + fileinfo.index;
+
     $('<div/>')
-      .text('name: ' + name + ', size: ' + size)
-      .appendTo('body');
+      .text('name: ' + fileinfo.name +
+           ', size: ' + fileinfo.size +
+           ', type: ' + fileinfo.type
+      )
+      .appendTo('.' + className);
+
     $('<img/>')
       .attr({src : data})
       .css({maxWidth : 500, maxHeight : 500})
-      .appendTo('body');
+      .appendTo('.' + className);
+
+    scrollToBottom();
   },
-  onLoadText : function(data, name, size, type) {
+
+  // text file: txt, html, js, css etc.
+  onLoadText : function(data, fileinfo) {
+    var className = 'drop-file-' + fileinfo.index;
+
     $('<div/>')
-      .text('name: ' + name + ', size: ' + size)
-      .appendTo('body');
+      .text('name: ' + fileinfo.name +
+           ', size: ' + fileinfo.size +
+           ', type: ' + fileinfo.type
+      )
+      .appendTo('.' + className);
+
     $('<textarea/>')
+      .css({width : '95%', height : 300})
       .val(data)
-      .css({width : '90%', height : 300})
-      .appendTo('body');
+      .appendTo('.' + className);
+
+    scrollToBottom();
   },
-  onLoadUnknown : function(data, name, size, type) {
+
+  // unknown file: zip, mp3, flv etc.
+  onLoadUnknown : function(data, fileinfo) {
+    var className = 'drop-file-' + fileinfo.index;
+
     $('<div/>')
-      .text('name: ' + name + ', size: ' + size)
-      .appendTo('body');
+      .text('name: ' + fileinfo.name +
+           ', size: ' + fileinfo.size +
+           ', type: ' + fileinfo.type
+      )
+      .appendTo('.' + className);
+
     $('<textarea/>')
+      .css({width : '95%', height : 300})
       .val(data)
-      .css({width : '90%', height : 300})
-      .appendTo('body');
+      .appendTo('.' + className);
+
+    scrollToBottom();
   },
+
   onLoadEnd : function() {
-    if (void 'use server') {
-      this.upload(
-        'http://www.example.com/',
-        'dropfiles'
-      ).then(function(res) {
-        alert('finish upload.\nresponse:\n\n' + res.responseText);
-      });
-    }
+    /*
+    // You can upload files to your server.
+    this.upload(
+      'http://www.example.com/',
+      'dropfiles'
+    ).then(function(res) {
+      alert('finish upload.\nresponse:\n\n' + res.responseText);
+    });
+    */
   }
 });
-alert("Let's try drag and drop any file from your desktop.");
 
 });
 </script>
+<style>
+body {
+  font-family: verdana, sans-serif;
+}
+
+.drop-field {
+  margin: 1em;
+  padding: 1em;
+  border: 1px dotted;
+  width: 86%;
+  height: 500px;
+  overflow: auto;
+}
+
+.drop-item {
+  margin: 1em 0;
+  border-bottom: 1px dashed;
+}
+
+.progress-wrapper {
+  margin: 0.5em;
+}
+
+.progress-wrapper .text {
+  margin-right: 1em;
+  font-size: 13px;
+}
+
+.progress-wrapper .frame {
+  border: 1px solid #2835cc;
+  width: 200px;
+  height: 10px;
+}
+
+.progress-wrapper .bar {
+  background: #2b3aff;
+  width: 0px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.drop-panel {
+  position: fixed;
+  left: 10%;
+  top: 10%;
+  width: 80%;
+  height: 80%;
+  min-height: 200px;
+  text-align: center;
+  color: #fff;
+  font-size: 120%;
+  font-weight: bold;
+  padding: 0;
+  background: #96e2af;
+  border: 2px solid #4cad6d;
+  z-index: 99999999;
+  -moz-box-shadow: 1px 1px 5px #333;
+  -webkit-box-shadow: 1px 1px 5px #333;
+  box-shadow: 1px 1px 5px #333;
+}
+
+footer {
+  text-align: center;
+  line-height: 1.5;
+}
+</style>
 </head>
 <body>
- <header>
-  <h1>Pot.js - Drag and Drop File Example</h1>
- </header>
- <article>
-  <h2>Demo</h2>
-  <p>Let's try drag and drop any file from your desktop.</p>
-  <div id="status"></div>
+  <header>
+    <h1>Pot.js - Drag and Drop File Example</h1>
+  </header>
   <p>
-   <a href="http://polygonplanet.github.com/Pot.js/"><strong>Pot.js + PotLite.js - Document and Reference</strong></a>
+    <a href="http://polygonplanet.github.com/Pot.js/#reference.Pot.DropFile.prototype.functions" title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library" target="_blank">Pot.DropFile</a> example
   </p>
- </article>
- <footer>
-  <p>2012 &copy; polygon planet</p>
- </footer>
+  <p>
+    Let's try drag and drop any file from your desktop.
+  </p>
+  <div class="drop-field">
+    Drop here.
+  </div>
+  <div class="progress-wrapper progress">
+    <span class="text"></span>
+    <div class="frame">
+      <div class="bar"></div>
+    </div>
+  </div>
+  <footer>
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/"><strong>Pot.js + PotLite.js - Document and Reference</strong></a>
+      <br>
+      <a href="https://github.com/polygonplanet/Pot.js"><strong>Pot.js - GitHub</strong></a>
+    </p>
+    <p>2012 &copy; <a href="http://twitter.com/polygon_planet">polygon planet</a></p>
+  </footer>
 </body>
 </html>

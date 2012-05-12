@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.Deferred Example</title>
+<script src="../pot.min.js"></script>
+<script>
+Pot.begin(function() {
+  Pot.debug('BEGIN example');
+}).then(function() {
+  // A simple HTTP request
+  //  that even works on Node.js (non-browser).
+  // or you can Pot.getJSON() simply.
+  return Pot.request('pot.deferred.example.json', {
+    mimeType : 'application/json'
+  }).ensure(function(res) {
+    if (Pot.isError(res)) {
+      return {
+        foo : 'fooError',
+        bar : 'barError',
+        baz : 'bazError'
+      };
+    } else {
+      Pot.debug(res.responseText);
+      // e.g., responseText = {
+      //         foo: 'fooValue',
+      //         bar: 'barValue',
+      //         baz: 'bazValue'
+      //       }
+      return Pot.parseFromJSON(res.responseText);
+    }
+    // Iterate on chain by "forEach" method.
+  }).forEach(function(val, key) {
+    Pot.debug(key + ' : ' + val); // foo : fooValue ... etc.
+
+    // Executed in one second intervals.
+    return Pot.wait(1);
+
+    // Wait 0.5 seconds
+    //  and set the speed to slow between each chains.
+  }).wait(0.5).speed('slow').then(function(res) {
+    var s = '', keys = [];
+
+    // Iterate by "forEach" method on synchronous.
+    Pot.forEach(res, function(val, key) {
+      s += key;
+      keys.push(key);
+    });
+    keys.push(s);
+    return keys;
+
+    // Like (Destructuring-Assignment)
+  }).then(function(foo, bar, baz, all) {
+    Pot.debug('foo = ' + foo); // foo = 'foo'
+    Pot.debug('bar = ' + bar); // bar = 'bar'
+    Pot.debug('baz = ' + baz); // baz = 'baz'
+    Pot.debug('all = ' + all); // all = 'foobarbaz'
+
+    return [foo, bar, baz];
+
+    // Iterate by "map" method at a slower speed.
+  }).map.doze(function(val) {
+    Pot.debug('in map.doze(val) : ' + val);
+
+    return val + '!';
+
+  }).then(function(res) {
+    Pot.debug(res); // ['foo!', 'bar!', 'baz!']
+
+    var d = new Pot.Deferred();
+    return d.then(function() {
+      // Generate an error for testing.
+      throw new Error('TestError');
+
+    }).then(function() {
+      // This callback chain never executed
+      //  because occured the error.
+      Pot.debug('Help me!!');
+
+    }).rescue(function(err) {
+      // Catch the error.
+      Pot.debug(err); // (Error: TestError)
+
+    }).then(function() {
+      // And, continue the callback chain.
+
+      // Iterate by "reduce" method on asynchronous.
+      return Pot.Deferred.reduce(res, function(a, b) {
+        return a + b;
+      }).then(function(result) {
+        return result;
+      });
+    }).begin(); // Begin the callback chain.
+
+  }).wait(2).then(function(res) {
+
+    Pot.debug(res); // 'foo!bar!baz!'
+
+    // Iterate by "filter" method on synchronous.
+    return Pot.filter(res.split('!'), function(val) {
+      return val && val.length;
+    });
+  });
+
+}).then(function(result) {
+  Pot.debug(result); // ['foo', 'bar', 'baz']
+  Pot.debug('END example');
+
+}).end(); // Chain can be closed by the "end" method on any.
+</script>
+<style>
+body {
+  font-family: verdana, sans-serif;
+}
+
+.content {
+  margin: 1em;
+  border-bottom: 1px dashed;
+  padding-bottom: 1em;
+}
+
+.footer {
+  margin: 1em;
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+  <div class="content">
+    <h1>Pot.js - Pot.Deferred Example - JavaScript Library</h1>
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/#manual.Deferred.Reference:en" title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library" target="_blank">Pot.Deferred</a> example.
+    </p>
+    <p><strong>See console</strong></p>
+  </div>
+  <div class="footer">
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/"><strong>Pot.js + PotLite.js - Document and Reference</strong></a>
+      <br>
+      <a href="https://github.com/polygonplanet/Pot.js"><strong>Pot.js - GitHub</strong></a>
+    </p>
+    <p>2012 &copy; <a href="http://twitter.com/polygon_planet">polygon planet</a></p>
+  </div>
+</body>
+</html>

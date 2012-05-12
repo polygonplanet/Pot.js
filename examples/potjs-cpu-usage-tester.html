@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js - CPU usage tester</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="../pot.min.js"></script>
+<script>
+$(function() {
+
+  var speed = 'normal';
+  var max   = 0;
+
+  init();
+
+
+  function init() {
+    togglePotSpeed($('[name="loop-by"]:checked'));
+
+    $('[name="loop-by"]').click(function() {
+      togglePotSpeed($(this));
+    });
+
+    $('#run').click(function() {
+      var that = $(this), label = that.text();
+
+      resetResult();
+      that.text('Processing...');
+
+      Pot.callLazy(function() {
+        return run();
+      }).then(function() {
+        that.text(label);
+      });
+    });
+  }
+
+
+
+
+  function run() {
+    var loopBy = $('[name="loop-by"]:checked').val();
+    var items = [];
+
+    max   = $('#loop-count :selected').val() - 0;
+    speed = $('#speed :selected').val();
+
+    resetResult();
+
+    return Pot.begin(function() {
+      return Pot.Deferred.repeat.ninja(max, function(i) {
+        items[i] = i;
+      });
+    }).then(function() {
+      var func, callback, time, next, d = new Pot.Deferred();
+
+      switch (loopBy) {
+        case 'pot':
+            func = asyncPotForEach;
+            break;
+        case 'jsfor':
+            func = asyncForLoop;
+            break;
+        case 'jquery':
+            func = asyncjQueryEach;
+            break;
+      }
+
+      callback = function(key, val) {
+        void function() {
+          return new Array(1000).join('x').replace(/x/, '');
+        }();
+
+        progress(key, items.length);
+      };
+
+      next = function() {
+        time = +new Date() - time;
+
+        $('#result-time').text(time + 'ms.');
+        $('#result').text('Refer your CPU load monitoring history, and compare each loops.');
+
+        d.begin();
+      };
+
+      time = +new Date();
+      func(items, callback, next);
+
+      return d;
+    });
+  }
+
+
+  function togglePotSpeed(target) {
+    var selectSpeed = $('#speed');
+
+    if (target.val() === 'pot') {
+      selectSpeed.removeAttr('disabled');
+    } else {
+      selectSpeed.attr({disabled : true});
+    }
+    resetResult();
+  }
+
+
+  function resetResult() {
+    $('#result,#result-time').text('');
+    $('.progress').text('');
+  }
+
+
+  function progress(current, total) {
+    var per = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
+
+    $('.progress').text(per + '%');
+  }
+
+
+  // Pot.js - Pot.Deferred.forEach loop.
+  function asyncPotForEach(items, callback, next) {
+    Pot.Deferred.forEach[speed](items, function(val, key) {
+      callback(key, val);
+    }).then(function() {
+      next();
+    });
+  }
+
+
+  // JavaScript - for loop.
+  function asyncjQueryEach(items, callback, next) {
+    setTimeout(function() {
+      $.each(items, function(key, val) {
+        callback(key, val);
+      });
+      next();
+    }, 0);
+  }
+
+
+  // jQuery - jQuery.each loop.
+  function asyncForLoop(items, callback, next) {
+    setTimeout(function() {
+      var len = items.length;
+      for (var i = 0; i < len; i++) {
+        callback(i, items[i]);
+      }
+      next();
+    }, 0);
+  }
+
+});
+</script>
+<style>
+body {
+  font-family: verdana, sans-serif;
+}
+
+.desc, .loop-settings {
+  margin: 1.5em;
+  padding-bottom: 1em;
+  border-bottom: 1px dashed;
+}
+
+.progress {
+  font-weight: bold;
+  color: #F00;
+}
+
+#result, #result-time {
+  color: #F00;
+}
+
+.progress, .footer, .run-container, .result-container {
+  margin: 1.5em;
+}
+
+#run {
+  font-weight: bold;
+  font-size: 150%;
+  padding: 0.2em 0.8em;
+}
+
+#loop-count, .loop-by-container, #speed {
+  margin-left: 2em;
+}
+
+.loop-by-container div {
+  margin-bottom: 0.2em;
+}
+
+.footer {
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+  <h1>Pot.js - CPU usage tester</h1>
+  <div class="desc">
+    <h3>See your browser's CPU usage.</h3>
+    <p>
+      (e.g. on Windows: Under the Performance tab in Task Manager, a user can monitor CPU usage.)
+      <br>
+      or use any CPU monitoring application.
+    </p>
+    <p>
+     Next, setting loops and click "Run" button.
+    </p>
+    <p>
+     You will notice that Pot.js iterator does not occur the &quot;Warning: Unresponsive script&quot; prompt.
+    </p>
+  </div>
+
+  <div class="loop-settings">
+    <div>
+      <p>
+        <strong>Select Loop Count: (Note to browser freeze!)</strong>
+      </p>
+      <select id="loop-count">
+        <option value="100">100</option>
+        <option value="1000">1000</option>
+        <option value="10000">10000</option>
+        <option value="100000" selected="selected">100000</option>
+        <option value="1000000">1000000</option>
+        <option value="10000000">10000000</option>
+        <option value="100000000">100000000</option>
+      </select>
+    </div>
+    <div>
+      <p>
+        <strong>Select Loop function/statement:</strong>
+      </p>
+      <div class="loop-by-container">
+        <div><label><input type="radio" name="loop-by" value="jquery">jQuery.each()</label></div>
+        <div><label><input type="radio" name="loop-by" value="jsfor">JavaScript for(...) loop</label></div>
+        <div><label><input type="radio" name="loop-by" value="pot" checked="checked">Pot.Deferred.forEach()</label></div>
+      </div>
+    </div>
+
+    <div class="potjs-iterator-speed-container">
+      <p>
+        <strong>Pot.js Iterator Speed:</strong>
+      </p>
+      <select id="speed">
+        <option value="ninja">fastest</option>
+        <option value="rapid">faster</option>
+        <option value="fast">fast</option>
+        <option value="normal" selected="selected">normal</option>
+        <option value="slow">slowly</option>
+        <option value="doze">more slowly</option>
+        <option value="limp">most slowly</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="run-container">
+    <button type="button" id="run">Run</button>
+  </div>
+
+  <div class="progress"></div>
+
+  <div class="result-container">
+    <div id="result-time"></div>
+    <div id="result"></div>
+  </div>
+
+  <div class="footer">
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/"><strong>Pot.js + PotLite.js - Document and Reference</strong></a>
+      <br>
+      <a href="https://github.com/polygonplanet/Pot.js"><strong>Pot.js - GitHub</strong></a>
+    </p>
+    <p>2012 &copy; <a href="http://twitter.com/polygon_planet">polygon planet</a></p>
+  </div>
+</body>
+</html>

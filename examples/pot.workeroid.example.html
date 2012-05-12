@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pot.js - Pot.Workeroid Example</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="../pot.min.js"></script>
+<script>
+$(function() {
+
+  var worker;
+
+  function doit() {
+    worker = new Pot.Workeroid(function(data) {
+      //
+      // This scope is child worker thread.
+      //
+      var n = 1;
+      Pot.Deferred.forEver.slow(function() {
+        n += 1;
+        for (var i = 2; i <= Math.sqrt(n); i += 1) {
+          if (n % i == 0) {
+            return;
+          }
+        }
+        // Post a prime number.
+        postMessage(n);
+      });
+    });
+
+    // On receive message.
+    worker.onmessage = function(data, event) {
+      $('#result').text(data);
+    };
+
+    // Post and start Worker thread.
+    worker.postMessage();
+  }
+
+
+  $('#run').click(function() {
+    $(this).attr({disabled : true});
+    doit();
+  });
+
+
+  $('#stop').click(function() {
+    worker.terminate();
+  });
+
+});
+</script>
+<style>
+body {
+  font-family: verdana, sans-serif;
+  padding: 1em;
+}
+
+.desc-this-example {
+  margin-top: 1em;
+  border-top: 1px dashed;
+}
+
+#result {
+  font-weight: bold;
+  font-size: 150%;
+  margin: 1em 1em 1em 0;
+  padding: 1em;
+  border-top: 1px dashed;
+  border-bottom: 1px dashed;
+}
+
+#run, #stop {
+  font-weight: bold;
+  font-size: 150%;
+  padding: 0.2em 0.5em;
+}
+
+.footer {
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+  <h1>Pot.js - Pot.Workeroid Example</h1>
+  <div class="desc">
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/#reference.Pot.Workeroid.methods" title="Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library" target="_blank">Pot.Workeroid</a> is a constructor that is compatible and flexible with <a href="http://www.w3.org/TR/workers/" title="Web Workers - W3C" target="_blank">HTML5 WebWorkers API</a>,
+      and it emulates to work cross-browser if environment is not supported native Worker.
+    </p>
+    <p>
+      That will used the Worker on web browser,
+      and will use the ChromeWorker if script runs on userscript(Greasemonkey) or on XUL (Firefox add-ons).
+      If environment cannot use both will runs in the background simply.
+    </p>
+    <p>
+      Either case, you can exit the worker thread by &quot;terminate&quot; method.
+    </p>
+    <p>
+      You can use the postMessage, terminate, onerror, onmessage, and add/removeEventListener APIs like native Worker.
+    </p>
+    <p>
+      In addition, Pot object is available from the Worker thread.
+      You can use Pot.js library if Pot.js is running, and can use PotLite.js library if PotLite.js is running.
+      Therefore, you can execute worker without burdening the CPU by Pot.js asynchronous iterators (e.g. Pot.Deferred.forEach).
+    </p>
+    <p>
+      <strong>Pot.Workeroid is possible to pass Function object</strong> in addition to a filename to constructor.
+    </p>
+  </div>
+
+  <div class="desc-this-example">
+    <p>
+      This example code is simply an search for a prime number.
+    </p>
+    <p>
+      The postMessage() method is used to send a message back to the parent thread when a prime is found.
+    </p>
+    <p>
+      You can terminate process by clicking &quot;Stop&quot; button.
+    </p>
+  </div>
+
+  <div class="run-container">
+    <button type="button" id="run">Run</button>
+    <button type="button" id="stop">Stop</button>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="footer">
+    <p>
+      <a href="http://polygonplanet.github.com/Pot.js/"><strong>Pot.js + PotLite.js - Document and Reference</strong></a>
+      <br>
+      <a href="https://github.com/polygonplanet/Pot.js"><strong>Pot.js - GitHub</strong></a>
+    </p>
+    <p>2012 &copy; <a href="http://twitter.com/polygon_planet">polygon planet</a></p>
+  </div>
+</body>
+</html>
