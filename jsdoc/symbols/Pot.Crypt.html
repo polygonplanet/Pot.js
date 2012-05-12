@@ -197,6 +197,8 @@ ul.inheritsList
 	
 	<li><a href="../symbols/Pot.Archive.AlphamericString.html">Pot.Archive.AlphamericString</a></li>
 	
+	<li><a href="../symbols/Pot.ArrayBufferoid.html">Pot.ArrayBufferoid</a></li>
+	
 	<li><a href="../symbols/Pot.Base64.html">Pot.Base64</a></li>
 	
 	<li><a href="../symbols/Pot.Browser.html">Pot.Browser</a></li>
@@ -416,7 +418,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.crc32">crc32</a></b>(string)
+								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.crc32">crc32</a></b>(data)
 								</div>
 								<div class="description">Calculate the 32-bit CRC (cyclic redundancy checksum) checksum.</div>
 							</td>
@@ -425,7 +427,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.hashCode">hashCode</a></b>(string)
+								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.hashCode">hashCode</a></b>(data)
 								</div>
 								<div class="description">String hash function similar to java.lang.String.hashCode().</div>
 							</td>
@@ -434,7 +436,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.md5">md5</a></b>(string)
+								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.md5">md5</a></b>(data)
 								</div>
 								<div class="description">Calculate the MD5 hash of a string.</div>
 							</td>
@@ -443,7 +445,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.sha1">sha1</a></b>(string)
+								<div class="fixedFont">Pot.Crypt.<b><a href="../symbols/Pot.Crypt.html#.sha1">sha1</a></b>(data)
 								</div>
 								<div class="description">Calculate the SHA1 hash of a string.</div>
 							</td>
@@ -559,7 +561,7 @@ Original algorithm:
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Crypt.</span><b>crc32</b>(string)
+					<span class="light">Pot.Crypt.</span><b>crc32</b>(data)
 					
 					</div>
 					<div class="description">
@@ -580,7 +582,7 @@ Original algorithm:
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>string</b>
+									<span class="light fixedFont">{String|Array}</span> <b>data</b>
 									
 								</dt>
 								<dd>Data.</dd>
@@ -607,7 +609,7 @@ Original algorithm:
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Crypt.</span><b>hashCode</b>(string)
+					<span class="light">Pot.Crypt.</span><b>hashCode</b>(data)
 					
 					</div>
 					<div class="description">
@@ -623,15 +625,20 @@ We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
 					
 					
 					
+					<pre class="code">  Pot.debug( Pot.hashCode('abc') ); // 96354
+  Pot.debug( Pot.hashCode([0x61, 0x62, 0x63]) ); // 96354</pre>
+					
+					
+					
 						
 							<dl class="detailList">
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String|*}</span> <b>string</b>
+									<span class="light fixedFont">{String|Array|*}</span> <b>data</b>
 									
 								</dt>
-								<dd>A string.</dd>
+								<dd>A target data.</dd>
 							
 							</dl>
 						
@@ -643,9 +650,9 @@ We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Number}</span> Hash value for `string`,
-                               between 0 (inclusive)
-                                and 2^32 (exclusive).
-                             The empty string returns 0.</dd>
+                                   between 0 (inclusive)
+                                   and 2^32 (exclusive).
+                                 The empty string returns 0.</dd>
 							
 							</dl>
 						
@@ -658,7 +665,7 @@ We mod the result to make it between 0 (inclusive) and 2^32 (exclusive).
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Crypt.</span><b>md5</b>(string)
+					<span class="light">Pot.Crypt.</span><b>md5</b>(data)
 					
 					</div>
 					<div class="description">
@@ -681,10 +688,10 @@ RFC 1321 - The MD5 Message-Digest Algorithm
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>string</b>
+									<span class="light fixedFont">{String|Array}</span> <b>data</b>
 									
 								</dt>
-								<dd>The target string.</dd>
+								<dd>The target data.</dd>
 							
 							</dl>
 						
@@ -715,7 +722,7 @@ RFC 1321 - The MD5 Message-Digest Algorithm
 					<div class="fixedFont">&lt;static&gt; 
 					
 					<span class="light">{Function}</span>
-					<span class="light">Pot.Crypt.</span><b>sha1</b>(string)
+					<span class="light">Pot.Crypt.</span><b>sha1</b>(data)
 					
 					</div>
 					<div class="description">
@@ -738,10 +745,10 @@ RFC 3174 - US Secure Hash Algorithm 1 (SHA1)
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{String}</span> <b>string</b>
+									<span class="light fixedFont">{String|Array}</span> <b>data</b>
 									
 								</dt>
-								<dd>The input string.</dd>
+								<dd>The input data.</dd>
 							
 							</dl>
 						
@@ -780,7 +787,7 @@ RFC 3174 - US Secure Hash Algorithm 1 (SHA1)
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Apr 15 2012 03:16:59 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun May 13 2012 07:27:04 GMT+0900 (JST)
 		</div>
 	</body>
 </html>

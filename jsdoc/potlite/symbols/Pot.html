@@ -697,9 +697,27 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isArrayBuffer">isArrayBuffer</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument is ArrayBuffer object or not.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isArrayLike">isArrayLike</a></b>(o)
 								</div>
 								<div class="description">Return whether the argument object like Array (i.e.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isBlob">isBlob</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument is Blob or not.</div>
 							</td>
 						</tr>
 					
@@ -736,6 +754,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isElement">isElement</a></b>(x)
 								</div>
 								<div class="description">Check whether the argument object is Element.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isFileReader">isFileReader</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument is a instance of FileReader or not.</div>
 							</td>
 						</tr>
 					
@@ -836,6 +863,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isStopIter">isStopIter</a></b>(o)
 								</div>
 								<div class="description">Return whether the argument is StopIteration or not.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isTypedArray">isTypedArray</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument is TypedArray object or not.</div>
 							</td>
 						</tr>
 					
@@ -2466,6 +2502,60 @@ That is for cases where JavaScript sucks
 
 					<hr />
 				
+					<a name=".isArrayBuffer"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isArrayBuffer</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument is ArrayBuffer object or not.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var obj = {foo : 1};
+  var arr = [1, 2, 3];
+  var buf = new ArrayBuffer(10);
+  var uar = new Uint8Array(10);
+  debug(isArrayBuffer(obj)); // false
+  debug(isArrayBuffer(arr)); // false
+  debug(isArrayBuffer(buf)); // true
+  debug(isArrayBuffer(uar)); // false</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is ArrayBuffer object.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".isArrayLike"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -2510,6 +2600,58 @@ That is for cases where JavaScript sucks
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Boolean}</span> ture or false (iterable or false)</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isBlob"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isBlob</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument is Blob or not.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var bb = new Pot.System.BlobBuilder();
+  bb.append('hoge');
+  var blob = bb.getBlob();
+  Pot.debug(Pot.isBlob(blob));   // true
+  Pot.debug(Pot.isBlob({}));     // false
+  Pot.debug(Pot.isBlob('hoge')); // false</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is Blob.</dd>
 							
 							</dl>
 						
@@ -2732,6 +2874,56 @@ That is for cases where JavaScript sucks
 							
 								<dd><span class="light fixedFont">{Boolean}</span> Return true if the argument object
                                is Element, otherwise return false.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isFileReader"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isFileReader</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument is a instance of FileReader or not.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var object = {hoge : 1};
+  var reader = new FileReader();
+  Pot.debug(Pot.isFileReader(object)); // false
+  Pot.debug(Pot.isFileReader(reader)); // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is FileReader.</dd>
 							
 							</dl>
 						
@@ -3375,6 +3567,60 @@ This function treats as scalar type for
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is StopIteration.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isTypedArray"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isTypedArray</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument is TypedArray object or not.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var obj = {foo : 1};
+  var arr = [1, 2, 3];
+  var buf = new ArrayBuffer(10);
+  var uar = new Uint8Array(10);
+  debug(isTypedArray(obj)); // false
+  debug(isTypedArray(arr)); // false
+  debug(isTypedArray(buf)); // true
+  debug(isTypedArray(uar)); // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is TypedArray object.</dd>
 							
 							</dl>
 						
@@ -4644,7 +4890,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Apr 15 2012 03:18:32 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun May 13 2012 07:30:17 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
