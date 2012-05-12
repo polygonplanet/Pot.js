@@ -146,7 +146,7 @@ update(Pot.UTF8, {
    * @public
    */
   decode : function(string) {
-    var result = '', chars = [], i = 0, j, len,
+    var result = '', chars = [], i = 0, len,
         n, c, c2, c3, c4, code, sc = fromUnicode,
         s = stringify(string);
     if (s) {

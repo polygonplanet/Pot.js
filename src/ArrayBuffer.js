@@ -200,7 +200,6 @@ ArrayBufferoid.fn = ArrayBufferoid.prototype = {
    * @ignore
    */
   init : function(args) {
-    var that = this;
     if (!this.serial) {
       this.serial = buildSerial(this);
     }
@@ -1140,7 +1139,7 @@ update(ArrayBufferoid, {
  * @ignore
  */
 function createArrayBuffer(type, args) {
-  var result, types = ArrayBufferoidTypes, len = args.length, val;
+  var types = ArrayBufferoidTypes, len = args.length, val;
   if (PotSystem.hasTypedArray) {
     switch (true) {
       case ((type & types.ArrayBuffer) === type):
