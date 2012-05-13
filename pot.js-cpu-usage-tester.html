@@ -12,14 +12,18 @@
 <script src="http://api.polygonpla.net/js/pot/1.19/pot.min.js"></script>
 <script>
 $(function() {
+  'use strict';
 
   var speed = 'normal';
   var max   = 0;
+  var lang  = Pot.LANG === 'ja' && Pot.LANG || 'en';
 
   init();
 
 
   function init() {
+    initLang();
+    toggleLang($('.lang-toggle'), true);
     togglePotSpeed($('[name="loop-by"]:checked'));
 
     $('[name="loop-by"]').click(function() {
@@ -46,7 +50,7 @@ $(function() {
     var items = [];
 
     max   = $('#loop-count :selected').val() - 0;
-    speed = $('#speed :selected').val();
+    speed = $(((lang === 'ja') ? '#speed-lang-ja' : '#speed') + ' :selected').val();
 
     resetResult();
 
@@ -81,7 +85,11 @@ $(function() {
         time = +new Date() - time;
 
         $('#result-time').text(time + 'ms.');
-        $('#result').text('Refer your CPU load monitoring history, and compare each loops.');
+        $('#result').text(
+          (lang === 'en') ?
+            'Refer your CPU load monitoring history, and compare each loops.' :
+            'CPU 使用率のグラフを各ループで比較してみてください'
+        );
 
         d.begin();
       };
@@ -95,7 +103,7 @@ $(function() {
 
 
   function togglePotSpeed(target) {
-    var selectSpeed = $('#speed');
+    var selectSpeed = $('#speed,#speed-lang-ja');
 
     if (target.val() === 'pot') {
       selectSpeed.removeAttr('disabled');
@@ -155,17 +163,80 @@ $(function() {
     }, 0);
   }
 
+
+  function getLang(full) {
+    return (lang === 'ja') ? (full ? 'English'  : 'en')
+                           : (full ? 'Japanese' : 'ja');
+  }
+
+
+  function initLang() {
+    $('<a/>')
+      .addClass('lang-toggle')
+      .attr({
+        href  : Pot.JS_VOID_URI,
+        title : getLang(true)
+      })
+      .text(getLang(true))
+      .click(function() {
+        toggleLang($(this));
+      })
+      .appendTo('.lang');
+  }
+
+
+  function toggleLang(elem, asis) {
+    var en = $('.lang-en'),
+        ja = $('.lang-ja'),
+        speedEn = $('#speed'),
+        speedJa = $('#speed-lang-ja');
+
+    if (!asis) {
+      lang = getLang();
+    }
+
+    if (lang === 'ja') {
+      en.hide();
+      ja.show();
+      speedEn.hide();
+      speedJa.show();
+    } else {
+      ja.hide();
+      en.show();
+      speedJa.hide();
+      speedEn.show();
+    }
+
+    if (elem) {
+      $(elem)
+        .attr({title : getLang(true)})
+        .text(getLang(true));
+    }
+  }
+
 });
 </script>
 <style>
+:focus {
+  outline: 0;
+}
+
 body {
   font-family: verdana, sans-serif;
+}
+
+h1 {
+  margin-bottom: 0.1em;
 }
 
 .desc, .loop-settings {
   margin: 1.5em;
   padding-bottom: 1em;
   border-bottom: 1px dashed;
+}
+
+.desc {
+  margin-top: 0.2em;
 }
 
 .progress {
@@ -187,7 +258,7 @@ body {
   padding: 0.2em 0.8em;
 }
 
-#loop-count, .loop-by-container, #speed {
+#loop-count, .loop-by-container, #speed, #speed-lang-ja {
   margin-left: 2em;
 }
 
@@ -195,36 +266,71 @@ body {
   margin-bottom: 0.2em;
 }
 
+.lang {
+  text-align: right;
+  margin-right: 3em;
+}
+
 .footer {
   line-height: 1.5;
+}
+
+#speed-lang-ja, .lang-ja {
+  display: none;
 }
 </style>
 </head>
 <body>
   <h1>Pot.js - CPU usage tester</h1>
+  <div class="lang"></div>
   <div class="desc">
-    <h3>See your browser's CPU usage.</h3>
-    <p>
-      (e.g. on Windows: Under the Performance tab in Task Manager, a user can monitor CPU usage.)
-      <br>
-      or use any CPU monitoring application.
-    </p>
-    <p>
-     Next, setting loops and click "Run" button.
-    </p>
-    <p>
-     The most important thing of performance in JavaScript, that is not numeric speed, but is to execute without causing stress to the UI.
-     <br>
-     Pot.js can be performed without causing stress to the UI and the CPU load by using easy loop iteration functions.
-     <br>
-     Also, you will notice that Pot.js iterator does not occur the &quot;Warning: Unresponsive script&quot; prompt.
-    </p>
+    <div class="lang-en">
+      <h3>See your browser's CPU usage.</h3>
+      <p>
+        (e.g. on Windows: Under the Performance tab in Task Manager, a user can monitor CPU usage.)
+        <br>
+        or use any CPU monitoring application.
+      </p>
+      <p>
+        Next, setting loops and click "Run" button.
+      </p>
+      <p>
+        The most important thing of performance in JavaScript, that is not numeric speed, but is to execute without causing stress to the UI.
+        <br>
+        Pot.js can be performed without causing stress to the UI and the CPU load by using easy loop iteration functions.
+        <br>
+        Also, you will notice that Pot.js iterator does not occur the &quot;Warning: Unresponsive script&quot; prompt.
+      </p>
+    </div>
+    <div class="lang-ja">
+      <h3>ブラウザの CPU 使用率を確認できる状態にしてください</h3>
+      <p>
+        例えば Windows ならタスクマネージャの「パフォーマンス」タブから CPU 使用率が確認できます。
+        <br>
+        もしくは、使い慣れた CPU モニタリング可能なアプリがあればそれを利用します。
+      </p>
+      <p>
+        CPU グラフを確認できる状態になったら、任意にループの設定をして「Run」ボタンを押します。
+      </p>
+      <p>
+        Web ページで実行される JavaScript において、重要なのは数値的な速度ではなく、UI へのストレスを減らし
+        常にブラウザに応答し 処理の重さを感じさせないことです。
+        <br>
+        Pot.js は、ループ処理における CPU 負荷を抑え UI にストレスを与えることなく JavaScript を実行できます。
+        <br>
+        そして、各ループを比較すると
+        Pot.js のイテレータは「応答のないスクリプト」警告を発生させずに実行できていることに気付けると思います。
+      </p>
+    </div>
   </div>
 
   <div class="loop-settings">
     <div>
       <p>
-        <strong>Select Loop Count: (Note to browser freeze!)</strong>
+        <strong>
+          <span class="lang-en">Select Loop Count: (Note to browser freeze!)</span>
+          <span class="lang-ja">ループ回数: (ブラウザのフリーズに注意!)</span>
+        </strong>
       </p>
       <select id="loop-count">
         <option value="100">100</option>
@@ -238,7 +344,10 @@ body {
     </div>
     <div>
       <p>
-        <strong>Select Loop function/statement:</strong>
+        <strong>
+          <span class="lang-en">Select Loop function/statement:</span>
+          <span class="lang-ja">ループする関数/文:</span>
+        </strong>
       </p>
       <div class="loop-by-container">
         <div><label><input type="radio" name="loop-by" value="jquery">jQuery.each()</label></div>
@@ -249,7 +358,10 @@ body {
 
     <div class="potjs-iterator-speed-container">
       <p>
-        <strong>Pot.js Iterator Speed:</strong>
+        <strong>
+          <span class="lang-en">Pot.js Iterator Speed:</span>
+          <span class="lang-ja">Pot.js イテレータの速度:</span>
+        </strong>
       </p>
       <select id="speed">
         <option value="ninja">fastest</option>
@@ -259,6 +371,15 @@ body {
         <option value="slow">slowly</option>
         <option value="doze">more slowly</option>
         <option value="limp">most slowly</option>
+      </select>
+      <select id="speed-lang-ja">
+        <option value="ninja">もっと速く</option>
+        <option value="rapid" selected="selected">速く</option>
+        <option value="fast">少し速く</option>
+        <option value="normal">通常</option>
+        <option value="slow">少し遅く</option>
+        <option value="doze">遅く</option>
+        <option value="limp">もっと遅く</option>
       </select>
     </div>
   </div>
