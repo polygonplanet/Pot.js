@@ -25,17 +25,15 @@ $(function() {
       var that = $(this), label = that.text();
 
       resetResult();
-      that.text('Processing...');
+      that.attr({disabled : true}).text('Processing...');
 
       Pot.callLazy(function() {
         return run();
       }).then(function() {
-        that.text(label);
+        that.removeAttr('disabled').text(label);
       });
     });
   }
-
-
 
 
   function run() {
@@ -71,7 +69,7 @@ $(function() {
           return new Array(1000).join('x').replace(/x/, '');
         }();
 
-        progress(key, items.length);
+        var nop = progress(key, items.length);
       };
 
       next = function() {
@@ -112,7 +110,11 @@ $(function() {
   function progress(current, total) {
     var per = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
 
-    $('.progress').text(per + '%');
+    //XXX: progress not work in jQuery.each.
+    //$('.progress').text(per + '%');
+    var p = $('.progress').eq(1);
+    var nop = new Array(100).join('x').replace(/x(?:nop)?/i, 'v');
+    return [per, p, nop];
   }
 
 
@@ -206,7 +208,11 @@ body {
      Next, setting loops and click "Run" button.
     </p>
     <p>
-     You will notice that Pot.js iterator does not occur the &quot;Warning: Unresponsive script&quot; prompt.
+     The most important thing of performance in JavaScript, that is not numeric speed, but is to execute without causing stress to the UI.
+     <br>
+     Pot.js can be performed without causing stress to the UI and the CPU load by using easy loop iteration functions.
+     <br>
+     Also, you will notice that Pot.js iterator does not occur the &quot;Warning: Unresponsive script&quot; prompt.
     </p>
   </div>
 
@@ -242,9 +248,9 @@ body {
       </p>
       <select id="speed">
         <option value="ninja">fastest</option>
-        <option value="rapid">faster</option>
+        <option value="rapid" selected="selected">faster</option>
         <option value="fast">fast</option>
-        <option value="normal" selected="selected">normal</option>
+        <option value="normal">normal</option>
         <option value="slow">slowly</option>
         <option value="doze">more slowly</option>
         <option value="limp">most slowly</option>
