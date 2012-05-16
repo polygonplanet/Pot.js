@@ -14,6 +14,181 @@ location.href = './#manual.overview';
 <div class="pot-js-document-reference-content-container">
 <!--#Pot.js-reference-content:{{{-->
 
+<h2 id="manualsub.overview.whats.Pot.js" class="potjs-manual-item-for-in-view">Pot.js とは</h2>
+<div class="potjs-manual-item-for-in-view">
+  <p>
+    <strong>Pot.js</strong> は CPU に負荷をかけることなく JavaScript の実行を可能とするユーティリティライブラリです。
+  </p>
+  <pre>for (var i = 0, len = items.length; i &lt; len; i++) {
+    var item = items[i];
+    // 何らかの重い処理
+}</pre>
+  <p>
+    このような JavaScript のループが、処理によっては負荷となり「応答のないスクリプト」になってしまうことがあります。
+    <br>
+    これを Pot.js ライブラリのループ関数に置き換えます。
+  </p>
+  <pre>Pot.Deferred.forEach(items, function(item, i) {
+    // 何らかの重い処理
+})</pre>
+  <p>
+    この変化で、どれくらい CPU 使用率に違いあるか示した図です。
+  </p>
+  <div style="margin: 10px; padding: 5px;">
+    <table class="grid" border="1">
+      <tr>
+        <td class="header title-marker">イテレータ</td>
+        <td class="header title-marker">データサイズ</td>
+        <td class="header title-marker">CPU 最大使用率</td>
+        <td class="header title-marker">CPU 平均使用率</td>
+        <td class="header title-marker">実行時間 (ms)</td>
+      </tr>
+      <tr>
+        <td>for 文</td>
+        <td>1MB</td>
+        <td><strong>14.52%</strong></td>
+        <td><strong>10.61%</strong></td>
+        <td>1211ms.</td>
+      </tr>
+      <tr>
+        <td>jQuery.each</td>
+        <td>1MB</td>
+        <td><strong>16.28%</strong></td>
+        <td><strong>13.53%</strong></td>
+        <td>1362ms.</td>
+      </tr>
+      <tr>
+        <td class="marker"><strong>Pot.Deferred.forEach</strong></td>
+        <td class="marker">1MB</td>
+        <td class="marker"><strong>11.65%</strong></td>
+        <td class="marker"><strong>5.53%</strong></td>
+        <td class="marker">1647ms.</td>
+      </tr>
+      <tr>
+        <td>for 文</td>
+        <td>5MB</td>
+        <td><strong>24.85%</strong></td>
+        <td><strong>21.71%</strong></td>
+        <td>4717ms.</td>
+      </tr>
+      <tr>
+        <td>jQuery.each</td>
+        <td>5MB</td>
+        <td><strong>27.78%</strong></td>
+        <td><strong>24.29%</strong></td>
+        <td>5570ms.</td>
+      </tr>
+      <tr>
+        <td class="marker"><strong>Pot.Deferred.forEach</strong></td>
+        <td class="marker">5MB</td>
+        <td class="marker"><strong>13.74%</strong></td>
+        <td class="marker"><strong>8.61%</strong></td>
+        <td class="marker">8925ms.</td>
+      </tr>
+      <tr>
+        <td>for 文</td>
+        <td>10MB</td>
+        <td><strong>28.14%</strong></td>
+        <td><strong>25.92%</strong></td>
+        <td>10699ms.</td>
+      </tr>
+      <tr>
+        <td>jQuery.each</td>
+        <td>10MB</td>
+        <td><strong>31.09%</strong></td>
+        <td><strong>30.77%</strong></td>
+        <td>15844ms.</td>
+      </tr>
+      <tr>
+        <td class="marker"><strong>Pot.Deferred.forEach</strong></td>
+        <td class="marker">10MB</td>
+        <td class="marker"><strong>18.62%</strong></td>
+        <td class="marker"><strong>9.77%</strong></td>
+        <td class="marker">38909ms.</td>
+      </tr>
+    </table>
+  </div>
+  <p>
+   この結果は、<a href="http://potjs.tumblr.com/post/21958543402/jquery-each-pot-js-cpu"
+                  title="jQuery.each と Pot.js イテレータで CPU使用率比較グラフ - Pot.js Blog"
+                  target="_blank">jQuery と JavaScript Pot.js ループの CPU 使用率比較グラフ</a> の記事から得られたものです (Core i5)。
+   <br>
+   各サイズの JSON ファイルを対象としています。
+   <br>
+   Pot.js イテレータは、処理時間が他と比べ長めになっていますが CPU 最大使用率、CPU 平均使用率 共に安定しているのがわかると思います。
+   <br>
+   速度に関しては調節ができ、より高速に実行したい場合は並列処理にすることもできます。
+   <br>
+   また、「応答のないスクリプト」警告を出さずに実行することが可能です。
+  </p>
+  <p>
+    <a href="http://polygonplanet.github.com/Pot.js/pot.js-cpu-usage-tester.html"
+       title="Pot.js - CPU usage tester"
+       target="_blank"
+       style="font-size: 120%; font-weight: bold;">このページで実際に実行して体験できます</a>
+  </p>
+</div>
+<h2 id="manualsub.overview.download" class="potjs-manual-item-for-in-view">ダウンロード</h2>
+<div class="potjs-manual-item-for-in-view">
+ <div style="margin: 8px;">
+   <div>
+    <h4>最新</h4>
+   </div>
+   <ul>
+     <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"
+            title="Pot.js + PotLite.js - 最新の zip"
+            style="font-size: 120%; font-weight: bold;">Download zip</a>
+     </li>
+     <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"
+            title="Pot.js + PotLite.js - 最新の tar.gz"
+            style="font-size: 120%; font-weight: bold;">Download tar.gz</a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>Pot.js</h4>
+   </div>
+   <ul>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js"
+            title="Production (Minified)"
+            style="font-size: 110%;"><strong>pot.min.js</strong> - Production (Minified)</a>
+     </li>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
+            title="Development (Uncompressed Code)"
+            style="font-size: 110%;"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>PotLite.js (lite)</h4>
+   </div>
+   <ul>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js"
+            title="Production (Minified)"
+            style="font-size: 110%;"><strong>potlite.min.js</strong> - Production (Minified)</a>
+     </li>
+     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.js"
+            title="Development (Uncompressed Code)"
+            style="font-size: 110%;"><strong>potlite.js</strong> - Development (Uncompressed Code)</a>
+     </li>
+   </ul>
+ </div>
+ <div style="margin: 8px;">
+   <div>
+    <h4>レポジトリ</h4>
+   </div>
+   <pre>$ git clone git://github.com/polygonplanet/Pot.js</pre>
+   <div style="margin: 8px;">
+     <p>
+      GitHub : <a href="https://github.com/polygonplanet/Pot.js"
+                  title="polygonplanet/Pot.js - GitHub"
+                  style="font-size: 120%; font-weight: bold;">polygonplanet/Pot.js - GitHub</a>
+     </p>
+   </div>
+ </div>
+</div>
 <h2 id="manualsub.overview.overview" class="potjs-manual-item-for-in-view">概要</h2>
 <div class="potjs-manual-item-for-in-view">
   <p>
@@ -53,60 +228,6 @@ location.href = './#manual.overview';
     <br>
     Pot.js で実装されている Deferred などの非同期処理の部分だけを抽出したライトバージョンです。
   </p>
-</div>
-<h2 id="manualsub.overview.download" class="potjs-manual-item-for-in-view">ダウンロード</h2>
-<div class="potjs-manual-item-for-in-view">
- <div style="margin: 8px;">
-   <div>
-    <h4>最新</h4>
-   </div>
-   <ul>
-     <li><a href="http://github.com/polygonplanet/Pot.js/zipball/master"
-            title="Pot.js + PotLite.js - 最新の zip"><strong>zip</strong></a>
-     </li>
-     <li><a href="http://github.com/polygonplanet/Pot.js/tarball/master"
-            title="Pot.js + PotLite.js - 最新の tar.gz"><strong>tar.gz</strong></a>
-     </li>
-   </ul>
- </div>
- <div style="margin: 8px;">
-   <div>
-    <h4>Pot.js</h4>
-   </div>
-   <ul>
-     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js"
-            title="Production (Minified)"><strong>pot.min.js</strong> - Production (Minified)</a>
-     </li>
-     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/pot.js"
-            title="Development (Uncompressed Code)"><strong>pot.js</strong> - Development (Uncompressed Code)</a>
-     </li>
-   </ul>
- </div>
- <div style="margin: 8px;">
-   <div>
-    <h4>PotLite.js (lite)</h4>
-   </div>
-   <ul>
-     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.min.js"
-            title="Production (Minified)"><strong>potlite.min.js</strong> - Production (Minified)</a>
-     </li>
-     <li><a href="https://github.com/polygonplanet/Pot.js/raw/master/potlite.js"
-            title="Development (Uncompressed Code)"><strong>potlite.js</strong> - Development (Uncompressed Code)</a>
-     </li>
-   </ul>
- </div>
- <div style="margin: 8px;">
-   <div>
-    <h4>レポジトリ</h4>
-   </div>
-   <pre>$ git clone git://github.com/polygonplanet/Pot.js</pre>
-   <div style="margin: 8px;">
-     <p>
-      GitHub : <a href="https://github.com/polygonplanet/Pot.js"
-                  title="polygonplanet/Pot.js - GitHub">polygonplanet/Pot.js</a>
-     </p>
-   </div>
- </div>
 </div>
 <h2 id="manualsub.overview.install" class="potjs-manual-item-for-in-view">インストール</h2>
 <div class="potjs-manual-item-for-in-view">

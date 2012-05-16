@@ -3,8 +3,9 @@
     "manual.overview":{
       "title":{"ja":"概要","en":"Overview"},
       "items":{
-        "manualsub.overview.overview":{"ja":"概要","en":"Overview"},
+        "manualsub.overview.whats.Pot.js":{"ja":"Pot.js とは","en":"What's Pot.js?"},
         "manualsub.overview.download":{"ja":"ダウンロード","en":"Download"},
+        "manualsub.overview.overview":{"ja":"概要","en":"Overview"},
         "manualsub.overview.install":{"ja":"インストール","en":"Install"},
         "manualsub.overview.compatibility":{"ja":"動作環境","en":"Compatibility"},
         "manualsub.overview.TestRun":{"ja":"動作テスト","en":"TestRun"},

@@ -7,7 +7,7 @@
 <meta http-equiv="cache-control" content="no-cache">
 <meta http-equiv="cache-control" content="no-store">
 <title>Pot.js + PotLite.js - Document and Reference - JavaScript Async + String Utility Library</title>
-<link rel="shortcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.ico">
+<link rel="shortcut icon" href="http://api.polygonpla.net/img/favicon/potjs-favicon.png">
 <meta name="description" lang="en" content="Pot.js/PotLite.js is an implemental utility library that can execute JavaScript without burdening the CPU.">
 <meta name="keywords" lang="en" content="pot,potlite,potjs,pot.js,potlite.js,potlitejs,javascript,asynchronous,async,deferred,defer,deferrize,iterator,iterate,ecmascript,node.js,cross-browser,ajax,xmlhttprequest,json,jsonp,library">
 <meta name="description" lang="ja" content="Pot.js/PotLite.jsはCPUに負荷をかけることなくJavaScriptの実行を可能とするユーティリティライブラリ.">
@@ -1004,7 +1004,26 @@ body > .layout-liquid-container {
   margin: 4px 6px;
 }
 
+.header-download-search-container {
+  margin-left: 10px;
+}
+
+.header-download {
+  float: left;
+}
+
+.header-download a {
+  margin: 0 5em 0 1em;
+  font-weight: bold;
+  font-size: 150%;
+}
+
+.header-download a .header-download-subtitle {
+  font-size: 85%;
+}
+
 .header-search {
+  float: right;
   margin: 16px 12px 4px 4px;
   text-align: right;
 }
@@ -1105,6 +1124,9 @@ td.marker, td.marker * {
   background: #e2e5ff;
 }
 
+td.title-marker, td.title-marker * {
+  background: #cacbf2;
+}
 
 /* ----- Accordion Menu ----- */
 .ui-helper-reset {
@@ -1638,8 +1660,14 @@ body #goog-gt-tt {
              </div>
             </div>
           </div>
-          <div class="header-search">
-            <div id="cse-search-form"></div>
+          <div class="header-download-search-container clearfix">
+            <div class="header-download">
+              <a href="https://github.com/polygonplanet/Pot.js/zipball/master"
+                 title="Download zip (latest)">Download <span class="header-download-subtitle">(latest)</span></a>
+            </div>
+            <div class="header-search">
+              <div id="cse-search-form"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1670,8 +1698,8 @@ body #goog-gt-tt {
       <div class="footer-wrapper">
         <div class="footer-buttons-container clearfix">
           <p class="footer-buttons-wrapper">
-            Last modified: 2012-05-10
-            Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet">polygon planet</a>
+            Last modified: 2012-05-16
+            Written by <a href="http://twitter.com/polygon_planet" title="Twitter @polygon_planet" target="_blank">polygon planet</a>
           </p>
           <div class="footer-buttons-wrapper">
             <iframe src="http://markdotto.github.com/github-buttons/github-btn.html?user=polygonplanet&amp;repo=Pot.js&amp;type=fork"
