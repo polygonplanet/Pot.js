@@ -81,7 +81,6 @@ toString       = ObjectProto.toString,
 hasOwnProperty = ObjectProto.hasOwnProperty,
 toFuncString   = FunctionProto.toString,
 fromCharCode   = String.fromCharCode,
-StopIteration  = (typeof StopIteration === 'undefined') ? void 0 : StopIteration,
 
 /**
  * faster way of String.fromCharCode(c).
@@ -329,7 +328,7 @@ update(Pot, {
       /(?!^.*compatible.*$).*mozilla.*?(firefox)(?:[\s\/]+([\w.]+)|)/,
       re.mozilla
     ],
-    u = String(n && n.userAgent).toLowerCase();
+    u = ('' + (n && n.userAgent)).toLowerCase();
     if (u) {
       for (i = 0, len = rs.length; i < len; i++) {
         if ((m = rs[i].exec(u))) {
@@ -345,13 +344,13 @@ update(Pot, {
           ver = m[2];
         }
         if (ua) {
-          r[ua] = {version : String(ver || 0)};
+          r[ua] = {version : '' + (ver || 0)};
         }
       }
       m = re.webkit.exec(u) || re.opera.exec(u)   ||
           re.msie.exec(u)   || re.mozilla.exec(u) || [];
       if (m && m[1]) {
-        r[m[1]] = {version : String(m[2] || 0)};
+        r[m[1]] = {version : '' + (m[2] || 0)};
       }
     }
     return r;
@@ -399,9 +398,9 @@ update(Pot, {
    */
   OS : (function(nv) {
     var r = {}, n = nv || {}, i, len, o,
-        pf = String(n.platform).toLowerCase(),
-        ua = String(n.userAgent).toLowerCase(),
-        av = String(n.appVersion).toLowerCase(),
+        pf = ('' + (n.platform)).toLowerCase(),
+        ua = ('' + (n.userAgent)).toLowerCase(),
+        av = ('' + (n.appVersion)).toLowerCase(),
         maps = [
           {s : 'iphone',     p : pf},
           {s : 'ipod',       p : pf},
@@ -1400,30 +1399,29 @@ Pot.update({
    * @public
    */
   isStopIter : function(o) {
-    if (!o) {
+    if (o &&
+        (
+          (PotStopIteration !== void 0 &&
+            (o == PotStopIteration || o instanceof PotStopIteration)
+          ) ||
+          (typeof StopIteration === 'object' &&
+            (o == StopIteration || o instanceof StopIteration)
+          ) ||
+          (this && this.StopIteration !== void 0 &&
+            (o == this.StopIteration || o instanceof this.StopIteration)
+          ) ||
+          (~toString.call(o).indexOf(SI) ||
+            ~String(o && o.toString && o.toString() || o).indexOf(SI)
+          ) ||
+          (isError(o) && o[SI] && !(SI in o[SI]) &&
+            !isError(o[SI]) && isStopIter(o[SI])
+          )
+        )
+    ) {
+      return true;
+    } else {
       return false;
     }
-    if (PotStopIteration !== void 0 &&
-        (o == PotStopIteration || o instanceof PotStopIteration)) {
-      return true;
-    }
-    if (typeof StopIteration !== 'undefined' &&
-        (o == StopIteration || o instanceof StopIteration)) {
-      return true;
-    }
-    if (this && this.StopIteration !== void 0 &&
-        (o == this.StopIteration || o instanceof this.StopIteration)) {
-      return true;
-    }
-    if (~toString.call(o).indexOf(SI) ||
-        ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
-      return true;
-    }
-    if (isError(o) && o[SI] && !(SI in o[SI]) &&
-        !isError(o[SI]) && isStopIter(o[SI])) {
-      return true;
-    }
-    return false;
   },
   /**
    * Return whether the argument is Iterator or not.
@@ -2350,11 +2348,6 @@ Pot.update({
   }())/*{#endif}*/
 });
 }('StopIteration'));
-
-// Define StopIteration (this scope only)
-if (typeof StopIteration === 'undefined' || !StopIteration) {
-  StopIteration = Pot.StopIteration;
-}
 
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
