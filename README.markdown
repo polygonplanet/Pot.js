@@ -49,11 +49,9 @@ Install
 ========
 Will work with common ways.
 
-```
     <script type="text/javascript" src="pot.min.js"></script>
     <!-- or -->
     <script type="text/javascript" src="potlite.min.js"></script>
-```
 
 For Node.js.
 
