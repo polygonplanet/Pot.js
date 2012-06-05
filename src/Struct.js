@@ -572,7 +572,7 @@ update(Pot.Struct, {
         len = args.length, i = 0;
     do {
       if (isArray(args[i])) {
-        args[i] = pairs.apply(null, args[i]);
+        args[i] = Pot.Struct.pairs.apply(null, args[i]);
       }
       if (isObject(args[i])) {
         each(args[i++], function(v, k) {
