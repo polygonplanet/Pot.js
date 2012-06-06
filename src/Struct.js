@@ -1276,7 +1276,7 @@ update(Pot.Struct, {
               } else {
                 result = false;
                 each(object, function(v, i) {
-                  if (!(i in subject) || !cmp(v, subject[i])) {
+                  if (!(i in subject) || !Pot.Struct.equals(v, subject[i], cmp)) {
                     result = false;
                     throw PotStopIteration;
                   } else {
@@ -1306,7 +1306,7 @@ update(Pot.Struct, {
                     throw PotStopIteration;
                   }
                   try {
-                    if (!cmp(value, subject[p])) {
+                    if (!Pot.Struct.equals(value, subject[p], cmp)) {
                       result = false;
                       throw PotStopIteration;
                     }
@@ -1359,7 +1359,7 @@ update(Pot.Struct, {
                 } else {
                   result = false;
                   each(object, function(v, k) {
-                    if (!cmp(v, subject[k])) {
+                    if (!Pot.Struct.equals(v, subject[k], cmp)) {
                       result = false;
                       throw PotStopIteration;
                     } else {
@@ -1373,7 +1373,7 @@ update(Pot.Struct, {
                   } else {
                     result = false;
                     each(object.prototype, function(v, k) {
-                      if (!cmp(v, subject.prototype[k])) {
+                      if (!Pot.Struct.equals(v, subject.prototype[k], cmp)) {
                         result = false;
                         throw PotStopIteration;
                       } else {
@@ -1401,11 +1401,12 @@ update(Pot.Struct, {
             break;
         case 'error':
             if (isError(subject)) {
-              if ((('message' in object &&
-                    cmp(object.message, subject.message)) ||
-                   ('description' in object &&
-                    cmp(object.description, subject.description))) &&
-                    cmp(object.constructor, subject.constructor)) {
+              if (Pot.Struct.equals(
+                    Pot.getErrorMessage(object),
+                    Pot.getErrorMessage(subject),
+                    cmp
+                  ) &&
+                  cmp(object.constructor, subject.constructor)) {
                 result = true;
               }
             }
