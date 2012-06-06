@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.explode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.explode';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.explode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.Struct.explode"><em>Pot.Struct.</em>explode</dfn>
+    (<em>{String}</em> string [, <em>{String|RegExp}</em> delimiter = ':' [, <em>{String|RegExp}</em> separator = ',']])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列を指定のデリミタで分解してオブジェクトにして返します。
+    </p>
+    <div>
+      <p>
+ 引数 string は、分解する文字列を指定します。
+ <br>
+ 引数 delimiter は、キーと値に対して分解する文字列または正規表現を指定します。デフォルトは ':' です。
+ <br>
+ 引数 separator は、要素と次の要素に対して分解する文字列または正規表現を指定します。デフォルトは ',' です。
+ <br>
+ この関数は <a href="#reference.function.Pot.Struct.implode">Pot.implode()</a> の逆のような動作をします。
+ <br>
+ 分解された要素を持つオブジェクトが返ります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.explode() が explode() で実行できます。
+</p>
+<p>
+ string を delimiter と separator で分解したオブジェクトが返ります。
+</p>
+
+<pre>var string = 'color:blue;margin:5px;';
+var result = Pot.explode(string, ':', ';');
+Pot.debug(result);
+// {color: 'blue', margin: '5px'}</pre>
+
+
+<pre>var string = 'foo=1&amp;bar=2&amp;baz=3';
+var result = Pot.explode(string, '=', '&amp;'});
+Pot.debug(result);
+// {foo: '1', bar: '2', baz: '3'}</pre>
+
+
+<pre>var string = 'A : 1, B:2, C: 3;';
+var result = Pot.explode(string, /(?:\s*:\s*)/, /(?:\s*[,;]\s*)/);
+Pot.debug(result);
+// {A: '1', B: '2', C: '3'}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

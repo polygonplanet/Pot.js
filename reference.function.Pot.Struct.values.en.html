@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.values</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.values';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.values</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.Struct.values"><em>Pot.Struct.</em>values</dfn>
+    (<em>{Object}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の値を配列で取得します。
+    </p>
+    <div>
+      <p>
+ オブジェクト o の各値を配列で取得します。
+ <a href="#reference.function.Pot.Struct.keys">Pot.keys()</a> が添字に対して、この関数は値です。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.values() が values() で実行できます。
+</p>
+<p>
+ o の値のすべてを含んだ配列が返ります。
+</p>
+
+<pre>var obj = {foo: 1, bar: 2, baz: 3};
+Pot.debug(Pot.values(obj)); // [1, 2, 3]
+
+var array = ['foo', 'bar', 'baz'];
+Pot.debug(Pot.values(array)); // ['foo', 'bar', 'baz'];
+
+delete array[1];
+Pot.debug(Pot.values(array)); // ['foo', 'baz']</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

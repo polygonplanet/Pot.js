@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.removeAt</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.removeAt';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.removeAt</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.Struct.removeAt"><em>Pot.Struct.</em>removeAt</dfn>
+    (<em>{*}</em> object, <em>{Number}</em> index [, <em>{Number}</em> length = 1])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      object のうち指定した位置から長さまで削除して返します。
+    </p>
+    <div>
+      <p>
+ 引数 object のうち、引数 index から 引数 length まで削除したコピーが返ります。
+ <br>
+ length を省略すると 長さ 1 だけ削除されます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.removeAt() が removeAt() で実行できます。
+</p>
+<p>
+ index から length の長さまで削除された object のコピーが返ります。
+</p>
+
+<pre>// String
+Pot.debug(Pot.removeAt('foo bar baz', 2));         // 'fo bar baz'
+Pot.debug(Pot.removeAt('foo bar baz', 2, 5));      // 'fo baz'
+Pot.debug(Pot.removeAt('foo bar baz', 100));       // 'foo bar baz'
+
+// Array
+Pot.debug(Pot.removeAt([1, 2, 3, 4, 5], 2));       // [1, 2, 4, 5]
+Pot.debug(Pot.removeAt([1, 2, 3, 4, 5], 2, 2));    // [1, 2, 5]
+Pot.debug(Pot.removeAt([1, 2, 3, 4, 5], -1, 5));   // [1, 2, 3, 4]
+
+// Object
+Pot.debug(Pot.removeAt({A: 1, B: 2, C: 3}, 2));    // {A: 1, B: 2}
+Pot.debug(Pot.removeAt({A: 1, B: 2, C: 3}, 1, 5)); // {A: 1}
+Pot.debug(Pot.removeAt({A: 1, B: 2, C: 3}, 5));    // {A: 1, B: 2, C: 3}
+
+// Number
+Pot.debug(Pot.removeAt(1234512345, 2));            // 123451245
+Pot.debug(Pot.removeAt(1234512345, 2, 3));         // 1234545
+Pot.debug(Pot.removeAt(-1234512345, 2, 3));        // -1234545</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

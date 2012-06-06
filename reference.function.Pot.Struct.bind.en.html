@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.bind</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.bind';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.bind</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Function}</em>
+    <dfn id="definition.reference.function.Pot.Struct.bind"><em>Pot.Struct.</em>bind</dfn>
+    (<em>{Function}</em> func, <em>{Object}</em> self [, <em>{*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      this と引数を束縛した関数を返します。
+    </p>
+    <div>
+      <p>
+ this を引数と共に束縛した新しい関数を作成し返します。
+ <br>
+ 引数 func は対象の関数を指定します。
+ <br>
+ 引数 self は対象となるオブジェクト (this) を指定します。
+ <br>
+ self 以降に任意の数の引数を指定すると、束縛する対象となります。
+ <br>
+ bind は、Function.prototype.bind (JavaScript 1.8.5 以上で有効) と似ています。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.bind() が bind() で実行できます。
+</p>
+<p>
+ this と引数を束縛した関数が返ります。
+</p>
+
+
+<pre>var Hoge = function() {
+    this.msg = 'Hello Hoge!';
+};
+Hoge.prototype.sayHoge = function() {
+    Pot.debug(this.msg);
+};
+
+var hoge = new Hoge();
+
+// direct
+setTimeout(hoge.sayHoge, 1000); // undefined
+
+// bind
+setTimeout(Pot.bind(hoge.sayHoge, hoge), 1000); // Hello Hoge!
+
+// with arguments
+Hoge.prototype.sayHogeMsg = function(msg) {
+  Pot.debug(this.msg + msg);
+};
+
+// direct
+setTimeout(hoge.sayHogeMsg, 1000); // NaN
+
+// bind
+setTimeout(Pot.bind(hoge.sayHogeMsg, hoge, 'Hi!'), 1000); // Hello Hoge!Hi!</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.keys</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.keys';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.keys</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.Struct.keys"><em>Pot.Struct.</em>keys</dfn>
+    (<em>{Object}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      オブジェクトのキー名を配列で取得します。
+    </p>
+    <div>
+      <p>
+ 引数 o のキー名をすべて含めた配列を作成し、それを返します。
+ <br>
+ この関数は、ES5 の Object.keys(o) と同じように動作します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.keys() が keys() で実行できます。
+</p>
+<p>
+ o のキー名の配列が返ります。
+</p>
+
+<pre>var obj = {foo: 1, bar: 2, baz: 3};
+Pot.debug(Pot.keys(obj)); // ['foo', 'bar', 'baz']
+
+var array = [10, 20, 30, 40, 50];
+Pot.debug(Pot.keys(array)); // [0, 1, 2, 3, 4]
+
+delete array[2];
+Pot.debug(Pot.keys(array)); // [0, 1, 3, 4]</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

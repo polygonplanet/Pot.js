@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.shuffle</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.shuffle';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.shuffle</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array|Object|*}</em>
+    <dfn id="definition.reference.function.Pot.Struct.shuffle"><em>Pot.Struct.</em>shuffle</dfn>
+    (<em>{Array|Object|*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の要素をシャッフルして返します。
+    </p>
+    <div>
+      <p>
+ 引数 o の要素の順番をシャッフルして、そのコピーを返します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.shuffle() が shuffle() で実行できます。
+</p>
+<p>
+ 要素をシャッフルした o のコピーが返ります。
+</p>
+
+<pre>Pot.debug(Pot.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+// e.g. (uncertain)
+//   [8, 1, 6, 4, 3, 5, 2, 7, 9]
+
+Pot.debug(Pot.shuffle(['foo', 'bar', 'baz']));
+// e.g.
+//   ['bar', 'foo', 'baz']
+
+Pot.debug(Pot.shuffle(12345));
+// e.g.
+//   25143
+
+Pot.debug(Pot.shuffle(-123456789.0839893));
+// e.g.
+//   -276195348.9908833
+
+debug(Pot.shuffle({a: 1, b: 2, c: 3, d: 4, e: 5}));
+// e.g.
+//   {c: 3, b: 2, d: 4, e: 5, a: 1}
+
+Pot.debug(Pot.shuffle('abcdef12345'));
+// e.g.
+//   'ae2d135cb4f'</pre>
+
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

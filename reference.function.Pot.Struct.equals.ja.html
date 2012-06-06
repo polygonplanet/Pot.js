@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.equals</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.equals';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.equals</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Struct.equals"><em>Pot.Struct.</em>equals</dfn>
+    (<em>{Array|Object|*}</em> object, <em>{Array|Object|*}</em> subject [, <em>{Function}</em> func])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      2 つのオブジェクトが同じ値を持つか比較します。
+    </p>
+    <div>
+      <p>
+ 引数 object と 引数 subject が同じ値を持つか比較し、
+ <br>
+ 同じ場合は 真 (true) が返り、違う場合は 偽 (false) が返ります。
+ <br>
+ 比較は単純な === だけではなく、値を比較します。
+ <br>
+ 任意に引数 func によって、比較する関数が指定できます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.equals() が equals() で実行できます。
+</p>
+<p>
+ object と subject が同じ値を持つ場合 true が返り、違う場合 false が返ります。
+</p>
+
+<pre>var obj1 = {foo: 10, bar: 20, baz: 30};
+var obj2 = {foo: 10, bar: 20, baz: 30};
+var obj3 = {a: 'hoge', b: 'fuga'};
+Pot.debug(Pot.equals(obj1, obj2)); // true
+Pot.debug(Pot.equals(obj1, obj3)); // false
+
+var obj4 = {};
+var obj5 = {};
+Pot.debug(Pot.equals(obj4, obj5)); // true</pre>
+
+
+<pre>var arr1 = [1, 2, 3];
+var arr2 = [1, 2, 3];
+var arr3 = [1, 2, 10];
+Pot.debug(Pot.equals(arr1, arr2)); // true
+Pot.debug(Pot.equals(arr1, arr3)); // false
+
+var arr4 = [];
+var arr5 = [];
+Pot.debug(Pot.equals(arr4, arr5)); // true
+
+var cmp = function(a, b) {
+  return a == b ||
+    String(a).toLowerCase() == String(b).toLowerCase();
+};
+
+var arr6 = [1, 2, 'foo', 'bar'];
+var arr7 = ['1', 2, 'FOO', 'baR'];
+Pot.debug(Pot.equals(arr6, arr7, cmp)); // true</pre>
+
+
+<pre>var func1 = (function() {});
+var func2 = (function() {});
+var func3 = (function() { return this; });
+Pot.debug(Pot.equals(func1, func2)); // true
+Pot.debug(Pot.equals(func1, func3)); // false</pre>
+
+
+<pre>var date1 = new Date();
+var date2 = new Date(date1.getTime());
+var date3 = new Date(date1.getTime() + 100);
+Pot.debug(Pot.equals(date1, date2)); // true
+Pot.debug(Pot.equals(date1, date3)); // false</pre>
+
+
+<pre>var str1 = 'foobarbaz';
+var str2 = 'foobarbaz';
+var str3 = 'hoge';
+Pot.debug(Pot.equals(str1, str2)); // true
+Pot.debug(Pot.equals(str1, str3)); // false</pre>
+
+
+<pre>var num1 = 12345;
+var num2 = 12345;
+var num3 = 12345.455512;
+var num4 = 12345.443556;
+var num5 = 12345.443556999;
+Pot.debug(Pot.equals(num1, num2)); // true
+Pot.debug(Pot.equals(num1, num3)); // false
+Pot.debug(Pot.equals(num3, num4)); // false
+Pot.debug(Pot.equals(num4, num5)); // true</pre>
+
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

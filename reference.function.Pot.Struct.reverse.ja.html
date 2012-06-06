@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.reverse</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.reverse';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.reverse</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object|*}</em>
+    <dfn id="definition.reference.function.Pot.Struct.reverse"><em>Pot.Struct.</em>reverse</dfn>
+    (<em>{Object|Array|*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の値を逆にして返します。
+    </p>
+    <div>
+      <p>
+ 値を逆にした 引数 o のコピーを取得します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.reverse() が reverse() で実行できます。
+</p>
+<p>
+ 値を逆にした o のコピーが返ります。
+</p>
+
+<pre>Pot.debug(Pot.reverse({foo: 1, bar: 2, baz: 3})); // {baz: 3, bar: 2, foo: 1}</pre>
+
+<pre>Pot.debug(Pot.reverse([1, 2, 3, 4, 5])); // [5, 4, 3, 2, 1]</pre>
+
+<pre>Pot.debug(Pot.reverse('123abc')); // 'cba321'</pre>
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

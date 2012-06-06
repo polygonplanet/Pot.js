@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.first</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.first';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.first</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{*}</em>
+    <dfn id="definition.reference.function.Pot.Struct.first"><em>Pot.Struct.</em>first</dfn>
+    (<em>{Object|Array|*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o の要素のうち最初の値を取得します。
+    </p>
+    <div>
+      <p>
+ 引数 o の持つ要素のうち、最初の値を取得し返します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.first() が first() で実行できます。
+</p>
+<p>
+ o の最初の値が返ります。
+</p>
+
+<pre>Pot.debug(Pot.first({a: 1, b: 2, c: 3}));   // 1
+Pot.debug(Pot.first({}));                   // undefined
+Pot.debug(Pot.first([1, 2, 3, 4, 5]));      // 1
+Pot.debug(Pot.first([]));                   // undefined
+Pot.debug(Pot.first({a: 'foo', b: 'bar'})); // 'foo'
+Pot.debug(Pot.first(new Array(100)));       // undefined
+Pot.debug(Pot.first(null));                 // undefined
+Pot.debug(Pot.first((void 0)));             // undefined
+Pot.debug(Pot.first('hoge'));               // 'h'
+Pot.debug(Pot.first(''));                   // ''
+Pot.debug(Pot.first(new String('hoge')));   // 'h'
+Pot.debug(Pot.first(123));                  // 3
+Pot.debug(Pot.first(0));                    // 0
+Pot.debug(Pot.first(-123));                 // 3</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.contains</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.contains';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.contains</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Struct.contains"><em>Pot.Struct.</em>contains</dfn>
+    (<em>{*}</em> object, <em>{*}</em> subject)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      subject が object に含まれているか調べます。
+    </p>
+    <div>
+      <p>
+ 引数 object に 引数 subject が含まれているか調べ、
+ <br>
+ 含まれている場合 真 (true) を返し、含まれていない場合 偽 (false) を返します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.contains() が contains() で実行できます。
+</p>
+<p>
+ subject が object に含まれている場合 true が返り、そうでない場合 false が返ります。
+</p>
+
+<pre>var obj = {foo: 10, bar: 20, baz: 30};
+Pot.debug(Pot.contains(obj, 20));    // true
+Pot.debug(Pot.contains(obj, 50));    // false
+
+var arr = [10, 20, 30, 'foo', 'bar'];
+Pot.debug(Pot.contains(arr, 20));    // true
+Pot.debug(Pot.contains(arr, 75));    // false
+Pot.debug(Pot.contains(arr, 'foo')); // true
+Pot.debug(Pot.contains(arr, 'FOO')); // false
+
+var str = 'foobarbaz';
+Pot.debug(Pot.contains(str, 'A'));   // false
+Pot.debug(Pot.contains(str, 'foo')); // true
+Pot.debug(Pot.contains(str, '123')); // false
+
+var num = 12345;
+Pot.debug(Pot.contains(num, 1));     // true
+Pot.debug(Pot.contains(num, 45));    // true
+Pot.debug(Pot.contains(num, 7));     // false</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

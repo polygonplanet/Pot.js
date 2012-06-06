@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.implode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.implode';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.implode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Struct.implode"><em>Pot.Struct.</em>implode</dfn>
+    (<em>{Object}</em> object [, <em>{String}</em> delimiter = ':' [, <em>{String}</em> separator = ',' [, <em>{Boolean|String}</em> tail = false]]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      オブジェクトをデリミタとセパレータで連結し文字列にして取得します。
+    </p>
+    <div>
+      <p>
+ 引数 object は連結するオブジェクトを指定します。
+ <br>
+ 引数 delimiter は、キーと値を連結する文字を指定します。デフォルトは ':' です。
+ <br>
+ 引数 separator は、要素と次の要素を連結する文字を指定します。デフォルトは ',' です。
+ <br>
+ 引数 tail を 真 (true) として指定すると、結果の末尾に separator が付きます。
+ <br>
+ tail を文字列で指定すると、tail そのものが結果の末尾に付きます。
+ <br>
+ この関数の引数の順序は定義と違っていても動きます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.implode() が implode() で実行できます。
+</p>
+<p>
+ object を delimiter と separator で連結した文字列が返ります。
+</p>
+
+<pre>Pot.debug(Pot.implode({color: 'blue', margin: '5px'}, ':', ';', true));
+// 'color:blue;margin:5px;'</pre>
+
+
+<pre>// Arguments can passed in any order.
+// (The first will be the `delimiter` as a string).
+Pot.debug(Pot.implode('+', {a: 1, b: 2, c: 3}, '*'));
+// 'a+1*b+2*c+3'</pre>
+
+
+<pre>// If the `tail` is given as string
+//  then will be append the `tail` itself to string.
+Pot.debug(Pot.implode('&gt;&gt;', {a: 1, b: 2, c: 3}, '^', '==?'));
+// 'a&gt;&gt;1^b&gt;&gt;2^c&gt;&gt;3==?'</pre>
+
+
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

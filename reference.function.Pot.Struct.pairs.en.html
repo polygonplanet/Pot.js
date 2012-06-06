@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.pairs</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.pairs';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.pairs</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.Struct.pairs"><em>Pot.Struct.</em>pairs</dfn>
+    (<em>{String|*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      key-value のペアからオブジェクトを生成します。
+    </p>
+    <div>
+      <p>
+ 可変引数のキーと値のペアからオブジェクトを生成し、返します。
+ <br>
+ 第一引数が キー名1、第二引数が 値1 といった変換になります。
+ <br>
+ 引数が奇数になった場合は、値が undefined になります。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.pairs() が pairs() で実行できます。
+</p>
+<p>
+ 生成したオブジェクトが返ります。
+</p>
+
+
+<pre>Pot.debug(Pot.pairs('key', 'value'));
+// {key : 'value'}
+
+Pot.debug(Pot.pairs('key1', 'value1', 'key2', 'value2'));
+// {key1: 'value1', key2: 'value2'}
+
+Pot.debug(Pot.pairs('key'));
+// {key: undefined}
+
+Pot.debug(Pot.pairs(['key', 'value']));
+// {key: 'value'}
+
+Pot.debug(Pot.pairs('key1', 1, ['key2', 2], 'key3', 3));
+// {key1: 1, key2: 2, key3: 3}
+
+Pot.debug(Pot.pairs(['a', 1, ['b', 2, [{c: 3}, 'd', 4]]]));
+// {a: 1, b: 2, c: 3, d: 4}</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

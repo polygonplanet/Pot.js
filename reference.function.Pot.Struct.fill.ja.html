@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Struct.fill</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Struct.fill';
+</script>
+</head>
+<body>
+<h1>Pot.Struct.fill</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array|Object|*}</em>
+    <dfn id="definition.reference.function.Pot.Struct.fill"><em>Pot.Struct.</em>fill</dfn>
+    (<em>{Array|Object|*}</em> defaults, <em>{*}</em> value, <em>{Number}</em> count)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      指定された値を 指定の数だけ埋めて返します。
+    </p>
+    <div>
+      <p>
+ 引数 defaults はデフォルトの値 (型) を指定します。
+ <br>
+ 引数 value は埋める値を指定します。
+ <br>
+ 引数 count は埋める数を指定します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.fill() が fill() で実行できます。
+</p>
+<p>
+ defaults に value を count のぶんだけ埋めた新しいオブジェクトが返ります。
+</p>
+
+
+<pre>Pot.debug(Pot.fill([1, 2], 3, 5));
+// [1, 2, 3, 3, 3, 3, 3]
+
+Pot.debug(Pot.fill([], null, 3));
+// [null, null, null]
+
+Pot.debug(Pot.fill('foo', 'o', 10));
+// 'foooooooooooo'
+
+Pot.debug(Pot.fill('', 'hoge', 5));
+// 'hogehogehogehogehoge'
+
+Pot.debug(Pot.fill({}, 2, 5));
+// {'0': 2, '1': 2, '2': 2, '3': 2, '4': 2}
+
+Pot.debug(Pot.fill({a: 1, b: 2, c: 3}, null));
+// {a: null, b: null, c: null}
+
+Pot.debug(Pot.fill(100, 5, 10));
+// 5555555555100</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
