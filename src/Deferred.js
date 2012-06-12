@@ -2564,7 +2564,7 @@ update(Deferred, {
    *         debug(5);
    *         return 5;
    *       });
-   *     }),
+   *     }).begin(),
    *     6.00126,
    *     function() {
    *       return Pot.Deferred.succeed().then(function() {
@@ -2606,13 +2606,13 @@ update(Deferred, {
    *           return Pot.Deferred.succeed(2);
    *         });
    *       });
-   *     }),
+   *     }).begin(),
    *     baz : function() {
    *       var d = new Pot.Deferred();
    *       return d.async(false).then(function() {
    *         debug(3);
    *         return 3;
-   *       });
+   *       }).begin();
    *     }
    *   }).then(function(values) {
    *     debug(values);
@@ -2667,14 +2667,7 @@ update(Deferred, {
           defer = deferred;
         } else if (isFunction(deferred)) {
           defer = new Deferred();
-          defer.then(function() {
-            var r = deferred();
-            if (isDeferred(r) &&
-                r.state === Deferred.states.unfired) {
-              r.begin();
-            }
-            return r;
-          });
+          defer.then(deferred);
         } else {
           defer = Deferred.succeed(deferred);
         }
