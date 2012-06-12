@@ -1258,14 +1258,22 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty, keys, i, len, k;
+    var result = false, cmp, empty, keys, i, len, k, doCmp;
     /**@ignore*/
     cmp = isFunction(func) ? func : (function(a, b) { return a === b; });
+    /**@ignore*/
+    doCmp = function(a, b) {
+      try {
+        return cmp(a, b);
+      } catch (e) {
+        return false;
+      }
+    };
     if (object == null) {
       if (cmp(object, subject)) {
         result = true;
       }
-    } else if (object === subject) {
+    } else if (object === subject || doCmp(object, subject)) {
       result = true;
     } else {
       switch (typeLikeOf(object)) {
