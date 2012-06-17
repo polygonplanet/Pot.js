@@ -58,6 +58,7 @@ update(Pot.Format, {
    *
    *   - a : Return the string in lowercase the result encoded in base 36.
    *   - A : Return the string in uppercase the result encoded in base 36.
+   *   - n : Return the string that is formatted number with grouped thousands.
    *
    * </pre>
    *
@@ -137,6 +138,12 @@ update(Pot.Format, {
    *   //   [many monke]
    *
    *
+   * @example
+   *   Pot.debug(Pot.sprintf('%n', 1234567890)); // 1,234,567,890
+   *   Pot.debug(Pot.sprintf('%n', 12345678.9)); // 12,345,678.9
+   *   Pot.debug(Pot.sprintf('%n', 123));        // 123
+   *
+   *
    * @param  {String}  format   The format string is composed of zero or
    *                              more directives: ordinary characters
    *                              (excluding %) that are copied directly
@@ -158,7 +165,8 @@ update(Pot.Format, {
       /**@ignore*/
       me.formatProcedure = (function() {
         var args,
-            re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi;
+            re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi,
+            ren = /\d{1,3}(?=(?:\d{3})+(?:[.]\d+|)$)/g;
         /**@ignore*/
         function utf8(s) {
           return Pot.UTF8 && Pot.UTF8.encode(s) || stringify(s);
@@ -344,6 +352,9 @@ update(Pot.Format, {
                   break;
               case 'A':
                   v = base(36, v).toUpperCase();
+                  break;
+              case 'n':
+                  v = ('' + parse(v, true)).replace(ren, '$&,');
             }
             result = justify(v, mark, width, precision, left, numeric);
           }
