@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.24
- * @date           2012-05-13
+ * @version        1.25
+ * @date           2012-06-17
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
  */
@@ -612,7 +612,7 @@ $(function() {
         var arr = [1, 2, 3];
         result.push(isTypedArray(obj));
         result.push(isTypedArray(arr));
-        if (PotSystem.hasTypedArray) {
+        if (Pot.System.hasTypedArray) {
           result.push(isTypedArray(new ArrayBuffer(10)));
           result.push(isTypedArray(new Uint8Array(10)));
         } else {
@@ -2456,7 +2456,7 @@ $(function() {
           },
           (new Deferred()).then(function() {
             return 'baz';
-          })
+          }).begin()
         ]).then(function(values) {
           return values;
         });
@@ -2480,7 +2480,7 @@ $(function() {
             var d = new Deferred();
             return d.async(false).then(function() {
               return 3;
-            });
+            }).begin();
           }
         }).then(function(values) {
           return values;
@@ -2490,47 +2490,47 @@ $(function() {
     }, {
       title  : 'Pot.Deferred.chain()',
       code   : function() {
-        var result = [];
+        var result = 0;
         var deferred = chain(
           function() {
             return wait(1).then(function() {
-              result.push(1);
+              result++;
             });
           },
           function(res) {
             throw new Error('TestChainError');
           },
           function rescue(err) {
-            result.push(err);
+            result++;
           },
           function(res) {
             return succeed(res).then(function(val) {
-              result.push(2);
+              result++;
             });
           },
           {
             foo : function(res) {
-              result.push(3);
+              result++;
             },
             bar : function(res) {
               return begin(function() {
-                result.push(4);
+                result++;
               });
             }
           },
           function(res) {
-            result.push(5);
+            result++;
           },
           [
             function(res) {
               return wait(1).then(function() {
-                result.push(6);
+                result++;
               });
             },
             function(res) {
               return begin(function() {
-                return succeed(7).then(function(val) {
-                  result.push(val);
+                return succeed().then(function(val) {
+                  result++;
                 });
               });
             }
@@ -2540,7 +2540,7 @@ $(function() {
           return result;
         });
       },
-      expect : [1, new Error('TestChainError'), 2, 3, 4, 5, 6, 7]
+      expect : 8
     }, {
       title : 'A simple Deferred chain',
       code  : function() {
