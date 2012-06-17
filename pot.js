@@ -4,7 +4,7 @@
  * Pot.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.19, 2012-05-13
+ * Version 1.20, 2012-06-17
  * Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
  * https://github.com/polygonplanet/Pot.js
@@ -68,8 +68,8 @@
  *
  * @fileoverview   Pot.js library
  * @author         polygon planet
- * @version        1.19
- * @date           2012-05-13
+ * @version        1.20
+ * @date           2012-06-17
  * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
@@ -105,7 +105,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.19', TYPE : 'full'},
+var Pot = {VERSION : '1.20', TYPE : 'full'},
 
 // Refer the Pot properties/functions.
 PotSystem,
@@ -179,7 +179,6 @@ toString       = ObjectProto.toString,
 hasOwnProperty = ObjectProto.hasOwnProperty,
 toFuncString   = FunctionProto.toString,
 fromCharCode   = String.fromCharCode,
-StopIteration  = (typeof StopIteration === 'undefined') ? void 0 : StopIteration,
 
 /**
  * faster way of String.fromCharCode(c).
@@ -427,7 +426,7 @@ update(Pot, {
       /(?!^.*compatible.*$).*mozilla.*?(firefox)(?:[\s\/]+([\w.]+)|)/,
       re.mozilla
     ],
-    u = String(n && n.userAgent).toLowerCase();
+    u = ('' + (n && n.userAgent)).toLowerCase();
     if (u) {
       for (i = 0, len = rs.length; i < len; i++) {
         if ((m = rs[i].exec(u))) {
@@ -443,13 +442,13 @@ update(Pot, {
           ver = m[2];
         }
         if (ua) {
-          r[ua] = {version : String(ver || 0)};
+          r[ua] = {version : '' + (ver || 0)};
         }
       }
       m = re.webkit.exec(u) || re.opera.exec(u)   ||
           re.msie.exec(u)   || re.mozilla.exec(u) || [];
       if (m && m[1]) {
-        r[m[1]] = {version : String(m[2] || 0)};
+        r[m[1]] = {version : '' + (m[2] || 0)};
       }
     }
     return r;
@@ -497,9 +496,9 @@ update(Pot, {
    */
   OS : (function(nv) {
     var r = {}, n = nv || {}, i, len, o,
-        pf = String(n.platform).toLowerCase(),
-        ua = String(n.userAgent).toLowerCase(),
-        av = String(n.appVersion).toLowerCase(),
+        pf = ('' + (n.platform)).toLowerCase(),
+        ua = ('' + (n.userAgent)).toLowerCase(),
+        av = ('' + (n.appVersion)).toLowerCase(),
         maps = [
           {s : 'iphone',     p : pf},
           {s : 'ipod',       p : pf},
@@ -1498,30 +1497,29 @@ Pot.update({
    * @public
    */
   isStopIter : function(o) {
-    if (!o) {
+    if (o &&
+        (
+          (PotStopIteration !== void 0 &&
+            (o == PotStopIteration || o instanceof PotStopIteration)
+          ) ||
+          (typeof StopIteration === 'object' &&
+            (o == StopIteration || o instanceof StopIteration)
+          ) ||
+          (this && this.StopIteration !== void 0 &&
+            (o == this.StopIteration || o instanceof this.StopIteration)
+          ) ||
+          (~toString.call(o).indexOf(SI) ||
+            ~String(o && o.toString && o.toString() || o).indexOf(SI)
+          ) ||
+          (isError(o) && o[SI] && !(SI in o[SI]) &&
+            !isError(o[SI]) && isStopIter(o[SI])
+          )
+        )
+    ) {
+      return true;
+    } else {
       return false;
     }
-    if (PotStopIteration !== void 0 &&
-        (o == PotStopIteration || o instanceof PotStopIteration)) {
-      return true;
-    }
-    if (typeof StopIteration !== 'undefined' &&
-        (o == StopIteration || o instanceof StopIteration)) {
-      return true;
-    }
-    if (this && this.StopIteration !== void 0 &&
-        (o == this.StopIteration || o instanceof this.StopIteration)) {
-      return true;
-    }
-    if (~toString.call(o).indexOf(SI) ||
-        ~String(o && o.toString && o.toString() || o).indexOf(SI)) {
-      return true;
-    }
-    if (isError(o) && o[SI] && !(SI in o[SI]) &&
-        !isError(o[SI]) && isStopIter(o[SI])) {
-      return true;
-    }
-    return false;
   },
   /**
    * Return whether the argument is Iterator or not.
@@ -2448,11 +2446,6 @@ Pot.update({
   }())
 });
 }('StopIteration'));
-
-// Define StopIteration (this scope only)
-if (typeof StopIteration === 'undefined' || !StopIteration) {
-  StopIteration = Pot.StopIteration;
-}
 
 // Refer the Pot properties/functions.
 PotStopIteration = Pot.StopIteration;
@@ -7566,7 +7559,7 @@ update(Deferred, {
    *         debug(5);
    *         return 5;
    *       });
-   *     }),
+   *     }).begin(),
    *     6.00126,
    *     function() {
    *       return Pot.Deferred.succeed().then(function() {
@@ -7608,13 +7601,13 @@ update(Deferred, {
    *           return Pot.Deferred.succeed(2);
    *         });
    *       });
-   *     }),
+   *     }).begin(),
    *     baz : function() {
    *       var d = new Pot.Deferred();
    *       return d.async(false).then(function() {
    *         debug(3);
    *         return 3;
-   *       });
+   *       }).begin();
    *     }
    *   }).then(function(values) {
    *     debug(values);
@@ -7669,14 +7662,7 @@ update(Deferred, {
           defer = deferred;
         } else if (isFunction(deferred)) {
           defer = new Deferred();
-          defer.then(function() {
-            var r = deferred();
-            if (isDeferred(r) &&
-                r.state === Deferred.states.unfired) {
-              r.begin();
-            }
-            return r;
-          });
+          defer.then(deferred);
         } else {
           defer = Deferred.succeed(deferred);
         }
@@ -24867,7 +24853,7 @@ update(Pot.Struct, {
         len = args.length, i = 0;
     do {
       if (isArray(args[i])) {
-        args[i] = pairs.apply(null, args[i]);
+        args[i] = Pot.Struct.pairs.apply(null, args[i]);
       }
       if (isObject(args[i])) {
         each(args[i++], function(v, k) {
@@ -25553,14 +25539,22 @@ update(Pot.Struct, {
    * @public
    */
   equals : function(object, subject, func) {
-    var result = false, cmp, empty, keys, i, len, k;
+    var result = false, cmp, empty, keys, i, len, k, doCmp;
     /**@ignore*/
     cmp = isFunction(func) ? func : (function(a, b) { return a === b; });
+    /**@ignore*/
+    doCmp = function(a, b) {
+      try {
+        return cmp(a, b);
+      } catch (e) {
+        return false;
+      }
+    };
     if (object == null) {
       if (cmp(object, subject)) {
         result = true;
       }
-    } else if (object === subject) {
+    } else if (object === subject || doCmp(object, subject)) {
       result = true;
     } else {
       switch (typeLikeOf(object)) {
@@ -25571,7 +25565,7 @@ update(Pot.Struct, {
               } else {
                 result = false;
                 each(object, function(v, i) {
-                  if (!(i in subject) || !cmp(v, subject[i])) {
+                  if (!(i in subject) || !Pot.Struct.equals(v, subject[i], cmp)) {
                     result = false;
                     throw PotStopIteration;
                   } else {
@@ -25601,7 +25595,7 @@ update(Pot.Struct, {
                     throw PotStopIteration;
                   }
                   try {
-                    if (!cmp(value, subject[p])) {
+                    if (!Pot.Struct.equals(value, subject[p], cmp)) {
                       result = false;
                       throw PotStopIteration;
                     }
@@ -25654,7 +25648,7 @@ update(Pot.Struct, {
                 } else {
                   result = false;
                   each(object, function(v, k) {
-                    if (!cmp(v, subject[k])) {
+                    if (!Pot.Struct.equals(v, subject[k], cmp)) {
                       result = false;
                       throw PotStopIteration;
                     } else {
@@ -25668,7 +25662,7 @@ update(Pot.Struct, {
                   } else {
                     result = false;
                     each(object.prototype, function(v, k) {
-                      if (!cmp(v, subject.prototype[k])) {
+                      if (!Pot.Struct.equals(v, subject.prototype[k], cmp)) {
                         result = false;
                         throw PotStopIteration;
                       } else {
@@ -25696,11 +25690,12 @@ update(Pot.Struct, {
             break;
         case 'error':
             if (isError(subject)) {
-              if ((('message' in object &&
-                    cmp(object.message, subject.message)) ||
-                   ('description' in object &&
-                    cmp(object.description, subject.description))) &&
-                    cmp(object.constructor, subject.constructor)) {
+              if (Pot.Struct.equals(
+                    Pot.getErrorMessage(object),
+                    Pot.getErrorMessage(subject),
+                    cmp
+                  ) &&
+                  cmp(object.constructor, subject.constructor)) {
                 result = true;
               }
             }
@@ -30518,6 +30513,7 @@ update(Pot.Format, {
    *
    *   - a : Return the string in lowercase the result encoded in base 36.
    *   - A : Return the string in uppercase the result encoded in base 36.
+   *   - n : Return the string that is formatted number with grouped thousands.
    *
    * </pre>
    *
@@ -30597,6 +30593,12 @@ update(Pot.Format, {
    *   //   [many monke]
    *
    *
+   * @example
+   *   Pot.debug(Pot.sprintf('%n', 1234567890)); // 1,234,567,890
+   *   Pot.debug(Pot.sprintf('%n', 12345678.9)); // 12,345,678.9
+   *   Pot.debug(Pot.sprintf('%n', 123));        // 123
+   *
+   *
    * @param  {String}  format   The format string is composed of zero or
    *                              more directives: ordinary characters
    *                              (excluding %) that are copied directly
@@ -30618,7 +30620,8 @@ update(Pot.Format, {
       /**@ignore*/
       me.formatProcedure = (function() {
         var args,
-            re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi;
+            re = /%%|%('?(?:[0\u0020+-]|[^%\w.-])+|)(\d*|)(\.\d*|)([%a-z])/gi,
+            ren = /\d{1,3}(?=(?:\d{3})+(?:[.]\d+|)$)/g;
         /**@ignore*/
         function utf8(s) {
           return Pot.UTF8 && Pot.UTF8.encode(s) || stringify(s);
@@ -30804,6 +30807,9 @@ update(Pot.Format, {
                   break;
               case 'A':
                   v = base(36, v).toUpperCase();
+                  break;
+              case 'n':
+                  v = ('' + parse(v, true)).replace(ren, '$&,');
             }
             result = justify(v, mark, width, precision, left, numeric);
           }

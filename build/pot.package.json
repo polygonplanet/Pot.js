@@ -1,7 +1,7 @@
 {
   "fileName": "pot.js",
   "debug": false,
-  "version": "1.19",
+  "version": "1.20",
   "files": [
     "Core.js",
     "Deferred.js",
