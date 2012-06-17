@@ -46,10 +46,11 @@ location.href = './#reference.function.Pot.Deferred.chain';
  <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応済みの場合、Pot.Deferred.chain() が chain() で実行できます。
 </p>
 
-<pre>var deferred = Pot.Deferred.chain(
+<pre>var result = 0;
+var deferred = Pot.Deferred.chain(
     function() {
         return Pot.Deferred.wait(1).then(function() {
-            Pot.debug(1);
+            result++;
         });
     },
     function(res) {
@@ -57,43 +58,44 @@ location.href = './#reference.function.Pot.Deferred.chain';
     },
     // 関数名に rescue と付けることで rescue メソッド扱いになる
     function rescue(err) {
-        Pot.debug(err);
+        result++;
     },
     function(res) {
         return Pot.Deferred.succeed(res).then(function(val) {
-            Pot.debug(2);
+            result++;
         });
     },
     {
         foo : function(res) {
-            Pot.debug(3);
+            result++;
         },
         bar : function(res) {
             return Pot.Deferred.begin(function() {
-                Pot.debug(4);
+                result++;
             });
         }
     },
     function(res) {
-        Pot.debug(5);
+        result++;
     },
     [
         function(res) {
             return Pot.Deferred.wait(1).then(function() {
-                Pot.debug(6);
+                result++;
             });
         },
         function(res) {
             return Pot.Deferred.begin(function() {
                 return Pot.Deferred.succeed(7).then(function(val) {
-                    Pot.debug(val);
+                    result++;
                 });
             });
         }
     ]
 );
-// 1, (Error: error), 2, 3, 4, 5, 6, 7
-// と出力される</pre>
+deferred.begin().then(function() {
+    Pot.debug(result); // 8
+});</pre>
     </div>
   </dd>
 </dl>

@@ -64,7 +64,7 @@ Pot.Deferred.parallel([
     },
     (new Pot.Deferred()).then(function() {
         return 'baz';
-    })
+    }).begin()
 ]).then(function(values) {
     Pot.debug(values);
     // values[0] == 'foo'
@@ -85,12 +85,12 @@ Pot.Deferred.parallel([
                 return Pot.Deferred.succeed(2);
             });
         });
-    }),
+    }).begin(),
     baz : function() {
         var d = new Pot.Deferred();
         return d.async(false).then(function() {
             return 3;
-        });
+        }).begin();
     }
 }).then(function(values) {
     Pot.debug(values);
