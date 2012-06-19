@@ -136,6 +136,9 @@ location.href = './#reference.function.Pot.Format.sprintf';
     <li>
      <em>A</em> - 引数を整数として扱い、36 進数として (大文字で) 表現します。
     </li>
+    <li>
+     <em>n</em> - 引数を数値として扱い、3 桁区切りの数字として表現します。
+    </li>
    </ul>
   </li>
  </ol>
@@ -225,6 +228,10 @@ debug(sprintf(&quot;[%10.10s]&quot;, t)); // 左詰めを行い、10 文字以�
 //   [####monkey]
 //   [many monke]
 //</pre>
+
+<pre>Pot.debug(Pot.sprintf('%n', 1234567890)); // 1,234,567,890
+Pot.debug(Pot.sprintf('%n', 12345678.9)); // 12,345,678.9
+Pot.debug(Pot.sprintf('%n', 123));        // 123</pre>
 
     </div>
   </dd>
