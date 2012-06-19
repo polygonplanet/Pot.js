@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Sanitizer.escapeAppleScriptString</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Sanitizer.escapeAppleScriptString';
+</script>
+</head>
+<body>
+<h1>Pot.Sanitizer.escapeAppleScriptString</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Sanitizer.escapeAppleScriptString"><em>Pot.Sanitizer.</em>escapeAppleScriptString</dfn>
+    (<em>{String}</em> s)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 s を AppleScript としてエスケープします。
+    </p>
+    <div>
+      <p>
+ <code>&quot;</code> が <code>\&quot;</code> に変換されます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.escapeAppleScriptString() が escapeAppleScriptString() で実行できます。
+</p>
+<p>
+ エスケープされた文字列が返ります。
+</p>
+
+<pre>var file = Pot.escapeAppleScriptString('ヾ(&quot;ゝω・&quot;)ﾉ&quot;');
+var command = [
+    'tell application &quot;Finder&quot;',
+    '  get exists of file &quot;' + file + '&quot; of desktop',
+    'end tell'
+].join('\n');
+
+Pot.debug(command);
+//   tell application &quot;Finder&quot;
+//     get exists of file &quot;ヾ(\&quot;ゝω・\&quot;)ﾉ\&quot;&quot; of desktop
+//   end tell</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

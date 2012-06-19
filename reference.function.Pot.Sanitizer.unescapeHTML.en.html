@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Sanitizer.unescapeHTML</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Sanitizer.unescapeHTML';
+</script>
+</head>
+<body>
+<h1>Pot.Sanitizer.unescapeHTML</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Sanitizer.unescapeHTML"><em>Pot.Sanitizer.</em>unescapeHTML</dfn>
+    (<em>{String}</em> text)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 text を HTML 文字列としてアンエスケープします。
+    </p>
+    <div>
+      <p>
+ 引数 text をエスケープ済みの HTML 文字列として、アンエスケープして返します。
+ <br>
+ 基本的に <a href="#reference.function.Pot.Sanitizer.escapeHTML">Pot.escapeHTML</a> の逆の動作をします。
+ <br>
+ また、他のエンティティも変換します。
+ <br>
+ 例えば <code>&amp;apos;</code> は <code>' (U+0027)</code> になり、<code>&amp;middot;</code> は <code>・ (U+30FB)</code> になります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.unescapeHTML() が unescapeHTML() で実行できます。
+</p>
+<p>
+ アンエスケープされた文字列が返ります。
+</p>
+
+<pre>var string = '(&amp;gt;_&amp;lt;)/&amp;quot;&amp;lt; Hello World!';
+var result = Pot.unescapeHTML(string);
+Pot.debug(result);
+// '(&gt;_&lt;)/&quot;&lt; Hello World!'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

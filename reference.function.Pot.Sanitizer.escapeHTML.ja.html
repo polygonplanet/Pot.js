@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Sanitizer.escapeHTML</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Sanitizer.escapeHTML';
+</script>
+</head>
+<body>
+<h1>Pot.Sanitizer.escapeHTML</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.Sanitizer.escapeHTML"><em>Pot.Sanitizer.</em>escapeHTML</dfn>
+    (<em>{String}</em> text)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 text を HTML 文字列としてエスケープします。
+    </p>
+    <div>
+      <p>
+ 引数 text を HTML 文字列とし、エスケープします。
+</p>
+<ul>
+ <li><code>&amp;</code> は <code>&amp;amp;</code> になります。</li>
+ <li><code>&lt;</code> は <code>&amp;lt;</code> になります。</li>
+ <li><code>&gt;</code> は <code>&amp;gt;</code> になります。</li>
+ <li><code>&quot;</code> は <code>&amp;quot;</code> になります。</li>
+ <li><code>'</code> は <code>&amp;#039;</code> になります。</li>
+</ul>
+<p>
+ この関数は、既にエスケープされている文字列を 2 重でエスケープしません。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.escapeHTML() が escapeHTML() で実行できます。
+</p>
+<p>
+ エスケープされた文字列が返ります。
+</p>
+
+<pre>var string = '(&gt;_&lt;)/&quot;&lt; Hello World!';
+var result = Pot.escapeHTML(string);
+Pot.debug(result);
+// '(&amp;gt;_&amp;lt;)/&amp;quot;&amp;lt; Hello World!'</pre>
+
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
