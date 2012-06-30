@@ -1423,7 +1423,13 @@ function readerPolling(reader) {
         done = true;
         d.begin(ev && ev.target && ev.target.result);
       }
-      orgLoad && orgLoad.apply(this, arguments);
+      if (isFunction(orgLoad)) {
+        if (orgLoad.apply) {
+          orgLoad.apply(this, arguments);
+        } else {
+          orgLoad(ev);
+        }
+      }
     };
     /**@ignore*/
     reader.onloadend = function(ev) {
@@ -1431,7 +1437,13 @@ function readerPolling(reader) {
         done = true;
         d.begin(ev && ev.target && ev.target.result);
       }
-      orgLoadEnd && orgLoadEnd.apply(this, arguments);
+      if (isFunction(orgLoadEnd)) {
+        if (orgLoadEnd.apply) {
+          orgLoadEnd.apply(this, arguments);
+        } else {
+          orgLoadEnd(ev);
+        }
+      }
     };
     /**@ignore*/
     reader.onerror = function(e) {
@@ -1439,7 +1451,13 @@ function readerPolling(reader) {
         done = true;
         d.raise(e);
       }
-      orgError && orgError.apply(this, arguments);
+      if (isFunction(orgError)) {
+        if (orgError.apply) {
+          orgError.apply(this, arguments);
+        } else {
+          orgError(e);
+        }
+      }
     };
   } else {
     d.begin(reader.result);
