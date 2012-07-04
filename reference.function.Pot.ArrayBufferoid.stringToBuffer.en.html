@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.ArrayBufferoid.stringToBuffer</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.ArrayBufferoid.stringToBuffer';
+</script>
+</head>
+<body>
+<h1>Pot.ArrayBufferoid.stringToBuffer</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.ArrayBufferoid}</em>
+    <dfn id="definition.reference.function.Pot.ArrayBufferoid.stringToBuffer"><em>Pot.ArrayBufferoid.</em>stringToBuffer</dfn>
+    (<em>{String}</em> string)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      UTF-16 文字列を UTF-8 ArrayBufferoid に変換します。
+    </p>
+    <div>
+      <p>
+ 引数 string は、変換する文字列を指定します。
+ <br>
+ 文字列が UTF-8 に変換され、新しい Pot.ArrayBufferoid インスタンスとして返ります。
+</p>
+
+<p>
+ UTF-8 文字を持つ Pot.ArrayBufferoid インスタンスが返ります。
+</p>
+
+<pre>var s = 'hogeほげ';
+var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+var string = Pot.ArrayBufferoid.bufferToString(buffer);
+Pot.debug(buffer);
+// buffer:
+//   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+Pot.debug(s === string); // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

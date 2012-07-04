@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.ArrayBufferoid.prototype.seek</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.ArrayBufferoid.prototype.seek';
+</script>
+</head>
+<body>
+<h1>Pot.ArrayBufferoid.prototype.seek</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Number}</em>
+    <dfn id="definition.reference.function.Pot.ArrayBufferoid.prototype.seek"><em>Pot.ArrayBufferoid.prototype.</em>seek</dfn>
+    (<em>{Number}</em> offset)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      ストリーム中の位置を offset に移動します。
+    </p>
+    <div>
+      <p>
+ Pot.ArrayBufferoid をストリームとして利用する際の、位置を設定します。
+ <br>
+ 引数 offset は、移動する位置を整数で指定します。
+</p>
+
+<p>
+ 移動後の位置 (オフセット) が返ります。
+</p>
+
+<pre>var buffer = new Pot.ArrayBufferoid([1, 2, 3, 4, 5]);
+Pot.debug(buffer.tell());  // 0
+buffer.seek(1);
+Pot.debug(buffer.tell());  // 1
+Pot.debug(buffer.read(1)); // [2]
+buffer.seek(3);
+Pot.debug(buffer.tell());  // 3
+Pot.debug(buffer.read(2)); // [4, 5]</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

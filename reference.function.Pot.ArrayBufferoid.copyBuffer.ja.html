@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.ArrayBufferoid.copyBuffer</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.ArrayBufferoid.copyBuffer';
+</script>
+</head>
+<body>
+<h1>Pot.ArrayBufferoid.copyBuffer</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{TypedArray|Pot.ArrayBufferoid|Array}</em>
+    <dfn id="definition.reference.function.Pot.ArrayBufferoid.copyBuffer"><em>Pot.ArrayBufferoid.</em>copyBuffer</dfn>
+    (<em>{TypedArray|Pot.ArrayBufferoid|Array}</em> buffer)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      与えられた TypedArray のコピーを作成します。
+    </p>
+    <div>
+      <p>
+ 引数 buffer は、コピーする対象の TypedArray や Pot.ArrayBufferoid または配列を指定します。
+</p>
+
+<p>
+ コピーした新しい TypedArray が返ります。
+</p>
+
+<pre>var buffer = new ArrayBuffer(10);
+var view1 = new Uint8Array(buffer);
+var view2 = new Uint8Array(buffer);
+view1[0] = 10;
+view2[1] = 20;
+Pot.debug(view1[0]); // 10
+Pot.debug(view2[0]); // 10
+Pot.debug(view1[1]); // 20
+Pot.debug(view2[1]); // 20
+var copy = new Uint8Array(Pot.ArrayBufferoid.copyBuffer(buffer));
+copy[1] = 100;
+Pot.debug(copy[0]);  // 10
+Pot.debug(copy[1]);  // 100
+Pot.debug(view1[0]); // 10
+Pot.debug(view1[1]); // 20
+Pot.debug(view2[0]); // 10
+Pot.debug(view2[1]); // 20</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

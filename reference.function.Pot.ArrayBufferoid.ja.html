@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.ArrayBufferoid</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.ArrayBufferoid';
+</script>
+</head>
+<body>
+<h1>Pot.ArrayBufferoid</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.ArrayBufferoid}</em>
+    <em>new</em>
+    <dfn id="definition.reference.function.Pot.ArrayBufferoid"><em>Pot.</em>ArrayBufferoid</dfn>
+    ([<em>{Array|TypedArray|Pot.ArrayBufferoid|Number|*}</em> ...args])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      Pot.ArrayBufferoid の新しいインスタンスを生成します。
+    </p>
+    <div>
+      <p>
+ 引数に数値 (Number) を渡すと、その数の分の要素を持つインスタンスが返ります。
+ <br>
+ 引数に配列 (Array) または TypedArray を渡すと、その要素を持つ Pot.ArrayBufferoid のインスタンスが返ります。
+ <br>
+ 引数に Pot.ArrayBufferoid インスタンスを渡すと、そのコピーが返ります。
+ <br>
+ 引数を省略すると、空の要素をもつインスタンスが返ります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、new Pot.ArrayBufferoid() が new ArrayBufferoid() で実行できます。
+</p>
+<p>
+ Pot.ArrayBufferoid の新しいインスタンスが返ります。
+</p>
+
+
+<pre>// Number
+Pot.debug(new Pot.ArrayBufferoid(5));
+// [undefined, undefined, undefined, undefined, undefined]
+
+// Array
+Pot.debug(new Pot.ArrayBufferoid([1, 2, 3, 4, 5]));
+// [1, 2, 3, 4, 5]
+
+// ArrayBufferoid
+var buffer = new Pot.ArrayBufferoid([1, 2, 3]);
+var buffer2 = new Pot.ArrayBufferoid(buffer);
+Pot.debug(buffer);  // [1, 2, 3]
+buffer[0] = 10;
+Pot.debug(buffer);  // [10, 2, 3]
+Pot.debug(buffer2); // [1, 2, 3]
+
+// Typed Array
+var uint8array = new Uint8Array([97, 98, 99]);
+var buffer = new Pot.ArrayBufferoid(uint8array);
+Pot.debug(buffer); // [97, 98, 99]</pre>
+
+<p>
+ Pot.ArrayBufferoid は、TypedArray や DataView をクロスブラウザに扱う際に役立ちます。
+ <br>
+ Array.prototype 同様の機能を持っているため、
+ <br>
+ Array または TypedArray のように扱うことが可能です。
+ <br>
+ また、Pot.ArrayBufferoid は TypedArray へ変換する架け橋として利用でき、
+ <br>
+ ストリームで使用する際にも役立ちます。
+</p>
+
+<pre>var buffer = new Pot.ArrayBufferoid();
+var i = 0;
+
+// index指定によって値を埋める
+buffer[i++] = 255;
+buffer[i++] = 254;
+
+// push (Array.prototype.push) を使って値を埋める
+buffer.push(253);
+buffer.push(252);
+
+// DataView がない環境でも同じ機能が使えるようになります
+Pot.debug(buffer.getUint16(0, true)); // 65279
+
+// length は size() を使います
+Pot.debug('buffer.length = ' + buffer.size()); // 4
+
+// Typed Array に変換 (ない環境は Array になる)
+var arrayBuffer = buffer.toArrayBuffer();
+var uint8Array = buffer.toUint8Array();
+
+// ストリームな使い方
+buffer.seek(0);
+var data1 = buffer.read(1);
+Pot.debug(data1[0]); // 255
+Pot.debug(buffer.tell()); // 1
+var data2 = buffer.read(2);
+Pot.debug(data2); // [254, 253]
+buffer.seek(0);
+buffer.write([100, 101]);
+Pot.debug(buffer); // [100, 101, 253, 252]</pre>
+
+<p>
+ Pot.ArrayBufferoid は、変換やコピーを扱う関数を持っています。
+</p>
+
+<pre>// Uint8Arrayに変換
+var uint8array = Pot.ArrayBufferoid.toUint8Array([0x61, 0x62, 0x63]);
+
+// TypedArrayをコピー
+var copy = Pot.ArrayBufferoid.copyBuffer(uint8array);
+
+// 文字列に変換
+var binary = Pot.ArrayBufferoid.bufferToBinary(copy);
+Pot.debug(binary); // 'abc'
+
+// 巨大な配列を
+var view = new Pot.ArrrayBufferoid(1000000).toUint8Array();
+for (var i = 0; i < 1000000; i++) {
+  view[i] = 0x61;
+}
+// 非同期で負荷をかけずに変換
+Pot.ArrayBufferoid.bufferToBinary.deferred(view).then(function(res) {
+  Pot.debug(res); // 'aaaaaaaaaaa...'
+});
+
+// UTF-16 文字列から UTF-8 Buffer に変換と逆変換
+var s = 'hogeほげ';
+var buffer = Pot.ArrayBufferoid.stringToBuffer(s);
+var string = Pot.ArrayBufferoid.bufferToString(buffer);
+Pot.debug(buffer);
+// buffer:
+//   [104, 111, 103, 101, 227, 129, 187, 227, 129, 146]
+Pot.debug(s === string); // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
