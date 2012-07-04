@@ -1082,8 +1082,8 @@ update(ArrayBufferoid, {
    *   Pot.debug(s === string); // true
    *
    *
-   * @param {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer UTF-8 ArrayBuffer.
-   * @param {String}                                      UTF-16 string.
+   * @param  {Pot.ArrayBufferoid|ArrayBuffer|Array} buffer UTF-8 ArrayBuffer.
+   * @return {String}                                      UTF-16 string.
    * @type  Function
    * @function
    * @static
