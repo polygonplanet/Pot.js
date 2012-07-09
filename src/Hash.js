@@ -327,7 +327,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    *   //   '{"foo":[1],"bar":[2],"baz":[3],"a":4,"b":5,"c":[6,7,"\"hoge\""]}'
    *
    *
-   * @return      Return a JSON string object that has all items.
+   * @return {String} Return a JSON string object that has all items.
    * @function
    * @public
    */
@@ -350,7 +350,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    *  if special keys existed (e.g. hasOwnProperty or __iterator__ etc.)
    *    then object will be broken.
    *
-   * @return      Return an object that has all items.
+   * @return {Object} Return an object that has all items.
    * @function
    * @public
    */
@@ -387,7 +387,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
    *
    * @see Pot.Struct.items
    *
-   * @return      Return the items() format array.
+   * @return {Array} Return the items() format array.
    * @function
    * @public
    */
@@ -450,7 +450,7 @@ Hash.fn = Hash.prototype = update(Hash.prototype, {
           result = callback.call(context, val, key, object);
         }
       });
-      return this;
+      return that;
     };
     return func;
   }),
