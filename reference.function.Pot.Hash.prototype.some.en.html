@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Hash.prototype.some</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Hash.prototype.some';
+</script>
+</head>
+<body>
+<h1>Pot.Hash.prototype.some</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.Hash.prototype.some"><em>Pot.Hash.prototype.</em>some</dfn>
+    (<em>{Function}</em> callback [, <em>{*}</em> context])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      Hash に対して some イテレートを実行します。
+    </p>
+    <div>
+      <p>
+ Hash インスタンスの要素に対して some イテレートを実行します。
+ <br>
+ 詳細は、<a href="#reference.function.Pot.some">some</a> を参照ください。
+</p>
+
+<p>
+ 結果の真偽値が返ります。
+</p>
+
+<pre>var hash = new Pot.Hash();
+hash.set({A: 2, B: 5, C: 8, D: 1, E: 4});
+var result = hash.some(function(value, key, object) {
+    return (value >= 10);
+});
+Pot.debug(result); // false
+
+hash.clear();
+hash.set({A: 12, B: 5, C: 8, D: 1, E: 4});
+result = hash.some(function(value, key, object) {
+    return (value >= 10);
+});
+Pot.debug(result); // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

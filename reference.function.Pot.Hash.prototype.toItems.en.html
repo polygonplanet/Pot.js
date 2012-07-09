@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Hash.prototype.toItems</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Hash.prototype.toItems';
+</script>
+</head>
+<body>
+<h1>Pot.Hash.prototype.toItems</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.Hash.prototype.toItems"><em>Pot.Hash.prototype.</em>toItems</dfn>
+    ()
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      Hash を items 形式の配列で取得します。
+    </p>
+    <div>
+      <p>
+ Pot.Hash インスタンスに設定されているすべての要素を、<a href="#reference.function.Pot.items">items()</a> 形式の配列で取得します。
+ <br>
+ 'prototype' や 'hasOwnProperty' などのキー名がある場合でも問題なく扱えます。
+</p>
+
+<p>
+ インスタンスのすべての要素を持つ items() 形式の配列が返ります。
+</p>
+
+<pre>var hash = new Pot.Hash();
+hash.set('prototype',      'value1');
+hash.set('__iterator__',   'value2');
+hash.set('hasOwnProperty', 'value3');
+var result = hash.toItems();
+Pot.debug(result);
+// result:
+//   [
+//     ['prototype',      'value1'],
+//     ['__iterator__',   'value2'],
+//     ['hasOwnProperty', 'value3']
+//   ]</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
