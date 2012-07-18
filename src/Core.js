@@ -811,6 +811,13 @@ update(PotSystem, (function() {
     }
   } catch (e) {}
   try {
+    if (typeof Blob === 'function' &&
+        toString.call(new Blob()) === '[object Blob]' &&
+        typeof Blob.prototype.slice === 'function') {
+      o.hasBlob = true;
+    }
+  } catch (e) {}
+  try {
     b = (typeof BlobBuilder       !== 'undefined') ? BlobBuilder       :
         (typeof MozBlobBuilder    !== 'undefined') ? MozBlobBuilder    :
         (typeof WebKitBlobBuilder !== 'undefined') ? WebKitBlobBuilder :
@@ -829,6 +836,29 @@ update(PotSystem, (function() {
       }
     }
   } catch (e) {}
+  /**@ignore*/
+  o.createBlob = function() {
+    if (o.hasBlob) {
+      return function(value, type) {
+        var arr = concat.call([], value);
+        if (type) {
+          return new Blob(arr, {type : type});
+        } else {
+          return new Blob(arr);
+        }
+      };
+    } else if (o.BlobBuilder) {
+      return function(value, type) {
+        var blb = new o.BlobBuilder();
+        blb.append(value);
+        if (type) {
+          return blb.getBlob(type);
+        } else {
+          return blb.getBlob();
+        }
+      };
+    }
+  }();
   try {
     u = (typeof URL       !== 'undefined') ? URL       :
         (typeof webkitURL !== 'undefined') ? webkitURL : null;
@@ -854,7 +884,7 @@ update(PotSystem, (function() {
           canWorkerDataURI    = 'can' + key + 'DataURI',
           canWorkerBlobURI    = 'can' + key + 'BlobURI',
           canWorkerPostObject = 'can' + key + 'PostObject',
-          ref, msg, w, bb, wb;
+          ref, msg, w, wb;
       /**@ignore*/
       ref = function() {
         return 1;
@@ -912,17 +942,17 @@ update(PotSystem, (function() {
           }
         }
       } catch (e) {}
-      if (o[hasWorker] && o.BlobBuilder && o.BlobURI) {
+      if (o[hasWorker] && o.createBlob && o.BlobURI) {
         try {
-          bb = new o.BlobBuilder();
-          bb.append('onmessage=function(e){' +
-            'postMessage(' +
-              '(e&&e.data&&' +
-                '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
-              ')+1' +
-            ')' +
-          '}');
-          wb = new worker(o.BlobURI.createObjectURL(bb.getBlob()));
+          wb = new worker(o.BlobURI.createObjectURL(o.createBlob(
+            'onmessage=function(e){' +
+              'postMessage(' +
+                '(e&&e.data&&' +
+                  '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
+                ')+1' +
+              ')' +
+            '}'
+          )));
           /**@ignore*/
           wb.onmessage = function(ev) {
             if (ev) {
@@ -3754,6 +3784,37 @@ Pot.update({
       msg = (error && error.toString && error.toString()) || error;
     }
     return stringify(msg) || stringify(defaults) || 'error';
+  },
+  /**
+   * Create new instance of Blob.
+   *
+   *
+   * @example
+   *   Pot.begin(function() {
+   *     var blob = Pot.createBlob('hoge');
+   *     var reader = new FileReader();
+   *     reader.readAsText(blob);
+   *     return reader;
+   *   }).then(function(res) {
+   *     Pot.debug(res); // 'hoge'
+   *   });
+   *
+   *
+   * @param  {*}         value   value.
+   * @param  {(String)}  (type)  Optional MIME type.
+   * @return {Blob}              Return new instance of Blob.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  createBlob : function(value, type) {
+    if (PotSystem.createBlob) {
+      try {
+        return PotSystem.createBlob(value, type);
+      } catch (e) {}
+    }
+    return null;
   }
 });
 
