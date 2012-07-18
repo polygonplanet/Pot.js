@@ -971,14 +971,13 @@ update(ArrayBufferoid, {
      * @public
      */
     deferred : function(buffer) {
-      var bb, fl, d = new Deferred();
-      if (buffer && PotSystem.hasFileReader && PotSystem.BlobBuilder) {
-        bb = new PotSystem.BlobBuilder();
+      var b, fl, d = new Deferred();
+      if (buffer && PotSystem.hasFileReader && PotSystem.createBlob) {
         fl = new FileReader();
         if (isArrayBufferoid(buffer)) {
-          bb.append(buffer.toArrayBuffer());
+          b = buffer.toArrayBuffer();
         } else {
-          bb.append(buffer.buffer || buffer);
+          b = buffer.buffer || buffer;
         }
         /**@ignore*/
         fl.onload = function(ev) {
@@ -992,7 +991,7 @@ update(ArrayBufferoid, {
         fl.onerror = function(er) {
           d.raise(er);
         };
-        fl.readAsBinaryString(bb.getBlob());
+        fl.readAsBinaryString(Pot.createBlob(b));
       } else {
         d.begin(ArrayBufferoid.bufferToBinary(buffer));
       }

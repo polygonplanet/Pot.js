@@ -338,14 +338,13 @@ update(Pot.UTF8, {
       return d.then(function(res) {
         dfd = new Deferred();
         try {
-          bb = new PotSystem.BlobBuilder();
           fl = new FileReader();
           if (isArrayBufferoid(res)) {
-            bb.append(res.toArrayBuffer());
+            bb = res.toArrayBuffer();
           } else if (isArrayLike(res)) {
-            bb.append(new ArrayBufferoid(res).toArrayBuffer());
+            bb = new ArrayBufferoid(res).toArrayBuffer();
           } else {
-            bb.append(res);
+            bb = res;
           }
           /**@ignore*/
           fl.onload = function(ev) {
@@ -361,7 +360,7 @@ update(Pot.UTF8, {
             fl.onload = fl.onerror = PotNoop;
             dfd.raise(er);
           };
-          b = bb.getBlob('text/plain');
+          b = Pot.createBlob(bb, 'text/plain');
           if (from == null || isAuto.test(from)) {
             fl.readAsText(b);
           } else {

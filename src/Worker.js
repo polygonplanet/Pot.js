@@ -1526,9 +1526,7 @@ function fromDataURI(uri) {
  * @ignore
  */
 function toBlobURI(code) {
-  var b = new PotSystem.BlobBuilder();
-  b.append(code);
-  return PotSystem.BlobURI.createObjectURL(b.getBlob());
+  return PotSystem.BlobURI.createObjectURL(Pot.createBlob(code));
 }
 
 /**
