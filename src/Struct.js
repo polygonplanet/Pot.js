@@ -1281,7 +1281,7 @@ update(Pot.Struct, {
             if (subject && isArrayLike(subject)) {
               if (Pot.isEmpty(object) && Pot.isEmpty(subject)) {
                 result = true;
-              } else {
+              } else if (object && object.length === subject.length) {
                 result = false;
                 each(object, function(v, i) {
                   if (!(i in subject) || !Pot.Struct.equals(v, subject[i], cmp)) {
@@ -1306,27 +1306,31 @@ update(Pot.Struct, {
               } else {
                 keys = Pot.keys(subject);
                 len = keys.length;
-                i = 0;
-                result = true;
-                each(object, function(value, p) {
-                  if (!(i in keys) || keys[i] !== p) {
-                    result = false;
-                    throw PotStopIteration;
-                  }
-                  try {
-                    if (!Pot.Struct.equals(value, subject[p], cmp)) {
+                if (object && Pot.keys(object).length === len) {
+                  i = 0;
+                  result = true;
+                  each(object, function(value, p) {
+                    if (!(i in keys) || keys[i] !== p) {
                       result = false;
                       throw PotStopIteration;
                     }
-                  } catch (e) {}
-                  i++;
-                });
+                    try {
+                      if (!Pot.Struct.equals(value, subject[p], cmp)) {
+                        result = false;
+                        throw PotStopIteration;
+                      }
+                    } catch (e) {}
+                    i++;
+                  });
+                }
               }
             }
             break;
         case 'string':
             if (isString(subject)) {
-              if (cmp(object.toString(), subject.toString())) {
+              if (object.length === subject.length &&
+                  cmp(object.toString(), subject.toString())
+              ) {
                 result = true;
               }
             }
