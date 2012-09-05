@@ -28,10 +28,10 @@ Pot.update({
    * @static
    */
   deferrizejQueryAjax : (function() {
-    if (typeof jQuery !== 'function' || !jQuery.fn) {
-      return PotNoop;
-    }
     return function() {
+      if (typeof jQuery !== 'function' || !jQuery.fn) {
+        return false;
+      }
       return (function($) {
         var orgAjax = $.ajax;
         $.pot = Pot;
