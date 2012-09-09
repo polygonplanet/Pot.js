@@ -1980,11 +1980,7 @@ update(Deferred, {
   maybeDeferred : function(x) {
     var result;
     if (isDeferred(x)) {
-      if (Deferred.isFired(x)) {
-        result = x;
-      } else {
-        result = x.begin();
-      }
+      result = x;
     } else if (isError(x)) {
       result = Deferred.failure(x);
     } else {
