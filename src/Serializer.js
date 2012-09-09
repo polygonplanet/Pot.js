@@ -433,7 +433,7 @@ update(Pot.Serializer, {
           }
           each(arrayize(val), function(t) {
             queries[queries.length] = encode(key) + sep +
-                                      encode(stringify(t, true));
+                                      encode(stringify(t, false));
           });
         }
       });
