@@ -642,22 +642,84 @@ update(Pot.Style, {
         height : height
       });
     }
+  },
+  /**
+   * Gets the resize size.
+   *
+   * @param  {Number} orgWidth    Original width.
+   * @param  {Number} orgHeight   Original height.
+   * @param  {Number} maxWidth    Maximum width.
+   * @param  {(Number)} (maxHeight)   (Optional) Maximum height.
+   *
+   * @type   Function
+   * @function
+   * @static
+   * @public
+   */
+  getResizeSize : function(orgWidth, orgHeight, maxWidth, maxHeight) {
+    var result, percent, ratioX, ratioY;
+    if (maxHeight == null) {
+      maxHeight = maxWidth;
+      if (orgHeight > maxHeight) {
+        percent = maxHeight / orgHeight * 100;
+      } else {
+        percent = 100;
+      }
+    } else if (maxWidth == null) {
+      maxWidth = maxHeight;
+      if (orgWidth > maxWidth) {
+        percent = maxWidth / orgWidth * 100;
+      } else {
+        percent = 100;
+      }
+    } else {
+      if (orgWidth > maxWidth) {
+        ratioX = maxWidth / orgWidth * 100;
+      } else {
+        ratioX = 100;
+      }
+      if (orgHeight > maxHeight) {
+        ratioY = maxHeight / orgHeight * 100;
+      } else {
+        ratioY = 100;
+      }
+      if (ratioX < ratioY) {
+        percent = ratioX;
+      } else if (ratioX > ratioY) {
+        percent = ratioY;
+      } else {
+        percent = 0;
+      }
+    }
+    if (percent === 0) {
+      result = {
+        width  : maxWidth,
+        height : maxHeight
+      };
+    } else {
+      result = {
+        width  : Math.round(orgWidth  * percent / 100),
+        height : Math.round(orgHeight * percent / 100)
+      };
+    }
+    return result;
   }
 });
 
 // Update Pot object.
 Pot.update({
-  css          : Pot.Style.css,
-  getStyle     : Pot.Style.getStyle,
-  setStyle     : Pot.Style.setStyle,
-  isShown      : Pot.Style.isShown,
-  isVisible    : Pot.Style.isVisible,
-  pxize        : Pot.Style.pxize,
-  getSizePos   : Pot.Style.getSizePos,
-  getPixelSize : Pot.Style.getPixelSize,
-  setSize      : Pot.Style.setSize,
-  getWidth     : Pot.Style.getWidth,
-  setWidth     : Pot.Style.setWidth,
-  getHeight    : Pot.Style.getHeight,
-  setHeight    : Pot.Style.setHeight
+  css           : Pot.Style.css,
+  getStyle      : Pot.Style.getStyle,
+  setStyle      : Pot.Style.setStyle,
+  isShown       : Pot.Style.isShown,
+  isVisible     : Pot.Style.isVisible,
+  pxize         : Pot.Style.pxize,
+  getSizePos    : Pot.Style.getSizePos,
+  getPixelSize  : Pot.Style.getPixelSize,
+  setSize       : Pot.Style.setSize,
+  getWidth      : Pot.Style.getWidth,
+  setWidth      : Pot.Style.setWidth,
+  getHeight     : Pot.Style.getHeight,
+  setHeight     : Pot.Style.setHeight,
+  getResizeSize : Pot.Style.getResizeSize
 });
