@@ -455,6 +455,7 @@ update(PotInternal, {
     attr                     : Pot.DOM.attr,
     convertToHTMLDocument    : Pot.DOM.convertToHTMLDocument,
     convertToHTMLString      : Pot.DOM.convertToHTMLString,
+    isElementInView          : Pot.DOM.isElementInView,
     css                      : Pot.Style.css,
     getStyle                 : Pot.Style.getStyle,
     setStyle                 : Pot.Style.setStyle,
@@ -467,7 +468,8 @@ update(PotInternal, {
     getWidth                 : Pot.Style.getWidth,
     setWidth                 : Pot.Style.setWidth,
     getHeight                : Pot.Style.getHeight,
-    setHeight                : Pot.Style.setHeight,/*{#endif}*/
+    setHeight                : Pot.Style.setHeight,
+    getResizeSize            : Pot.Style.getResizeSize,/*{#endif}*/
     rescape                  : rescape,
     arrayize                 : arrayize,/*{#if Pot}*/
     numeric                  : numeric,/*{#endif}*/
