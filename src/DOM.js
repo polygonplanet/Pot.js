@@ -2714,6 +2714,57 @@ update(DOM, {
       }
     }
     return result;
+  },
+  /**
+   * Checks whether element is in the view.
+   *
+   * @param  {Element}  element  The target element.
+   * @return {Boolean}  Whether element is in the view.
+   * @type   Function
+   * @function
+   * @static
+   * @public
+   */
+  isElementInView : function(element) {
+    var result = false,
+        win, doc, de, body,
+        scrollLeft, scrollTop,
+        rect, left, top;
+    try {
+      elem = element.jquery ? element.get(0) : element;
+      rect = elem.getClientRects()[0];
+      if (!rect) {
+        throw false;
+      }
+      win = Pot.currentWindow();
+      doc = Pot.currentDocument();
+      de = doc.documentElement;
+      body = doc.body || de;
+      scrollLeft = Math.max(de.scrollLeft, body.scrollLeft);
+      scrollTop  = Math.max(de.scrollTop, body.scrollTop);
+      if (PotBrowser.opera &&
+          (rect.left < 0 || rect.left > win.innerWidth ||
+           rect.top  < 0 || rect.top  > win.innerHeight)) {
+        throw false;
+      }
+    } catch (e) {
+      return false;
+    }
+    left = (rect.left - 0) || 0;
+    top  = (rect.top  - 0) || 0;
+    if (PotBrowser.opera || PotBrowser.safari) {
+      left += scrollLeft;
+      top  += scrollTop;
+    } else if (PotBrowser.firefox) {
+      left += 1;
+      top  += 1;
+    }
+    try {
+      if (doc.elementFromPoint(left, top) === elem) {
+        result = true;
+      }
+    } catch (e) {}
+    return result
   }
 });
 }(Pot.DOM));
@@ -2758,5 +2809,6 @@ Pot.update({
   evaluate              : Pot.DOM.evaluate,
   attr                  : Pot.DOM.attr,
   convertToHTMLDocument : Pot.DOM.convertToHTMLDocument,
-  convertToHTMLString   : Pot.DOM.convertToHTMLString
+  convertToHTMLString   : Pot.DOM.convertToHTMLString,
+  isElementInView       : Pot.DOM.isElementInView
 });
