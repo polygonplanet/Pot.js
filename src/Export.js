@@ -479,6 +479,7 @@ update(PotInternal, {
     now                      : now,
     globalize                : Pot.globalize,
     debug                    : Pot.Debug.debug,
+    dump                     : Pot.Debug.dump,
     addPlugin                : Pot.Plugin.add,
     hasPlugin                : Pot.Plugin.has,
     removePlugin             : Pot.Plugin.remove,
