@@ -979,6 +979,8 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     if (!this.serial) {
       this.serial = buildSerial(this);
     }
+    this.loadedFiles = [];
+    this.handleCache = [];
     this.isShow = false;
     this.target = getElement(target);
     this.options = update({}, this.defaultOptions, options || {});

@@ -191,22 +191,22 @@ update(Pot.Text, {
        * @ignore
        * @private
        */
-      saving : [],
+      saving : null,
       /**
        * @ignore
        * @private
        */
-      strings : [],
+      strings : null,
       /**
        * @ignore
        * @private
        */
-      patterns : [],
+      patterns : null,
       /**
        * @ignore
        * @private
        */
-      reserves : [],
+      reserves : null,
       /**
        * Initialize.
        *
@@ -217,6 +217,10 @@ update(Pot.Text, {
         if (!this.serial) {
           this.serial = buildSerial(this);
         }
+        this.saving = [];
+        this.strings = [];
+        this.patterns = [];
+        this.reserves = [];
         this.setString(string);
         this.setPattern(pattern);
         this.setReserve(reserve);

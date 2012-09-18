@@ -69,6 +69,7 @@ WorkerServer.fn = WorkerServer.prototype = update(WorkerServer.prototype, {
    * @ignore
    */
   init : function(js) {
+    this.queues = [];
     this.child = new WorkerChild(this, js);
     return this;
   },
@@ -221,6 +222,7 @@ WorkerChild.fn = WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   init : function(server, js) {
     var that = this;
+    this.queues = [];
     this.server = server;
     this.context = update({}, {
       postMessage         : bind(this.postMessage, this),
