@@ -277,6 +277,7 @@ update(PotInternal, {
     hasReturn                : Pot.hasReturn,
     override                 : Pot.override,
     createBlob               : Pot.createBlob,
+    createConstructor        : Pot.createConstructor,
     getErrorMessage          : Pot.getErrorMessage,
     getFunctionCode          : Pot.getFunctionCode,
     currentWindow            : Pot.currentWindow,

@@ -3815,6 +3815,109 @@ Pot.update({
       } catch (e) {}
     }
     return null;
+  },
+  /**
+   * Create a constructor with prototype.
+   *
+   * That will set the toString method to constructor
+   *   if argument `name` specified.
+   * If argument `init` has been specified in the string,
+   *   then that method will be used to initialize.
+   * If argument `init` has been specified in a function,
+   *   then initialization will be execute by `init`.
+   * If omitted argument `init`, and `proto` has 'init' function
+   *   then initialization will be execute by 'init' function.
+   *
+   *
+   * @example
+   *   var Hoge = Pot.createConstructor('Hoge', {
+   *     init : function(a, b, c) {
+   *       this.value = a + b + c;
+   *     },
+   *     getHoge : function() {
+   *       return 'hogehoge';
+   *     }
+   *   });
+   *   Pot.debug(new Hoge(1, 2, 3).value); // 6
+   *   Pot.debug(new Hoge().getHoge());    // 'hogehoge'
+   *
+   *
+   * @example
+   *   var Fuga = Pot.createConstructor({
+   *     value : 1,
+   *     addValue : function(v) {
+   *       this.value += v;
+   *       return this;
+   *     },
+   *     getValue : function() {
+   *       return this.value;
+   *     }
+   *   }, function(a, b, c) {
+   *     this.value += a + b + c;
+   *   });
+   *   Pot.debug(new Fuga(1, 2, 3).value); // 7
+   *   Pot.debug(new Fuga(1, 2, 3).addValue(10).getValue()); // 17
+   *
+   *
+   * @example
+   *   var Piyo = Pot.createConstructor('Piyo', {
+   *     initialize : function(a, b, c) {
+   *       this.value = a + b + c;
+   *     },
+   *     getValue : function() {
+   *       return this.value;
+   *     }
+   *   }, 'initialize');
+   *   Pot.debug(new Piyo(10, 20, 30).getValue()); // 60
+   *
+   *
+   * @param  {(String)} (name)  (Optional) A name of constructor.
+   * @param  {Object}  (proto)  prototype.
+   * @param  {(Function|String)} (init) (Optional) initialization method name
+   *                                    or initialization function.
+   * @return {Function} Return new constructor.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  createConstructor : function(name, proto, init) {
+    var c, p, n, def = 'init';
+    if (isString(name)) {
+      n = name;
+    } else {
+      init = proto;
+      proto = name;
+    }
+    p = proto || {};
+    if (!init && def in p) {
+      init = def;
+    }
+    if (isString(init) && init in p) {
+      /**@ignore*/
+      c = function() {
+        this[init].apply(this, arguments);
+      };
+    } else if (isFunction(init)) {
+      proto.init = init;
+      /**@ignore*/
+      c = function() {
+        this.init.apply(this, arguments);
+      };
+    }
+    if (!c) {
+      /**@ignore*/
+      c = function() {};
+    }
+    c.prototype = p;
+    c.prototype.constructor = c;
+    if (n) {
+      /**@ignore*/
+      c.prototype.toString = function() {
+        return buildObjectString(n);
+      };
+    }
+    return c;
   }
 });
 
