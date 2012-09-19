@@ -1572,6 +1572,36 @@ Pot.update({
     return !!(PotSystem.hasFileReader && x && x.constructor === FileReader);
   },
   /**
+   * Check whether the argument is a instance of Image or not.
+   *
+   *
+   * @example
+   *   var object = {hoge : 1};
+   *   var image = new Image();
+   *   Pot.debug(Pot.isImage(object)); // false
+   *   Pot.debug(Pot.isImage(image));  // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Image.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isImage : function() {
+    var hasImage = (typeof Image === 'function') ||
+                   (PotBrowser.msie && typeof Image === 'object');
+    return function(x) {
+      return !!(hasImage && x &&
+                (x.constructor === Image ||
+                 toString.call(x) === '[object HTMLImageElement]' ||
+                 stringify(x.tagName).toLowerCase() === 'img'
+                )
+               );
+    };
+  }(),
+  /**
    * Check whether the argument is Arguments object or not.
    *
    *

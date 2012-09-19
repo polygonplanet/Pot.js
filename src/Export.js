@@ -205,6 +205,7 @@ update(PotInternal, {
     isScalar                 : Pot.isScalar,
     isBlob                   : Pot.isBlob,
     isFileReader             : Pot.isFileReader,
+    isImage                  : Pot.isImage,
     isArguments              : Pot.isArguments,
     isTypedArray             : Pot.isTypedArray,
     isArrayBuffer            : Pot.isArrayBuffer,
