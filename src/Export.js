@@ -480,6 +480,7 @@ update(PotInternal, {
     now                      : now,
     globalize                : Pot.globalize,
     debug                    : Pot.Debug.debug,
+    error                    : Pot.Debug.error,
     dump                     : Pot.Debug.dump,
     addPlugin                : Pot.Plugin.add,
     hasPlugin                : Pot.Plugin.has,

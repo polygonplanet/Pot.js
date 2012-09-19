@@ -4329,6 +4329,42 @@ function debug(msg) {
   return msg;
 }
 
+/**
+ * @ignore
+ */
+function error(msg) {
+  var args = arguments, func;
+  try {
+    if (!debug.firebug('error', args)) {
+      if (!PotSystem.hasComponents) {
+        throw false;
+      }
+      Cu.reportError(msg);
+    }
+  } catch (e) {
+    if (typeof console !== 'undefined' && console) {
+      func = console.error || console.debug || console.dir || console.log;
+    } else if (typeof opera !== 'undefined' && opera && opera.postError) {
+      func = opera.postError;
+    } else if (typeof GM_log === 'function') {
+      func = GM_log;
+    } else {
+      /**@ignore*/
+      func = function(x) { throw x; };
+    }
+    try {
+      if (func.apply) {
+        func.apply(func, args);
+      } else {
+        func(msg);
+      }
+    } catch (e) {
+      throw msg;
+    }
+  }
+  return msg;
+}
+
 // Update debug function.
 update(debug, {
   /**
@@ -4927,7 +4963,22 @@ Pot.update({
    * @public
    * @static
    */
-  debug : debug
+  debug : debug,
+  /**
+   * Output to the console using 'error' function for error logging.
+   *
+   *
+   * @example
+   *   Pot.error('Error!'); // Error!
+   *
+   *
+   * @param  {*}  msg  An error message, or variable.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  error : error
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-

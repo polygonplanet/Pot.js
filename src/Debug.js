@@ -37,6 +37,21 @@ update(Pot.Debug, {
    */
   debug : debug,
   /**
+   * Output to the console using 'error' function for error logging.
+   *
+   *
+   * @example
+   *   Pot.error('Error!'); // Error!
+   *
+   *
+   * @param  {*}  msg  An error message, or variable.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  error : error,
+  /**
    * Dump and returns all of object as string.
    *
    *
