@@ -1221,6 +1221,8 @@ function fireProcedure() {
         result = workerMessaging.call(this, result);
       } else if (Pot.isFileReader(result)) {
         result = readerPolling.call(this, result);
+      } else if (Pot.isImage(result)) {
+        result = imagePolling.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
@@ -1461,6 +1463,65 @@ function readerPolling(reader) {
     };
   } else {
     d.begin(reader.result);
+  }
+  return d;
+}
+
+/**
+ * Observe Image state.
+ *
+ * @private
+ * @ignore
+ */
+function imagePolling(image) {
+  var d, done,
+      async = false,
+      orgLoad = image.onload,
+      orgError = image.onerror,
+      /**@ignore*/
+      isZero = function(img) {
+        return (('naturalWidth' in img &&
+                !(img.naturalWidth + img.naturalHeight)) ||
+                !(img.width + img.height));
+      };
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  d = new Deferred({async : async});
+  if (!isZero(image)) {
+    d.begin(image);
+  } else {
+    /**@ignore*/
+    image.onload = function(ev) {
+      if (!done) {
+        done = true;
+        if (isZero(this)) {
+          return this.onerror(new Error(this.src));
+        }
+        d.begin(this);
+      }
+      if (isFunction(orgLoad)) {
+        if (orgLoad.apply) {
+          orgLoad.apply(this, arguments);
+        } else {
+          orgLoad(ev);
+        }
+      }
+    };
+    /**@ignore*/
+    image.onerror = function(e) {
+      if (!done) {
+        done = true;
+        d.raise(e);
+      }
+      if (isFunction(orgError)) {
+        if (orgError.apply) {
+          orgError.apply(this, arguments);
+        } else {
+          orgError(e);
+        }
+      }
+    };
   }
   return d;
 }
@@ -1978,15 +2039,46 @@ update(Deferred, {
    * @static
    */
   maybeDeferred : function(x) {
-    var result;
+    var d;
     if (isDeferred(x)) {
-      result = x;
-    } else if (isError(x)) {
-      result = Deferred.failure(x);
-    } else {
-      result = Deferred.succeed(x);
+      return x;
     }
-    return result;
+    if (isError(x)) {
+      return Deferred.failure(x);
+    }
+    if (x) {
+      try {
+        // jQuery Deferred convertion.
+        if (typeof jQuery === 'function' && jQuery.Deferred &&
+            typeof x.then === 'function' &&
+            x.promise && x.always && x.resolve && x.rejectWith
+        ) {
+          d = new Deferred();
+          x.then(function() {
+            d.begin.apply(d, arguments);
+          }, function() {
+            d.raise.apply(d, arguments);
+          });
+          return d;
+        }
+      } catch (e) {}
+      try {
+        // JSDeferred convertion.
+        if (x._id === 0xE38286E381AE &&
+            typeof x.next === 'function' && typeof x.error === 'function' &&
+            typeof x.fail === 'function' && typeof x.cancel === 'function'
+        ) {
+          d = new Deferred();
+          x.next(function() {
+            d.begin.apply(d, arguments);
+          }).error(function() {
+            d.raise.apply(d, arguments);
+          });
+          return d;
+        }
+      } catch (e) {}
+    }
+    return Deferred.succeed(x);
   },
   /**
    * Check whether the callback chain was fired.
