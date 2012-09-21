@@ -4,7 +4,7 @@
  * PotLite.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.37, 2012-06-17
+ * Version 1.38, 2012-09-21
  * Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
  * https://github.com/polygonplanet/Pot.js
@@ -68,8 +68,8 @@
  *
  * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.37
- * @date           2012-06-17
+ * @version        1.38
+ * @date           2012-09-21
  * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
@@ -105,7 +105,7 @@
  * @static
  * @public
  */
-var Pot = {VERSION : '1.37', TYPE : 'lite'},
+var Pot = {VERSION : '1.38', TYPE : 'lite'},
 
 // Refer the Pot properties/functions.
 PotSystem,
@@ -772,6 +772,13 @@ update(PotSystem, (function() {
     }
   } catch (e) {}
   try {
+    if (typeof Blob === 'function' &&
+        toString.call(new Blob()) === '[object Blob]' &&
+        typeof Blob.prototype.slice === 'function') {
+      o.hasBlob = true;
+    }
+  } catch (e) {}
+  try {
     b = (typeof BlobBuilder       !== 'undefined') ? BlobBuilder       :
         (typeof MozBlobBuilder    !== 'undefined') ? MozBlobBuilder    :
         (typeof WebKitBlobBuilder !== 'undefined') ? WebKitBlobBuilder :
@@ -790,6 +797,29 @@ update(PotSystem, (function() {
       }
     }
   } catch (e) {}
+  /**@ignore*/
+  o.createBlob = function() {
+    if (o.hasBlob) {
+      return function(value, type) {
+        var arr = concat.call([], value);
+        if (type) {
+          return new Blob(arr, {type : type});
+        } else {
+          return new Blob(arr);
+        }
+      };
+    } else if (o.BlobBuilder) {
+      return function(value, type) {
+        var blb = new o.BlobBuilder();
+        blb.append(value);
+        if (type) {
+          return blb.getBlob(type);
+        } else {
+          return blb.getBlob();
+        }
+      };
+    }
+  }();
   try {
     u = (typeof URL       !== 'undefined') ? URL       :
         (typeof webkitURL !== 'undefined') ? webkitURL : null;
@@ -815,7 +845,7 @@ update(PotSystem, (function() {
           canWorkerDataURI    = 'can' + key + 'DataURI',
           canWorkerBlobURI    = 'can' + key + 'BlobURI',
           canWorkerPostObject = 'can' + key + 'PostObject',
-          ref, msg, w, bb, wb;
+          ref, msg, w, wb;
       /**@ignore*/
       ref = function() {
         return 1;
@@ -873,17 +903,17 @@ update(PotSystem, (function() {
           }
         }
       } catch (e) {}
-      if (o[hasWorker] && o.BlobBuilder && o.BlobURI) {
+      if (o[hasWorker] && o.createBlob && o.BlobURI) {
         try {
-          bb = new o.BlobBuilder();
-          bb.append('onmessage=function(e){' +
-            'postMessage(' +
-              '(e&&e.data&&' +
-                '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
-              ')+1' +
-            ')' +
-          '}');
-          wb = new worker(o.BlobURI.createObjectURL(bb.getBlob()));
+          wb = new worker(o.BlobURI.createObjectURL(o.createBlob(
+            'onmessage=function(e){' +
+              'postMessage(' +
+                '(e&&e.data&&' +
+                  '((typeof e.data.a==="function"&&e.data.a())||e.data)' +
+                ')+1' +
+              ')' +
+            '}'
+          )));
           /**@ignore*/
           wb.onmessage = function(ev) {
             if (ev) {
@@ -1502,6 +1532,36 @@ Pot.update({
   isFileReader : function(x) {
     return !!(PotSystem.hasFileReader && x && x.constructor === FileReader);
   },
+  /**
+   * Check whether the argument is a instance of Image or not.
+   *
+   *
+   * @example
+   *   var object = {hoge : 1};
+   *   var image = new Image();
+   *   Pot.debug(Pot.isImage(object)); // false
+   *   Pot.debug(Pot.isImage(image));  // true
+   *
+   *
+   * @param  {*}         x   Target object.
+   * @return {Boolean}       Return true if argument is Image.
+   * @type Function
+   * @function
+   * @static
+   * @public
+   */
+  isImage : function() {
+    var hasImage = (typeof Image === 'function') ||
+                   (PotBrowser.msie && typeof Image === 'object');
+    return function(x) {
+      return !!(hasImage && x &&
+                (x.constructor === Image ||
+                 toString.call(x) === '[object HTMLImageElement]' ||
+                 stringify(x.tagName).toLowerCase() === 'img'
+                )
+               );
+    };
+  }(),
   /**
    * Check whether the argument is Arguments object or not.
    *
@@ -3433,6 +3493,140 @@ Pot.update({
       msg = (error && error.toString && error.toString()) || error;
     }
     return stringify(msg) || stringify(defaults) || 'error';
+  },
+  /**
+   * Create new instance of Blob.
+   *
+   *
+   * @example
+   *   Pot.begin(function() {
+   *     var blob = Pot.createBlob('hoge');
+   *     var reader = new FileReader();
+   *     reader.readAsText(blob);
+   *     return reader;
+   *   }).then(function(res) {
+   *     Pot.debug(res); // 'hoge'
+   *   });
+   *
+   *
+   * @param  {*}         value   value.
+   * @param  {(String)}  (type)  Optional MIME type.
+   * @return {Blob}              Return new instance of Blob.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  createBlob : function(value, type) {
+    if (PotSystem.createBlob) {
+      try {
+        return PotSystem.createBlob(value, type);
+      } catch (e) {}
+    }
+    return null;
+  },
+  /**
+   * Create a constructor with prototype.
+   *
+   * That will set the toString method to constructor
+   *   if argument `name` specified.
+   * If argument `init` has been specified in the string,
+   *   then that method will be used to initialize.
+   * If argument `init` has been specified in a function,
+   *   then initialization will be execute by `init`.
+   * If omitted argument `init`, and `proto` has 'init' function
+   *   then initialization will be execute by 'init' function.
+   *
+   *
+   * @example
+   *   var Hoge = Pot.createConstructor('Hoge', {
+   *     init : function(a, b, c) {
+   *       this.value = a + b + c;
+   *     },
+   *     getHoge : function() {
+   *       return 'hogehoge';
+   *     }
+   *   });
+   *   Pot.debug(new Hoge(1, 2, 3).value); // 6
+   *   Pot.debug(new Hoge().getHoge());    // 'hogehoge'
+   *
+   *
+   * @example
+   *   var Fuga = Pot.createConstructor({
+   *     value : 1,
+   *     addValue : function(v) {
+   *       this.value += v;
+   *       return this;
+   *     },
+   *     getValue : function() {
+   *       return this.value;
+   *     }
+   *   }, function(a, b, c) {
+   *     this.value += a + b + c;
+   *   });
+   *   Pot.debug(new Fuga(1, 2, 3).value); // 7
+   *   Pot.debug(new Fuga(1, 2, 3).addValue(10).getValue()); // 17
+   *
+   *
+   * @example
+   *   var Piyo = Pot.createConstructor('Piyo', {
+   *     initialize : function(a, b, c) {
+   *       this.value = a + b + c;
+   *     },
+   *     getValue : function() {
+   *       return this.value;
+   *     }
+   *   }, 'initialize');
+   *   Pot.debug(new Piyo(10, 20, 30).getValue()); // 60
+   *
+   *
+   * @param  {(String)} (name)  (Optional) A name of constructor.
+   * @param  {Object}  (proto)  prototype.
+   * @param  {(Function|String)} (init) (Optional) initialization method name
+   *                                    or initialization function.
+   * @return {Function} Return new constructor.
+   * @type  Function
+   * @function
+   * @static
+   * @public
+   */
+  createConstructor : function(name, proto, init) {
+    var c, p, n, def = 'init';
+    if (isString(name)) {
+      n = name;
+    } else {
+      init = proto;
+      proto = name;
+    }
+    p = proto || {};
+    if (!init && def in p) {
+      init = def;
+    }
+    if (isString(init) && init in p) {
+      /**@ignore*/
+      c = function() {
+        this[init].apply(this, arguments);
+      };
+    } else if (isFunction(init)) {
+      proto.init = init;
+      /**@ignore*/
+      c = function() {
+        this.init.apply(this, arguments);
+      };
+    }
+    if (!c) {
+      /**@ignore*/
+      c = function() {};
+    }
+    c.prototype = p;
+    c.prototype.constructor = c;
+    if (n) {
+      /**@ignore*/
+      c.prototype.toString = function() {
+        return buildObjectString(n);
+      };
+    }
+    return c;
   }
 });
 
@@ -3711,6 +3905,42 @@ function debug(msg) {
           } catch (e) {}
         }
       }
+    }
+  }
+  return msg;
+}
+
+/**
+ * @ignore
+ */
+function error(msg) {
+  var args = arguments, func;
+  try {
+    if (!debug.firebug('error', args)) {
+      if (!PotSystem.hasComponents) {
+        throw false;
+      }
+      Cu.reportError(msg);
+    }
+  } catch (e) {
+    if (typeof console !== 'undefined' && console) {
+      func = console.error || console.debug || console.dir || console.log;
+    } else if (typeof opera !== 'undefined' && opera && opera.postError) {
+      func = opera.postError;
+    } else if (typeof GM_log === 'function') {
+      func = GM_log;
+    } else {
+      /**@ignore*/
+      func = function(x) { throw x; };
+    }
+    try {
+      if (func.apply) {
+        func.apply(func, args);
+      } else {
+        func(msg);
+      }
+    } catch (e) {
+      throw msg;
     }
   }
   return msg;
@@ -4281,7 +4511,22 @@ Pot.update({
    * @public
    * @static
    */
-  debug : debug
+  debug : debug,
+  /**
+   * Output to the console using 'error' function for error logging.
+   *
+   *
+   * @example
+   *   Pot.error('Error!'); // Error!
+   *
+   *
+   * @param  {*}  msg  An error message, or variable.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  error : error
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -5636,6 +5881,8 @@ function fireProcedure() {
         result = workerMessaging.call(this, result);
       } else if (Pot.isFileReader(result)) {
         result = readerPolling.call(this, result);
+      } else if (Pot.isImage(result)) {
+        result = imagePolling.call(this, result);
       }
       this.destAssign = false;
       this.state = setState.call({}, result);
@@ -5838,7 +6085,13 @@ function readerPolling(reader) {
         done = true;
         d.begin(ev && ev.target && ev.target.result);
       }
-      orgLoad && orgLoad.apply(this, arguments);
+      if (isFunction(orgLoad)) {
+        if (orgLoad.apply) {
+          orgLoad.apply(this, arguments);
+        } else {
+          orgLoad(ev);
+        }
+      }
     };
     /**@ignore*/
     reader.onloadend = function(ev) {
@@ -5846,7 +6099,13 @@ function readerPolling(reader) {
         done = true;
         d.begin(ev && ev.target && ev.target.result);
       }
-      orgLoadEnd && orgLoadEnd.apply(this, arguments);
+      if (isFunction(orgLoadEnd)) {
+        if (orgLoadEnd.apply) {
+          orgLoadEnd.apply(this, arguments);
+        } else {
+          orgLoadEnd(ev);
+        }
+      }
     };
     /**@ignore*/
     reader.onerror = function(e) {
@@ -5854,10 +6113,75 @@ function readerPolling(reader) {
         done = true;
         d.raise(e);
       }
-      orgError && orgError.apply(this, arguments);
+      if (isFunction(orgError)) {
+        if (orgError.apply) {
+          orgError.apply(this, arguments);
+        } else {
+          orgError(e);
+        }
+      }
     };
   } else {
     d.begin(reader.result);
+  }
+  return d;
+}
+
+/**
+ * Observe Image state.
+ *
+ * @private
+ * @ignore
+ */
+function imagePolling(image) {
+  var d, done,
+      async = false,
+      orgLoad = image.onload,
+      orgError = image.onerror,
+      /**@ignore*/
+      isZero = function(img) {
+        return (('naturalWidth' in img &&
+                !(img.naturalWidth + img.naturalHeight)) ||
+                !(img.width + img.height));
+      };
+  if (this.options && this.options.async) {
+    async = true;
+  }
+  d = new Deferred({async : async});
+  if (!isZero(image)) {
+    d.begin(image);
+  } else {
+    /**@ignore*/
+    image.onload = function(ev) {
+      if (!done) {
+        done = true;
+        if (isZero(this)) {
+          return this.onerror(new Error(this.src));
+        }
+        d.begin(this);
+      }
+      if (isFunction(orgLoad)) {
+        if (orgLoad.apply) {
+          orgLoad.apply(this, arguments);
+        } else {
+          orgLoad(ev);
+        }
+      }
+    };
+    /**@ignore*/
+    image.onerror = function(e) {
+      if (!done) {
+        done = true;
+        d.raise(e);
+      }
+      if (isFunction(orgError)) {
+        if (orgError.apply) {
+          orgError.apply(this, arguments);
+        } else {
+          orgError(e);
+        }
+      }
+    };
   }
   return d;
 }
@@ -6375,19 +6699,46 @@ update(Deferred, {
    * @static
    */
   maybeDeferred : function(x) {
-    var result;
+    var d;
     if (isDeferred(x)) {
-      if (Deferred.isFired(x)) {
-        result = x;
-      } else {
-        result = x.begin();
-      }
-    } else if (isError(x)) {
-      result = Deferred.failure(x);
-    } else {
-      result = Deferred.succeed(x);
+      return x;
     }
-    return result;
+    if (isError(x)) {
+      return Deferred.failure(x);
+    }
+    if (x) {
+      try {
+        // jQuery Deferred convertion.
+        if (typeof jQuery === 'function' && jQuery.Deferred &&
+            typeof x.then === 'function' &&
+            x.promise && x.always && x.resolve && x.rejectWith
+        ) {
+          d = new Deferred();
+          x.then(function() {
+            d.begin.apply(d, arguments);
+          }, function() {
+            d.raise.apply(d, arguments);
+          });
+          return d;
+        }
+      } catch (e) {}
+      try {
+        // JSDeferred convertion.
+        if (x._id === 0xE38286E381AE &&
+            typeof x.next === 'function' && typeof x.error === 'function' &&
+            typeof x.fail === 'function' && typeof x.cancel === 'function'
+        ) {
+          d = new Deferred();
+          x.next(function() {
+            d.begin.apply(d, arguments);
+          }).error(function() {
+            d.raise.apply(d, arguments);
+          });
+          return d;
+        }
+      } catch (e) {}
+    }
+    return Deferred.succeed(x);
   },
   /**
    * Check whether the callback chain was fired.
@@ -12950,6 +13301,7 @@ WorkerServer.fn = WorkerServer.prototype = update(WorkerServer.prototype, {
    * @ignore
    */
   init : function(js) {
+    this.queues = [];
     this.child = new WorkerChild(this, js);
     return this;
   },
@@ -13102,6 +13454,7 @@ WorkerChild.fn = WorkerChild.prototype = update(WorkerChild.prototype, {
    */
   init : function(server, js) {
     var that = this;
+    this.queues = [];
     this.server = server;
     this.context = update({}, {
       postMessage         : bind(this.postMessage, this),
@@ -14407,9 +14760,7 @@ function fromDataURI(uri) {
  * @ignore
  */
 function toBlobURI(code) {
-  var b = new PotSystem.BlobBuilder();
-  b.append(code);
-  return PotSystem.BlobURI.createObjectURL(b.getBlob());
+  return PotSystem.BlobURI.createObjectURL(Pot.createBlob(code));
 }
 
 /**
@@ -14960,7 +15311,7 @@ update(Pot.Serializer, {
           }
           each(arrayize(val), function(t) {
             queries[queries.length] = encode(key) + sep +
-                                      encode(stringify(t, true));
+                                      encode(stringify(t, false));
           });
         }
       });
@@ -17822,6 +18173,8 @@ DropFile.fn = DropFile.prototype = update(DropFile.prototype, {
     if (!this.serial) {
       this.serial = buildSerial(this);
     }
+    this.loadedFiles = [];
+    this.handleCache = [];
     this.isShow = false;
     this.target = getElement(target);
     this.options = update({}, this.defaultOptions, options || {});
@@ -19409,7 +19762,280 @@ update(Pot.Debug, {
    * @public
    * @static
    */
-  debug : debug
+  debug : debug,
+  /**
+   * Output to the console using 'error' function for error logging.
+   *
+   *
+   * @example
+   *   Pot.error('Error!'); // Error!
+   *
+   *
+   * @param  {*}  msg  An error message, or variable.
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  error : error,
+  /**
+   * Dump and returns all of object as string.
+   *
+   *
+   * @example
+   *   var reg = /^[a-z]+$/g;
+   *   var err = new Error('error!');
+   *   var str = new String('hello');
+   *   var arr = [1, 2, 3, {a: 4, b: 5, c: true}, false, null, void 0];
+   *   var obj = {
+   *     key1 : 'val1',
+   *     key2 : 'val2',
+   *     arr  : arr,
+   *     arr2 : arr,
+   *     strs : [str, str],
+   *     err  : err,
+   *     err2 : err,
+   *     reg1 : reg,
+   *     reg2 : reg,
+   *     reg3 : reg
+   *   };
+   *   obj.obj = obj;
+   *   Pot.debug( Pot.dump(obj) );
+   *   // @results
+   *   //   #0 {
+   *   //     key1: "val1",
+   *   //     key2: "val2",
+   *   //     arr: #3 [
+   *   //       1,
+   *   //       2,
+   *   //       3,
+   *   //       {
+   *   //         a: 4,
+   *   //         b: 5,
+   *   //         c: true
+   *   //       },
+   *   //       false,
+   *   //       null,
+   *   //       undefined
+   *   //     ],
+   *   //     arr2: #3,
+   *   //     strs: [
+   *   //       #5 (new String("hello")),
+   *   //       #5
+   *   //     ],
+   *   //     err: #6 (new Error("error!")),
+   *   //     err2: #6,
+   *   //     reg1: #8 (new RegExp(/^[a-z]+$/g)),
+   *   //     reg2: #8,
+   *   //     reg3: #8,
+   *   //     obj: #0
+   *   //   }
+   *
+   *
+   * @param  {*}  val  A target object/value.
+   * @param  {(Number)} (recursiveLimit) (Optional) recursive limit.
+   *                                     (default = 16)
+   * @param  {(Number)} (lengthLimit) (Optional) length limit.
+   *                                     (default = 1024)
+   * @return {String} dumped string.
+   *
+   * @type Function
+   * @function
+   * @public
+   * @static
+   */
+  dump : (function() {
+    /**@ignore*/
+    var Dumper = function() {
+      return this.init.apply(this, arguments);
+    };
+    Dumper.prototype = {
+      /**@ignore*/
+      data : null,
+      /**@ignore*/
+      refs : null,
+      /**@ignore*/
+      first : true,
+      /**@ignore*/
+      recursiveLimit : 16,
+      /**@ignore*/
+      lengthLimit : 1024,
+      /**@ignore*/
+      isStop : false,
+      /**@ignore*/
+      init : function(recursiveLimit, lengthLimit) {
+        this.data = [];
+        this.refs = [];
+        if (isNumeric(recursiveLimit)) {
+          this.recursiveLimit = recursiveLimit - 0;
+        }
+        if (isNumeric(lengthLimit)) {
+          this.lengthLimit = lengthLimit - 0;
+        }
+        return this;
+      },
+      /**@ignore*/
+      typeOf : function(v) {
+        return (v === null) ? 'null' : typeof v;
+      },
+      /**@ignore*/
+      add : function(value, object, isRef, isNull) {
+        this.refs[this.refs.length] = isNull ? null : object;
+        this.data[this.data.length] = [value, isRef];
+      },
+      /**@ignore*/
+      getReferenceNumber : function(object) {
+        var i = 0, len = this.refs.length;
+        for (; i < len; i++) {
+          if (this.refs[i] === object) {
+            if (i === 0 && this.first) {
+              this.first = false;
+              continue;
+            }
+            if (this.data[i] && !this.data[i][1]) {
+              this.data[i][1] = true;
+              this.data[i][2] = '#' + i + ' ';
+            }
+            return i;
+          }
+        }
+        return false;
+      },
+      /**@ignore*/
+      dump : function(object) {
+        var r = [], i = 0, len, recursiveCount = 0;
+        this.add('', object);
+        try {
+          this.dumpAll(object, recursiveCount);
+        } catch (e) {
+          return Pot.getErrorMessage(e);
+        }
+        len = this.data.length;
+        for (; i < len; i++) {
+          r[r.length] = (this.data[i][2] || '') + this.data[i][0];
+        }
+        this.data = this.refs = [];
+        return r.join('');
+      },
+      /**@ignore*/
+      dumpAll : function(object, recursiveCount) {
+        if (this.lengthLimit >= 0 &&
+            this.data.length > this.lengthLimit) {
+          this.add('\n...\n', object);
+          this.isStop = true;
+          return;
+        }
+        if (this.recursiveLimit >= 0 &&
+            recursiveCount > this.recursiveLimit) {
+          this.add('[RECURSIVE LIMIT]', object);
+          return;
+        }
+        switch (this.typeOf(object)) {
+          case 'null':
+              this.add('null', object);
+              break;
+          case 'string':
+              this.add('"' + object + '"', object);
+              break;
+          case 'number':
+          case 'boolean':
+          case 'xml':
+              this.add(object.toString(), object);
+              break;
+          case 'function':
+              this.dumpFunction(object);
+              break;
+          case 'object':
+              this.dumpObject(object, recursiveCount);
+              break;
+          default:
+              this.add('undefined', object);
+        }
+      },
+      /**@ignore*/
+      dumpFunction : function(object) {
+        var n = this.getReferenceNumber(object);
+        if (n !== false) {
+          this.add('#' + n, object, true);
+        } else {
+          this.add(Pot.getFunctionCode(object), object);
+        }
+      },
+      /**@ignore*/
+      dumpObject : function(object, recursiveCount) {
+        var that = this, rs, rv, p, k, keys, val, index, wrap, n;
+        n = this.getReferenceNumber(object);
+        if (n !== false) {
+          this.add('#' + n, object, true, true);
+        } else if (isString(object)) {
+          this.add('(new String("' + object + '"))', object);
+        } else if (isNumber(object)) {
+          this.add('(new Number(' + object + '))', object);
+        } else if (isBoolean(object)) {
+          this.add('(new Boolean(' + object.toString() + '))', object);
+        } else if (isRegExp(object)) {
+          this.add('(new RegExp(' + object.toString() + '))', object);
+        } else if (isError(object)) {
+          this.add(
+            '(new ' + (object.name || 'Error') +
+            '("' + Pot.getErrorMessage(object) + '"))',
+            object
+          );
+        } else if (isDate(object)) {
+          this.add('(new Date("' + object.toString() + '"))', object);
+        } else if (isFunction(object)) {
+          this.add(Pot.getFunctionCode(object), object);
+        } else {
+          index = this.data.length;
+          if (isArray(object)) {
+            wrap = ['[', ']'];
+            each(object, function(v) {
+              that.dumpAll(v, recursiveCount + 1);
+              if (that.isStop) {
+                throw PotStopIteration;
+              }
+            });
+          } else {
+            wrap = ['{', '}'];
+            k = ': ';
+            keys = [];
+            for (p in object) {
+              keys[keys.length] = p;
+            }
+            each(keys, function(p) {
+              try {
+                val = object[p];
+              } catch (e) {
+                return;
+              }
+              that.dumpAll(val, recursiveCount + 1);
+              if (that.isStop) {
+                throw PotStopIteration;
+              }
+            });
+          }
+          this.refs.splice(index, this.refs.length);
+          rs = this.data.splice(index, this.data.length);
+          rv = [];
+          each(rs, function(r, i) {
+            rv[rv.length] = (k ? keys[i] + k : '') +
+                            (r[2] || '') +
+                            r[0];
+          });
+          this.add(wrap[0] + rv.join(', ') + wrap[1], object);
+        }
+      }
+    };
+    return function(val, recursiveLimit, lengthLimit) {
+      return new Dumper(recursiveLimit, lengthLimit).dump(val);
+    };
+  }())
+});
+
+// Update Pot object.
+Pot.update({
+  debug : Pot.Debug.debug,
+  dump  : Pot.Debug.dump
 });
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -19442,10 +20068,10 @@ Pot.update({
    * @static
    */
   deferrizejQueryAjax : (function() {
-    if (typeof jQuery !== 'function' || !jQuery.fn) {
-      return PotNoop;
-    }
     return function() {
+      if (typeof jQuery !== 'function' || !jQuery.fn) {
+        return false;
+      }
       return (function($) {
         var orgAjax = $.ajax;
         $.pot = Pot;
@@ -19980,6 +20606,7 @@ update(PotInternal, {
     isScalar                 : Pot.isScalar,
     isBlob                   : Pot.isBlob,
     isFileReader             : Pot.isFileReader,
+    isImage                  : Pot.isImage,
     isArguments              : Pot.isArguments,
     isTypedArray             : Pot.isTypedArray,
     isArrayBuffer            : Pot.isArrayBuffer,
@@ -20044,6 +20671,8 @@ update(PotInternal, {
     isNL                     : Pot.isNL,
     hasReturn                : Pot.hasReturn,
     override                 : Pot.override,
+    createBlob               : Pot.createBlob,
+    createConstructor        : Pot.createConstructor,
     getErrorMessage          : Pot.getErrorMessage,
     getFunctionCode          : Pot.getFunctionCode,
     currentWindow            : Pot.currentWindow,
@@ -20083,6 +20712,8 @@ update(PotInternal, {
     now                      : now,
     globalize                : Pot.globalize,
     debug                    : Pot.Debug.debug,
+    error                    : Pot.Debug.error,
+    dump                     : Pot.Debug.dump,
     addPlugin                : Pot.Plugin.add,
     hasPlugin                : Pot.Plugin.has,
     removePlugin             : Pot.Plugin.remove,
