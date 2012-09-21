@@ -9,8 +9,8 @@
  *
  * @fileoverview   PotLite.js Run test
  * @author         polygon planet
- * @version        1.25
- * @date           2012-06-17
+ * @version        1.26
+ * @date           2012-09-21
  * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
  */
@@ -21,14 +21,16 @@ var Assert = {
   POTJS_LOADED : false
 };
 
-$(function() {
+$(function assertLoadback() {
+  'use strict';
+
   // IE9 SUCKS
   try {
     if (typeof Pot === 'undefined') {
       throw 'continue';
     }
   } catch (e) {
-    setTimeout(arguments.callee, 13);
+    setTimeout(assertLoadback, 13);
     return;
   }
   if (Assert.POTJS_LOADED) {
@@ -141,10 +143,11 @@ $(function() {
       return result;
     },
     dump : function(o) {
-      var r, me = arguments.callee, repr = function(x) {
-        return (x == null) ? String(x) :
-                x.toString ? x.toString() : String(x);
-      };
+      var r, me = Assert.dump,
+          repr = function(x) {
+            return (x == null) ? String(x) :
+                    x.toString ? x.toString() : String(x);
+          };
       if (o == null) {
         return String(o);
       }
@@ -561,12 +564,10 @@ $(function() {
     }, {
       title  : 'Pot.isBlob()',
       code   : function() {
-        if (!Pot.System.BlobBuilder) {
+        if (!Pot.System.createBlob) {
           return [true, false, false];
         } else {
-          var bb = new Pot.System.BlobBuilder();
-          bb.append('hoge');
-          var blob = bb.getBlob();
+          var blob = Pot.createBlob('hoge');
           return [
             isBlob(blob),
             isBlob({}),
@@ -586,6 +587,21 @@ $(function() {
           return [
             isFileReader(object),
             isFileReader(reader)
+          ];
+        }
+      },
+      expect : [false, true]
+    }, {
+      title  : 'Pot.isImage()',
+      code   : function() {
+        if (typeof Image === 'undefined') {
+          return [false, true];
+        } else {
+          var object = {hoge : 1};
+          var image = new Image();
+          return [
+            isImage(object),
+            isImage(image)
           ];
         }
       },
@@ -898,6 +914,7 @@ $(function() {
       title  : 'Pot.tokenize()',
       code   : function() {
         var hoge = function() {
+          "use strict";
           var a = 1, b = 0.5, c = String(1), $d = /'\/'/g;
           return $d.test(c) ? a : b;
         };
@@ -905,6 +922,7 @@ $(function() {
       },
       expect : [
         'function', '(', ')', '{', '\n',
+          '"use strict"', ';', '\n',
           'var', 'a', '=', '1', ',', 'b', '=', '0.5', ',',
                  'c', '=', 'String', '(', '1', ')', ',',
                  '$d', '=', '/\'\\/\'/g', ';', '\n',
@@ -916,12 +934,14 @@ $(function() {
       title  : 'Pot.joinTokens()',
       code   : function() {
         var hoge = function() {
+          "use strict";
           var a = 1, b = 0.5, c = String(1), $d = /'\/'/g;
           return $d.test(c) ? a : b;
         };
         return joinTokens(tokenize(hoge));
       },
       expect : 'function(){\n' +
+        '"use strict";\n' +
         'var a=1,b=0.5,c=String(1),$d=/\'\\/\'/g;\n' +
         'return $d.test(c)?a:b;\n' +
       '}'
@@ -980,6 +1000,48 @@ $(function() {
         return getErrorMessage(new Error('ErrorMessage'));
       },
       expect : 'ErrorMessage'
+    }, {
+      title  : 'Pot.createConstructor()',
+      code   : function() {
+        var result = [];
+        var Hoge = Pot.createConstructor('Hoge', {
+          init : function(a, b, c) {
+            this.value = a + b + c;
+          },
+          getHoge : function() {
+            return 'hogehoge';
+          }
+        });
+        result.push(new Hoge(1, 2, 3).value); // 6
+        result.push(new Hoge().getHoge());    // 'hogehoge'
+
+        var Fuga = Pot.createConstructor({
+          value : 1,
+          addValue : function(v) {
+            this.value += v;
+            return this;
+          },
+          getValue : function() {
+            return this.value;
+          }
+        }, function(a, b, c) {
+          this.value += a + b + c;
+        });
+        result.push(new Fuga(1, 2, 3).value); // 7
+        result.push(new Fuga(1, 2, 3).addValue(10).getValue()); // 17
+
+        var Piyo = Pot.createConstructor('Piyo', {
+          initialize : function(a, b, c) {
+            this.value = a + b + c;
+          },
+          getValue : function() {
+            return this.value;
+          }
+        }, 'initialize');
+        result.push(new Piyo(10, 20, 30).getValue()); // 60
+        return result;
+      },
+      expect : [6, 'hogehoge', 7, 17, 60]
     }, {
       title  : 'Pot.Plugin methods',
       code   : function() {
@@ -1217,6 +1279,35 @@ $(function() {
         return urlDecode('(a%2Bb)*c+%3D+%3F');
       },
       expect : '(a+b)*c = ?'
+    }, {
+      title  : 'Pot.dump()',
+      code   : function() {
+        var reg = /^[a-z]+$/g;
+        var err = new Error('error!');
+        var str = new String('hello');
+        var arr = [1, 2, 3, {a: 4, b: 5, c: true}, false, null];
+        var obj = {
+          key1 : 'val1',
+          key2 : 'val2',
+          arr  : arr,
+          arr2 : arr,
+          strs : [str, str],
+          err  : err,
+          err2 : err,
+          reg1 : reg,
+          reg2 : reg,
+          reg3 : reg
+        };
+        obj.obj = obj;
+        return Pot.dump(obj);
+      },
+      expect : '#0 {key1: "val1", key2: "val2", ' +
+               'arr: #3 [1, 2, 3, {a: 4, b: 5, c: true}, ' +
+               'false, null], arr2: #3, ' +
+               'strs: [#5 (new String("hello")), #5], ' +
+               'err: #6 (new Error("error!")), ' +
+               'err2: #6, reg1: #8 (new RegExp(/^[a-z]+$/g)), ' +
+               'reg2: #8, reg3: #8, obj: #0}'
     }, {
       title  : 'Pot.forEach() with Array',
       code   : function() {
@@ -2199,7 +2290,7 @@ $(function() {
         var d = new Deferred();
         d.then(function() {
           return 'Deferred';
-        });
+        }).begin();
         var value = 'Hello';
         return maybeDeferred(d).then(function(r1) {
           return maybeDeferred(value).then(function(r2) {
@@ -2566,11 +2657,9 @@ $(function() {
       title : 'Deferred callback with FileReader',
       code  : function() {
         return begin(function() {
-          if (Pot.System.hasFileReader && Pot.System.BlobBuilder) {
-            var bb = new Pot.System.BlobBuilder();
+          if (Pot.System.hasFileReader && Pot.System.createBlob) {
             var fl = new FileReader();
-            bb.append('hoge');
-            fl.readAsText(bb.getBlob());
+            fl.readAsText(Pot.createBlob('hoge'));
             return fl;
           } else {
             return 'hoge';
@@ -2578,6 +2667,20 @@ $(function() {
         });
       },
       expect : 'hoge'
+    }, {
+      title : 'Deferred callback with Image',
+      code  : function() {
+        return begin(function() {
+          var img = new Image();
+          img.src = 'http://api.polygonpla.net/img/logo/pot.js.mini.png';
+          return img;
+        }).then(function(img) {
+          return img.width;
+        }).rescue(function(err) {
+          return err;
+        });
+      },
+      expect : 300
     }, {
       title : 'Iterate with specific speed for synchronous',
       code  : function() {

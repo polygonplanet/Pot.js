@@ -47,13 +47,9 @@ function randomDeferred() {
         return new Error('error');
     } else if (n &lt; 5) {
         return 'string';
-    } else if (n &lt; 7) {
-        return new Pot.Deferred().then(function() {
-            return 'unfired';
-        });
     } else {
         return Pot.Deferred.begin(function() {
-            return 'fired';
+            return 'deferred';
         });
     }
 }
@@ -64,7 +60,7 @@ Pot.Deferred.begin(function() {
     // 次のチェインに繋げられるように Deferred 化する
     return Pot.Deferred.maybeDeferred(value);
 }).ensure(function(res) {
-    Pot.debug(res); // (Error: error) or 'string' or 'unfired' or 'fired'
+    Pot.debug(res); // (Error: error) or 'string' or 'deferred'
 });</pre>
     </div>
   </dd>
