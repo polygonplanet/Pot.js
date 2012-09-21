@@ -560,6 +560,24 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.createBlob">createBlob</a></b>(value, (type))
+								</div>
+								<div class="description">Create new instance of Blob.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.createConstructor">createConstructor</a></b>((name), (proto), (init))
+								</div>
+								<div class="description">Create a constructor with prototype.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.currentDocument">currentDocument</a></b>()
 								</div>
 								<div class="description">Get the current DOM Document object if exists (i.e.</div>
@@ -600,6 +618,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.deferrizejQueryAjax">deferrizejQueryAjax</a></b>()
 								</div>
 								<div class="description">Definition of jQuery plugin and convert Ajax function to deferred.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.error">error</a></b>(msg)
+								</div>
+								<div class="description">Output to the console using 'error' function for error logging.</div>
 							</td>
 						</tr>
 					
@@ -763,6 +790,15 @@ ul.inheritsList
 								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isFileReader">isFileReader</a></b>(x)
 								</div>
 								<div class="description">Check whether the argument is a instance of FileReader or not.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">Pot.<b><a href="../symbols/Pot.html#.isImage">isImage</a></b>(x)
+								</div>
+								<div class="description">Check whether the argument is a instance of Image or not.</div>
 							</td>
 						</tr>
 					
@@ -1651,6 +1687,169 @@ ul.inheritsList
 
 					<hr />
 				
+					<a name=".createBlob"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>createBlob</b>(value, (type))
+					
+					</div>
+					<div class="description">
+						Create new instance of Blob.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.begin(function() {
+    var blob = Pot.createBlob('hoge');
+    var reader = new FileReader();
+    reader.readAsText(blob);
+    return reader;
+  }).then(function(res) {
+    Pot.debug(res); // 'hoge'
+  });</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>value</b>
+									
+								</dt>
+								<dd>value.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{(String)}</span> <b>(type)</b>
+									
+								</dt>
+								<dd>Optional MIME type.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Blob}</span> Return new instance of Blob.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".createConstructor"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>createConstructor</b>((name), (proto), (init))
+					
+					</div>
+					<div class="description">
+						Create a constructor with prototype.
+
+That will set the toString method to constructor
+  if argument `name` specified.
+If argument `init` has been specified in the string,
+  then that method will be used to initialize.
+If argument `init` has been specified in a function,
+  then initialization will be execute by `init`.
+If omitted argument `init`, and `proto` has 'init' function
+  then initialization will be execute by 'init' function.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var Hoge = Pot.createConstructor('Hoge', {
+    init : function(a, b, c) {
+      this.value = a + b + c;
+    },
+    getHoge : function() {
+      return 'hogehoge';
+    }
+  });
+  Pot.debug(new Hoge(1, 2, 3).value); // 6
+  Pot.debug(new Hoge().getHoge());    // 'hogehoge'</pre>
+					
+					<pre class="code">  var Fuga = Pot.createConstructor({
+    value : 1,
+    addValue : function(v) {
+      this.value += v;
+      return this;
+    },
+    getValue : function() {
+      return this.value;
+    }
+  }, function(a, b, c) {
+    this.value += a + b + c;
+  });
+  Pot.debug(new Fuga(1, 2, 3).value); // 7
+  Pot.debug(new Fuga(1, 2, 3).addValue(10).getValue()); // 17</pre>
+					
+					<pre class="code">  var Piyo = Pot.createConstructor('Piyo', {
+    initialize : function(a, b, c) {
+      this.value = a + b + c;
+    },
+    getValue : function() {
+      return this.value;
+    }
+  }, 'initialize');
+  Pot.debug(new Piyo(10, 20, 30).getValue()); // 60</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{(String)}</span> <b>(name)</b>
+									
+								</dt>
+								<dd>(Optional) A name of constructor.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>(proto)</b>
+									
+								</dt>
+								<dd>prototype.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{(Function|String)}</span> <b>(init)</b>
+									
+								</dt>
+								<dd>(Optional) initialization method name
+                                   or initialization function.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Function}</span> Return new constructor.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name=".currentDocument"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -1816,6 +2015,46 @@ ul.inheritsList
 					
 					
 					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".error"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>error</b>(msg)
+					
+					</div>
+					<div class="description">
+						Output to the console using 'error' function for error logging.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  Pot.error('Error!'); // Error!</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>msg</b>
+									
+								</dt>
+								<dd>An error message, or variable.</dd>
+							
+							</dl>
 						
 						
 						
@@ -2924,6 +3163,56 @@ That is for cases where JavaScript sucks
 							<dt class="heading">Returns:</dt>
 							
 								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is FileReader.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name=".isImage"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					<span class="light">{Function}</span>
+					<span class="light">Pot.</span><b>isImage</b>(x)
+					
+					</div>
+					<div class="description">
+						Check whether the argument is a instance of Image or not.
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">  var object = {hoge : 1};
+  var image = new Image();
+  Pot.debug(Pot.isImage(object)); // false
+  Pot.debug(Pot.isImage(image));  // true</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{*}</span> <b>x</b>
+									
+								</dt>
+								<dd>Target object.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Boolean}</span> Return true if argument is Image.</dd>
 							
 							</dl>
 						
@@ -4890,7 +5179,7 @@ The return types:
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Jun 17 2012 19:39:00 GMT+0900 (JST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Sep 21 2012 19:35:44 GMT+0900 (JST)
 		</div>
 	</body>
 </html>
