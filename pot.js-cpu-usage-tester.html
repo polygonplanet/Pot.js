@@ -59,16 +59,19 @@ $(function() {
         items[i] = i;
       });
     }).then(function() {
-      var func, callback, time, next, d = new Pot.Deferred();
+      var func, callback, time, next, loopName, d = new Pot.Deferred();
 
       switch (loopBy) {
         case 'pot':
+            loopName = 'Pot.Deferred.forEach()';
             func = asyncPotForEach;
             break;
         case 'jsfor':
+            loopName = 'JavaScript for(...) loop';
             func = asyncForLoop;
             break;
         case 'jquery':
+            loopName = 'jQuery.each()';
             func = asyncjQueryEach;
             break;
       }
@@ -82,15 +85,33 @@ $(function() {
       };
 
       next = function() {
+        var container = $('.result-container'),
+            descContainer = $('.result-desc-container');
+
         time = +new Date() - time;
 
-        $('#result-time').text(time + 'ms.');
-        $('#result').text(
-          (lang === 'en') ?
-            'Refer your CPU load monitoring history, and compare each loops.' :
-            'CPU 使用率のグラフを各ループで比較してみてください'
-        );
+        $('<div/>')
+          .text(loopName)
+          .css({fontWeight : 'bold'})
+          .appendTo(container);
 
+        $('<div/>')
+          .text(time + 'ms.')
+          .appendTo(container);
+
+        $('<div/>')
+          .text('------------')
+          .appendTo(container);
+
+        if (descContainer.children().length === 0) {
+          $('<div/>')
+            .text(
+              (lang === 'en') ?
+              'Refer your CPU load monitoring history, and compare each loops.' :
+              'CPU 使用率のグラフを各ループで比較してみてください'
+            )
+            .appendTo(descContainer);
+        }
         d.begin();
       };
 
@@ -115,7 +136,6 @@ $(function() {
 
 
   function resetResult() {
-    $('#result,#result-time').text('');
     $('.progress').text('');
   }
 
@@ -244,7 +264,7 @@ h1 {
   color: #F00;
 }
 
-#result, #result-time {
+.result-container, .result-desc-container {
   color: #F00;
 }
 
@@ -390,10 +410,8 @@ h1 {
 
   <div class="progress"></div>
 
-  <div class="result-container">
-    <div id="result-time"></div>
-    <div id="result"></div>
-  </div>
+  <div class="result-container"></div>
+  <div class="result-desc-container"></div>
 
   <div class="footer">
     <h3>Download</h3>
