@@ -2048,7 +2048,7 @@ update(Deferred, {
     }
     if (x) {
       try {
-        // jQuery Deferred convertion.
+        // jQuery Deferred conversion.
         if (typeof jQuery === 'function' && jQuery.Deferred &&
             typeof x.then === 'function' &&
             x.promise && x.always && x.resolve && x.rejectWith
@@ -2063,15 +2063,33 @@ update(Deferred, {
         }
       } catch (e) {}
       try {
-        // JSDeferred convertion.
+        // JSDeferred conversion.
         if (x._id === 0xE38286E381AE &&
             typeof x.next === 'function' && typeof x.error === 'function' &&
             typeof x.fail === 'function' && typeof x.cancel === 'function'
         ) {
           d = new Deferred();
+          while (x._next) {
+            x = x._next;
+          }
           x.next(function() {
             d.begin.apply(d, arguments);
           }).error(function() {
+            d.raise.apply(d, arguments);
+          });
+          return d;
+        }
+      } catch (e) {}
+      try {
+        // Other Deferred conversion.
+        // (MochiKit.Async.Deferred, dojo.Deferred,  Closure Library etc.)
+        if (typeof x.addCallback === 'function' &&
+            typeof x.addErrback  === 'function') {
+          d = new Deferred();
+          x.addCallback(function() {
+            d.begin.apply(d, arguments);
+          });
+          x.addErrback(function() {
             d.raise.apply(d, arguments);
           });
           return d;
