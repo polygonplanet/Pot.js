@@ -489,16 +489,17 @@ update(Pot, {
      * @private
      * @ignore
      */
-    getMagicNumber : (function(sn) {
-      var c = 0, n = +sn;
+    getMagicNumber : function() {
+      var c = 0, n = 0xC26BEB642C0A;
       return function() {
         var i = n + (c++);
         if (!isFinite(i) || isNaN(i)) {
-          c = n = i = 0;
+          c = 0;
+          i = n;
         }
         return i;
       };
-    }('0xC26BEB642C0A')),
+    }(),
     /**
      * Get the export object.
      *
@@ -1384,7 +1385,7 @@ Pot.update({
    * @const
    * @public
    */
-  StopIteration : (function() {
+  StopIteration : function() {
     /**@ignore*/
     var f = update(function() {
       return f;
@@ -1399,7 +1400,7 @@ Pot.update({
     };
     f.prototype.constructor.prototype = f.constructor.prototype;
     return new f();
-  }()),
+  }(),
   /**
    * Return whether the argument is StopIteration or not.
    *
