@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.isPlainObject</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.isPlainObject';
+</script>
+</head>
+<body>
+<h1>Pot.isPlainObject</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isPlainObject"><em>Pot.</em>isPlainObject</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。 
+    </p>
+    <p class="potjs-reference-description">
+      引数 o がプレーンなオブジェクトインスタンスかどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 o がプレーンなオブジェクト <code>e.g., {}, {foo: 1} etc.</code> かどうか調べます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.isPlainObject() が isPlainObject() で実行できます。
+</p>
+<p>
+ 引数 o がプレーンなオブジェクトインスタンスなら true が返り、そうでない場合 false が返ります。
+</p>
+
+<pre>Pot.debug(Pot.isPlainObject(String));         // false
+Pot.debug(Pot.isPlainObject(new String(''))); // false
+Pot.debug(Pot.isPlainObject(Date));           // false
+Pot.debug(Pot.isPlainObject(new Date()));     // false
+Pot.debug(Pot.isPlainObject(Number));         // false
+Pot.debug(Pot.isPlainObject(new Number(1)));  // false
+Pot.debug(Pot.isPlainObject(Array));          // false
+Pot.debug(Pot.isPlainObject(new Array()));    // false
+Pot.debug(Pot.isPlainObject([]));             // false
+Pot.debug(Pot.isPlainObject(Object));         // false
+Pot.debug(Pot.isPlainObject(new Object()));   // true
+Pot.debug(Pot.isPlainObject({}));             // true
+Pot.debug(Pot.isPlainObject({foo: 'bar'}));   // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

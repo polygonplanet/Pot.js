@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.dump</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.dump';
+</script>
+</head>
+<body>
+<h1>Pot.dump</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.dump"><em>Pot.</em>dump</dfn>
+    (<em>{*}</em> val [, <em>{Number}</em> recursiveLimit = 16 [, <em>{Number}</em> lengthLimit = 1024]])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      オブジェクトをダンプした結果の文字列を返します。
+    </p>
+    <div>
+      <p>
+ 引数 val をダンプした結果の文字列を返します。
+ <br>
+ 任意に、引数 recursiveLimit が数値で与えられると、出力する深さを設定できます。
+ <br>
+ 任意に、引数 lengthLimit が数値で与えられると、出力する最大の長さを設定できます。
+ <br>
+ recursiveLimit, lengthLimit に -1 を指定すると無制限になります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.dump() が dump() で実行できます。
+</p>
+<p>
+ 引数 val をダンプした文字列が返ります。
+</p>
+
+<pre>var reg = /^[a-z]+$/g;
+var err = new Error(&#039;error!&#039;);
+var str = new String(&#039;hello&#039;);
+var arr = [1, 2, 3, {a: 4, b: 5, c: true}, false, null, void 0];
+var obj = {
+  key1 : &#039;val1&#039;,
+  key2 : &#039;val2&#039;,
+  arr  : arr,
+  arr2 : arr,
+  strs : [str, str],
+  err  : err,
+  err2 : err,
+  reg1 : reg,
+  reg2 : reg,
+  reg3 : reg
+};
+obj.obj = obj;
+Pot.debug( Pot.dump(obj) );
+//
+//   #0 {
+//     key1: &quot;val1&quot;,
+//     key2: &quot;val2&quot;,
+//     arr: #3 [
+//       1,
+//       2,
+//       3,
+//       {
+//         a: 4,
+//         b: 5,
+//         c: true
+//       },
+//       false,
+//       null,
+//       undefined
+//     ],
+//     arr2: #3,
+//     strs: [
+//       #5 (new String(&quot;hello&quot;)),
+//       #5
+//     ],
+//     err: #6 (new Error(&quot;error!&quot;)),
+//     err2: #6,
+//     reg1: #8 (new RegExp(/^[a-z]+$/g)),
+//     reg2: #8,
+//     reg3: #8,
+//     obj: #0
+//   }</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

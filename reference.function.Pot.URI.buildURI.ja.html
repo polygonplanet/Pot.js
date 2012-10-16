@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.URI.buildURI</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.URI.buildURI';
+</script>
+</head>
+<body>
+<h1>Pot.URI.buildURI</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.URI.buildURI"><em>Pot.URI.</em>buildURI</dfn>
+    (<em>{Object|String}</em> url [, <em>{Object|Array|String}</em> query])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      URI を組み立てます。
+    </p>
+    <div>
+      <p>
+ 引数 url を文字列で指定すると、引数 query を queryString とみなして組み立てます。
+ <br>
+ その際に、query が指定されていた場合、<a href="#reference.function.Pot.URI.urlEncode">Pot.URI.urlEncode</a> によってエンコードされます。
+ <br>
+ 引数 query は、文字列またはオブジェクト、items 形式の配列が指定できます。
+ <br>
+ 引数 url がオブジェクトで指定された場合、
+ <br>
+ 各キー名は <a href="#reference.function.Pot.URI.parseURI">Pot.parseURI</a> の結果のキー名と同じ指定ができます。
+ <br>
+ その際に キー名 'query' はオブジェクトで指定することができます。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.buildURI() が buildURI() で実行できます。
+</p>
+<p>
+ 組み立てた URI 文字列が返ります。
+</p>
+
+<pre>var url = &#039;http://www.example.com/&#039;;
+var params = {
+  foo : &#039;{foo}&#039;,
+  bar : &#039;{bar}&#039;
+};
+var result = Pot.buildURI(url, params);
+Pot.debug(result);
+// &#039;http://www.example.com/?foo=%7Bfoo%7D&amp;bar=%7Bbar%7D&#039;</pre>
+
+<pre>var url = &#039;http://www.example.com/test?a=1&#039;;
+var params = [
+  [&#039;prototype&#039;,    &#039;{foo}&#039;],
+  [&#039;__iterator__&#039;, &#039;{bar}&#039;],
+];
+var result = Pot.buildURI(url, params);
+Pot.debug(result);
+// &#039;http://www.example.com/test?a=1&amp;prototype=%7Bfoo%7D&amp;__iterator__=%7Bbar%7D&#039;</pre>
+
+<pre>var url = &#039;http://www.example.com/test?a=1&#039;;
+var params = &#039;b=2&amp;c=3&#039;;
+var result = Pot.buildURI(url, params);
+Pot.debug(result);
+// &#039;http://www.example.com/test?a=1&amp;b=2&amp;c=3&#039;</pre>
+
+<pre>var parts = {
+  protocol : &#039;http:&#039;,
+  username : &#039;user&#039;,
+  password : &#039;pass&#039;,
+  hostname : &#039;www.example.com&#039;,
+  port     : 8000,
+  pathname : &#039;/path/to/file.ext&#039;,
+  query    : {
+    arg1   : &#039;v1&#039;,
+    arg2   : &#039;v#2&#039;
+  },
+  hash     : &#039;a&#039;
+};
+var result = Pot.buildURI(parts);
+Pot.debug(result);
+// &#039;http://user:pass@www.example.com:8000/path/to/file.ext?arg1=v1&amp;arg2=v%232#a&#039;</pre>
+
+<pre>var uri = &#039;http://user:pass@host:8000/path/to/file.ext?arg=value#fragment&#039;;
+var parts = Pot.parseURI(uri);
+var result = Pot.buildURI(parts);
+Pot.debug(result);
+// &#039;http://user:pass@host:8000/path/to/file.ext?arg=value#fragment&#039;</pre>
+
+<pre>var parts = {
+  protocol : &#039;file:&#039;,
+  pathname : &#039;C:\\path\\to\\file.ext&#039;,
+  query    : {
+    arg1   : &#039;value#1&#039;,
+    arg2   : &#039;value#2&#039;
+  },
+  hash     : &#039;#fragment&#039;
+};
+var result = Pot.buildURI(parts);
+Pot.debug(result);
+// &#039;file:///C:\\path\\to\\file.ext?arg1=value%231&amp;arg2=value%232#fragment&#039;</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

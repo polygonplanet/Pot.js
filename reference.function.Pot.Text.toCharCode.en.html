@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.Text.toCharCode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.Text.toCharCode';
+</script>
+</head>
+<body>
+<h1>Pot.Text.toCharCode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Array}</em>
+    <dfn id="definition.reference.function.Pot.Text.toCharCode"><em>Pot.Text.</em>toCharCode</dfn>
+    (<em>{String}</em> string [, <em>{Function}</em> callback])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      文字列 string を Unicode 値の配列に変換します。
+    </p>
+    <div>
+      <p>
+ 文字列 string の各文字をそれぞれ Unicode 値の数値に変換し、その値をもつ配列を返します。
+ <br>
+ 引数 callback が与えられると、各値はその関数の戻り値になります。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.toCharCode() が toCharCode() で実行できます。
+</p>
+<p>
+ 引数 string を Unicode 値の配列にした結果、もしくは callback 通りに変換した結果が返ります。
+</p>
+
+<pre>var string = 'foo bar ほげ';
+var result = Pot.toCharCode(string);
+Pot.debug(result);
+// [102, 111, 111, 32, 98, 97, 114, 32, 12411, 12370]</pre>
+
+<pre>var string = 'abc';
+var result = Pot.toCharCode(string, function(code) {
+    return code.toString(16);
+});
+Pot.debug(result);
+// ['61', '62', '63']</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

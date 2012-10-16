@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.URI.getExt</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.URI.getExt';
+</script>
+</head>
+<body>
+<h1>Pot.URI.getExt</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.URI.getExt"><em>Pot.URI.</em>getExt</dfn>
+    (<em>{String}</em> path)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 path の拡張子を取得します。
+    </p>
+    <div>
+      <p>
+ 引数 path をファイル名または URI とみなして拡張子を取得します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.getExt() が getExt() で実行できます。
+</p>
+<p>
+ 引数 path のうち拡張子の部分文字列があれば、それを返します。
+</p>
+
+<pre>var fileName = 'foo.html';
+var result = Pot.getExt(fileName);
+Pot.debug(result); // 'html'</pre>
+
+<pre>var fileName = 'C:\\foo\\bar\\baz.tmp.txt';
+var result = Pot.getExt(fileName);
+Pot.debug(result); // 'txt'</pre>
+
+<pre>var uri = 'http://www.example.com/file.html?q=hoge.js';
+var result = Pot.getExt(uri);
+Pot.debug(result); // 'html'</pre>
+
+<pre>var uri = 'http://www.example.com/?output=hoge.xml#fuga.piyo';
+var result = Pot.getExt(uri);
+Pot.debug(result); // 'xml'</pre>
+
+<pre>var uri = 'http://www.example.com/?q=hoge';
+var result = Pot.getExt(uri);
+Pot.debug(result); // ''</pre>
+
+<pre>var uri = 'http://www.example.com/http%3A%2F%2Fwww.example.com%2Ffoo%2Ejs';
+var result = Pot.getExt(uri);
+Pot.debug(result); // 'js'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

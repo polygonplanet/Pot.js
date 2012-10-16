@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.createBlob</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.createBlob';
+</script>
+</head>
+<body>
+<h1>Pot.createBlob</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Blob|Null}</em>
+    <dfn id="definition.reference.function.Pot.createBlob"><em>Pot.</em>createBlob</dfn>
+    (<em>{*}</em> value [, <em>{String}</em> type])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      Blob インスタンスを作成して返します。
+    </p>
+    <div>
+      <p>
+ Blob インスタンス (<a href="http://www.w3.org/TR/FileAPI/" target="_blank" title="File API - W3C">HTML5 File API</a>) を作成します。
+ <br>
+ Blob コンストラクタがサポートされてない場合、BlobBuilder がサポートされてたらそれを使用します。
+ <br>
+ Blob がサポートされてない場合は null が返ります。
+ <br>
+ 任意に引数 type に MIME Type を指定します。('text/plain' etc.)
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.createBlob() が createBlob() で実行できます。
+</p>
+<p>
+ 新しい Blob インスタンス が返ります。Blob をサポートしてない場合は null が返ります。
+</p>
+
+<pre>Pot.begin(function() {
+    var blob = Pot.createBlob('hoge');
+    var reader = new FileReader();
+    reader.readAsText(blob);
+    return reader;
+}).then(function(res) {
+    Pot.debug(res); // 'hoge'
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

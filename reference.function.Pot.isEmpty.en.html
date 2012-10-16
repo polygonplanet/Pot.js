@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.isEmpty</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.isEmpty';
+</script>
+</head>
+<body>
+<h1>Pot.isEmpty</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isEmpty"><em>Pot.</em>isEmpty</dfn>
+    (<em>{*}</em> o)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      引数 o が空かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 o が空、もしくは空と判断できる値かどうか調べます。
+</p>
+
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.isEmpty() が isEmpty() で実行できます。
+</p>
+<p>
+ 引数 o が空なら true が返り、そうでない場合 false が返ります。
+</p>
+
+
+<pre>Pot.debug(Pot.isEmpty(null));                // true
+Pot.debug(Pot.isEmpty(true));                // false
+Pot.debug(Pot.isEmpty(false));               // true
+Pot.debug(Pot.isEmpty(0));                   // true
+Pot.debug(Pot.isEmpty(-524560620));          // false
+Pot.debug(Pot.isEmpty(0.1205562));           // false
+Pot.debug(Pot.isEmpty(''));                  // true
+Pot.debug(Pot.isEmpty('abc'));               // false
+Pot.debug(Pot.isEmpty(new String()));        // true
+Pot.debug(Pot.isEmpty([]));                  // true
+Pot.debug(Pot.isEmpty([1, 2, 3]));           // false
+Pot.debug(Pot.isEmpty([[]]));                // false
+Pot.debug(Pot.isEmpty(new Array()));         // true
+Pot.debug(Pot.isEmpty(new Array('a', 'b'))); // false
+Pot.debug(Pot.isEmpty({a:1, b:2, c:3}));     // false
+Pot.debug(Pot.isEmpty({}));                  // true
+Pot.debug(Pot.isEmpty(new Object()));        // true
+Pot.debug(Pot.isEmpty((void 0)));            // true
+Pot.debug(Pot.isEmpty((function() {})));     // true
+var f = function(a, b) {
+  return a + b;
+};
+Pot.debug(Pot.isEmpty(f)); // false</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

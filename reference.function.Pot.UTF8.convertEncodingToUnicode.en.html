@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.UTF8.convertEncodingToUnicode</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.UTF8.convertEncodingToUnicode';
+</script>
+</head>
+<body>
+<h1>Pot.UTF8.convertEncodingToUnicode</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Pot.Deferred}</em>
+    <dfn id="definition.reference.function.Pot.UTF8.convertEncodingToUnicode"><em>Pot.UTF8.</em>convertEncodingToUnicode</dfn>
+    (<em>{TypedArray|Array|Blob}</em> data [, <em>{String}</em> from])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      Unicode に文字コード変換します。
+    </p>
+    <div>
+      <p>
+ Blob の機能を利用し、文字コード変換を行います。
+ <br>
+ 引数 data には、変換するデータを TypedArray か Array もしくは Blob で指定します。
+ <br>
+ 任意に、引数 from に変換前の文字コードを指定できます (e.g. 'Shift_JIS', 'EUC-JP' etc.)。
+ <br>
+ 変換された文字列を結果にもつ <a href="#reference.function.Pot.Deferred">Pot.Deferred</a> インスタンスが返ります。
+ <br>
+ Blob がサポートされていない場合、失敗します。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.convertEncodingToUnicode() が convertEncodingToUnicode() で実行できます。
+</p>
+<p>
+ Unicode に変換された文字列を結果にもつ Pot.Deferred インスタンスが返ります。
+</p>
+
+<pre>// 'こんにちは。ほげほげ'
+var unicode = [
+  12371, 12435, 12395, 12385, 12399, 12290,
+  12411, 12370, 12411, 12370
+];
+// Shift_JIS: 'こんにちは。ほげほげ'
+var sjis = [
+  130, 177, 130, 241, 130, 201,
+  130, 191, 130, 205, 129, 66,
+  130, 217, 130, 176, 130, 217,
+  130, 176
+];
+// EUC-JP: 'こんにちは。ほげほげ'
+var eucjp = [
+  164, 179, 164, 243, 164, 203,
+  164, 193, 164, 207, 161, 163,
+  164, 219, 164, 178, 164, 219,
+  164, 178
+];
+// UTF-8: 'こんにちは。ほげほげ'
+var utf8 = [
+  227, 129, 147, 227, 130, 147,
+  227, 129, 171, 227, 129, 161,
+  227, 129, 175, 227, 128, 130,
+  227, 129, 187, 227, 129, 146,
+  227, 129, 187, 227, 129, 146
+];
+Pot.convertEncodingToUnicode(sjis, 'Shift_JIS').then(function(res) {
+  Pot.debug('SJIS to Unicode:');
+  Pot.debug(res); // 'こんにちは。ほげほげ'
+}).then(function() {
+  return Pot.convertEncodingToUnicode(eucjp, 'EUC-JP').then(function(res) {
+    Pot.debug('EUC-JP to Unicode:');
+    Pot.debug(res); // 'こんにちは。ほげほげ'
+  });
+}).then(function() {
+  return Pot.convertEncodingToUnicode(utf8, 'UTF-8').then(function(res) {
+    Pot.debug('UTF-8 to Unicode:');
+    Pot.debug(res); // 'こんにちは。ほげほげ'
+  });
+});</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.URI.parseURI</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.URI.parseURI';
+</script>
+</head>
+<body>
+<h1>Pot.URI.parseURI</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Object}</em>
+    <dfn id="definition.reference.function.Pot.URI.parseURI"><em>Pot.URI.</em>parseURI</dfn>
+    (<em>{String}</em> uri)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      URI 文字列を解析します。
+    </p>
+    <div>
+      <p>
+ URI を解析し、各要素をもつオブジェクトを返します。
+ <br>
+ 結果のオブジェクトのキー名は window.location の要素名を拡張したものです。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.parseURI() が parseURI() で実行できます。
+</p>
+<p>
+ URI を解析したオブジェクトが返ります。
+</p>
+
+<pre>//
+// This results contains all the keys and values.
+//
+var uri = 'http://user:pass@host:8000/path/to/file.ext?arg=value#fragment';
+var result = Pot.parseURI(uri);
+Pot.debug(result);
+//   {
+//     protocol  : 'http:',
+//     scheme    : 'http',
+//     userinfo  : 'user:pass',
+//     username  : 'user',
+//     password  : 'pass',
+//     host      : 'host:8000',
+//     hostname  : 'host',
+//     port      : '8000',
+//     pathname  : '/path/to/file.ext',
+//     dirname   : '/path/to',
+//     filename  : 'file.ext',
+//     extension : 'ext',
+//     search    : '?arg=value',
+//     query     : 'arg=value',
+//     hash      : '#fragment',
+//     fragment  : 'fragment'
+//   }</pre>
+
+<pre>var uri = 'file:///C:/foo/bar/baz.js';
+var result = Pot.parseURI(uri);
+Pot.debug(result);
+//   {
+//     protocol  : 'file:',
+//     scheme    : 'file',
+//     userinfo  : '',
+//     username  : '',
+//     password  : '',
+//     host      : '',
+//     hostname  : '',
+//     port      : '',
+//     pathname  : 'C:/foo/bar/baz.js',
+//     dirname   : 'C:/foo/bar',
+//     filename  : 'baz.js',
+//     extension : 'js',
+//     search    : '',
+//     query     : '',
+//     hash      : '',
+//     fragment  : ''
+//   }</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

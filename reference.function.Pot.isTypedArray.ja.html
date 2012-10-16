@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.isTypedArray</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.isTypedArray';
+</script>
+</head>
+<body>
+<h1>Pot.isTypedArray</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{Boolean}</em>
+    <dfn id="definition.reference.function.Pot.isTypedArray"><em>Pot.</em>isTypedArray</dfn>
+    (<em>{*}</em> x)
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js と PotLite.js で利用可能。
+    </p>
+    <p class="potjs-reference-description">
+      引数 x が TypedArray かどうかチェックします。
+    </p>
+    <div>
+      <p>
+ 引数 x が TypedArray かどうか調べ、適正なら true を返します。
+ TypedArray でない場合、false が返ります。 
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.isTypedArray() が isTypedArray() で実行できます。
+</p>
+<p>
+ 引数 x が TypedArray なら true が返り、そうでない場合 false が返ります。
+</p>
+
+<pre>var obj = {foo : 1};
+var arr = [1, 2, 3];
+var buf = new ArrayBuffer(10);
+var uar = new Uint8Array(10);
+Pot.debug(Pot.isTypedArray(obj)); // false
+Pot.debug(Pot.isTypedArray(arr)); // false
+Pot.debug(Pot.isTypedArray(buf)); // true
+Pot.debug(Pot.isTypedArray(uar)); // true</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>

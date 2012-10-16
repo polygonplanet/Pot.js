@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Pot.URI.resolveRelativeURI</title>
+<link rel="Pot.js Repository - GitHub" href="http://github.com/polygonplanet/Pot.js">
+<link rel="author" title="polygon planet" href="http://polygonpla.net/">
+<script type="text/javascript">
+location.href = './#reference.function.Pot.URI.resolveRelativeURI';
+</script>
+</head>
+<body>
+<h1>Pot.URI.resolveRelativeURI</h1>
+<div class="pot-js-document-reference-content-container">
+<!--#Pot.js-reference-content:{{{-->
+
+<dl>
+  <dt>
+    <em>{String}</em>
+    <dfn id="definition.reference.function.Pot.URI.resolveRelativeURI"><em>Pot.URI.</em>resolveRelativeURI</dfn>
+    (<em>{String}</em> uri [, <em>{Object}</em> context])
+  </dt>
+  <dd>
+    <p class="potjs-reference-compatibility">
+      Pot.js で利用可能。 PotLite.js では利用できません。
+    </p>
+    <p class="potjs-reference-description">
+      相対パスを解決します。
+    </p>
+    <div>
+      <p>
+ 相対パスなどの '.' や '../' を解決した URI 文字列に変換します。
+ <br>
+ 引数 context が指定されると、それを基準に修正します (e.g., document)。
+</p>
+
+<p>
+ <a href="#reference.function.Pot.globalize">Pot.globalize()</a> が適応されている場合、Pot.resolveRelativeURI() が resolveRelativeURI() で実行できます。
+</p>
+<p>
+ 相対パスが解決された URI 文字列が返ります。
+</p>
+
+<pre>var uri = 'C:/path/to/foo/bar/../hoge.ext';
+var result = Pot.resolveRelativeURI(uri);
+Pot.debug(result);
+// 'C:/path/to/foo/hoge.ext'</pre>
+
+<pre>var uri = 'C:/path/to/../../hoge.ext';
+var result = Pot.resolveRelativeURI(uri);
+Pot.debug(result);
+// 'C:/hoge.ext'</pre>
+
+<pre>var uri = 'C:/path/to/../../../../././../../hoge.ext';
+var result = Pot.resolveRelativeURI(uri);
+Pot.debug(result);
+// 'C:/hoge.ext'</pre>
+
+<pre>var uri = '/////path/to/////hoge.ext';
+var context = document;
+var result = Pot.resolveRelativeURI(uri, context);
+Pot.debug(result);
+// e.g., 'http://www.example.com/path/to/hoge.ext'</pre>
+
+<pre>var uri = './hoge.png';
+var context = document.getElementById('image1');
+var result = Pot.resolveRelativeURI(uri, context);
+Pot.debug(result);
+// e.g., 'http://www.example.com/dir1/dir2/hoge.png'</pre>
+
+<pre>var uri = '/usr/local/bin/../././hoge.ext';
+var result = Pot.resolveRelativeURI(uri);
+Pot.debug(result);
+// '/usr/local/hoge.ext'</pre>
+
+    </div>
+  </dd>
+</dl>
+
+<!--}}}:#Pot.js-reference-content-->
+</div>
+<noscript>
+ <style type="text/css">
+ body {
+   padding-top: 120px;
+ }
+ .potjs-reference-noscript-notice {
+   position: absolute;
+   left: 35%;
+   top: 10px;
+   color: #e53d5e;
+   border: 1px solid #e53d5e;
+   background: #ffd8d7;
+   padding: 8px;
+ }
+ .potjs-reference-noscript-notice a {
+   font-weight: bold;
+   text-decoration: underline;
+ }
+ </style>
+ <div class="potjs-reference-noscript-notice">
+  <p>このページは直接参照するものではありません。</p>
+  <p><a href="./">Pot.js / PotLite.js リファレンスはこちらです</a></p>
+ </div>
+</noscript>
+</body>
+</html>
