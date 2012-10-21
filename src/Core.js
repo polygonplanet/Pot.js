@@ -1187,16 +1187,60 @@ update(PotInternal, {
      * @ignore
      * @based JSDeferred.next
      */
-    flush : function(callback) {
-      var handler = this.byEvent || this.byTick || this.byTimer;
-      handler(callback);
+    flush : function() {
+      (this.byTick    || this.byImmediate ||
+       this.byMessage || this.byEvent     ||
+       this.byTimer)(callback);
     },
+    /**
+     * @private
+     * @ignore
+     */
+    byMessage : function() {
+      var channel, queue;
+      if (typeof MessageChannel !== 'function') {
+        return false;
+      }
+      try {
+        channel = new MessageChannel();
+        if (!channel.port1 || !channel.port2) {
+          throw false;
+        }
+        queue = [];
+        /**@ignore*/
+        channel.port1.onmessage = function() {
+          queue.shift()();
+        };
+      } catch (e) {
+        return false;
+      }
+      return function(callback) {
+        queue.push(callback);
+        channel.port2.postMessage('');
+      };
+    }(),
+    /**
+     * @private
+     * @ignore
+     */
+    byImmediate : function() {
+      if (typeof setImmediate !== 'function') {
+        return false;
+      }
+      return function(callback) {
+        try {
+          setImmediate(callback);
+        } catch (e) {
+          (this.byImmediate = this.byTimer)(callback);
+        }
+      };
+    }(),
     /**
      * @private
      * @ignore
      * @based JSDeferred.next
      */
-    byEvent : (function() {
+    byEvent : function() {
       var IMAGE;
       if (PotSystem.isNonBrowser || PotSystem.isNodeJS ||
           typeof window !== 'object'  || typeof document !== 'object' ||
@@ -1234,15 +1278,15 @@ update(PotInternal, {
         try {
           img.src = IMAGE;
         } catch (e) {
-          this.byEvent = this.byTimer;
+          (this.byEvent = this.byTimer)(callback);
         }
       };
-    }()),
+    }(),
     /**
      * @private
      * @ignore
      */
-    byTick : (function() {
+    byTick : function() {
       if (!PotSystem.isNodeJS || typeof process !== 'object' ||
           typeof process.nextTick !== 'function') {
         return false;
@@ -1251,7 +1295,7 @@ update(PotInternal, {
       return function(callback) {
         process.nextTick(callback);
       };
-    }()),
+    }(),
     /**
      * @private
      * @ignore
