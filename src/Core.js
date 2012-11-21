@@ -121,7 +121,7 @@ RE_RTRIM           = /[\s\u00A0\u3000]+$/g,
 RE_STRIP           = /[\s\u00A0\u3000]+/g,
 RE_NL              = /\r\n|\r|\n/,
 RE_NL_GROUP        = /(\r\n|\r|\n)/,
-RE_EMPTYFN         = /^[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*$/,
+RE_EMPTYFN         = /^(?:[(]\s*function)\s*[(]?[^{]*?[{][\s\u00A0]*[}]\s*[)]?\s*[)]?\s*$/,
 RE_JS_ESCAPED      = /^(?:[\w!#$()*+,.:;=?@[\]^`|~-]|\\[ux][0-9a-f]+)*$/i,
 RE_HTML_ESCAPED    =
   /^(?:[^<>"'&]|&(?:[a-z]\w{0,24}|#(?:x[0-9a-f]{1,8}|[0-9]{1,10}));)*$/i,/*{#endif}*/
@@ -1187,7 +1187,7 @@ update(PotInternal, {
      * @ignore
      * @based JSDeferred.next
      */
-    flush : function() {
+    flush : function(callback) {
       (this.byTick    || this.byImmediate ||
        this.byMessage || this.byEvent     ||
        this.byTimer)(callback);
