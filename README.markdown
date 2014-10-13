@@ -1,6 +1,8 @@
 Pot.js
 ========
 
+[![Build Status](https://travis-ci.org/polygonplanet/Pot.js.svg?branch=master)](https://travis-ci.org/polygonplanet/Pot.js)
+
 ![Pot.js Logo][Pot.js-Logo]
 
 **Pot.js / PotLite.js** :  
@@ -49,60 +51,41 @@ Install
 ========
 Will work with common ways.
 
-    <script type="text/javascript" src="pot.min.js"></script>
-    <!-- or -->
-    <script type="text/javascript" src="potlite.min.js"></script>
+```html
+<script type="text/javascript" src="pot.min.js"></script>
+<!-- or -->
+<script type="text/javascript" src="potlite.min.js"></script>
+```
 
-For Node.js.
+For Node.js
 
-    // Example to define Pot object on Node.js.
-    var Pot = require('./pot.min.js');
-    Pot.debug(Pot.VERSION);
-    
-    Pot.Deferred.begin(function() {
-        Pot.debug('Hello World!');
-    }).then(function() {
-        // ...
-    })
-    // ...
+`npm install pot.js`
 
-Example of Greasemonkey (userscript).
-
-    // ==UserScript==
-    // ...
-    // @require  https://github.com/polygonplanet/Pot.js/raw/master/pot.min.js
-    // ...
-    // ==/UserScript==
-    Pot.Deferred.begin(function() {
-        var url = 'http://www.example.com/data.json';
-        return Pot.request(url).then(function(res) {
-            return Pot.parseFromJSON(res.responseText);
-        });
-    }).then(function(res) {
-        Pot.debug(res);
-        // do something...
-    });
-    //...
+```javascript
+var pot = require('pot.js');
+```
 
 As for jQuery plugin.
 
-    // Run after loading with jQuery.
-    Pot.deferrizejQueryAjax();
-    
-    // Ajax-based functions will return with Pot.Deferred object instance.
-    $.getJSON('/hoge.json').then(function(data) {
-        alert(data.results[0].text);
-    }).rescue(function(err) {
-        alert('Error! ' + err);
-    }).ensure(function() {
-        return someNextProcess();
-    });
+```javascript
+// Run after loading with jQuery.
+Pot.deferrizejQueryAjax();
 
-    // Will added 'deferred' method for effects etc
-    //  that convert to Deferred functions.
-    $('div#hoge').deferred('hide', 'slow').then(function() {
-        // (...Do something after hide() method completed.)
-    });
+// Ajax-based functions will return with Pot.Deferred object instance.
+$.getJSON('/hoge.json').then(function(data) {
+    alert(data.results[0].text);
+}).rescue(function(err) {
+    alert('Error! ' + err);
+}).ensure(function() {
+    return someNextProcess();
+});
+
+// Will added 'deferred' method for effects etc
+//  that convert to Deferred functions.
+$('div#hoge').deferred('hide', 'slow').then(function() {
+    // (...Do something after hide() method completed.)
+});
+```
 
 Compatibility
 ========
@@ -131,7 +114,7 @@ Test Run
 License
 ========
 Dual licensed under the MIT and GPL v2 licenses.    
-Copyright &copy; 2012 polygon planet
+Copyright &copy; 2012-2014 polygon planet
 
 Documentation And Reference
 ========
@@ -148,119 +131,114 @@ Blog
 
 Example
 ========
-Example:   
-A simple iterate and Deferred object usage with asynchronous and synchronous.
 
-    // This example uses globalize for short function name.
-    Pot.globalize();
-    
-    begin(function() {
-        debug('BEGIN example');
-    }).then(function() {
-        // A simple HTTP request
-        //  that even works on Node.js (non-browser).
-        return request('pot.js.example.json', {
-            mimeType : 'application/json'
-        }).ensure(function(res) {
-            if (isError(res)) {
-                return {
-                    foo : 'fooError',
-                    bar : 'barError',
-                    baz : 'bazError'
-                };
-            } else {
-                debug(res.responseText);
-                // e.g., responseText = {
-                //         foo: 'fooValue',
-                //         bar: 'barValue',
-                //         baz: 'bazValue'
-                //       }
-                return parseFromJSON(res.responseText);
-            }
-            // Iterate on chain by "forEach" method.
-        }).forEach(function(val, key) {
-            debug(key + ' : ' + val); // foo : fooValue ... etc.
-            
-            // Executed in one second intervals.
-            return wait(1);
-            
-            // Wait 0.5 seconds
-            //  and set the speed to slow between each chains.
-        }).wait(0.5).speed('slow').then(function(res) {
-            var s = '', keys = [];
-            
-            // Iterate by "forEach" method on synchronous.
-            forEach(res, function(val, key) {
-                s += key;
-                keys.push(key);
-            });
-            keys.push(s);
-            return keys;
-            
-            // Like (Destructuring-Assignment)
-        }).then(function(foo, bar, baz, all) {
-            debug('foo = ' + foo); // foo = 'foo'
-            debug('bar = ' + bar); // bar = 'bar'
-            debug('baz = ' + baz); // baz = 'baz'
-            debug('all = ' + all); // all = 'foobarbaz'
-            
-            return [foo, bar, baz];
-            
-            // Iterate by "map" method at a slower speed.
-        }).map.doze(function(val) {
-            debug('in map.doze(val) : ' + val);
-            
-            return val + '!';
-            
-        }).then(function(res) {
-            debug(res); // ['foo!', 'bar!', 'baz!']
-            
-            var d = new Deferred();
-            return d.then(function() {
-                // Generate an error for testing.
-                throw new Error('TestError');
-                
-            }).then(function() {
-                // This callback chain never executed
-                //  because occured the error.
-                debug('Help me!!');
-                
-            }).rescue(function(err) {
-                // Catch the error.
-                debug(err); // (Error: TestError)
-                
-            }).then(function() {
-                // And, continue the callback chain.
-                
-                // Iterate by "reduce" method on asynchronous.
-                return Deferred.reduce(res, function(a, b) {
-                    return a + b;
-                }).then(function(result) {
-                    return result;
-                });
-            }).begin(); // Begin the callback chain.
-            
-        }).wait(2).then(function(res) {
-            
-            debug(res); // 'foo!bar!baz!'
-            
-            // Iterate by "filter" method on synchronous.
-            return filter(res.split('!'), function(val) {
-                return val && val.length;
-            });
+```javascript
+Pot.begin(function() {
+    Pot.debug('BEGIN example');
+}).then(function() {
+    // A simple HTTP request
+    //  that even works on Node.js (non-browser).
+    return Pot.request('pot.js.example.json', {
+        mimeType : 'application/json'
+    }).ensure(function(res) {
+        if (Pot.isError(res)) {
+            return {
+                foo : 'fooError',
+                bar : 'barError',
+                baz : 'bazError'
+            };
+        } else {
+            Pot.debug(res.responseText);
+            // e.g., responseText = {
+            //         foo: 'fooValue',
+            //         bar: 'barValue',
+            //         baz: 'bazValue'
+            //       }
+            return Pot.parseFromJSON(res.responseText);
+        }
+        // Iterate on chain by "forEach" method.
+    }).forEach(function(val, key) {
+        Pot.debug(key + ' : ' + val); // foo : fooValue ... etc.
+        
+        // Executed in one second intervals.
+        return Pot.wait(1);
+        
+        // Wait 0.5 seconds
+        //  and set the speed to slow between each chains.
+    }).wait(0.5).speed('slow').then(function(res) {
+        var s = '', keys = [];
+        
+        // Iterate by "forEach" method on synchronous.
+        Pot.forEach(res, function(val, key) {
+            s += key;
+            keys.push(key);
         });
+        keys.push(s);
+        return keys;
         
-    }).then(function(result) {
-        debug(result); // ['foo', 'bar', 'baz']
-        debug('END example');
+        // Like (Destructuring-Assignment)
+    }).then(function(foo, bar, baz, all) {
+        Pot.debug('foo = ' + foo); // foo = 'foo'
+        Pot.debug('bar = ' + bar); // bar = 'bar'
+        Pot.debug('baz = ' + baz); // baz = 'baz'
+        Pot.debug('all = ' + all); // all = 'foobarbaz'
         
-    }).end(); // Chain can be closed by the "end" method on any.
+        return [foo, bar, baz];
+        
+        // Iterate by "map" method at a slower speed.
+    }).map.doze(function(val) {
+        Pot.debug('in map.doze(val) : ' + val);
+        
+        return val + '!';
+        
+    }).then(function(res) {
+        Pot.debug(res); // ['foo!', 'bar!', 'baz!']
+        
+        var d = new Pot.Deferred();
+        return d.then(function() {
+            // Generate an error for testing.
+            throw new Error('TestError');
+            
+        }).then(function() {
+            // This callback chain never executed
+            //  because occured the error.
+            Pot.debug('Help me!!');
+            
+        }).rescue(function(err) {
+            // Catch the error.
+            Pot.debug(err); // (Error: TestError)
+            
+        }).then(function() {
+            // And, continue the callback chain.
+            
+            // Iterate by "reduce" method on asynchronous.
+            return Pot.Deferred.reduce(res, function(a, b) {
+                return a + b;
+            }).then(function(result) {
+                return result;
+            });
+        }).begin(); // Begin the callback chain.
+        
+    }).wait(2).then(function(res) {
+        
+        Pot.debug(res); // 'foo!bar!baz!'
+        
+        // Iterate by "filter" method on synchronous.
+        return Pot.filter(res.split('!'), function(val) {
+            return val && val.length;
+        });
+    });
+    
+}).then(function(result) {
+    Pot.debug(result); // ['foo', 'bar', 'baz']
+    Pot.debug('END example');
+    
+}).end(); // Chain can be closed by the "end" method on any.
+```
 
 Refer document if you want to need more example and usage.  
   
 **[Pot.js + PotLite.js - Document and Reference][Reference]**  
-
-
 
 
 [Pot.js-Logo]: http://api.polygonpla.net/img/logo/pot.js.mini.png?2 "Pot.js Logo"
