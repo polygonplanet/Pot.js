@@ -1,0 +1,29 @@
+{
+  "name": "pot.js",
+  "version": "1.2.1",
+  "description": "Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.",
+  "main": "pot.js",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "scripts": {
+    "test": "mocha tests/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:polygonplanet/Pot.js.git"
+  },
+  "keywords": [
+    "pot", "util"
+  ],
+  "author": "polygon planet",
+  "license": "MIT and GPL v2",
+  "bugs": {
+    "url": "https://github.com/polygonplanet/Pot.js/issues"
+  },
+  "homepage": "https://github.com/polygonplanet/Pot.js"
+}
