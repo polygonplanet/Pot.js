@@ -4221,8 +4221,8 @@ var tests = [{
     pot.callLater(0, hoge.sayHoge);
     pot.callLater(0, pot.bind(hoge.sayHoge, hoge));
     Hoge.prototype.sayHoges = function(msg) {
-      var value = this.msg + msg;
-      results.push(value || null);
+      var value = this.msg ? this.msg + msg : null;
+      results.push(value);
     };
     pot.callLater(0, hoge.sayHoges);
     pot.callLater(0, pot.bind(hoge.sayHoges, hoge, 'Hi!'));
