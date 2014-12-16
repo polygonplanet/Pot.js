@@ -4,8 +4,8 @@
  * PotLite.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.38, 2012-09-21
- * Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
+ * Version 1.3.9, 2014-12-16
+ * Copyright (c) 2012-2014 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
  * https://github.com/polygonplanet/Pot.js
  * http://polygonplanet.github.com/Pot.js/
@@ -68,11 +68,11 @@
  *
  * @fileoverview   PotLite.js library
  * @author         polygon planet
- * @version        1.38
- * @date           2012-09-21
+ * @version        1.3.9
+ * @date           2014-12-16
  * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
- * @copyright      Copyright (c) 2012 polygon planet <polygon.planet.aqua@gmail.com>
+ * @copyright      Copyright (c) 2012-2014 polygon planet <polygon.planet.aqua@gmail.com>
  * @license        Dual licensed under the MIT or GPL v2 licenses.
  *
  * Based:
