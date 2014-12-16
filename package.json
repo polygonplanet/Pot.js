@@ -1,6 +1,6 @@
 {
   "name": "pot.js",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.",
   "main": "pot.js",
   "directories": {
@@ -21,7 +21,7 @@
     "pot", "util"
   ],
   "author": "polygon planet",
-  "license": "MIT and GPL v2",
+  "license": "MIT or GPL v2",
   "bugs": {
     "url": "https://github.com/polygonplanet/Pot.js/issues"
   },
