@@ -4,7 +4,7 @@
  * Pot.js is an implemental utility library
  *  that can execute JavaScript without burdening the CPU.
  *
- * Version 1.2.2, 2014-12-16
+ * Version 1.2.3, 2014-12-16
  * Copyright (c) 2012-2014 polygon planet <polygon.planet.aqua@gmail.com>
  * Dual licensed under the MIT or GPL v2 licenses.
  * https://github.com/polygonplanet/Pot.js
@@ -68,7 +68,7 @@
  *
  * @fileoverview   Pot.js library
  * @author         polygon planet
- * @version        1.2.2
+ * @version        1.2.3
  * @date           2014-12-16
  * @link           https://github.com/polygonplanet/Pot.js
  * @link           http://polygonplanet.github.com/Pot.js/
