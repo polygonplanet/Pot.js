@@ -1,6 +1,6 @@
 {
   "name": "pot.js",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Pot.js is an implemental utility library that can execute JavaScript without burdening the CPU.",
   "main": "pot.js",
   "directories": {
