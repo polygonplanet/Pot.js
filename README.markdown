@@ -1,4 +1,6 @@
 # This repository is no longer maintained.
+## To reduce JavaScript CPU usage by asynchronous iteration, use [chillout.js](https://github.com/polygonplanet/chillout) instead.
+
 
 ----
 
@@ -245,7 +247,7 @@ Refer document if you want to need more example and usage.
 **[Pot.js + PotLite.js - Document and Reference][Reference]**  
 
 
-[Pot.js-Logo]: http://api.polygonpla.net/img/logo/pot.js.mini.png?2 "Pot.js Logo"
+[Pot.js-Logo]: http://polygonplanet.github.io/Pot.js/img/logo/pot.js.mini.png?2 "Pot.js Logo"
 
 [Reference]: http://polygonplanet.github.com/Pot.js/ "Pot.js + PotLite.js - Document and Reference"
 
